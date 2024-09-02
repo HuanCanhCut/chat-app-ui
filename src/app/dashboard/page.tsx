@@ -3,14 +3,25 @@
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 
-export default function Home({ children }: { children: React.ReactNode }) {
+const Dashboard: React.FC = () => {
     const currentUser = false
     const router = useRouter()
+
     useEffect(() => {
         if (!currentUser) {
             return router.push('/login')
         }
-        return router.push('/dashboard')
     }, [currentUser, router])
-    return <>{children}</>
+
+    if (!currentUser) {
+        return <></>
+    }
+
+    return (
+        <main>
+            <h1>dashboard</h1>
+        </main>
+    )
 }
+
+export default Dashboard
