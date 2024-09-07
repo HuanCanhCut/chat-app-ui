@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
+import { ToastContainer } from 'react-toastify'
 
 export default function Home({ children }: { children: React.ReactNode }) {
     const currentUser = false
@@ -12,5 +13,10 @@ export default function Home({ children }: { children: React.ReactNode }) {
         }
         return router.push('/dashboard')
     }, [currentUser, router])
-    return <>{children}</>
+    return (
+        <>
+            {children}
+            <ToastContainer />
+        </>
+    )
 }
