@@ -40,3 +40,13 @@ export const getCurrentUser = async (): Promise<AxiosResponse<Response>> => {
         return error
     }
 }
+
+export const loginWithGoogle = async (token: string): Promise<AxiosResponse<Response>> => {
+    try {
+        return await request.post('/auth/loginwithtoken', {
+            token,
+        })
+    } catch (error: any) {
+        return error
+    }
+}

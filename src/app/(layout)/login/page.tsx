@@ -7,18 +7,24 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons'
 import { useDispatch, useSelector } from 'react-redux'
 import { useRouter } from 'next/navigation'
+import { signInWithPopup } from 'firebase/auth'
+import { AxiosResponse } from 'axios'
 
+import config from '~/config'
 import * as authServices from '~/services/authService'
 import { setCurrentUser } from '~/redux/reducers/auth'
 import { UserModel } from '~/type/type'
 import { showToast } from '~/project/services'
-import { AxiosResponse } from 'axios'
 import { getCurrentUser } from '~/redux/selectors'
 
 interface FieldValue {
     email: string
     password: string
     rePassword?: string
+}
+
+interface Response {
+    data: UserModel
 }
 
 const Login: React.FC = () => {
@@ -43,7 +49,7 @@ const Login: React.FC = () => {
 
     const [errorMessage, setErrorMessage] = useState<string>('')
 
-    const setUserToRedux = ({ user }: { user: UserModel }) => {
+    const setUserToRedux = (user: UserModel) => {
         dispatch(setCurrentUser(user))
 
         showToast({
@@ -55,10 +61,6 @@ const Login: React.FC = () => {
 
     const onSubmit: SubmitHandler<FieldValue> = (data) => {
         const handleLogin = async () => {
-            interface Response {
-                data: UserModel
-            }
-
             try {
                 const response: AxiosResponse<Response> = await authServices.login({
                     email: data.email,
@@ -67,7 +69,7 @@ const Login: React.FC = () => {
 
                 switch (response.status) {
                     case 200:
-                        setUserToRedux({ user: response.data.data })
+                        setUserToRedux(response.data.data)
                         break
                     case 401:
                         return setErrorMessage('Email hoặc mật khẩu không đúng')
@@ -106,6 +108,22 @@ const Login: React.FC = () => {
         }
     }
 
+    const handleLoginWithGoogle = async () => {
+        try {
+            const { user }: any = await signInWithPopup(config.auth, config.googleProvider)
+
+            if (user) {
+                const response: AxiosResponse<Response> = await authServices.loginWithGoogle(user.accessToken)
+
+                if (response.status === 200) {
+                    setUserToRedux(response.data.data)
+                }
+            }
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
     return (
         <main className="grid w-full grid-cols-12">
             <div className="col-span-12 p-8 sm:col-span-6">
@@ -128,11 +146,11 @@ const Login: React.FC = () => {
                     </h1>
 
                     <ul className="flex items-center justify-center gap-4">
-                        <li className="cursor-pointer rounded-full border border-amber-500 p-1">
+                        <li
+                            className="cursor-pointer rounded-full border border-amber-500 p-1"
+                            onClick={handleLoginWithGoogle}
+                        >
                             <Image src="/static/media/google-icon.png" alt="" width={28} height={28} quality={100} />
-                        </li>
-                        <li className="cursor-pointer rounded-full border border-amber-500 p-1">
-                            <Image src="/static/media/facebook-icon.png" alt="" width={28} height={28} quality={100} />
                         </li>
                     </ul>
 
