@@ -3,7 +3,7 @@ interface Timestamp {
     updatedAt: Date
 }
 
-export interface User extends Timestamp {
+export interface UserModel extends Timestamp {
     id: number
     first_name: string
     last_name: string

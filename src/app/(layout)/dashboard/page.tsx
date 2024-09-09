@@ -2,9 +2,11 @@
 
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
+import { useSelector } from 'react-redux'
+import { getCurrentUser } from '~/redux/selectors'
 
 const Dashboard: React.FC = () => {
-    const currentUser = false
+    const currentUser = useSelector(getCurrentUser)
     const router = useRouter()
 
     useEffect(() => {

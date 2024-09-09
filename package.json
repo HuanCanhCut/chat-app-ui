@@ -14,11 +14,13 @@
         "@fortawesome/free-regular-svg-icons": "^6.5.1",
         "@fortawesome/free-solid-svg-icons": "^6.5.1",
         "@fortawesome/react-fontawesome": "^0.2.0",
+        "@reduxjs/toolkit": "^2.2.7",
         "axios": "^1.7.7",
         "next": "14.2.7",
         "react": "^18",
         "react-dom": "^18",
         "react-hook-form": "^7.53.0",
+        "react-redux": "^9.1.2",
         "react-toastify": "^10.0.5",
         "redux": "^5.0.1",
         "redux-persist": "^6.0.0"

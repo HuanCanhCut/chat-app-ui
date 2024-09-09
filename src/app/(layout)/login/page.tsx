@@ -1,11 +1,19 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Image from 'next/image'
 import { useForm, SubmitHandler } from 'react-hook-form'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons'
+import { useDispatch, useSelector } from 'react-redux'
+import { useRouter } from 'next/navigation'
+
 import * as authServices from '~/services/authService'
+import { setCurrentUser } from '~/redux/reducers/auth'
+import { UserModel } from '~/type/type'
+import { showToast } from '~/project/services'
+import { AxiosResponse } from 'axios'
+import { getCurrentUser } from '~/redux/selectors'
 
 interface FieldValue {
     email: string
@@ -14,7 +22,18 @@ interface FieldValue {
 }
 
 const Login: React.FC = () => {
+    const dispatch = useDispatch()
+    const router = useRouter()
+    const currentUser = useSelector(getCurrentUser)
+
+    useEffect(() => {
+        if (currentUser) {
+            return router.push('/dashboard')
+        }
+    }, [currentUser, router])
+
     const [type, setType] = useState<'login' | 'register' | 'forgotPassword'>('login')
+    const [showPassword, setShowPassword] = useState<boolean>(false)
 
     const {
         register,
@@ -22,13 +41,39 @@ const Login: React.FC = () => {
         formState: { errors },
     } = useForm<FieldValue>()
 
-    const [error, setError] = useState<string>('')
+    const [errorMessage, setErrorMessage] = useState<string>('')
+
+    const setUserToRedux = ({ user }: { user: UserModel }) => {
+        dispatch(setCurrentUser(user))
+
+        showToast({
+            message: 'Đăng nhập thành công.',
+        })
+
+        router.push('/dashboard')
+    }
 
     const onSubmit: SubmitHandler<FieldValue> = (data) => {
         const handleLogin = async () => {
+            interface Response {
+                data: UserModel
+            }
+
             try {
-                const response = await authServices.login({ email: data.email, password: data.password })
-                console.log(response)
+                const response: AxiosResponse<Response> = await authServices.login({
+                    email: data.email,
+                    password: data.password,
+                })
+
+                switch (response.status) {
+                    case 200:
+                        setUserToRedux({ user: response.data.data })
+                        break
+                    case 401:
+                        return setErrorMessage('Email hoặc mật khẩu không đúng')
+                    default:
+                        console.log(response)
+                }
             } catch (error) {
                 console.log(error)
             }
@@ -37,11 +82,12 @@ const Login: React.FC = () => {
         const handleRegister = async () => {
             try {
                 if (data.rePassword !== data.password) {
-                    setError('Xác nhận mật khẩu không đúng, vui lòng thử laị.')
+                    setErrorMessage('Xác nhận mật khẩu không đúng, vui lòng thử laị.')
                     return
                 }
 
                 const response = await authServices.register({ email: data.email, password: data.password })
+
                 console.log(response)
             } catch (error) {
                 console.log(error)
@@ -77,7 +123,9 @@ const Login: React.FC = () => {
                     className="flex flex-col items-center justify-center gap-5 md:px-6"
                     onSubmit={handleSubmit(onSubmit)}
                 >
-                    <h1 className="mt-3 text-center font-bold">Đăng nhập vào HuanPG</h1>
+                    <h1 className="mt-3 flex flex-col text-center font-bold">
+                        Đăng nhập vào <span className="text-cyan-800">Huấn Cánh Cụt</span>
+                    </h1>
 
                     <ul className="flex items-center justify-center gap-4">
                         <li className="cursor-pointer rounded-full border border-amber-500 p-1">
@@ -102,14 +150,14 @@ const Login: React.FC = () => {
                                     message: 'Email không đúng định dạng',
                                 },
                                 onChange: () => {
-                                    setError('')
+                                    setErrorMessage('')
                                 },
                             })}
                         />
                         {errors.email && <span className="text-sm text-primary">{errors.email.message}</span>}
                         <div className="relative">
                             <input
-                                type="password"
+                                type={showPassword ? 'text' : 'password'}
                                 className="w-full rounded-lg border border-gray-500 bg-gray-100 p-2 outline-none"
                                 placeholder="Nhập mật khẩu"
                                 {...register('password', {
@@ -119,33 +167,45 @@ const Login: React.FC = () => {
                                         message: 'Mật khẩu phải có ít nhất 6 kí tự',
                                     },
                                     onChange: () => {
-                                        setError('')
+                                        setErrorMessage('')
                                     },
                                 })}
                             />
                             <button
                                 type="button"
-                                className="absolute right-3 top-1/2 translate-y-[-50%] text-sm leading-none"
+                                className="absolute right-3 top-1/2 translate-y-[-50%] leading-none text-gray-700"
+                                onClick={() => {
+                                    setShowPassword(!showPassword)
+                                }}
                             >
-                                <FontAwesomeIcon icon={faEye} />
+                                <FontAwesomeIcon className="text-xs" icon={showPassword ? faEye : faEyeSlash} />
                             </button>
                         </div>
                         {errors.password && <span className="text-sm text-primary">{errors.password.message}</span>}
 
                         {(type === 'register' || type === 'forgotPassword') && (
                             <>
-                                <div>
+                                <div className="relative">
                                     <input
-                                        type="password"
+                                        type={showPassword ? 'text' : 'password'}
                                         className="w-full rounded-lg border border-gray-500 bg-gray-100 p-2 outline-none"
                                         placeholder="Nhập lại mật khẩu"
                                         {...register('rePassword', {
                                             required: 'Nhập lại mật khẩu không được bỏ trống',
                                             onChange: () => {
-                                                setError('')
+                                                setErrorMessage('')
                                             },
                                         })}
                                     />
+                                    <button
+                                        type="button"
+                                        className="absolute right-3 top-1/2 translate-y-[-50%] leading-none text-gray-700"
+                                        onClick={() => {
+                                            setShowPassword(!showPassword)
+                                        }}
+                                    >
+                                        <FontAwesomeIcon className="text-xs" icon={showPassword ? faEye : faEyeSlash} />
+                                    </button>
                                 </div>
                                 {errors.rePassword && (
                                     <span className="text-sm text-primary">{errors.rePassword.message}</span>
@@ -153,7 +213,7 @@ const Login: React.FC = () => {
                             </>
                         )}
 
-                        {error && <span className="text-sm text-primary">{error}</span>}
+                        {errorMessage && <span className="text-sm text-primary">{errorMessage}</span>}
                     </div>
 
                     <button className="w-full rounded-lg bg-primary p-2 text-white" type="submit">
