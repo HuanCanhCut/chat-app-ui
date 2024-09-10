@@ -9,6 +9,11 @@ interface RegisterProps {
 
 interface Response {
     data: UserModel
+    meta?: {
+        pagination: {
+            exp: number
+        }
+    }
 }
 
 export const register = async ({ email, password }: RegisterProps): Promise<AxiosResponse<Response>> => {

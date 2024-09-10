@@ -7,7 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons'
 import { useDispatch, useSelector } from 'react-redux'
 import { useRouter } from 'next/navigation'
-import { signInWithPopup } from 'firebase/auth'
+import { signInWithPopup, signInWithRedirect } from 'firebase/auth'
 import { AxiosResponse } from 'axios'
 
 import config from '~/config'
@@ -25,6 +25,11 @@ interface FieldValue {
 
 interface Response {
     data: UserModel
+    meta?: {
+        pagination: {
+            exp: number
+        }
+    }
 }
 
 const Login: React.FC = () => {
@@ -70,6 +75,9 @@ const Login: React.FC = () => {
                 switch (response.status) {
                     case 200:
                         setUserToRedux(response.data.data)
+
+                        localStorage.setItem('exp', JSON.stringify(response.data.meta?.pagination?.exp))
+
                         break
                     case 401:
                         return setErrorMessage('Email hoặc mật khẩu không đúng')
@@ -117,6 +125,9 @@ const Login: React.FC = () => {
 
                 if (response.status === 200) {
                     setUserToRedux(response.data.data)
+                    if (response.data.meta) {
+                        localStorage.setItem('exp', JSON.stringify(response.data.meta.pagination.exp))
+                    }
                 }
             }
         } catch (error) {
