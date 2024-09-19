@@ -55,3 +55,33 @@ export const loginWithGoogle = async (token: string): Promise<AxiosResponse<Resp
         return error
     }
 }
+
+export const sendVerifyCode = async (email: string): Promise<AxiosResponse<Response>> => {
+    try {
+        return await request.post('/auth/verify', {
+            email,
+        })
+    } catch (error: any) {
+        return error
+    }
+}
+
+export const resetPassword = async ({
+    email,
+    password,
+    code,
+}: {
+    email: string
+    password: string
+    code: string
+}): Promise<AxiosResponse<Response>> => {
+    try {
+        return await request.post('/auth/reset-password', {
+            email,
+            password,
+            code,
+        })
+    } catch (error: any) {
+        return error
+    }
+}

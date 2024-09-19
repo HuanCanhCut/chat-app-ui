@@ -8,6 +8,7 @@ import { store, persistor } from '~/redux/store'
 
 const inter = Inter({ subsets: ['latin'] })
 import './globals.css'
+import { ToastContainer } from 'react-toastify'
 
 export default function RootLayout({
     children,
@@ -22,6 +23,7 @@ export default function RootLayout({
                         {children}
                     </PersistGate>
                 </Provider>
+                <ToastContainer />
             </body>
         </html>
     )

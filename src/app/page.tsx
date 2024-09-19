@@ -2,12 +2,12 @@
 
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 
 import { getCurrentUser } from '~/redux/selectors'
 import { UserModel } from '~/type/type'
 
-export default function Home({ children }: { children: React.ReactNode }) {
+export default function Home() {
     const currentUser: UserModel | null = useSelector(getCurrentUser)
     const router = useRouter()
 
@@ -18,5 +18,5 @@ export default function Home({ children }: { children: React.ReactNode }) {
         return router.push('/dashboard')
     }, [currentUser, router])
 
-    return <>{children}</>
+    return <></>
 }

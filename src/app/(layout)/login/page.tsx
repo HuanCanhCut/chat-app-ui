@@ -1,13 +1,13 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
-import { useForm, SubmitHandler } from 'react-hook-form'
+import { useForm, SubmitHandler, Controller } from 'react-hook-form'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons'
 import { useDispatch, useSelector } from 'react-redux'
 import { useRouter } from 'next/navigation'
-import { signInWithPopup, signInWithRedirect } from 'firebase/auth'
+import { signInWithPopup } from 'firebase/auth'
 import { AxiosResponse } from 'axios'
 
 import config from '~/config'
@@ -16,11 +16,13 @@ import { setCurrentUser } from '~/redux/reducers/auth'
 import { UserModel } from '~/type/type'
 import { showToast } from '~/project/services'
 import { getCurrentUser } from '~/redux/selectors'
+import SendVerifyCode from './components/SendVerifyCode'
 
-interface FieldValue {
+export interface FieldValue {
     email: string
     password: string
-    rePassword?: string
+    rePassword: string
+    verifyCode: string
 }
 
 interface Response {
@@ -37,11 +39,7 @@ const Login: React.FC = () => {
     const router = useRouter()
     const currentUser = useSelector(getCurrentUser)
 
-    useEffect(() => {
-        if (currentUser) {
-            return router.push('/dashboard')
-        }
-    }, [currentUser, router])
+    const emailRef = useRef<HTMLInputElement | null>(null)
 
     const [type, setType] = useState<'login' | 'register' | 'forgotPassword'>('login')
     const [showPassword, setShowPassword] = useState<boolean>(false)
@@ -49,10 +47,18 @@ const Login: React.FC = () => {
     const {
         register,
         handleSubmit,
+        control,
         formState: { errors },
+        setValue,
     } = useForm<FieldValue>()
 
     const [errorMessage, setErrorMessage] = useState<string>('')
+
+    useEffect(() => {
+        if (currentUser) {
+            return router.push('/dashboard')
+        }
+    }, [currentUser, router])
 
     const setUserToRedux = (user: UserModel) => {
         dispatch(setCurrentUser(user))
@@ -75,9 +81,7 @@ const Login: React.FC = () => {
                 switch (response.status) {
                     case 200:
                         setUserToRedux(response.data.data)
-
                         localStorage.setItem('exp', JSON.stringify(response.data.meta?.pagination?.exp))
-
                         break
                     case 401:
                         return setErrorMessage('Email hoặc mật khẩu không đúng')
@@ -96,9 +100,51 @@ const Login: React.FC = () => {
                     return
                 }
 
-                const response = await authServices.register({ email: data.email, password: data.password })
+                const response: AxiosResponse<Response> = await authServices.register({
+                    email: data.email,
+                    password: data.password,
+                })
 
-                console.log(response)
+                if (response?.status === 201) {
+                    setUserToRedux(response.data.data)
+                    showToast({ message: 'Đăng kí tài khoản thành công' })
+                    return
+                }
+
+                if (response?.status === 409) {
+                    return setErrorMessage('Tài khoản đã tồn tại.')
+                }
+
+                setErrorMessage('Đăng kí thất bại, vui lòng thử lại hoặc liên hệ admin để xử lí.')
+            } catch (error) {
+                console.log(error)
+            }
+        }
+
+        const handleForgotPassword = async () => {
+            try {
+                const response: AxiosResponse<Response> = await authServices.resetPassword({
+                    email: data.email,
+                    password: data.password,
+                    code: data.verifyCode,
+                })
+
+                if (response.status === 204) {
+                    showToast({ message: 'Đổi mật khẩu thành công' })
+                    setType('login')
+                    setValue('email', '')
+                    setValue('password', '')
+                    setValue('verifyCode', '')
+                    setValue('rePassword', '')
+                    return
+                }
+
+                if (response.status === 401) {
+                    setErrorMessage('Mã xác minh không đúng hoặc đã hết hạn')
+                    return
+                }
+
+                setErrorMessage('Đổi mật khẩu thất bại, vui lòng thử lại hoặc liên hệ admin để xử lí.')
             } catch (error) {
                 console.log(error)
             }
@@ -110,6 +156,9 @@ const Login: React.FC = () => {
                 break
             case 'register':
                 handleRegister()
+                break
+            case 'forgotPassword':
+                handleForgotPassword()
                 break
             default:
                 break
@@ -168,7 +217,7 @@ const Login: React.FC = () => {
                     <span className="text-small text-gray-500">Hoặc đăng nhập bằng email</span>
 
                     <div className="flex w-full flex-col gap-2">
-                        <input
+                        {/* <input
                             type="text"
                             className="w-full rounded-lg border border-gray-500 bg-gray-100 p-2 outline-none"
                             placeholder="Nhập email của bạn"
@@ -182,8 +231,57 @@ const Login: React.FC = () => {
                                     setErrorMessage('')
                                 },
                             })}
+                            ref={emailRef}
+                        /> */}
+
+                        <Controller
+                            name="email"
+                            control={control}
+                            defaultValue=""
+                            rules={{
+                                required: 'Email không được bỏ trống',
+                                pattern: {
+                                    value: /^\w+([\\.-]?\w+)*@\w+([\\.-]?\w+)*(\.\w{2,3})+$/,
+                                    message: 'Email không đúng định dạng',
+                                },
+                                onChange: () => {
+                                    setErrorMessage('')
+                                },
+                            }}
+                            render={({ field }) => (
+                                <input
+                                    className="w-full rounded-lg border border-gray-500 bg-gray-100 p-2 outline-none"
+                                    placeholder="Nhập email của bạn"
+                                    type="text"
+                                    {...field}
+                                    ref={(e) => {
+                                        field.ref(e)
+                                        emailRef.current = e
+                                    }}
+                                />
+                            )}
                         />
+
                         {errors.email && <span className="text-sm text-primary">{errors.email.message}</span>}
+                        {type === 'forgotPassword' && (
+                            <div className="relative">
+                                <input
+                                    type="text"
+                                    className="w-full rounded-lg border border-gray-500 bg-gray-100 p-2 outline-none"
+                                    placeholder="Mã xác minh"
+                                    {...register('verifyCode', {
+                                        required: 'Mã xác minh không được bỏ trống',
+
+                                        onChange: () => {
+                                            setErrorMessage('')
+                                        },
+                                    })}
+                                />
+                                <SendVerifyCode emailRef={emailRef} />
+                            </div>
+                        )}
+                        {errors.verifyCode && <span className="text-sm text-primary">{errors.verifyCode.message}</span>}
+
                         <div className="relative">
                             <input
                                 type={showPassword ? 'text' : 'password'}
@@ -211,6 +309,17 @@ const Login: React.FC = () => {
                             </button>
                         </div>
                         {errors.password && <span className="text-sm text-primary">{errors.password.message}</span>}
+
+                        {type === 'login' && (
+                            <span
+                                className="mt-1 cursor-pointer text-sm text-gray-500"
+                                onClick={() => {
+                                    setType('forgotPassword')
+                                }}
+                            >
+                                Quên mật khẩu?
+                            </span>
+                        )}
 
                         {(type === 'register' || type === 'forgotPassword') && (
                             <>
@@ -246,7 +355,7 @@ const Login: React.FC = () => {
                     </div>
 
                     <button className="w-full rounded-lg bg-primary p-2 text-white" type="submit">
-                        Đăng nhập
+                        {type === 'login' ? 'Đăng nhập' : type === 'register' ? 'Đăng kí' : 'Thay đổi mật khẩu'}
                     </button>
 
                     <span className="text-center text-sm text-gray-500">
@@ -274,6 +383,7 @@ const Login: React.FC = () => {
                     style={{ objectFit: 'cover' }}
                     quality={100}
                     sizes="(100%, 100vh)"
+                    priority
                 />
             </div>
         </main>
