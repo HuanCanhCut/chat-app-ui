@@ -48,6 +48,12 @@ const SendVerifyCode: React.FC<Props> = ({ emailRef }) => {
                     message: 'Mã xác nhận đã được gửi đến email của bạn, nếu không thấy hãy kiểm tra thư rác hoặc spam',
                     type: 'success',
                 })
+                return
+            }
+
+            if (response.status === 404) {
+                showToast({ message: 'Email không tồn tại trong hệ thống', type: 'error' })
+                return
             }
 
             setSendSuccess(true)
