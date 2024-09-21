@@ -1,11 +1,11 @@
 'use client'
 
-import { useEffect, useRef, useState, memo } from 'react'
+import { useEffect, useRef, useState, memo, MutableRefObject } from 'react'
 import { showToast } from '~/project/services'
 import * as authService from '~/services/authService'
 
 interface Props {
-    emailRef: React.RefObject<HTMLInputElement>
+    emailRef: MutableRefObject<HTMLInputElement | null>
 }
 
 const SendVerifyCode: React.FC<Props> = ({ emailRef }) => {
@@ -65,7 +65,7 @@ const SendVerifyCode: React.FC<Props> = ({ emailRef }) => {
     return (
         <button
             type="button"
-            className="absolute right-0 h-full min-w-16 rounded-br-lg rounded-tr-lg bg-primary px-2 text-sm font-medium text-white"
+            className="absolute right-0 top-0 h-full min-w-16 rounded-br-lg rounded-tr-lg bg-primary px-2 text-sm font-medium text-white"
             onClick={handleSendCode}
         >
             {sendSuccess ? (
