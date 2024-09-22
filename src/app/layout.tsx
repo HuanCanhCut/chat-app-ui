@@ -1,16 +1,13 @@
-'use client'
-
 import { Inter } from 'next/font/google'
-
-import { Provider } from 'react-redux'
-import { PersistGate } from 'redux-persist/integration/react'
-import { store, persistor } from '~/redux/store'
-
-const inter = Inter({ subsets: ['latin'] })
-import './globals.css'
 import { ToastContainer } from 'react-toastify'
 
-export default function RootLayout({
+import ReduxProvider from '~/redux/reduxProvider'
+import GetCurrentUser from './getCurrentUser'
+const inter = Inter({ subsets: ['latin'] })
+
+import './globals.css'
+
+function RootLayout({
     children,
 }: Readonly<{
     children: React.ReactNode
@@ -18,13 +15,13 @@ export default function RootLayout({
     return (
         <html lang="en">
             <body className={inter.className}>
-                <Provider store={store}>
-                    <PersistGate loading={null} persistor={persistor}>
-                        {children}
-                    </PersistGate>
-                </Provider>
-                <ToastContainer />
+                <ReduxProvider>
+                    <GetCurrentUser>{children}</GetCurrentUser>
+                    <ToastContainer />
+                </ReduxProvider>
             </body>
         </html>
     )
 }
+
+export default RootLayout

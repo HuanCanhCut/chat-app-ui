@@ -4,7 +4,7 @@ import Image from 'next/image'
 import { useForm, SubmitHandler } from 'react-hook-form'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { useRouter } from 'next/navigation'
 import { signInWithPopup } from 'firebase/auth'
 import { AxiosResponse } from 'axios'
@@ -14,8 +14,7 @@ import * as authServices from '~/services/authService'
 import { setCurrentUser } from '~/redux/reducers/auth'
 import { UserModel } from '~/type/type'
 import { showToast } from '~/project/services'
-import { getCurrentUser } from '~/redux/selectors'
-import SendVerifyCode from '../SendVerifyCode'
+import SendVerifyCode from './SendVerifyCode'
 import Input from '~/components/Input'
 
 export interface FieldValue {
@@ -38,31 +37,18 @@ interface ImperativeHandle {
     current: () => HTMLInputElement | null
 }
 
-const Form = () => {
+const AuthForm = () => {
     const dispatch = useDispatch()
     const router = useRouter()
-    const currentUser = useSelector(getCurrentUser)
 
     const emailRef = useRef<HTMLInputElement | null>(null)
 
     const [type, setType] = useState<'login' | 'register' | 'forgotPassword'>('login')
     const [showPassword, setShowPassword] = useState<boolean>(false)
 
-    const {
-        register,
-        handleSubmit,
-        control,
-        formState: { errors },
-        setValue,
-    } = useForm<FieldValue>()
+    const { handleSubmit, control, setValue } = useForm<FieldValue>()
 
     const [errorMessage, setErrorMessage] = useState<string>('')
-
-    useEffect(() => {
-        if (currentUser) {
-            return router.push('/dashboard')
-        }
-    }, [currentUser, router])
 
     const setUserToRedux = (user: UserModel) => {
         dispatch(setCurrentUser(user))
@@ -202,7 +188,7 @@ const Form = () => {
 
             <span className="text-small mx-auto text-gray-500">Hoặc đăng nhập bằng email</span>
 
-            <div className="flex w-full flex-col gap-2">
+            <div className="flex w-full flex-col gap-3">
                 <Input
                     name="email"
                     control={control}
@@ -338,4 +324,4 @@ const Form = () => {
     )
 }
 
-export default Form
+export default AuthForm

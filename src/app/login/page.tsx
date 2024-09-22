@@ -1,10 +1,11 @@
 import Image from 'next/image'
-import Form from './components/Form'
+import AuthForm from './components/AuthForm'
 
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-    title: 'Login | Huấn Cánh Cụt',
+    title: 'Login to Huấn Cánh Cụt',
+    description: 'Login to Huấn Cánh Cụt',
 }
 
 const Login: React.FC = () => {
@@ -23,8 +24,8 @@ const Login: React.FC = () => {
                 <h1 className="mt-3 flex flex-col text-center font-bold">
                     Đăng nhập vào <span className="text-cyan-800">Huấn Cánh Cụt</span>
                 </h1>
-                
-                <Form />
+
+                <AuthForm />
             </div>
             <div className="relative col-span-6 hidden h-screen sm:block">
                 <Image
