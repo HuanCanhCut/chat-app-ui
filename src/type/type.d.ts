@@ -10,4 +10,5 @@ export interface UserModel extends Timestamp {
     full_name: string
     email: string
     uuid: string
+    avatar: string
 }

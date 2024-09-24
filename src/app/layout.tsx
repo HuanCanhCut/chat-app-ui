@@ -1,7 +1,9 @@
+'use client'
+
 import { Inter } from 'next/font/google'
 import { ToastContainer } from 'react-toastify'
+import { SWRConfig } from 'swr'
 
-import ReduxProvider from '~/redux/reduxProvider'
 import GetCurrentUser from './getCurrentUser'
 const inter = Inter({ subsets: ['latin'] })
 
@@ -15,10 +17,15 @@ function RootLayout({
     return (
         <html lang="en">
             <body className={inter.className}>
-                <ReduxProvider>
+                <SWRConfig
+                    value={{
+                        revalidateOnFocus: false,
+                        shouldRetryOnError: false,
+                    }}
+                >
                     <GetCurrentUser>{children}</GetCurrentUser>
                     <ToastContainer />
-                </ReduxProvider>
+                </SWRConfig>
             </body>
         </html>
     )

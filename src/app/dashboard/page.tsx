@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 const Dashboard: React.FC = () => {
     return (
         <div>
-            <h1>dashboard</h1>
+            <h2>Chat container</h2>
         </div>
     )
 }

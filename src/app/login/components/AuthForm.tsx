@@ -1,17 +1,15 @@
 'use client'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useRef, useState } from 'react'
 import Image from 'next/image'
 import { useForm, SubmitHandler } from 'react-hook-form'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons'
-import { useDispatch } from 'react-redux'
 import { useRouter } from 'next/navigation'
 import { signInWithPopup } from 'firebase/auth'
 import { AxiosResponse } from 'axios'
 
 import config from '~/config'
 import * as authServices from '~/services/authService'
-import { setCurrentUser } from '~/redux/reducers/auth'
 import { UserModel } from '~/type/type'
 import { showToast } from '~/project/services'
 import SendVerifyCode from './SendVerifyCode'
@@ -38,7 +36,6 @@ interface ImperativeHandle {
 }
 
 const AuthForm = () => {
-    const dispatch = useDispatch()
     const router = useRouter()
 
     const emailRef = useRef<HTMLInputElement | null>(null)
@@ -51,8 +48,6 @@ const AuthForm = () => {
     const [errorMessage, setErrorMessage] = useState<string>('')
 
     const setUserToRedux = (user: UserModel) => {
-        dispatch(setCurrentUser(user))
-
         showToast({
             message: 'Đăng nhập thành công.',
         })
@@ -209,18 +204,6 @@ const AuthForm = () => {
 
                 {type === 'forgotPassword' && (
                     <div className="relative">
-                        {/* <input
-                            type="text"
-                            className="w-full rounded-lg border border-gray-500 bg-gray-100 p-2 outline-none"
-                            placeholder="Mã xác minh"
-                            {...register('verifyCode', {
-                                required: 'Mã xác minh không được bỏ trống',
-
-                                onChange: () => {
-                                    setErrorMessage('')
-                                },
-                            })}
-                        /> */}
                         <Input
                             name="verifyCode"
                             rules={{
@@ -264,17 +247,6 @@ const AuthForm = () => {
                     />
                 </div>
 
-                {type === 'login' && (
-                    <span
-                        className="mt-1 cursor-pointer text-sm text-gray-500"
-                        onClick={() => {
-                            setType('forgotPassword')
-                        }}
-                    >
-                        Quên mật khẩu?
-                    </span>
-                )}
-
                 {(type === 'register' || type === 'forgotPassword') && (
                     <>
                         <div className="relative">
@@ -300,6 +272,17 @@ const AuthForm = () => {
                 )}
 
                 {errorMessage && <span className="text-sm text-primary">{errorMessage}</span>}
+
+                {type === 'login' && (
+                    <span
+                        className="mt-1 cursor-pointer text-sm text-gray-500"
+                        onClick={() => {
+                            setType('forgotPassword')
+                        }}
+                    >
+                        Quên mật khẩu?
+                    </span>
+                )}
             </div>
 
             <button className="w-full rounded-lg bg-primary p-2 text-white" type="submit">

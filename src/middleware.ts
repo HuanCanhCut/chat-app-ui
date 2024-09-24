@@ -6,16 +6,26 @@ const authRoutes = ['/login']
 
 // This function can be marked `async` if using `await` inside
 export async function middleware(request: NextRequest) {
-    const token = request.cookies.get('token')
+    const token = request.cookies.get('token')?.value // Lấy giá trị của token
 
-    // Kiểm tra nếu đường dẫn là privateRoutes và không có token
-    if (privateRoutes.some((path) => request.nextUrl.pathname.startsWith(path)) && !token) {
-        return NextResponse.redirect(new URL('/login', request.url))
+    const { pathname } = request.nextUrl
+
+    if (pathname === '/') {
+        if (token) {
+            return NextResponse.redirect(new URL('/dashboard', request.url))
+        } else {
+            return NextResponse.redirect(new URL('/login', request.url))
+        }
     }
 
-    // Kiểm tra nếu đường dẫn là authRoutes và có token
-    if (authRoutes.some((path) => request.nextUrl.pathname.startsWith(path)) && token) {
+    // Kiểm tra nếu đang ở auth route mà đã có token
+    if (authRoutes.some((path) => pathname.startsWith(path)) && token) {
         return NextResponse.redirect(new URL('/dashboard', request.url))
+    }
+
+    // Kiểm tra nếu đang ở private route và không có token
+    if (privateRoutes.some((path) => pathname.startsWith(path)) && !authRoutes.includes(pathname) && !token) {
+        return NextResponse.redirect(new URL('/login', request.url))
     }
 
     return NextResponse.next()
@@ -23,5 +33,5 @@ export async function middleware(request: NextRequest) {
 
 // See "Matching Paths" below to learn more
 export const config = {
-    matcher: [...privateRoutes, ...authRoutes],
+    matcher: ['/dashboard', '/', '/login'],
 }
