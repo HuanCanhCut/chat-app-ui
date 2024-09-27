@@ -39,7 +39,7 @@ export const login = async ({ email, password }: RegisterProps): Promise<AxiosRe
     }
 }
 
-export const getCurrentUser = async () => {
+export const getCurrentUser = async (): Promise<AxiosResponse<Response>> => {
     try {
         return await request.get(config.apiEndpoint.auth.me)
     } catch (error: any) {

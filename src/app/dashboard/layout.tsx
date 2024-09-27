@@ -12,12 +12,14 @@ export default function DashboardLayout({ children, Sidebar, Info }: DashboardLa
     const [infoIsOpen, setInfoIsOpen] = useState(true)
 
     return (
-        <div className="grid h-screen w-full grid-cols-12">
-            <div className="col-span-12 sm:col-span-3">{Sidebar}</div>
-            <div className={`hidden sm:col-span-6 sm:block ${infoIsOpen ? 'col-span-6' : 'col-span-9'}`}>
-                {children}
+        <div className="flex h-screen w-full">
+            <div className="w-full flex-shrink-0 overflow-y-auto sm:w-72">{Sidebar}</div>
+            <div className="hidden flex-grow overflow-y-auto sm:block">
+                <div className="flex h-full">
+                    <div className={`flex-grow ${infoIsOpen ? 'w-2/3' : 'w-full'}`}>{children}</div>
+                    {infoIsOpen && <div className="w-1/3 flex-shrink-0 overflow-y-auto">{Info}</div>}
+                </div>
             </div>
-            <div className={`hidden sm:col-span-3 sm:block ${infoIsOpen ? 'block' : 'hidden'}`}>{Info}</div>
         </div>
     )
 }

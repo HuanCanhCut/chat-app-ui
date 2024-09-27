@@ -4,14 +4,14 @@ import Image from 'next/image'
 import { memo, useState } from 'react'
 
 interface Props {
-    src: string
+    src?: string
     alt?: string
     size?: number
 }
 
 const defaultAvatar = '/static/media/default-avatar.jpg'
 
-export default memo(function UserAvatar({ src = defaultAvatar, size = 32, alt = 'avatar' }: Props) {
+export default memo(function UserAvatar({ src = defaultAvatar, size = 36, alt = 'avatar' }: Props) {
     const [fallback, setFallback] = useState<string>()
 
     const handleError = () => {

@@ -22,3 +22,9 @@ body {
     font-family: 'Be Vietnam Pro', sans-serif !important;
     font-style: normal;
 }
+
+@layer utilities {
+    .flex-center {
+        @apply flex items-center justify-center;
+    }
+}

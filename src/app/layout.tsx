@@ -8,6 +8,8 @@ import GetCurrentUser from './getCurrentUser'
 const inter = Inter({ subsets: ['latin'] })
 
 import './globals.css'
+import 'react-loading-skeleton/dist/skeleton.css'
+import 'tippy.js/dist/tippy.css'
 
 function RootLayout({
     children,
