@@ -181,7 +181,7 @@ const AuthForm = () => {
                 </li>
             </ul>
 
-            <span className="text-small mx-auto text-gray-500">Hoặc đăng nhập bằng email</span>
+            <span className="text-small mx-auto text-gray-500 dark:text-gray-400">Hoặc đăng nhập bằng email</span>
 
             <div className="flex w-full flex-col gap-3">
                 <Input
@@ -275,7 +275,7 @@ const AuthForm = () => {
 
                 {type === 'login' && (
                     <span
-                        className="mt-1 cursor-pointer text-sm text-gray-500"
+                        className="mt-1 cursor-pointer text-sm text-gray-500 dark:text-gray-400"
                         onClick={() => {
                             setType('forgotPassword')
                         }}
@@ -289,7 +289,7 @@ const AuthForm = () => {
                 {type === 'login' ? 'Đăng nhập' : type === 'register' ? 'Đăng kí' : 'Thay đổi mật khẩu'}
             </button>
 
-            <span className="text-center text-sm text-gray-500">
+            <span className="text-center text-sm text-gray-500 dark:text-gray-400">
                 Bạn không có tài khoản?{' '}
                 <span
                     className="cursor-pointer font-semibold text-primary"
@@ -299,7 +299,7 @@ const AuthForm = () => {
                 </span>
             </span>
 
-            <footer className="text-center text-sm text-gray-500">
+            <footer className="text-center text-sm text-gray-500 dark:text-gray-400">
                 Việc bạn tiếp tục sử dụng trang web này có nghĩa bạn đồng ý với{' '}
                 <span className="text-primary">điều khoản</span> sử dụng của chúng tôi
             </footer>

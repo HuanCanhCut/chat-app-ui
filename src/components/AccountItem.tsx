@@ -12,8 +12,8 @@ export default memo(function AccountItem({ className = '', user }: AccountItemPr
         <div className={`flex items-center ${className}`}>
             <UserAvatar size={56} src={user.avatar} />
             <div className="ml-3">
-                <h3 className="text-lg font-medium">{user.full_name}</h3>
-                <p className="text-sm text-gray-500">{user.email}</p>
+                <h4 className="text-base font-medium">{user.full_name}</h4>
+                <p className="text-xs text-gray-500">{user.email}</p>
             </div>
         </div>
     )

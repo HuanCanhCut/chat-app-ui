@@ -1,6 +1,6 @@
 'use client'
 
-import { memo } from 'react'
+import React, { memo } from 'react'
 import useSWR from 'swr'
 import Skeleton from 'react-loading-skeleton'
 import { AxiosResponse } from 'axios'
@@ -16,6 +16,8 @@ import CustomTippy from '~/components/CustomTippy'
 import PopperWrapper from '~/components/PopperWrapper'
 import AccountItem from '~/components/AccountItem'
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core'
+import MenuItem from './MenuItem'
+import Button from '~/components/Button'
 
 interface Response {
     data: UserModel
@@ -26,14 +28,14 @@ interface Response {
     }
 }
 
-interface MenuItem {
+interface MenuItemType {
     icon: IconDefinition
     label: string
     line?: boolean
     switchButton?: boolean
 }
 
-const MENU_ITEMS: MenuItem[] = [
+const MENU_ITEMS: MenuItemType[] = [
     {
         icon: faMoon,
         label: 'Chế độ tối',
@@ -70,35 +72,28 @@ const Header = () => {
 
     const renderTooltip = () => {
         return (
-            <PopperWrapper className="min-w-[320px] px-5">
+            <PopperWrapper className="min-w-[320px] px-5 text-sm">
                 <header className="p-2">
                     <h4 className="text-center font-semibold">Tùy chọn</h4>
                 </header>
                 <section>
-                    <div className="border-b border-t border-gray-300 py-2">
+                    <div className="border-b border-t border-gray-300 py-2 dark:border-gray-700">
                         <label className="font-semibold">Tài khoản</label>
                         <div className="flex items-center justify-between">
                             {currentUser && <AccountItem user={currentUser.data.data} className="mt-2" />}
-                            <button className="flex-center h-9 w-9 rounded-full bg-gray-100">
+                            <Button buttonType="icon">
                                 <FontAwesomeIcon icon={faPen} className="text-sm" />
-                            </button>
+                            </Button>
+                            {/* <button className="flex-center h-9 w-9 rounded-full bg-gray-100">
+                                <FontAwesomeIcon icon={faPen} className="text-sm" />
+                            </button> */}
                         </div>
                     </div>
                     <div className="mt-4">
-                        {MENU_ITEMS.map((item, index) => (
-                            <>
-                                <button
-                                    key={index}
-                                    className={`flex w-full items-center gap-2 py-2 ${
-                                        item.line ? 'border-t border-gray-300' : ''
-                                    }`}
-                                >
-                                    <div className="flex h-9 w-9 items-center justify-center gap-2 rounded-full bg-gray-100">
-                                        <FontAwesomeIcon icon={item.icon} className="text-xl" />
-                                    </div>
-                                    <span className="font-medium">{item.label}</span>
-                                </button>
-                            </>
+                        {MENU_ITEMS.map((item: MenuItemType, index: number) => (
+                            <React.Fragment key={index}>
+                                <MenuItem item={item} />
+                            </React.Fragment>
                         ))}
                     </div>
                 </section>
@@ -112,14 +107,14 @@ const Header = () => {
                 {!isLoading ? (
                     <>
                         <UserAvatar src={currentUser?.data?.data?.avatar} />
-                        <h3 className="text-xl font-semibold">Huấn cánh cụt</h3>
+                        <h3 className="text- text-xl font-semibold dark:text-dark">Huấn cánh cụt</h3>
                         <CustomTippy
                             render={renderTooltip}
                             renderItem={renderTooltip}
                             placement="bottom-start"
                             offsetY={10}
                         >
-                            <button className="flex h-9 w-9 items-center justify-center rounded-full bg-gray-100">
+                            <button className="flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-darkGray dark:text-dark dark:hover:opacity-90">
                                 <FontAwesomeIcon icon={faEllipsis} className="text-xl" />
                             </button>
                         </CustomTippy>
@@ -129,7 +124,7 @@ const Header = () => {
                 )}
             </div>
             {!isLoading ? (
-                <Search placeholder="Tìm kiếm" />
+                <Search placeholder="Tìm kiếm trên Huấn Cánh Cụt" />
             ) : (
                 <Skeleton height={20} className="rounded-4xl mt-3 w-full p-4" />
             )}
