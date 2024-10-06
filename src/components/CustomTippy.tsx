@@ -76,7 +76,6 @@ export default memo(function CustomTippy({
         <Tippy
             trigger={trigger}
             animation={true}
-            appendTo={document.body}
             interactive
             delay={[timeDelayOpen, timeDelayClose]}
             offset={[offsetX, offsetY]}

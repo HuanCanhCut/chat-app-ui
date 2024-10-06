@@ -31,7 +31,9 @@ function RootLayout({
             <body className={inter.className}>
                 <SWRConfig
                     value={{
+                        revalidateIfStale: false,
                         revalidateOnFocus: false,
+                        revalidateOnReconnect: false,
                         shouldRetryOnError: false,
                     }}
                 >

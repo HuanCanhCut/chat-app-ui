@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+import { routes } from './config/routes'
 
-const privateRoutes = ['/dashboard']
-const authRoutes = ['/login']
+const privateRoutes = [routes.dashboard, routes.user]
+const authRoutes = [routes.login]
 
 // This function can be marked `async` if using `await` inside
 export async function middleware(request: NextRequest) {
@@ -10,22 +11,22 @@ export async function middleware(request: NextRequest) {
 
     const { pathname } = request.nextUrl
 
-    if (pathname === '/') {
+    if (pathname === routes.home) {
         if (token) {
-            return NextResponse.redirect(new URL('/dashboard', request.url))
+            return NextResponse.redirect(new URL(routes.dashboard, request.url))
         } else {
-            return NextResponse.redirect(new URL('/login', request.url))
+            return NextResponse.redirect(new URL(routes.login, request.url))
         }
     }
 
     // Kiểm tra nếu đang ở auth route mà đã có token
     if (authRoutes.some((path) => pathname.startsWith(path)) && token) {
-        return NextResponse.redirect(new URL('/dashboard', request.url))
+        return NextResponse.redirect(new URL(routes.dashboard, request.url))
     }
 
     // Kiểm tra nếu đang ở private route và không có token
     if (privateRoutes.some((path) => pathname.startsWith(path)) && !authRoutes.includes(pathname) && !token) {
-        return NextResponse.redirect(new URL('/login', request.url))
+        return NextResponse.redirect(new URL(routes.login, request.url))
     }
 
     return NextResponse.next()
@@ -33,5 +34,5 @@ export async function middleware(request: NextRequest) {
 
 // See "Matching Paths" below to learn more
 export const config = {
-    matcher: ['/dashboard', '/', '/login'],
+    matcher: [routes.dashboard, routes.home, routes.login, routes.user],
 }

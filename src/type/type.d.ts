@@ -15,9 +15,11 @@ export interface UserModel extends Timestamp {
     friend_count: number
 }
 
-export interface UserResponse {
+interface UserResponse {
     data: UserModel
-    meta: {
-        exp: number
+    meta?: {
+        pagination: {
+            exp: number
+        }
     }
 }
