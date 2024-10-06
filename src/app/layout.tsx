@@ -11,17 +11,20 @@ import './globals.css'
 import 'react-loading-skeleton/dist/skeleton.css'
 import 'tippy.js/dist/tippy.css'
 import { useEffect } from 'react'
+import useThemeStore from '~/zustand/useThemeStore'
 
 function RootLayout({
     children,
 }: Readonly<{
     children: React.ReactNode
 }>) {
+    const { theme } = useThemeStore()
+
     useEffect(() => {
-        if (localStorage.getItem('theme') === 'dark') {
+        if (theme === 'dark') {
             document.documentElement.classList.add('dark')
         }
-    }, [])
+    }, [theme])
 
     return (
         <html lang="en">

@@ -13,7 +13,7 @@ export default memo(function AccountItem({ className = '', user }: AccountItemPr
             <UserAvatar size={56} src={user.avatar} />
             <div className="ml-3">
                 <h4 className="text-base font-medium">{user.full_name}</h4>
-                <p className="text-xs text-gray-500">{user.email}</p>
+                <p className="text-xs text-gray-500">{user.nickname}</p>
             </div>
         </div>
     )

@@ -54,9 +54,12 @@ const MENU_ITEMS: MenuItemType[] = [
 
 const Header = () => {
     // fetch current user use swr
-    const { data: currentUser, isLoading } = useSWR<AxiosResponse<Response>>(config.apiEndpoint.auth.me, () => {
-        return authService.getCurrentUser()
-    })
+    const { data: currentUser, isLoading } = useSWR<AxiosResponse<Response>>(
+        config.apiEndpoint.me.getCurrentUser,
+        () => {
+            return authService.getCurrentUser()
+        },
+    )
 
     // define config framer-motion
 
@@ -84,9 +87,6 @@ const Header = () => {
                             <Button buttonType="icon">
                                 <FontAwesomeIcon icon={faPen} className="text-sm" />
                             </Button>
-                            {/* <button className="flex-center h-9 w-9 rounded-full bg-gray-100">
-                                <FontAwesomeIcon icon={faPen} className="text-sm" />
-                            </button> */}
                         </div>
                     </div>
                     <div className="mt-4">

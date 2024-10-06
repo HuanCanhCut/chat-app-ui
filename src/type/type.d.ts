@@ -1,6 +1,6 @@
 interface Timestamp {
-    createAt: Date
-    updatedAt: Date
+    create_at: Date
+    updated_at: Date
 }
 
 export interface UserModel extends Timestamp {
@@ -11,4 +11,13 @@ export interface UserModel extends Timestamp {
     email: string
     uuid: string
     avatar: string
+    nickname: string
+    friend_count: number
+}
+
+export interface UserResponse {
+    data: UserModel
+    meta: {
+        exp: number
+    }
 }

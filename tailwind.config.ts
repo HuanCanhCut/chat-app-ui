@@ -7,9 +7,13 @@ const config: Config = {
         './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
         './src/components/**/*.{js,ts,jsx,tsx,mdx}',
         './src/app/**/*.{js,ts,jsx,tsx,mdx}',
+        './src/layouts/**/*.{js,ts,jsx,tsx,mdx}',
     ],
     theme: {
         extend: {
+            height: {
+                header: '56px',
+            },
             colors: {
                 primary: '#fe2c55',
             },

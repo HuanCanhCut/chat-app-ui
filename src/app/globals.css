@@ -4,6 +4,10 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+    --header-height: 64px;
+}
+
 @layer base {
     h1 {
         @apply text-4xl;
