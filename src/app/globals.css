@@ -22,9 +22,55 @@
     }
 }
 
+html {
+    scroll-behavior: smooth;
+    overflow-x: hidden;
+}
+
+html *::-webkit-scrollbar {
+    border-radius: 0;
+    width: 4px;
+}
+
+html {
+    ::-webkit-scrollbar-thumb {
+        border-radius: 4px;
+        background-color: rgba(22, 24, 35, 0.3);
+    }
+
+    *::-webkit-scrollbar-track {
+        border-radius: 0;
+        background-color: inherit !important;
+    }
+}
+
+html.dark {
+    ::-webkit-scrollbar-thumb {
+        border-radius: 4px;
+        background-color: rgba(255, 255, 255, 0.08);
+    }
+
+    *::-webkit-scrollbar-track {
+        border-radius: 0;
+        background-color: #242526 !important;
+    }
+}
+
+html.dark .tippy-box {
+    background-color: rgba(244, 244, 244, 1);
+    border-radius: 8px;
+    font-weight: 400;
+    color: #000;
+}
+
+html.dark .tippy-arrow {
+    color: rgba(244, 244, 244, 1);
+}
+
 body {
     font-family: 'Be Vietnam Pro', sans-serif !important;
     font-style: normal;
+    overflow: overlay;
 }
 
 @layer utilities {

@@ -10,7 +10,6 @@ const inter = Inter({ subsets: ['latin'] })
 import './globals.css'
 import 'react-loading-skeleton/dist/skeleton.css'
 import 'tippy.js/dist/tippy.css'
-import { useEffect } from 'react'
 import useThemeStore from '~/zustand/useThemeStore'
 
 function RootLayout({
@@ -20,15 +19,9 @@ function RootLayout({
 }>) {
     const { theme } = useThemeStore()
 
-    useEffect(() => {
-        if (theme === 'dark') {
-            document.documentElement.classList.add('dark')
-        }
-    }, [theme])
-
     return (
-        <html lang="en">
-            <body className={inter.className}>
+        <html lang="en" className={theme}>
+            <body className={`${inter.className} text-black dark:text-dark`}>
                 <SWRConfig
                     value={{
                         revalidateIfStale: false,

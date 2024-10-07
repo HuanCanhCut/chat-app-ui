@@ -8,7 +8,7 @@ export const apiEndpoint = {
         resetPassword: '/auth/reset-password',
     },
     user: {
-        getAnUser: '/users/:nickname',
+        getAnUser: '/users/',
     },
     friend: {
         getAllFriends: '/friends',

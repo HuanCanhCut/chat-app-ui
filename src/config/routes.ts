@@ -1,6 +1,6 @@
 export const routes = {
     home: '/',
-    user: '/user/:nickname',
+    user: '/user/',
     login: '/login',
     dashboard: '/dashboard',
 }

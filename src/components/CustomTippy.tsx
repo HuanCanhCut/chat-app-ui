@@ -4,8 +4,7 @@ import { useSpring, motion } from 'framer-motion'
 
 interface CustomTippyProps {
     children: React.ReactElement
-    render: any
-    trigger?: 'click' | 'hover' | 'focus' | 'manual'
+    trigger?: 'click' | 'focus' | 'manual' | 'mouseenter' | 'focusin'
     renderItem: () => React.ReactElement
     placement?:
         | 'top'
@@ -43,8 +42,6 @@ export default memo(function CustomTippy({
 }: CustomTippyProps) {
     const springConfig: any = { damping: 15, stiffness: 300 }
     const initialScale = 0.5
-
-    // Khởi tạo useSpring với giá trị khởi tạo cụ thể
     const opacity = useSpring(0, springConfig)
     const scale = useSpring(initialScale, springConfig)
 

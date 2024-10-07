@@ -1,6 +1,6 @@
 interface Timestamp {
-    create_at: Date
-    updated_at: Date
+    createdAt: Date
+    updatedAt: Date
 }
 
 export interface UserModel extends Timestamp {
@@ -12,11 +12,31 @@ export interface UserModel extends Timestamp {
     uuid: string
     avatar: string
     nickname: string
-    friend_count: number
+    bio: string
+    friends_count: number
 }
 
 interface UserResponse {
     data: UserModel
+    meta?: {
+        pagination: {
+            exp: number
+        }
+    }
+}
+
+interface FriendsShip {
+    id: number
+    user_id: number
+    friend_id: number
+    status: string
+    createdAt: Date
+    updatedAt: Date
+    user: UserModel
+}
+
+interface FriendsResponse {
+    data: FriendsShip[]
     meta?: {
         pagination: {
             exp: number

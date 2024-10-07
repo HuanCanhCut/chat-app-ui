@@ -25,7 +25,7 @@ export default function MenuItem({ item }: { item: MenuItemProps }) {
 
     return (
         <div
-            className={`flex w-full items-center justify-between gap-2 py-2 ${item.line ? 'border-t border-gray-300 dark:border-gray-700' : ''}`}
+            className={`flex w-full cursor-pointer items-center justify-between gap-2 px-5 py-2 hover:bg-gray-100 dark:hover:bg-[#2d2d2f] ${item.line ? 'border-t border-gray-300 dark:border-gray-700' : ''}`}
         >
             <div className="flex items-center gap-2">
                 <Button buttonType="icon">

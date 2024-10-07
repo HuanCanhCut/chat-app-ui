@@ -15,7 +15,9 @@ const config: Config = {
                 header: '56px',
             },
             colors: {
-                primary: '#fe2c55',
+                primary: '#0866ff',
+                dark: '#242526',
+                darkGray: '#3a3b3c',
             },
             outline: {
                 none: 'none',

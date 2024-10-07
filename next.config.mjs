@@ -15,6 +15,12 @@ const nextConfig = {
                 port: '',
                 pathname: '/**',
             },
+            {
+                protocol: 'https',
+                hostname: 'hoanghamobile.com',
+                port: '',
+                pathname: '/**',
+            },
         ],
     },
 }
