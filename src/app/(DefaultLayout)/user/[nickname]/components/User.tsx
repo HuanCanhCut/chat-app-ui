@@ -57,7 +57,7 @@ export default function User({ friends, currentUser, user }: UserProps) {
             </div>
             <div className="mt-4 flex gap-2 sm:mt-0">
                 {currentUser.data.data.id === user.data.data.id ? (
-                    <Button buttonType="rounded" leftIcon={<FontAwesomeIcon icon={faUserPen} />}>
+                    <Button buttonType="rounded" className="flex-1" leftIcon={<FontAwesomeIcon icon={faUserPen} />}>
                         Chỉnh sửa hồ sơ
                     </Button>
                 ) : (

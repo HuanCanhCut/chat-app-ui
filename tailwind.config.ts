@@ -16,16 +16,16 @@ const config: Config = {
             },
             colors: {
                 primary: '#0866ff',
-                dark: '#242526',
-                darkGray: '#3a3b3c',
+                dark: '#18191a',
+                darkGray: '#242526',
             },
             outline: {
                 none: 'none',
             },
             backgroundColor: {
-                dark: '#242526',
+                dark: '#18191a',
                 lightGray: '#f0f2f5',
-                darkGray: '#3a3b3c',
+                darkGray: '#242526',
             },
             textColor: {
                 dark: '#ffffffe6',

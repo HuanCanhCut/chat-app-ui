@@ -110,7 +110,7 @@ export default function Header() {
     }
 
     return (
-        <header className="fixed left-0 right-0 top-0 z-20 flex h-[var(--header-height)] w-full items-center justify-between px-3 shadow-sm shadow-[#0000001f] dark:bg-dark dark:text-dark dark:shadow-[#ffffff1f]">
+        <header className="fixed left-0 right-0 top-0 z-20 flex h-[var(--header-height)] w-full items-center justify-between bg-white px-3 shadow-sm shadow-[#0000001f] dark:bg-darkGray dark:text-dark dark:shadow-[#ffffff1f]">
             <Logo />
 
             <nav className="relative flex h-full items-center">

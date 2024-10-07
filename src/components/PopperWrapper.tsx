@@ -8,7 +8,7 @@ interface PopperWrapperProps {
 export default memo(function PopperWrapper({ children, className = '' }: PopperWrapperProps) {
     return (
         <div
-            className={`rounded-md border border-gray-700 bg-white p-1 shadow-light dark:bg-dark dark:text-dark ${className}`}
+            className={`rounded-md border border-gray-700 bg-white p-1 shadow-light dark:bg-darkGray dark:text-dark ${className}`}
         >
             {children}
         </div>

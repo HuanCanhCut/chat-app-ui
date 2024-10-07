@@ -31,7 +31,7 @@ export default memo(function UserAvatar({ src = defaultAvatar, size = 36, alt = 
             alt={alt}
             width={size}
             height={size}
-            className={`${className} z cursor-pointer rounded-full object-cover`}
+            className={`z cursor-pointer rounded-full object-cover ${className}`}
             priority
             style={style}
         />
