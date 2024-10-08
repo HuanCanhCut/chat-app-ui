@@ -47,7 +47,7 @@ const AuthForm = () => {
 
     const [errorMessage, setErrorMessage] = useState<string>('')
 
-    const setUserToRedux = (user: UserModel) => {
+    const showSuccess = () => {
         showToast({
             message: 'Đăng nhập thành công.',
         })
@@ -65,7 +65,7 @@ const AuthForm = () => {
 
                 switch (response.status) {
                     case 200:
-                        setUserToRedux(response.data.data)
+                        showSuccess()
                         localStorage.setItem('exp', JSON.stringify(response.data.meta?.pagination?.exp))
                         break
                     case 401:
@@ -91,7 +91,7 @@ const AuthForm = () => {
                 })
 
                 if (response?.status === 201) {
-                    setUserToRedux(response.data.data)
+                    showSuccess()
                     showToast({ message: 'Đăng kí tài khoản thành công' })
                     return
                 }
@@ -162,7 +162,7 @@ const AuthForm = () => {
                 const response: AxiosResponse<Response> = await authServices.loginWithGoogle(user.accessToken)
 
                 if (response.status === 200) {
-                    setUserToRedux(response.data.data)
+                    showSuccess()
                     if (response.data.meta) {
                         localStorage.setItem('exp', JSON.stringify(response.data.meta.pagination.exp))
                     }
@@ -271,7 +271,7 @@ const AuthForm = () => {
                     </>
                 )}
 
-                {errorMessage && <span className="text-sm text-primary">{errorMessage}</span>}
+                {errorMessage && <span className="text-error text-sm">{errorMessage}</span>}
 
                 {type === 'login' && (
                     <span
@@ -292,7 +292,7 @@ const AuthForm = () => {
             <span className="text-center text-sm text-gray-500 dark:text-gray-400">
                 Bạn không có tài khoản?{' '}
                 <span
-                    className="cursor-pointer font-semibold text-primary"
+                    className="text-error cursor-pointer font-semibold"
                     onClick={() => setType(type === 'login' ? 'register' : 'login')}
                 >
                     {type === 'login' ? 'Đăng kí' : 'Đăng nhập'}
@@ -301,7 +301,7 @@ const AuthForm = () => {
 
             <footer className="text-center text-sm text-gray-500 dark:text-gray-400">
                 Việc bạn tiếp tục sử dụng trang web này có nghĩa bạn đồng ý với{' '}
-                <span className="text-primary">điều khoản</span> sử dụng của chúng tôi
+                <span className="text-error">điều khoản</span> sử dụng của chúng tôi
             </footer>
         </form>
     )

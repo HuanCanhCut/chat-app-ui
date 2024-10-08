@@ -20,6 +20,9 @@ const FriendList = ({ friends }: FriendListProps) => {
                             <UserAvatar src={friend.user.avatar} className="rounded-lg" size={70} />
                             <div>
                                 <h3 className="ml-4">{friend.user.full_name}</h3>
+                                <p className="ml-4 text-sm text-gray-400 dark:text-gray-500">
+                                    {friend.user.friends_count} nguời bạn
+                                </p>
                             </div>
                         </div>
                     )

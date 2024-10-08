@@ -7,9 +7,20 @@ interface ButtonProps {
     buttonType?: 'primary' | 'outline' | 'icon' | 'rounded'
     leftIcon?: React.ReactNode
     rightIcon?: React.ReactNode
+    onClick?: () => void
+    type?: 'button' | 'submit' | 'reset'
 }
 
-export default function Button({ children, className, href, buttonType = 'primary', leftIcon, ...props }: ButtonProps) {
+export default function Button({
+    children,
+    className,
+    href,
+    buttonType = 'primary',
+    leftIcon,
+    type = 'button',
+    onClick,
+    ...props
+}: ButtonProps) {
     const primaryClass = buttonType === 'primary' ? 'bg-primary px-4 py-2 rounded-md' : ''
     const outlineClass = buttonType === 'outline' ? 'border border-primary px-4 py-2 rounded-md' : ''
     const buttonIconClass = buttonType === 'icon' ? 'h-9 w-9 rounded-full bg-gray-100 dark:bg-[#313233]' : ''
@@ -32,6 +43,7 @@ export default function Button({ children, className, href, buttonType = 'primar
         <button
             className={`flex-center ${primaryClass} ${outlineClass} ${buttonIconClass} ${roundedClass} ${className}`}
             {...props}
+            onClick={onClick}
         >
             {leftIcon && <span className="mr-2">{leftIcon}</span>}
             {children}

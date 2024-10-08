@@ -12,6 +12,7 @@ interface Props {
     Icon?: React.ReactNode
     setShowIcon?: () => void
     IconClass?: string
+    defaultValue?: string
 }
 
 const IconClasses = 'absolute right-3 top-1/2 translate-y-[-50%] leading-none text-gray-700'
@@ -30,6 +31,7 @@ const Input = forwardRef<HTMLInputElement, Props>(
             Icon,
             setShowIcon = () => {},
             IconClass = IconClasses,
+            defaultValue = '',
         },
         ref,
     ) => {
@@ -38,7 +40,7 @@ const Input = forwardRef<HTMLInputElement, Props>(
                 <Controller
                     name={name}
                     control={control}
-                    defaultValue=""
+                    defaultValue={defaultValue}
                     rules={rules}
                     render={({ field, fieldState: { error } }) => (
                         <>
@@ -64,7 +66,7 @@ const Input = forwardRef<HTMLInputElement, Props>(
                                     </div>
                                 )}
                             </div>
-                            {error && <span className="mt-1 text-sm text-primary">{error.message}</span>}
+                            {error && <span className="text-error mt-1 text-sm">{error.message}</span>}
                         </>
                     )}
                 />

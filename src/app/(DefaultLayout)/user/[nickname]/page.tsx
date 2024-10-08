@@ -72,7 +72,7 @@ export default function UserPage() {
                 {user && currentUser && friends ? (
                     <div className="w-1100px mx-auto max-w-[1100px]">
                         <Image
-                            src="https://hoanghamobile.com/tin-tuc/wp-content/uploads/2023/07/anh-bia-dep-10.jpg"
+                            src={user.data.data.cover_photo || '/static/media/login-form.jpg'}
                             alt="user"
                             className="aspect-[12/5] h-auto w-[1100px] rounded-lg object-cover"
                             quality={100}

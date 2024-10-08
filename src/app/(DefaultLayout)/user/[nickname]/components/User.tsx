@@ -2,13 +2,15 @@
 
 import { faUserPen, faUserPlus } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import ReactModal from 'react-modal'
 import { AxiosResponse } from 'axios'
 import Link from 'next/link'
-import React from 'react'
+import React, { useState } from 'react'
 import Button from '~/components/Button'
 import { MessageIcon } from '~/components/Icons'
 import UserAvatar from '~/components/UserAvatar'
 import { FriendsResponse, FriendsShip, UserResponse } from '~/type/type'
+import EditProfile from './EditProfile'
 
 interface UserProps {
     friends: AxiosResponse<FriendsResponse>
@@ -17,8 +19,28 @@ interface UserProps {
 }
 
 export default function User({ friends, currentUser, user }: UserProps) {
+    const [isOpen, setIsOpen] = useState(false)
+
+    const openModal = () => {
+        setIsOpen(true)
+    }
+
+    const closeModal = () => {
+        setIsOpen(false)
+    }
+
     return (
         <header className="relative w-full px-6 py-4 sm:flex sm:items-center">
+            <ReactModal
+                isOpen={isOpen}
+                ariaHideApp={false}
+                overlayClassName="overlay"
+                closeTimeoutMS={200}
+                onRequestClose={closeModal}
+                className="modal"
+            >
+                <EditProfile closeModal={closeModal} />
+            </ReactModal>
             <UserAvatar
                 src={user?.data.data.avatar}
                 size={168}
@@ -57,7 +79,12 @@ export default function User({ friends, currentUser, user }: UserProps) {
             </div>
             <div className="mt-4 flex gap-2 sm:mt-0">
                 {currentUser.data.data.id === user.data.data.id ? (
-                    <Button buttonType="rounded" className="flex-1" leftIcon={<FontAwesomeIcon icon={faUserPen} />}>
+                    <Button
+                        buttonType="rounded"
+                        className="flex-1"
+                        leftIcon={<FontAwesomeIcon icon={faUserPen} />}
+                        onClick={openModal}
+                    >
                         Chỉnh sửa hồ sơ
                     </Button>
                 ) : (

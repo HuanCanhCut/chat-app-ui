@@ -1,3 +1,4 @@
+import { error } from 'console'
 import type { Config } from 'tailwindcss'
 
 const config: Config = {
@@ -16,6 +17,7 @@ const config: Config = {
             },
             colors: {
                 primary: '#0866ff',
+                error: '#ff453a',
                 dark: '#18191a',
                 darkGray: '#242526',
             },

@@ -12,7 +12,7 @@ export interface UserModel extends Timestamp {
     uuid: string
     avatar: string
     nickname: string
-    bio: string
+    cover_photo: string
     friends_count: number
 }
 
