@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useMemo } from 'react'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faBell, faCircleDot, faMoon, faPen, faSignOut, IconDefinition } from '@fortawesome/free-solid-svg-icons'
 import useSWR from 'swr'
@@ -9,6 +9,7 @@ import { AxiosResponse } from 'axios'
 import Skeleton from 'react-loading-skeleton'
 import Tippy from '@tippyjs/react'
 
+import * as authService from '~/services/authService'
 import PopperWrapper from '~/components/PopperWrapper'
 import Logo from '~/components/Logo'
 import Button from '~/components/Button'
@@ -22,7 +23,8 @@ import AccountItem from '~/components/AccountItem'
 import MenuItem from './MenuItem'
 import CustomTippy from '~/components/CustomTippy'
 
-interface MenuItemType {
+export interface MenuItemType {
+    type: 'theme' | 'status' | 'logout'
     icon: IconDefinition
     label: string
     line?: boolean
@@ -31,15 +33,18 @@ interface MenuItemType {
 
 const MENU_ITEMS: MenuItemType[] = [
     {
+        type: 'theme',
         icon: faMoon,
         label: 'Chế độ tối',
         switchButton: true,
     },
     {
+        type: 'status',
         icon: faCircleDot,
         label: 'Trạng thái hoạt động',
     },
     {
+        type: 'logout',
         icon: faSignOut,
         label: 'Đăng xuất',
         line: true,
@@ -48,6 +53,7 @@ const MENU_ITEMS: MenuItemType[] = [
 
 export default function Header() {
     const pathname = usePathname()
+    const router = useRouter()
 
     const { data: currentUser, isLoading } = useSWR<AxiosResponse<UserResponse>>(
         config.apiEndpoint.me.getCurrentUser,
@@ -73,6 +79,15 @@ export default function Header() {
         ]
     }, [currentUser])
 
+    const handleChoose = (type: MenuItemType['type']) => {
+        switch (type) {
+            case 'logout':
+                authService.logout()
+                router.push(config.routes.login)
+                break
+        }
+    }
+
     const renderTooltip = () => {
         return (
             <PopperWrapper className="min-w-[320px] text-sm">
@@ -92,7 +107,7 @@ export default function Header() {
                     <div className="mt-4">
                         {MENU_ITEMS.map((item: MenuItemType, index: number) => (
                             <React.Fragment key={index}>
-                                <MenuItem item={item} />
+                                <MenuItem item={item} onChoose={handleChoose} />
                             </React.Fragment>
                         ))}
                     </div>

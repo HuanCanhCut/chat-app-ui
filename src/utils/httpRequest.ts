@@ -57,12 +57,12 @@ export const get = async (path: string, options = {}) => {
     return response
 }
 
-export const post = async (path: string, data: any, options = {}) => {
+export const post = async (path: string, data: any = {}, options = {}) => {
     const response = await request.post(path, data, options)
     return response
 }
 
-export const patch = async (path: string, data: any, options = {}) => {
+export const patch = async (path: string, data: any = {}, options = {}) => {
     const response = await request.patch(path, data, options)
     return response
 }
