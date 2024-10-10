@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { AxiosResponse } from 'axios'
 import Image from 'next/image'
 import useSWR from 'swr'
@@ -8,12 +8,11 @@ import useSWR from 'swr'
 import config from '~/config'
 import { FriendsResponse, UserResponse } from '~/type/type'
 import * as friendsService from '~/services/friendsService'
-import * as authService from '~/services/authService'
+import * as meService from '~/services/meService'
 import * as userService from '~/services/userService'
 import { useParams } from 'next/navigation'
 import User from './components/User'
 import FriendList from './components/FriendList'
-import Button from '~/components/Button'
 import Skeleton from 'react-loading-skeleton'
 
 export default function UserPage() {
@@ -25,22 +24,15 @@ export default function UserPage() {
     })
 
     const { data: currentUser } = useSWR<AxiosResponse<UserResponse>>(config.apiEndpoint.me.getCurrentUser, () => {
-        return authService.getCurrentUser()
+        return meService.getCurrentUser()
     })
 
-    const { data: user, mutate: mutateUser } = useSWR<AxiosResponse<UserResponse>>(
-        config.apiEndpoint.user.getAnUser,
+    const { data: user } = useSWR<AxiosResponse<UserResponse> | undefined>(
+        nickname ? [config.apiEndpoint.user.getAnUser, nickname] : null,
         () => {
             return userService.getAnUser(nickname.slice(3) as string)
         },
-        {
-            revalidateOnFocus: true,
-        },
     )
-
-    useEffect(() => {
-        mutateUser()
-    }, [nickname, mutateUser])
 
     const Loading = () => {
         return (

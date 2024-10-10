@@ -7,7 +7,7 @@ import { AxiosResponse } from 'axios'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import config from '~/config'
-import * as authService from '~/services/authService'
+import * as meService from '~/services/meService'
 import UserAvatar from '~/components/UserAvatar'
 import { UserResponse } from '~/type/type'
 import Search from '~/components/Search'
@@ -19,7 +19,7 @@ const Header = () => {
     const { data: currentUser, isLoading } = useSWR<AxiosResponse<UserResponse>>(
         config.apiEndpoint.me.getCurrentUser,
         () => {
-            return authService.getCurrentUser()
+            return meService.getCurrentUser()
         },
     )
 

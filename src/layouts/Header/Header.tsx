@@ -3,15 +3,7 @@
 import React, { useMemo } from 'react'
 import { usePathname } from 'next/navigation'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import {
-    faBell,
-    faCircleDot,
-    faMessage,
-    faMoon,
-    faPen,
-    faSignOut,
-    IconDefinition,
-} from '@fortawesome/free-solid-svg-icons'
+import { faBell, faCircleDot, faMoon, faPen, faSignOut, IconDefinition } from '@fortawesome/free-solid-svg-icons'
 import useSWR from 'swr'
 import { AxiosResponse } from 'axios'
 import Skeleton from 'react-loading-skeleton'
@@ -22,7 +14,7 @@ import Logo from '~/components/Logo'
 import Button from '~/components/Button'
 import UserAvatar from '~/components/UserAvatar'
 import config from '~/config'
-import * as authService from '~/services/authService'
+import * as meService from '~/services/meService'
 import { UserResponse } from '~/type/type'
 import NavLink from '~/components/NavLink'
 import { HomeIcon, MessageIcon, UserIcon } from '~/components/Icons'
@@ -60,7 +52,7 @@ export default function Header() {
     const { data: currentUser, isLoading } = useSWR<AxiosResponse<UserResponse>>(
         config.apiEndpoint.me.getCurrentUser,
         () => {
-            return authService.getCurrentUser()
+            return meService.getCurrentUser()
         },
     )
 
@@ -91,7 +83,7 @@ export default function Header() {
                     <div className="border-b border-t border-gray-300 px-5 py-2 dark:border-gray-700">
                         <label className="font-semibold">Tài khoản</label>
                         <div className="flex items-center justify-between">
-                            {currentUser && <AccountItem user={currentUser.data.data} className="mt-2" />}
+                            {currentUser && <AccountItem user={currentUser?.data?.data} className="mt-2" />}
                             <Button buttonType="icon" href={`/user/@${currentUser?.data?.data?.nickname}`}>
                                 <FontAwesomeIcon icon={faPen} className="text-sm" />
                             </Button>

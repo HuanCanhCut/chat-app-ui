@@ -1,34 +1,41 @@
 import { faCamera, faXmark } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { AxiosResponse } from 'axios'
-import Image from 'next/image'
 import React, { useState, useRef, useEffect } from 'react'
-import useSWR from 'swr'
+import useSWR, { mutate } from 'swr'
+import { SubmitHandler, useForm } from 'react-hook-form'
 
-import * as authService from '~/services/authService'
+import * as meService from '~/services/meService'
 import Button from '~/components/Button'
 import PopperWrapper from '~/components/PopperWrapper'
 import config from '~/config'
+import CustomImage from '~/components/Image'
 import { UserResponse } from '~/type/type'
-import { SubmitHandler, useForm } from 'react-hook-form'
 import Input from '~/components/Input'
-
-interface EditProfileProps {
-    closeModal: () => void
-}
+import { showToast } from '~/project/services'
+import UserAvatar from '~/components/UserAvatar'
 
 interface IFile extends File {
     preview: string
 }
 
-interface FieldValue {}
+interface FieldValue {
+    full_name: string
+    nickname: string
+}
+
+interface EditProfileProps {
+    closeModal: () => void
+}
+
+const defaultCoverPhoto = '/static/media/login-form.jpg'
 
 const EditProfile = ({ closeModal }: EditProfileProps) => {
     const { data: currentUser } = useSWR<AxiosResponse<UserResponse>>(config.apiEndpoint.me.getCurrentUser, () => {
-        return authService.getCurrentUser()
+        return meService.getCurrentUser()
     })
 
-    const { handleSubmit, control, setValue } = useForm<FieldValue>()
+    const { handleSubmit, control } = useForm<FieldValue>()
 
     const inputRef = useRef<HTMLInputElement>(null)
     const inputCoverPhotoRef = useRef<HTMLInputElement>(null)
@@ -36,22 +43,20 @@ const EditProfile = ({ closeModal }: EditProfileProps) => {
     const [avatar, setAvatar] = useState<IFile>()
     const [coverPhoto, setCoverPhoto] = useState<IFile>()
 
-    const handleChange = (e: any, type: string) => {
+    type FileType = 'avatar' | 'cover_photo'
+    const handleChange = (e: any, type: FileType) => {
         const file = e.target.files?.[0]
+        file.preview = URL.createObjectURL(file)
 
-        switch (type) {
-            case 'avatar':
-                if (file) {
-                    file.preview = URL.createObjectURL(file)
+        if (file) {
+            switch (type) {
+                case 'avatar':
                     setAvatar(file)
-                }
-                break
-            case 'cover-photo':
-                if (file) {
-                    file.preview = URL.createObjectURL(file)
+                    break
+                case 'cover_photo':
                     setCoverPhoto(file)
-                }
-                break
+                    break
+            }
         }
     }
 
@@ -62,26 +67,65 @@ const EditProfile = ({ closeModal }: EditProfileProps) => {
         }
     }, [avatar, coverPhoto])
 
-    const IMAGE = [
-        {
-            ref: inputRef,
-            label: 'Ảnh đại diện',
-            type: 'avatar',
-            alt: 'avatar',
-            className:
-                'mx-auto aspect-square w-[130px] cursor-pointer rounded-full object-cover sm:w-[168px] border-2 border-gray-200 p-1 dark:border-gray-600',
-        },
-        {
-            ref: inputCoverPhotoRef,
-            label: 'Ảnh bìa',
-            type: 'cover-photo',
-            alt: 'cover-photo',
-            className: 'mx-auto aspect-[12/5] w-[80%] cursor-pointer object-cover rounded-lg',
-        },
-    ]
+    const onSubmit: SubmitHandler<FieldValue> = async (data) => {
+        try {
+            const formData = new FormData()
 
-    const onSubmit: SubmitHandler<FieldValue> = (data) => {
-        console.log(data)
+            if (avatar) {
+                formData.append('avatar', avatar)
+            }
+
+            if (coverPhoto) {
+                formData.append('cover_photo', coverPhoto)
+            }
+
+            formData.append('full_name', data.full_name)
+            formData.append('nickname', data.nickname)
+
+            // handle split full_name to first_name and last_name
+            const fullName = data.full_name.split(' ')
+
+            const middle = Math.ceil(fullName.length / 2)
+
+            const firstName = fullName.slice(0, middle).join(' ')
+            const lastName = fullName.slice(middle).join(' ')
+
+            formData.append('first_name', firstName)
+            formData.append('last_name', lastName)
+
+            // temp data
+            const newData = {
+                ...currentUser,
+                data: {
+                    ...currentUser?.data,
+                    data: {
+                        ...currentUser?.data.data,
+                        first_name: firstName,
+                        last_name: lastName,
+                        full_name: data.full_name,
+                        nickname: data.nickname,
+                        avatar: avatar?.preview || currentUser?.data.data.avatar,
+                        cover_photo: coverPhoto?.preview || currentUser?.data.data.cover_photo,
+                    },
+                },
+            }
+
+            // fake update
+            mutate(config.apiEndpoint.me.getCurrentUser, newData, {
+                revalidate: false,
+            })
+            showToast({ message: 'Cập nhật thành công' })
+
+            closeModal()
+
+            const response = await meService.updateCurrentUser(formData)
+
+            if (response.status === 200) {
+                mutate(config.apiEndpoint.me.getCurrentUser)
+            }
+        } catch (error) {
+            console.log(error)
+        }
     }
 
     interface Field {
@@ -112,51 +156,67 @@ const EditProfile = ({ closeModal }: EditProfileProps) => {
                 </Button>
             </header>
             <main className="p-4">
-                {IMAGE.map((item, index) => {
-                    return (
-                        <React.Fragment key={index}>
-                            <h4>{item.label}</h4>
-                            <div className="flex-center">
-                                <div className="relative mt-4">
-                                    {currentUser && (
-                                        <label htmlFor={item.type}>
-                                            <Image
-                                                src={
-                                                    item.type === 'avatar'
-                                                        ? avatar?.preview || currentUser.data.data.avatar
-                                                        : coverPhoto?.preview || currentUser.data.data.cover_photo
-                                                }
-                                                alt={item.alt}
-                                                width="0"
-                                                height="0"
-                                                sizes="100vw"
-                                                priority
-                                                quality={100}
-                                                className={item.className}
-                                            />
-                                        </label>
-                                    )}
-                                    <label
-                                        htmlFor={item.type}
-                                        className="flex-center absolute bottom-1 right-1 h-9 w-9 cursor-pointer rounded-full border-2 border-white bg-gray-100 dark:border-[#242526] dark:bg-[#313233]"
-                                    >
-                                        <FontAwesomeIcon icon={faCamera} />
-                                    </label>
-                                    <input
-                                        ref={item.ref}
-                                        id={item.type}
-                                        type="file"
-                                        className="hidden"
-                                        accept="image/*"
-                                        onChange={(e) => {
-                                            handleChange(e, item.type)
-                                        }}
-                                    />
-                                </div>
-                            </div>
-                        </React.Fragment>
-                    )
-                })}
+                <h4>Ảnh đại diện</h4>
+                <div className="flex-center">
+                    <div className="relative mt-4">
+                        {currentUser && (
+                            <label htmlFor="avatar">
+                                <UserAvatar
+                                    src={avatar?.preview || currentUser.data.data.avatar}
+                                    alt="avatar"
+                                    size={130}
+                                    className="mx-auto aspect-square w-[130px] cursor-pointer rounded-full border-2 border-gray-200 object-cover p-1 dark:border-gray-600 sm:w-[168px]"
+                                />
+                            </label>
+                        )}
+                        <label
+                            htmlFor="avatar"
+                            className="flex-center absolute bottom-1 right-1 h-9 w-9 cursor-pointer rounded-full border-2 border-white bg-gray-100 dark:border-[#242526] dark:bg-[#313233]"
+                        >
+                            <FontAwesomeIcon icon={faCamera} />
+                        </label>
+                        <input
+                            ref={inputRef}
+                            id="avatar"
+                            type="file"
+                            className="hidden"
+                            accept="image/*"
+                            onChange={(e) => {
+                                handleChange(e, 'avatar')
+                            }}
+                        />
+                    </div>
+                </div>
+                <h4>Ảnh bìa</h4>
+                <div>
+                    <div className="relative mt-4">
+                        {currentUser && (
+                            <label htmlFor="cover_photo">
+                                <CustomImage
+                                    src={coverPhoto?.preview || currentUser.data.data.cover_photo}
+                                    fallback={defaultCoverPhoto}
+                                    className="mx-auto aspect-[12/5] w-[80%] cursor-pointer rounded-lg object-cover"
+                                />
+                            </label>
+                        )}
+                        <label
+                            htmlFor="cover_photo"
+                            className="flex-center absolute bottom-1 right-1 h-9 w-9 cursor-pointer rounded-full border-2 border-white bg-gray-100 dark:border-[#242526] dark:bg-[#313233]"
+                        >
+                            <FontAwesomeIcon icon={faCamera} />
+                        </label>
+                        <input
+                            ref={inputCoverPhotoRef}
+                            id="cover_photo"
+                            type="file"
+                            className="hidden"
+                            accept="image/*"
+                            onChange={(e) => {
+                                handleChange(e, 'cover_photo')
+                            }}
+                        />
+                    </div>
+                </div>
                 <form className="mt-4" onSubmit={handleSubmit(onSubmit)}>
                     <h4>Thông tin cá nhân</h4>
                     {FIELD.map((field, index) => {

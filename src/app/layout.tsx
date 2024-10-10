@@ -4,7 +4,6 @@ import { Inter } from 'next/font/google'
 import { ToastContainer } from 'react-toastify'
 import { SWRConfig } from 'swr'
 
-import GetCurrentUser from './getCurrentUser'
 const inter = Inter({ subsets: ['latin'] })
 
 import './globals.css'
@@ -30,7 +29,7 @@ function RootLayout({
                         shouldRetryOnError: false,
                     }}
                 >
-                    <GetCurrentUser>{children}</GetCurrentUser>
+                    {children}
                     <ToastContainer />
                 </SWRConfig>
             </body>

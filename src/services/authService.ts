@@ -39,14 +39,6 @@ export const login = async ({ email, password }: RegisterProps): Promise<AxiosRe
     }
 }
 
-export const getCurrentUser = async (): Promise<AxiosResponse<Response>> => {
-    try {
-        return await request.get(config.apiEndpoint.me.getCurrentUser)
-    } catch (error: any) {
-        return error
-    }
-}
-
 export const loginWithGoogle = async (token: string): Promise<AxiosResponse<Response>> => {
     try {
         return await request.post(config.apiEndpoint.auth.loginWithToken, {

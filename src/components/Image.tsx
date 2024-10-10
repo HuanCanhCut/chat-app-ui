@@ -1,19 +1,27 @@
-'use client'
-
 import Image from 'next/image'
 import { memo, useState } from 'react'
 
 interface Props {
     src?: string
+    fallback?: string
     alt?: string
-    size?: number
+    width?: number
+    height?: number
     className?: string
     style?: React.CSSProperties
 }
 
 const defaultAvatar = '/static/media/default-avatar.jpg'
 
-export default memo(function UserAvatar({ src = defaultAvatar, size = 36, alt = 'avatar', className, style }: Props) {
+const CustomImage = ({
+    src,
+    fallback: customFallback = defaultAvatar,
+    width = 1000,
+    height = 1000,
+    alt = 'avatar',
+    className,
+    style,
+}: Props) => {
     const [fallback, setFallback] = useState<string>()
 
     const handleError = () => {
@@ -21,19 +29,21 @@ export default memo(function UserAvatar({ src = defaultAvatar, size = 36, alt = 
     }
 
     if (!src) {
-        src = defaultAvatar
+        src = customFallback
     }
-
     return (
         <Image
             src={fallback || src}
             onError={handleError}
             alt={alt}
-            width={size}
-            height={size}
-            className={`aspect-square cursor-pointer rounded-full object-cover ${className}`}
+            width={width}
+            height={height}
+            className={`cursor-pointer overflow-hidden object-cover ${className}`}
             priority
             style={style}
+            quality={100}
         />
     )
-})
+}
+
+export default memo(CustomImage)

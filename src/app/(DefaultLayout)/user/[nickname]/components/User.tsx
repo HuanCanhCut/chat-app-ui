@@ -42,7 +42,11 @@ export default function User({ friends, currentUser, user }: UserProps) {
                 <EditProfile closeModal={closeModal} />
             </ReactModal>
             <UserAvatar
-                src={user?.data.data.avatar}
+                src={
+                    currentUser.data.data.id === user.data.data.id
+                        ? currentUser.data.data.avatar
+                        : user.data.data.avatar
+                }
                 size={168}
                 className="absolute top-[-100px] w-[130px] border-4 border-white dark:border-[#242526] sm:top-[-30px] sm:w-[168px]"
             />
