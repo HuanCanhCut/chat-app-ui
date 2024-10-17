@@ -1,4 +1,3 @@
-import style from './SwitchButton.module.scss'
 import { motion } from 'framer-motion'
 
 type Props = {

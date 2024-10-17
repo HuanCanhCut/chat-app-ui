@@ -2,6 +2,7 @@ import Image from 'next/image'
 import AuthForm from './components/AuthForm'
 
 import { Metadata } from 'next'
+import Logo from '~/components/Logo'
 
 export const metadata: Metadata = {
     title: 'Login to Huấn Cánh Cụt',
@@ -12,15 +13,7 @@ const Login: React.FC = () => {
     return (
         <main className="grid w-full grid-cols-12 dark:bg-dark dark:text-dark">
             <div className="col-span-12 p-8 sm:col-span-6">
-                <Image
-                    src="/static/media/logo.png"
-                    sizes="1000px"
-                    className="mx-auto h-auto w-[120px] sm:mx-0"
-                    alt="logo"
-                    width="0"
-                    height="0"
-                    quality={100}
-                />
+                <Logo />
                 <h1 className="mt-3 flex flex-col text-center font-bold">
                     Đăng nhập vào <span className="text-cyan-800 dark:text-cyan-500">Huấn Cánh Cụt</span>
                 </h1>

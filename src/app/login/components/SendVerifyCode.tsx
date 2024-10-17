@@ -41,22 +41,35 @@ const SendVerifyCode: React.FC<Props> = ({ emailRef }) => {
                 return
             }
 
+            if (!/^\w+([\\.-]?\w+)*@\w+([\\.-]?\w+)*(\.\w{2,3})+$/.test(emailRef.current?.value)) {
+                showToast({ message: 'Email không đúng định dạng', type: 'error' })
+                return
+            }
+
             const response = await authService.sendVerifyCode(emailRef.current?.value)
 
-            if (response.status === 204) {
-                showToast({
-                    message: 'Mã xác nhận đã được gửi đến email của bạn, nếu không thấy hãy kiểm tra thư rác hoặc spam',
-                    type: 'success',
-                })
-                return
+            switch (response.status) {
+                case 204:
+                    showToast({
+                        message:
+                            'Mã xác nhận đã được gửi đến email của bạn, nếu không thấy hãy kiểm tra thư rác hoặc spam',
+                        type: 'success',
+                    })
+                    setSendSuccess(true)
+                    return
+                case 400:
+                    showToast({ message: 'Email không đúng định dạng', type: 'error' })
+                    return
+                case 404:
+                    showToast({ message: 'Email không tồn tại trong hệ thống', type: 'error' })
+                    return
+                default:
+                    showToast({
+                        message: 'Có lỗi xảy ra, vui lòng thử lại sau hoặc liên hệ admin để xử lí',
+                        type: 'error',
+                    })
+                    return
             }
-
-            if (response.status === 404) {
-                showToast({ message: 'Email không tồn tại trong hệ thống', type: 'error' })
-                return
-            }
-
-            setSendSuccess(true)
         } catch (error) {
             console.log(error)
         }
