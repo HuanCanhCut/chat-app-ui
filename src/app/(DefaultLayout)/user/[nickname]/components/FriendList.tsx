@@ -91,12 +91,12 @@ const FriendList = ({ user }: FriendListProps) => {
                     return (
                         <div
                             key={index}
-                            className="flex items-center rounded-md border border-gray-200 p-2 dark:border-gray-800"
+                            className="flex items-center rounded-md border border-gray-200 px-2 py-4 dark:border-gray-800"
                         >
                             <UserAvatar src={friend.user.avatar} className="rounded-lg" size={70} />
                             <div>
-                                <h3 className="ml-4">{friend.user.full_name}</h3>
-                                <p className="ml-4 text-sm text-gray-400 dark:text-gray-500">
+                                <h4 className="ml-4">{friend.user.full_name}</h4>
+                                <p className="ml-4 text-xs text-gray-600 dark:text-gray-400">
                                     {friend.user.friends_count} nguời bạn
                                 </p>
                             </div>

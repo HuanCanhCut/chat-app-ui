@@ -21,7 +21,7 @@ export default function Button({
     onClick,
     ...props
 }: ButtonProps) {
-    const primaryClass = buttonType === 'primary' ? 'bg-primary px-4 py-2 rounded-md' : ''
+    const primaryClass = buttonType === 'primary' ? 'bg-primary px-4 py-2 rounded-md text-white' : ''
     const outlineClass = buttonType === 'outline' ? 'border border-primary px-4 py-2 rounded-md' : ''
     const buttonIconClass = buttonType === 'icon' ? 'h-9 w-9 rounded-full bg-gray-100 dark:bg-[#313233]' : ''
     const roundedClass = buttonType === 'rounded' ? 'rounded-md px-4 py-2 dark:bg-[#313233] bg-gray-200' : ''
