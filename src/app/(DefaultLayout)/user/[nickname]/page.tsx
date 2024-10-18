@@ -1,9 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { AxiosResponse } from 'axios'
 import Image from 'next/image'
-import useSWR from 'swr'
+import useSWR, { mutate } from 'swr'
 
 import config from '~/config'
 import { FriendsResponse, UserResponse } from '~/type/type'
@@ -19,9 +19,15 @@ export default function UserPage() {
     const { nickname } = useParams()
     const [page, setPage] = useState(1)
 
-    const { data: friends } = useSWR<AxiosResponse<FriendsResponse>>(config.apiEndpoint.friend.getAllFriends, () => {
-        return friendsService.getFriends({ page })
-    })
+    const { data: friends, mutate: mutateFriends } = useSWR<AxiosResponse<FriendsResponse>>(
+        nickname ? [config.apiEndpoint.friend.getAllFriends, nickname] : null,
+        () => {
+            return friendsService.getFriends({ page })
+        },
+        {
+            revalidateOnMount: true,
+        },
+    )
 
     const { data: currentUser } = useSWR<AxiosResponse<UserResponse>>(config.apiEndpoint.me.getCurrentUser, () => {
         return meService.getCurrentUser()
@@ -33,6 +39,63 @@ export default function UserPage() {
             return userService.getAnUser(nickname.slice(3) as string)
         },
     )
+
+    useEffect(() => {
+        let isLoading = false // Track if a page increment is in progress
+
+        const handleScroll = () => {
+            if (window.innerHeight + window.scrollY >= document.body.offsetHeight && !isLoading) {
+                isLoading = true // Set loading to true to prevent further increments
+                if (!friends) {
+                    return
+                }
+
+                setPage((prevPage) => {
+                    return prevPage >= friends.data.meta.pagination.total_pages ? prevPage : prevPage + 1
+                })
+
+                setTimeout(() => {
+                    isLoading = false // Reset loading after a short delay
+                }, 500) // Adjust the delay as needed
+            }
+        }
+
+        window.addEventListener('scroll', handleScroll)
+        return () => {
+            window.removeEventListener('scroll', handleScroll)
+        }
+    }, [friends])
+
+    useEffect(() => {
+        if (page <= 1) {
+            return
+        }
+
+        const getMoreFriends = async () => {
+            const res = await friendsService.getFriends({ page })
+
+            if (!friends?.data.data) {
+                return
+            }
+
+            if (res.status === 200) {
+                const newData: AxiosResponse<FriendsResponse> = {
+                    ...res,
+                    data: {
+                        ...res.data,
+                        data: [...friends.data.data, ...res.data.data],
+                    },
+                }
+
+                mutateFriends(newData, {
+                    revalidate: false,
+                })
+            }
+        }
+
+        getMoreFriends()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [page])
 
     const Loading = () => {
         return (
@@ -59,12 +122,16 @@ export default function UserPage() {
     }
 
     return (
-        <div className="min-h-screen">
+        <div className="min-h-screen pb-4">
             <header className="bg-gray-100 dark:bg-darkGray">
                 {user && currentUser && friends ? (
                     <div className="w-1100px mx-auto max-w-[1100px]">
                         <Image
-                            src={user.data.data.cover_photo || '/static/media/login-form.jpg'}
+                            src={
+                                currentUser.data.data.id === user.data.data.id
+                                    ? currentUser.data.data.cover_photo
+                                    : user.data.data.cover_photo || '/static/media/login-form.jpg'
+                            }
                             alt="user"
                             className="aspect-[12/5] h-auto w-[1100px] rounded-lg object-cover"
                             quality={100}

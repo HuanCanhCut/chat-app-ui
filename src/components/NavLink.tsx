@@ -1,18 +1,21 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-export default function NavLink({
-    children,
-    href,
-    className = '',
-}: {
+
+interface NavLinkProps {
     children: React.ReactNode
     href: string
-    className?: string
-}) {
+    className?: (options: { isActive: boolean }) => string
+}
+
+export default function NavLink({ children, href, className = () => '' }: NavLinkProps) {
     const pathname = usePathname()
 
+    const options = {
+        isActive: pathname === href,
+    }
+
     return (
-        <Link href={href} className={`${pathname === href ? 'text-primary' : ''} ${className}`}>
+        <Link href={href} className={className(options)}>
             {children}
         </Link>
     )

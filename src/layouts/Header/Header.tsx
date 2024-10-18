@@ -84,6 +84,7 @@ export default function Header() {
             case 'logout':
                 authService.logout()
                 router.push(config.routes.login)
+                router.refresh()
                 break
         }
     }
@@ -117,7 +118,10 @@ export default function Header() {
     }
 
     return (
-        <header className="fixed left-0 right-0 top-0 z-20 flex h-[var(--header-height)] w-full items-center justify-between bg-white px-3 shadow-sm shadow-[#0000001f] dark:bg-darkGray dark:text-dark dark:shadow-[#ffffff1f]">
+        <header
+            id="header"
+            className="fixed left-0 right-0 top-0 z-20 flex h-[var(--header-height)] w-full items-center justify-between bg-white px-3 shadow-sm shadow-[#0000001f] dark:bg-darkGray dark:text-dark dark:shadow-[#ffffff1f]"
+        >
             <Logo />
 
             <nav className="relative flex h-full items-center">
@@ -129,7 +133,9 @@ export default function Header() {
                             >
                                 <NavLink
                                     href={item.href}
-                                    className={`flex-center h-full rounded-md text-xl hover:bg-[#a7a7a736] dark:hover:bg-[#313333]`}
+                                    className={(nav) => {
+                                        return `${nav.isActive ? 'text-primary' : ''} flex-center h-full rounded-md text-xl hover:bg-[#a7a7a736] dark:hover:bg-[#313333]`
+                                    }}
                                 >
                                     {item.icon}
                                 </NavLink>

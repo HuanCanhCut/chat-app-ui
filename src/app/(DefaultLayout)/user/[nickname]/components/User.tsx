@@ -58,9 +58,10 @@ export default function User({ friends, currentUser, user }: UserProps) {
                 <div className="mt-2 hidden sm:flex">
                     {friends.data.data.map((friend: FriendsShip, index) => {
                         // 7 là số lượng bạn bè tối đa hiển thị
-                        if (index === 7) {
+                        if (index >= 7) {
                             return
                         }
+
                         const translateValue = `translateX(-${index * 7}px)`
                         return (
                             <React.Fragment key={index}>

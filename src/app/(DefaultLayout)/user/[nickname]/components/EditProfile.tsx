@@ -123,6 +123,9 @@ const EditProfile = ({ closeModal }: EditProfileProps) => {
             if (response.status === 200) {
                 mutate(config.apiEndpoint.me.getCurrentUser)
             }
+
+            // replace state to update url without reloading page
+            window.history.replaceState({}, '', `/user/@${newData.data.data.nickname}`)
         } catch (error) {
             console.log(error)
         }

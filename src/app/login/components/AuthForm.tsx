@@ -4,7 +4,6 @@ import Image from 'next/image'
 import { useForm, SubmitHandler } from 'react-hook-form'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons'
-import { useRouter } from 'next/navigation'
 import { signInWithPopup } from 'firebase/auth'
 import { AxiosResponse } from 'axios'
 
@@ -31,13 +30,7 @@ interface Response {
     }
 }
 
-interface ImperativeHandle {
-    current: () => HTMLInputElement | null
-}
-
 const AuthForm = () => {
-    const router = useRouter()
-
     const emailRef = useRef<HTMLInputElement | null>(null)
 
     const [type, setType] = useState<'login' | 'register' | 'forgotPassword'>('login')
@@ -52,7 +45,8 @@ const AuthForm = () => {
             message: 'Đăng nhập thành công.',
         })
 
-        router.push('/dashboard')
+        // reload page
+        window.location.reload()
     }
 
     const onSubmit: SubmitHandler<FieldValue> = (data) => {
@@ -271,7 +265,7 @@ const AuthForm = () => {
                     </>
                 )}
 
-                {errorMessage && <span className="text-error text-sm">{errorMessage}</span>}
+                {errorMessage && <span className="text-sm text-error">{errorMessage}</span>}
 
                 {type === 'login' && (
                     <span
@@ -292,7 +286,7 @@ const AuthForm = () => {
             <span className="text-center text-sm text-gray-500 dark:text-gray-400">
                 Bạn không có tài khoản?{' '}
                 <span
-                    className="text-error cursor-pointer font-semibold"
+                    className="cursor-pointer font-semibold text-error"
                     onClick={() => setType(type === 'login' ? 'register' : 'login')}
                 >
                     {type === 'login' ? 'Đăng kí' : 'Đăng nhập'}
