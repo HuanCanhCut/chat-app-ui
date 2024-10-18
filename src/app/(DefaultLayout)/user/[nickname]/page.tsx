@@ -1,13 +1,11 @@
 'use client'
 
-import { useEffect, useState } from 'react'
 import { AxiosResponse } from 'axios'
 import Image from 'next/image'
-import useSWR, { mutate } from 'swr'
+import useSWR from 'swr'
 
 import config from '~/config'
-import { FriendsResponse, UserResponse } from '~/type/type'
-import * as friendsService from '~/services/friendsService'
+import { UserResponse } from '~/type/type'
 import * as meService from '~/services/meService'
 import * as userService from '~/services/userService'
 import { useParams } from 'next/navigation'
@@ -17,85 +15,17 @@ import Skeleton from 'react-loading-skeleton'
 
 export default function UserPage() {
     const { nickname } = useParams()
-    const [page, setPage] = useState(1)
-
-    const { data: friends, mutate: mutateFriends } = useSWR<AxiosResponse<FriendsResponse>>(
-        nickname ? [config.apiEndpoint.friend.getAllFriends, nickname] : null,
-        () => {
-            return friendsService.getFriends({ page })
-        },
-        {
-            revalidateOnMount: true,
-        },
-    )
 
     const { data: currentUser } = useSWR<AxiosResponse<UserResponse>>(config.apiEndpoint.me.getCurrentUser, () => {
         return meService.getCurrentUser()
     })
 
-    const { data: user } = useSWR<AxiosResponse<UserResponse> | undefined>(
+    const { data: user, isLoading } = useSWR<AxiosResponse<UserResponse>>(
         nickname ? [config.apiEndpoint.user.getAnUser, nickname] : null,
         () => {
             return userService.getAnUser(nickname.slice(3) as string)
         },
     )
-
-    useEffect(() => {
-        let isLoading = false // Track if a page increment is in progress
-
-        const handleScroll = () => {
-            if (window.innerHeight + window.scrollY >= document.body.offsetHeight && !isLoading) {
-                isLoading = true // Set loading to true to prevent further increments
-                if (!friends) {
-                    return
-                }
-
-                setPage((prevPage) => {
-                    return prevPage >= friends.data.meta.pagination.total_pages ? prevPage : prevPage + 1
-                })
-
-                setTimeout(() => {
-                    isLoading = false // Reset loading after a short delay
-                }, 500) // Adjust the delay as needed
-            }
-        }
-
-        window.addEventListener('scroll', handleScroll)
-        return () => {
-            window.removeEventListener('scroll', handleScroll)
-        }
-    }, [friends])
-
-    useEffect(() => {
-        if (page <= 1) {
-            return
-        }
-
-        const getMoreFriends = async () => {
-            const res = await friendsService.getFriends({ page })
-
-            if (!friends?.data.data) {
-                return
-            }
-
-            if (res.status === 200) {
-                const newData: AxiosResponse<FriendsResponse> = {
-                    ...res,
-                    data: {
-                        ...res.data,
-                        data: [...friends.data.data, ...res.data.data],
-                    },
-                }
-
-                mutateFriends(newData, {
-                    revalidate: false,
-                })
-            }
-        }
-
-        getMoreFriends()
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [page])
 
     const Loading = () => {
         return (
@@ -124,7 +54,7 @@ export default function UserPage() {
     return (
         <div className="min-h-screen pb-4">
             <header className="bg-gray-100 dark:bg-darkGray">
-                {user && currentUser && friends ? (
+                {user?.status === 200 && currentUser?.status === 200 ? (
                     <div className="w-1100px mx-auto max-w-[1100px]">
                         <Image
                             src={
@@ -141,19 +71,21 @@ export default function UserPage() {
                             priority
                             style={{ width: '100%', height: 'auto' }}
                         />
-                        {friends && user && currentUser && (
-                            <User friends={friends} currentUser={currentUser} user={user} />
-                        )}
+                        {user && currentUser && <User currentUser={currentUser} user={user} />}
                         <div className="mt-0 w-full border-t border-gray-300 py-2 dark:border-gray-700 sm:mt-10">
                             <button className="px-4 py-2 text-primary">Bạn bè</button>
                         </div>
+                    </div>
+                ) : user?.status !== 200 && !isLoading ? (
+                    <div className="flex items-center justify-center">
+                        <h1 className="text-2xl font-bold">User not found</h1>
                     </div>
                 ) : (
                     <Loading />
                 )}
             </header>
-            {friends ? (
-                <FriendList friends={friends} />
+            {user ? (
+                <FriendList user={user} />
             ) : (
                 <div className="mx-auto mt-4 max-w-[1100px]">
                     <div className="mt-8 grid grid-cols-1 gap-2 sm:grid-cols-2">

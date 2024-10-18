@@ -6,20 +6,35 @@ import ReactModal from 'react-modal'
 import { AxiosResponse } from 'axios'
 import Link from 'next/link'
 import React, { useState } from 'react'
+import useSWR from 'swr'
+import { useParams } from 'next/navigation'
+
+import * as friendsService from '~/services/friendsService'
 import Button from '~/components/Button'
 import { MessageIcon } from '~/components/Icons'
 import UserAvatar from '~/components/UserAvatar'
 import { FriendsResponse, FriendsShip, UserResponse } from '~/type/type'
 import EditProfile from './EditProfile'
+import config from '~/config'
 
 interface UserProps {
-    friends: AxiosResponse<FriendsResponse>
     currentUser: AxiosResponse<UserResponse>
     user: AxiosResponse<UserResponse>
 }
 
-export default function User({ friends, currentUser, user }: UserProps) {
+export default function User({ currentUser, user }: UserProps) {
+    const { nickname } = useParams()
     const [isOpen, setIsOpen] = useState(false)
+
+    const { data: friends } = useSWR<AxiosResponse<FriendsResponse>>(
+        nickname ? [config.apiEndpoint.friend.getAllFriends, nickname] : null,
+        () => {
+            return friendsService.getFriends({ page: 1, user_id: user.data.data.id })
+        },
+        {
+            revalidateOnMount: true,
+        },
+    )
 
     const openModal = () => {
         setIsOpen(true)
@@ -56,7 +71,7 @@ export default function User({ friends, currentUser, user }: UserProps) {
                     {user?.data.data.friends_count} người bạn
                 </p>
                 <div className="mt-2 hidden sm:flex">
-                    {friends.data.data.map((friend: FriendsShip, index) => {
+                    {friends?.data?.data?.map((friend: FriendsShip, index) => {
                         // 7 là số lượng bạn bè tối đa hiển thị
                         if (index >= 7) {
                             return
