@@ -70,19 +70,22 @@ export default memo(function CustomTippy({
     }
 
     return (
-        <Tippy
-            trigger={trigger}
-            animation={true}
-            interactive
-            delay={[timeDelayOpen, timeDelayClose]}
-            offset={[offsetX, offsetY]}
-            hideOnClick={hideOnClick}
-            placement={placement}
-            render={render}
-            onMount={onMount}
-            onHide={onHide}
-        >
-            {children}
-        </Tippy>
+        //Using a wrapper <div> or <span> tag around the reference element solves this by creating a new parentNode context.
+        <div>
+            <Tippy
+                trigger={trigger}
+                animation={true}
+                interactive
+                delay={[timeDelayOpen, timeDelayClose]}
+                offset={[offsetX, offsetY]}
+                hideOnClick={hideOnClick}
+                placement={placement}
+                render={render}
+                onMount={onMount}
+                onHide={onHide}
+            >
+                {children}
+            </Tippy>
+        </div>
     )
 })

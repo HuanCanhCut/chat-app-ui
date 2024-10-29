@@ -12,6 +12,7 @@ import { useParams } from 'next/navigation'
 import User from './components/User'
 import FriendList from './components/FriendList'
 import Skeleton from 'react-loading-skeleton'
+import NotFound from '~/app/not-found'
 
 export default function UserPage() {
     const { nickname } = useParams()
@@ -77,9 +78,7 @@ export default function UserPage() {
                         </div>
                     </div>
                 ) : user?.status !== 200 && !isLoading ? (
-                    <div className="flex items-center justify-center">
-                        <h1 className="text-2xl font-bold">User not found</h1>
-                    </div>
+                    <NotFound />
                 ) : (
                     <Loading />
                 )}

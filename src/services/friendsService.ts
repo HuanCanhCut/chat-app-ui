@@ -14,10 +14,11 @@ export const getFriends = async ({
     user_id,
 }: GetFriendsProps): Promise<AxiosResponse<FriendsResponse>> => {
     try {
-        return await request.get(`users/${user_id}/friends`, {
+        return await request.get(`users/friends`, {
             params: {
                 page,
                 per_page,
+                user_id,
             },
         })
     } catch (error: any) {

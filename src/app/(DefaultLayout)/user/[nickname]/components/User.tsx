@@ -13,9 +13,11 @@ import * as friendsService from '~/services/friendsService'
 import Button from '~/components/Button'
 import { MessageIcon } from '~/components/Icons'
 import UserAvatar from '~/components/UserAvatar'
-import { FriendsResponse, FriendsShip, UserResponse } from '~/type/type'
+import { FriendsResponse, FriendsShip, UserModel, UserResponse } from '~/type/type'
 import EditProfile from './EditProfile'
 import config from '~/config'
+import CustomTippy from '~/components/CustomTippy'
+import AccountPreview from '~/components/AccountPreview'
 
 interface UserProps {
     currentUser: AxiosResponse<UserResponse>
@@ -26,13 +28,11 @@ export default function User({ currentUser, user }: UserProps) {
     const { nickname } = useParams()
     const [isOpen, setIsOpen] = useState(false)
 
+    // get friends of user
     const { data: friends } = useSWR<AxiosResponse<FriendsResponse>>(
         nickname ? [config.apiEndpoint.friend.getAllFriends, nickname] : null,
         () => {
             return friendsService.getFriends({ page: 1, user_id: user.data.data.id })
-        },
-        {
-            revalidateOnMount: true,
         },
     )
 
@@ -42,6 +42,10 @@ export default function User({ currentUser, user }: UserProps) {
 
     const closeModal = () => {
         setIsOpen(false)
+    }
+
+    const renderAccountPreview = (user: UserModel) => {
+        return <AccountPreview user={user} currentUser={currentUser.data.data} />
     }
 
     return (
@@ -65,12 +69,10 @@ export default function User({ currentUser, user }: UserProps) {
                 size={168}
                 className="absolute top-[-100px] w-[130px] border-4 border-white dark:border-[#242526] sm:top-[-30px] sm:w-[168px]"
             />
-            <div className="mt-4 sm:ml-[180px] sm:mt-0 sm:flex-1">
-                <h1 className="font-semibold">{user?.data.data.full_name}</h1>
-                <p className="mt-1 text-base text-gray-700 dark:text-gray-300">
-                    {user?.data.data.friends_count} người bạn
-                </p>
-                <div className="mt-2 hidden sm:flex">
+            <div className="mt-4 flex flex-col gap-2 sm:ml-[180px] sm:mt-0 sm:flex-1">
+                <h1 className="m-0 mt-2 font-semibold">{user?.data.data.full_name}</h1>
+                <p className="text-base text-gray-700 dark:text-gray-400">{user?.data.data.friends_count} người bạn</p>
+                <div className="hidden sm:flex">
                     {friends?.data?.data?.map((friend: FriendsShip, index) => {
                         // 7 là số lượng bạn bè tối đa hiển thị
                         if (index >= 7) {
@@ -78,20 +80,28 @@ export default function User({ currentUser, user }: UserProps) {
                         }
 
                         const translateValue = `translateX(-${index * 7}px)`
+
                         return (
                             <React.Fragment key={index}>
-                                <Link href={`/user/@${friend.user.nickname}`}>
-                                    <UserAvatar
-                                        src={friend.user.avatar}
-                                        size={32}
-                                        key={index}
-                                        className={`border border-white dark:border-dark`}
-                                        style={{
-                                            transform: translateValue,
-                                            zIndex: friends.data.data.length - index,
-                                        }}
-                                    />
-                                </Link>
+                                <CustomTippy
+                                    renderItem={() => renderAccountPreview(friend.user)}
+                                    trigger="mouseenter"
+                                    timeDelayOpen={300}
+                                    timeDelayClose={100}
+                                    placement="top"
+                                >
+                                    <Link href={`/user/@${friend.user.nickname}`}>
+                                        <UserAvatar
+                                            src={friend.user.avatar}
+                                            size={36}
+                                            key={index}
+                                            className="border-2 border-white dark:border-dark"
+                                            style={{
+                                                transform: translateValue,
+                                            }}
+                                        />
+                                    </Link>
+                                </CustomTippy>
                             </React.Fragment>
                         )
                     })}

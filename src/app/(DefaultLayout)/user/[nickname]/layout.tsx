@@ -1,7 +1,7 @@
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-    title: 'Profile',
+    title: 'Profile | Huấn Cánh Cụt',
     description: 'Profile page',
 }
 

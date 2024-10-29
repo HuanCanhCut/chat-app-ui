@@ -7,6 +7,7 @@ import * as friendsService from '~/services/friendsService'
 import UserAvatar from '~/components/UserAvatar'
 import config from '~/config'
 import { FriendsResponse, FriendsShip, UserResponse } from '~/type/type'
+import Link from 'next/link'
 
 interface FriendListProps {
     user: AxiosResponse<UserResponse>
@@ -20,9 +21,6 @@ const FriendList = ({ user }: FriendListProps) => {
         nickname ? [config.apiEndpoint.friend.getAllFriends, nickname] : null,
         () => {
             return friendsService.getFriends({ page, user_id: user.data.data.id })
-        },
-        {
-            revalidateOnMount: true,
         },
     )
 
@@ -89,7 +87,8 @@ const FriendList = ({ user }: FriendListProps) => {
             <div className="mt-8 grid grid-cols-1 gap-2 sm:grid-cols-2">
                 {friends?.data?.data?.map((friend: FriendsShip, index: number) => {
                     return (
-                        <div
+                        <Link
+                            href={`/user/@${friend.user.nickname}`}
                             key={index}
                             className="flex items-center rounded-md border border-gray-200 px-2 py-4 dark:border-gray-800"
                         >
@@ -100,7 +99,7 @@ const FriendList = ({ user }: FriendListProps) => {
                                     {friend.user.friends_count} nguời bạn
                                 </p>
                             </div>
-                        </div>
+                        </Link>
                     )
                 })}
             </div>

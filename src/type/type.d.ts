@@ -8,12 +8,15 @@ export interface UserModel extends Timestamp {
     first_name: string
     last_name: string
     full_name: string
-    email: string
     uuid: string
     avatar: string
     nickname: string
     cover_photo: string
     friends_count: number
+    is_friend: boolean
+    friend_request: boolean
+    sent_friend_request: boolean
+    bio: string
 }
 
 interface UserResponse {
