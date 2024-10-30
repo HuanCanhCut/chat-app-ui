@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import ReactModal from 'react-modal'
 import { AxiosResponse } from 'axios'
 import Link from 'next/link'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import useSWR from 'swr'
 import { useParams } from 'next/navigation'
 
@@ -18,6 +18,7 @@ import EditProfile from './EditProfile'
 import config from '~/config'
 import CustomTippy from '~/components/CustomTippy'
 import AccountPreview from '~/components/AccountPreview'
+import { listentEvent } from '~/helpers/events'
 
 interface UserProps {
     currentUser: AxiosResponse<UserResponse>
@@ -29,12 +30,38 @@ export default function User({ currentUser, user }: UserProps) {
     const [isOpen, setIsOpen] = useState(false)
 
     // get friends of user
-    const { data: friends } = useSWR<AxiosResponse<FriendsResponse>>(
+    const { data: friends, mutate: mutateFriends } = useSWR<AxiosResponse<FriendsResponse>>(
         nickname ? [config.apiEndpoint.friend.getAllFriends, nickname] : null,
         () => {
             return friendsService.getFriends({ page: 1, user_id: user.data.data.id })
         },
     )
+
+    useEffect(() => {
+        // Remove friend from friends list when unfriend
+        const remove = listentEvent({
+            eventName: 'friend:unfriend',
+            handler: ({ detail: userId }) => {
+                if (!friends?.data.data) {
+                    return
+                }
+
+                const newFriends: AxiosResponse<FriendsResponse> = {
+                    ...friends,
+                    data: {
+                        ...friends?.data,
+                        data: friends?.data.data.filter((friend) => friend.user.id !== userId),
+                    },
+                }
+
+                mutateFriends(newFriends, {
+                    revalidate: false,
+                })
+            },
+        })
+
+        return remove
+    }, [friends, mutateFriends])
 
     const openModal = () => {
         setIsOpen(true)

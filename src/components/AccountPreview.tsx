@@ -19,7 +19,6 @@ const AccountPreview = ({ user, currentUser }: AccountPreviewProps) => {
                     <main className="mt-2 flex flex-col gap-1">
                         <h2 className="font-semibold">{user.full_name}</h2>
                         <h4 className="text-sm">{user.nickname}</h4>
-                        <p className="text-sm text-gray-500">Đây là bio của bạn</p>
                     </main>
                 </div>
                 {currentUser.id !== user.id && (

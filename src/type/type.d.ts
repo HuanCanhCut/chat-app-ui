@@ -16,7 +16,6 @@ export interface UserModel extends Timestamp {
     is_friend: boolean
     friend_request: boolean
     sent_friend_request: boolean
-    bio: string
 }
 
 interface UserResponse {

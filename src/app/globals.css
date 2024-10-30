@@ -56,14 +56,14 @@ html.dark {
 }
 
 html.dark .tippy-box {
-    background-color: rgba(244, 244, 244, 1);
+    background-color: rgb(208, 208, 208);
     border-radius: 8px;
     font-weight: 400;
     color: #000;
 }
 
 html.dark .tippy-arrow {
-    color: rgba(244, 244, 244, 1);
+    color: rgb(208, 208, 208);
 }
 
 body {
