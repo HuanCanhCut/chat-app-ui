@@ -2,7 +2,7 @@ export const sendEvent = ({ eventName, detail }: { eventName: string; detail?: a
     document.dispatchEvent(new CustomEvent(eventName, { detail }))
 }
 
-export const listentEvent = ({
+export const listenEvent = ({
     eventName,
     handler,
     context = document,

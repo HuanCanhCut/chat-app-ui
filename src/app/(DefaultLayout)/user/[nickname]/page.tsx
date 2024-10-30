@@ -3,16 +3,18 @@
 import { AxiosResponse } from 'axios'
 import Image from 'next/image'
 import useSWR from 'swr'
+import Skeleton from 'react-loading-skeleton'
+import { useEffect } from 'react'
+import { useParams } from 'next/navigation'
 
 import config from '~/config'
 import { UserResponse } from '~/type/type'
 import * as meService from '~/services/meService'
 import * as userService from '~/services/userService'
-import { useParams } from 'next/navigation'
 import User from './components/User'
 import FriendList from './components/FriendList'
-import Skeleton from 'react-loading-skeleton'
 import NotFound from '~/app/not-found'
+import { listenEvent } from '~/helpers/events'
 
 export default function UserPage() {
     const { nickname } = useParams()
@@ -21,12 +23,36 @@ export default function UserPage() {
         return meService.getCurrentUser()
     })
 
-    const { data: user, isLoading } = useSWR<AxiosResponse<UserResponse>>(
-        nickname ? [config.apiEndpoint.user.getAnUser, nickname] : null,
-        () => {
-            return userService.getAnUser(nickname.slice(3) as string)
-        },
-    )
+    const {
+        data: user,
+        isLoading,
+        mutate,
+    } = useSWR<AxiosResponse<UserResponse>>(nickname ? [config.apiEndpoint.user.getAnUser, nickname] : null, () => {
+        return userService.getAnUser(nickname.slice(3) as string)
+    })
+
+    useEffect(() => {
+        const remove = listenEvent({
+            eventName: 'friend:change-friend-status',
+            handler: ({ detail }) => {
+                if (!user?.data.data) {
+                    return
+                }
+
+                const newData: AxiosResponse<UserResponse> = {
+                    ...user,
+                    data: {
+                        ...user.data,
+                        data: { ...user.data.data, ...detail },
+                    },
+                }
+
+                mutate(newData, { revalidate: false })
+            },
+        })
+
+        return remove
+    }, [mutate, user])
 
     const Loading = () => {
         return (

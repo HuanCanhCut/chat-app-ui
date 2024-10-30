@@ -1,6 +1,6 @@
 'use client'
 
-import { faUserPen, faUserPlus } from '@fortawesome/free-solid-svg-icons'
+import { faUserPen } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import ReactModal from 'react-modal'
 import { AxiosResponse } from 'axios'
@@ -18,7 +18,8 @@ import EditProfile from './EditProfile'
 import config from '~/config'
 import CustomTippy from '~/components/CustomTippy'
 import AccountPreview from '~/components/AccountPreview'
-import { listentEvent } from '~/helpers/events'
+import { listenEvent } from '~/helpers/events'
+import FriendButton from '~/components/FriendButton'
 
 interface UserProps {
     currentUser: AxiosResponse<UserResponse>
@@ -39,8 +40,8 @@ export default function User({ currentUser, user }: UserProps) {
 
     useEffect(() => {
         // Remove friend from friends list when unfriend
-        const remove = listentEvent({
-            eventName: 'friend:unfriend',
+        const remove = listenEvent({
+            eventName: 'friend:get-new-friends',
             handler: ({ detail: userId }) => {
                 if (!friends?.data.data) {
                     return
@@ -146,12 +147,13 @@ export default function User({ currentUser, user }: UserProps) {
                     </Button>
                 ) : (
                     <>
-                        <Button buttonType="rounded" leftIcon={<FontAwesomeIcon icon={faUserPlus} />}>
-                            Thêm bạn bè
-                        </Button>
-                        <Button buttonType="primary" leftIcon={<MessageIcon />}>
-                            Nhắn tin
-                        </Button>
+                        <FriendButton user={user.data.data} />
+
+                        {user.data.data.is_friend && (
+                            <Button buttonType="primary" leftIcon={<MessageIcon />}>
+                                Nhắn tin
+                            </Button>
+                        )}
                     </>
                 )}
             </div>
