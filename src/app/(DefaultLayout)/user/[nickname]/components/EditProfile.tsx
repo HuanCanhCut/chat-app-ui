@@ -85,7 +85,11 @@ const EditProfile = ({ closeModal }: EditProfileProps) => {
             // handle split full_name to first_name and last_name
             const fullName = data.full_name.split(' ')
 
-            const middle = Math.ceil(fullName.length / 2)
+            let middle = 0
+
+            if (fullName.length > 1) {
+                middle = Math.ceil(fullName.length / 2)
+            }
 
             const firstName = fullName.slice(0, middle).join(' ')
             const lastName = fullName.slice(middle).join(' ')
@@ -114,14 +118,16 @@ const EditProfile = ({ closeModal }: EditProfileProps) => {
             mutate(config.apiEndpoint.me.getCurrentUser, newData, {
                 revalidate: false,
             })
-            showToast({ message: 'Cập nhật thành công' })
 
             closeModal()
 
             const response = await meService.updateCurrentUser(formData)
 
             if (response.status === 200) {
+                showToast({ message: 'Cập nhật thành công' })
                 mutate(config.apiEndpoint.me.getCurrentUser)
+            } else {
+                showToast({ message: 'Cập nhật thất bại', type: 'error' })
             }
 
             // replace state to update url without reloading page

@@ -1,12 +1,12 @@
 'use client'
 
 import { AxiosResponse } from 'axios'
-import Image from 'next/image'
 import useSWR from 'swr'
 import Skeleton from 'react-loading-skeleton'
 import { useEffect } from 'react'
 import { useParams } from 'next/navigation'
 
+import CustomImage from '~/components/Image'
 import config from '~/config'
 import { UserResponse } from '~/type/type'
 import * as meService from '~/services/meService'
@@ -83,19 +83,15 @@ export default function UserPage() {
             <header className="bg-gray-100 dark:bg-darkGray">
                 {user?.status === 200 && currentUser?.status === 200 ? (
                     <div className="w-1100px mx-auto max-w-[1100px]">
-                        <Image
+                        <CustomImage
                             src={
                                 currentUser.data.data.id === user.data.data.id
                                     ? currentUser.data.data.cover_photo
-                                    : user.data.data.cover_photo || '/static/media/login-form.jpg'
+                                    : user.data.data.cover_photo
                             }
+                            fallback="/static/media/login-form.jpg"
                             alt="user"
                             className="aspect-[12/5] h-auto w-[1100px] rounded-lg object-cover"
-                            quality={100}
-                            width="0"
-                            height="0"
-                            sizes="100vw"
-                            priority
                             style={{ width: '100%', height: 'auto' }}
                         />
                         {user && currentUser && <User currentUser={currentUser} user={user} />}

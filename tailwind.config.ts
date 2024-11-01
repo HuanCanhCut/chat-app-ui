@@ -1,4 +1,3 @@
-import { error } from 'console'
 import type { Config } from 'tailwindcss'
 
 const config: Config = {
