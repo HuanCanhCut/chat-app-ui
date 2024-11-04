@@ -1,6 +1,6 @@
 import { faBell, faUser } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 
 import * as notificationServices from '~/services/notification'
 import Button from '~/components/Button'
@@ -16,7 +16,7 @@ import { listenEvent } from '~/helpers/events'
 
 const Notification = () => {
     const [currentTab, setCurrentTab] = useState<'all' | 'unread'>('all')
-    const [isUpdateComment, setIsUpdateComment] = useState(false)
+    const [notificationUnSeenCount, setNotificationUnSeenCount] = useState(0)
 
     const { data: notifications, mutate } = useSWR<AxiosResponse<NotificationResponse>>(
         currentTab ? [config.apiEndpoint.notification.getNotifications, currentTab] : null,
@@ -24,6 +24,19 @@ const Notification = () => {
             return notificationServices.getNotifications({ page: 1, per_page: 10, type: currentTab })
         },
     )
+
+    // Count notification
+    useMemo(() => {
+        const count = notifications?.data.data.reduce((acc: number, curr: NotificationData) => {
+            return acc + (curr.notification_details.is_seen ? 0 : 1)
+        }, 0)
+
+        if (count) {
+            setNotificationUnSeenCount(count)
+        }
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [!!notifications?.data.data.length])
 
     const tippyInstanceRef = useRef<InstanceType<any>>(null)
 
@@ -62,16 +75,42 @@ const Notification = () => {
         tippyInstanceRef.current = instance
     }
 
+    const handleOpenNotification = () => {
+        if (notificationUnSeenCount) {
+            notificationServices.seen()
+            setNotificationUnSeenCount(0)
+        }
+    }
+
     useEffect(() => {
         const remove = listenEvent({
             eventName: 'notification:delete-notification',
-            handler: () => {
-                setIsUpdateComment(true)
+            handler: ({ detail: notificationId }) => {
+                const newNotifications = notifications?.data.data.filter(
+                    (notification: NotificationData) => notification.id !== notificationId,
+                )
+
+                if (notifications) {
+                    mutate({
+                        ...notifications,
+                        data: {
+                            ...notifications?.data,
+                            data: newNotifications || [],
+                            meta: {
+                                pagination: {
+                                    ...notifications?.data.meta.pagination,
+                                    total: notifications.data.meta.pagination.total - 1,
+                                    count: notifications.data.meta.pagination.count - 1,
+                                },
+                            },
+                        },
+                    })
+                }
             },
         })
 
         return remove
-    }, [mutate])
+    }, [mutate, notifications])
 
     useEffect(() => {
         const remove = listenEvent({
@@ -79,16 +118,11 @@ const Notification = () => {
             handler: () => {
                 // Hide tippy when click on notification item
                 tippyInstanceRef.current?.hide()
-
-                if (isUpdateComment) {
-                    mutate()
-                    setIsUpdateComment(false)
-                }
             },
         })
 
         return remove
-    }, [currentTab, mutate, isUpdateComment])
+    }, [currentTab])
 
     const renderNotification = () => {
         return (
@@ -125,12 +159,12 @@ const Notification = () => {
     return (
         <CustomTippy renderItem={renderNotification} onShow={tippyShow}>
             <div className="relative">
-                <Button buttonType="icon">
+                <Button buttonType="icon" onClick={handleOpenNotification}>
                     <FontAwesomeIcon icon={faBell} className="text-lg sm:text-xl" />
                 </Button>
-                {notifications?.status === 200 && notifications?.data?.meta.pagination.total > 0 && (
+                {notifications?.status === 200 && notificationUnSeenCount !== 0 && (
                     <span className="flex-center absolute right-[-3px] top-[-3px] h-4 w-4 rounded-full bg-red-500 text-xs text-white">
-                        {notifications?.data?.meta.pagination.total}
+                        {notificationUnSeenCount}
                     </span>
                 )}
             </div>

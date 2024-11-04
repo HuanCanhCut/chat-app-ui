@@ -57,6 +57,7 @@ interface NotificationDetail {
     id: number
     notification_id: number
     is_read: boolean
+    is_seen: boolean
     message: string
     sender_id: number
     sender_user: UserModel

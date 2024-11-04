@@ -9,7 +9,7 @@ import React, { useEffect, useState } from 'react'
 import useSWR from 'swr'
 import { useParams } from 'next/navigation'
 
-import * as friendsService from '~/services/friendsService'
+import * as friendService from '~/services/friendService'
 import Button from '~/components/Button'
 import { MessageIcon } from '~/components/Icons'
 import UserAvatar from '~/components/UserAvatar'
@@ -34,7 +34,7 @@ export default function User({ currentUser, user }: UserProps) {
     const { data: friends, mutate: mutateFriends } = useSWR<AxiosResponse<FriendsResponse>>(
         nickname ? [config.apiEndpoint.friend.getAllFriends, nickname] : null,
         () => {
-            return friendsService.getFriends({ page: 1, user_id: user.data.data.id })
+            return friendService.getFriends({ page: 1, user_id: user.data.data.id })
         },
     )
 

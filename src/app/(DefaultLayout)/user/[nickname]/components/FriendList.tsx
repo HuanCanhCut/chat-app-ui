@@ -3,7 +3,7 @@ import { useParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import useSWR from 'swr'
 
-import * as friendsService from '~/services/friendsService'
+import * as friendService from '~/services/friendService'
 import UserAvatar from '~/components/UserAvatar'
 import config from '~/config'
 import { FriendsResponse, FriendsShip, UserResponse } from '~/type/type'
@@ -20,7 +20,7 @@ const FriendList = ({ user }: FriendListProps) => {
     const { data: friends, mutate: mutateFriends } = useSWR<AxiosResponse<FriendsResponse>>(
         nickname ? [config.apiEndpoint.friend.getAllFriends, nickname] : null,
         () => {
-            return friendsService.getFriends({ page, user_id: user.data.data.id })
+            return friendService.getFriends({ page, user_id: user.data.data.id })
         },
     )
 
@@ -56,7 +56,7 @@ const FriendList = ({ user }: FriendListProps) => {
         }
 
         const getMoreFriends = async () => {
-            const res = await friendsService.getFriends({ page, user_id: user.data.data.id })
+            const res = await friendService.getFriends({ page, user_id: user.data.data.id })
 
             if (!friends?.data.data) {
                 return

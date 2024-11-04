@@ -23,3 +23,19 @@ export const getNotifications = async ({
         return error
     }
 }
+
+export const read = async (notification_id: number): Promise<AxiosResponse<void>> => {
+    try {
+        return await request.patch(`/notifications/read`, { notification_id })
+    } catch (error: any) {
+        return error
+    }
+}
+
+export const seen = async () => {
+    try {
+        return await request.patch(`/notifications/seen`)
+    } catch (error) {
+        console.log(error)
+    }
+}

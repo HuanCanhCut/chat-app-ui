@@ -11,6 +11,7 @@ import { useEffect } from 'react'
 import './globals.css'
 import 'react-loading-skeleton/dist/skeleton.css'
 import 'tippy.js/dist/tippy.css'
+import 'moment/locale/vi'
 
 const inter = Inter({ subsets: ['latin'] })
 function RootLayout({
