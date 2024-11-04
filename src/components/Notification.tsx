@@ -84,6 +84,29 @@ const Notification = () => {
 
     useEffect(() => {
         const remove = listenEvent({
+            eventName: 'notification:read-notification',
+            handler: ({ detail: notificationId }) => {
+                const newNotifications = notifications?.data.data.map((notification: NotificationData) => {
+                    if (notification.id === notificationId) {
+                        notification.notification_details.is_read = true
+                    }
+                    return notification
+                })
+
+                if (notifications) {
+                    mutate({
+                        ...notifications,
+                        data: { ...notifications?.data, data: newNotifications || [] },
+                    })
+                }
+            },
+        })
+
+        return remove
+    }, [mutate, notifications])
+
+    useEffect(() => {
+        const remove = listenEvent({
             eventName: 'notification:delete-notification',
             handler: ({ detail: notificationId }) => {
                 const newNotifications = notifications?.data.data.filter(

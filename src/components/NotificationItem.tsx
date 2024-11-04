@@ -1,6 +1,6 @@
 import moment from 'moment-timezone'
 import Link from 'next/link'
-import { useState } from 'react'
+import { memo, useState } from 'react'
 
 import * as NotificationServices from '~/services/notification'
 import Button from '~/components/Button'
@@ -28,6 +28,9 @@ const NotificationItem = ({
 
     const handleReadNotification = async () => {
         await NotificationServices.read(notification.id)
+        if (!notification.notification_details.is_read) {
+            sendEvent({ eventName: 'notification:read-notification', detail: notification.id })
+        }
         sendEvent({ eventName: 'tippy:hide' })
     }
 
@@ -102,4 +105,4 @@ const NotificationItem = ({
     )
 }
 
-export default NotificationItem
+export default memo(NotificationItem)
