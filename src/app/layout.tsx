@@ -4,19 +4,30 @@ import { Inter } from 'next/font/google'
 import { ToastContainer } from 'react-toastify'
 import { SWRConfig } from 'swr'
 
-const inter = Inter({ subsets: ['latin'] })
+import socket from '~/utils/socket'
+import useThemeStore from '~/zustand/useThemeStore'
+import { useEffect } from 'react'
 
 import './globals.css'
 import 'react-loading-skeleton/dist/skeleton.css'
 import 'tippy.js/dist/tippy.css'
-import useThemeStore from '~/zustand/useThemeStore'
 
+const inter = Inter({ subsets: ['latin'] })
 function RootLayout({
     children,
 }: Readonly<{
     children: React.ReactNode
 }>) {
     const { theme } = useThemeStore()
+
+    // connect to socket
+    useEffect(() => {
+        socket.connect()
+
+        return () => {
+            socket.disconnect()
+        }
+    }, [])
 
     return (
         <html lang="en" className={theme}>

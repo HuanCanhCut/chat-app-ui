@@ -148,7 +148,6 @@ export default function User({ currentUser, user }: UserProps) {
                 ) : (
                     <>
                         <FriendButton user={user.data.data} />
-
                         {user.data.data.is_friend && (
                             <Button buttonType="primary" leftIcon={<MessageIcon />}>
                                 Nhắn tin

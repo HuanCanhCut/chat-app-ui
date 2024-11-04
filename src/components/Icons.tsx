@@ -23,7 +23,7 @@ export const HomeIcon = ({ width = 32, height = 32, className }: IconProps) => {
     )
 }
 
-export const UserIcon = ({ width = 32, height = 32, className }: IconProps) => {
+export const UserGroupIcon = ({ width = 32, height = 32, className }: IconProps) => {
     return (
         <svg
             width={width}
@@ -52,12 +52,52 @@ export const UserIcon = ({ width = 32, height = 32, className }: IconProps) => {
     )
 }
 
+export const UserIcon = ({ width = 20, height = 20, className }: IconProps) => {
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width={width}
+            height={height}
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className={className}
+        >
+            <circle cx="12" cy="8" r="5" />
+            <path d="M20 21a8 8 0 0 0-16 0" />
+        </svg>
+    )
+}
+
 export const MessageIcon = ({ width = 20, height = 20, className }: IconProps) => {
     return (
         <svg viewBox="0 0 12 13" width={width} height={height} className={className} fill="currentColor">
             <g fillRule="evenodd" transform="translate(-450 -1073)">
                 <path d="m459.603 1077.948-1.762 2.851a.89.89 0 0 1-1.302.245l-1.402-1.072a.354.354 0 0 0-.433.001l-1.893 1.465c-.253.196-.583-.112-.414-.386l1.763-2.851a.89.89 0 0 1 1.301-.245l1.402 1.072a.354.354 0 0 0 .434-.001l1.893-1.465c.253-.196.582.112.413.386M456 1073.5c-3.38 0-6 2.476-6 5.82 0 1.75.717 3.26 1.884 4.305.099.087.158.21.162.342l.032 1.067a.48.48 0 0 0 .674.425l1.191-.526a.473.473 0 0 1 .32-.024c.548.151 1.13.231 1.737.231 3.38 0 6-2.476 6-5.82 0-3.344-2.62-5.82-6-5.82"></path>
             </g>
+        </svg>
+    )
+}
+
+export const SendIcon = ({ width = 20, height = 20, className }: IconProps) => {
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width={width}
+            height={height}
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className={className}
+        >
+            <path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z" />
+            <path d="m21.854 2.147-10.94 10.939" />
         </svg>
     )
 }

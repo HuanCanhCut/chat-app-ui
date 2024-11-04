@@ -1,5 +1,7 @@
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
+import { sendEvent } from '~/helpers/events'
+import * as friendService from '~/services/friendService'
 
 interface ShowToastProps {
     message: string
@@ -18,4 +20,16 @@ export const showToast = ({ message, type = 'success', duration = 4000 }: ShowTo
         progress: undefined,
         theme: 'dark',
     })
+}
+
+export const handleAcceptFriend = async (userID: number) => {
+    try {
+        sendEvent({
+            eventName: 'friend:change-friend-status',
+            detail: { is_friend: true, friend_request: false },
+        })
+        return await friendService.acceptFriend(userID)
+    } catch (error) {
+        console.log(error)
+    }
 }

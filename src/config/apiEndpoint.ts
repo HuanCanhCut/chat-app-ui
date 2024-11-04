@@ -23,4 +23,7 @@ export const apiEndpoint = {
         getCurrentUser: '/me',
         updateCurrentUser: '/me/update',
     },
+    notification: {
+        getNotifications: '/notifications',
+    },
 }

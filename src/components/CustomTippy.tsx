@@ -27,6 +27,7 @@ interface CustomTippyProps {
     hideOnClick?: boolean
     timeDelayOpen?: number
     timeDelayClose?: number
+    onShow?: (instance: any) => void
 }
 
 export default memo(function CustomTippy({
@@ -39,6 +40,7 @@ export default memo(function CustomTippy({
     offsetX = 0,
     offsetY = 0,
     hideOnClick = true,
+    onShow,
 }: CustomTippyProps) {
     const springConfig: any = { damping: 15, stiffness: 300 }
     const initialScale = 0.5
@@ -83,6 +85,7 @@ export default memo(function CustomTippy({
                 render={render}
                 onMount={onMount}
                 onHide={onHide}
+                onShow={onShow}
             >
                 {children}
             </Tippy>

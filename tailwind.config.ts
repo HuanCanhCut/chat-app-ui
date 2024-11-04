@@ -14,6 +14,10 @@ const config: Config = {
             height: {
                 header: '56px',
             },
+            screens: {
+                xxs: '340px',
+                xs: '480px',
+            },
             colors: {
                 primary: '#0866ff',
                 error: '#ff453a',

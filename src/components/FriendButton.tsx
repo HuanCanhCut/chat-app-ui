@@ -9,7 +9,7 @@ import * as friendService from '~/services/friendService'
 import PopperWrapper from './PopperWrapper'
 import { UserModel } from '~/type/type'
 import Button from './Button'
-import { showToast } from '~/project/services'
+import { handleAcceptFriend, showToast } from '~/project/services'
 import { sendEvent } from '~/helpers/events'
 
 interface FriendButtonProps {
@@ -26,11 +26,12 @@ const FriendButton = ({ user, className = '' }: FriendButtonProps) => {
                 eventName: 'friend:change-friend-status',
                 detail: { sent_friend_request: true },
             })
+
             return await friendService.addFriend(user.id)
         } catch (error) {
             console.log(error)
         }
-    }, [user.id])
+    }, [user])
 
     const handleCancelFriendRequest = useCallback(async () => {
         try {
@@ -51,18 +52,6 @@ const FriendButton = ({ user, className = '' }: FriendButtonProps) => {
             handleAddFriend()
         }
     }, [setModalIsOpen, user.is_friend, handleAddFriend])
-
-    const handleAcceptFriend = useCallback(async () => {
-        try {
-            sendEvent({
-                eventName: 'friend:change-friend-status',
-                detail: { is_friend: true, friend_request: false },
-            })
-            return await friendService.acceptFriend(user.id)
-        } catch (error) {
-            console.log(error)
-        }
-    }, [user.id])
 
     const handleRejectFriend = useCallback(async () => {
         try {
@@ -155,7 +144,12 @@ const FriendButton = ({ user, className = '' }: FriendButtonProps) => {
                 </Button>
             ) : user.friend_request ? (
                 <>
-                    <Button buttonType="primary" onClick={handleAcceptFriend}>
+                    <Button
+                        buttonType="primary"
+                        onClick={() => {
+                            handleAcceptFriend(user.id)
+                        }}
+                    >
                         Chấp nhận
                     </Button>
                     <Button buttonType="rounded" onClick={handleRejectFriend}>

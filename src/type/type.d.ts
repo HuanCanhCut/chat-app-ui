@@ -37,8 +37,7 @@ interface FriendsShip {
     user: UserModel
 }
 
-interface FriendsResponse {
-    data: FriendsShip[]
+interface MetaPagination {
     meta: {
         pagination: {
             total: number
@@ -48,4 +47,32 @@ interface FriendsResponse {
             total_pages: number
         }
     }
+}
+
+interface FriendsResponse extends MetaPagination {
+    data: FriendsShip[]
+}
+
+interface NotificationDetail {
+    id: number
+    notification_id: number
+    is_read: boolean
+    message: string
+    sender_id: number
+    sender_user: UserModel
+    createdAt: Date
+    updatedAt: Date
+}
+
+interface NotificationData {
+    id: number
+    recipient_id: number
+    notification_details: NotificationDetail
+    type: 'friend_request' | 'accept_friend_request' | 'message'
+    createdAt: Date
+    updatedAt: Date
+}
+
+interface NotificationResponse extends MetaPagination {
+    data: NotificationData[]
 }

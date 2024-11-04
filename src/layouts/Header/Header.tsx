@@ -3,7 +3,7 @@
 import React, { useMemo } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faBell, faCircleDot, faMoon, faPen, faSignOut, IconDefinition } from '@fortawesome/free-solid-svg-icons'
+import { faCircleDot, faMoon, faPen, faSignOut, IconDefinition } from '@fortawesome/free-solid-svg-icons'
 import useSWR from 'swr'
 import { AxiosResponse } from 'axios'
 import Skeleton from 'react-loading-skeleton'
@@ -18,10 +18,12 @@ import config from '~/config'
 import * as meService from '~/services/meService'
 import { UserResponse } from '~/type/type'
 import NavLink from '~/components/NavLink'
-import { HomeIcon, MessageIcon, UserIcon } from '~/components/Icons'
+import { HomeIcon, MessageIcon, UserGroupIcon } from '~/components/Icons'
 import AccountItem from '~/components/AccountItem'
 import MenuItem from './MenuItem'
 import CustomTippy from '~/components/CustomTippy'
+import Notification from '../Notification/Notification'
+import { sendEvent } from '~/helpers/events'
 
 export interface MenuItemType {
     type: 'theme' | 'status' | 'logout'
@@ -72,7 +74,7 @@ export default function Header() {
             },
             {
                 type: 'user',
-                icon: <UserIcon />,
+                icon: <UserGroupIcon />,
                 href: `/user/@${currentUser?.data?.data?.nickname}`,
                 tooltip: 'Tài khoản',
             },
@@ -82,7 +84,9 @@ export default function Header() {
     const handleChoose = (type: MenuItemType['type']) => {
         switch (type) {
             case 'logout':
+                sendEvent({ eventName: 'tippy:hide' })
                 authService.logout()
+
                 router.push(config.routes.login)
                 router.refresh()
                 break
@@ -129,7 +133,7 @@ export default function Header() {
                     return (
                         <Tippy content={item.tooltip} key={index}>
                             <div
-                                className={`aspect-[12/9] h-full border-b-2 py-2 ${pathname === item.href ? 'border-b-2 border-primary' : 'border-transparent'}`}
+                                className={`aspect-[1] h-full border-b-2 py-2 sm:aspect-[12/9] ${pathname === item.href ? 'border-b-2 border-primary' : 'border-transparent'}`}
                             >
                                 <NavLink
                                     href={item.href}
@@ -150,16 +154,7 @@ export default function Header() {
                     <Skeleton circle width={38} height={38} />
                 ) : (
                     <>
-                        <Tippy content="Thông báo">
-                            <div className="relative">
-                                <Button buttonType="icon">
-                                    <FontAwesomeIcon icon={faBell} className="text-xl" />
-                                </Button>
-                                <span className="flex-center absolute right-[-3px] top-[-3px] h-4 w-4 rounded-full bg-red-500 text-xs text-white">
-                                    1
-                                </span>
-                            </div>
-                        </Tippy>
+                        <Notification />
                         <Tippy content="Messenger">
                             <div>
                                 <Button buttonType="icon" href={config.routes.dashboard}>

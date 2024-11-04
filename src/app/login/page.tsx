@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 const Login: React.FC = () => {
     return (
-        <main className="grid w-full grid-cols-12 dark:bg-dark dark:text-dark">
+        <main className="grid min-h-screen w-full grid-cols-12 dark:bg-dark dark:text-dark">
             <div className="col-span-12 p-8 sm:col-span-6">
                 <Logo />
                 <h1 className="mt-3 flex flex-col text-center font-bold">
