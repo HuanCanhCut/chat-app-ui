@@ -3,10 +3,11 @@
 import { Inter } from 'next/font/google'
 import { ToastContainer } from 'react-toastify'
 import { SWRConfig } from 'swr'
+import { useEffect } from 'react'
 
 import socket from '~/utils/socket'
 import useThemeStore from '~/zustand/useThemeStore'
-import { useEffect } from 'react'
+import Notification from '~/globalWrapper/Notification'
 
 import './globals.css'
 import 'react-loading-skeleton/dist/skeleton.css'
@@ -41,7 +42,7 @@ function RootLayout({
                         shouldRetryOnError: false,
                     }}
                 >
-                    {children}
+                    <Notification>{children}</Notification>
                     <ToastContainer />
                 </SWRConfig>
             </body>
