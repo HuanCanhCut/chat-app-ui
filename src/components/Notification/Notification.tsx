@@ -84,20 +84,30 @@ const Notification = () => {
 
     useEffect(() => {
         const remove = listenEvent({
-            eventName: 'notification:read-notification',
-            handler: ({ detail: notificationId }) => {
+            eventName: 'notification:update-read-status',
+            handler: ({ detail: { notificationId, type } }) => {
                 const newNotifications = notifications?.data.data.map((notification: NotificationData) => {
                     if (notification.id === notificationId) {
-                        notification.notification_details.is_read = true
+                        notification.notification_details.is_read = type === 'read'
                     }
                     return notification
                 })
 
+                console.log({
+                    ...notifications,
+                    data: { ...notifications?.data, data: newNotifications || [] },
+                })
+
                 if (notifications) {
-                    mutate({
-                        ...notifications,
-                        data: { ...notifications?.data, data: newNotifications || [] },
-                    })
+                    mutate(
+                        {
+                            ...notifications,
+                            data: { ...notifications?.data, data: newNotifications || [] },
+                        },
+                        {
+                            revalidate: false,
+                        },
+                    )
                 }
             },
         })
@@ -114,20 +124,25 @@ const Notification = () => {
                 )
 
                 if (notifications) {
-                    mutate({
-                        ...notifications,
-                        data: {
-                            ...notifications?.data,
-                            data: newNotifications || [],
-                            meta: {
-                                pagination: {
-                                    ...notifications?.data.meta.pagination,
-                                    total: notifications.data.meta.pagination.total - 1,
-                                    count: notifications.data.meta.pagination.count - 1,
+                    mutate(
+                        {
+                            ...notifications,
+                            data: {
+                                ...notifications?.data,
+                                data: newNotifications || [],
+                                meta: {
+                                    pagination: {
+                                        ...notifications?.data.meta.pagination,
+                                        total: notifications.data.meta.pagination.total - 1,
+                                        count: notifications.data.meta.pagination.count - 1,
+                                    },
                                 },
                             },
                         },
-                    })
+                        {
+                            revalidate: false,
+                        },
+                    )
                 }
             },
         })

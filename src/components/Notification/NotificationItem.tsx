@@ -1,0 +1,214 @@
+import moment from 'moment-timezone'
+import Link from 'next/link'
+import { memo, useEffect, useRef, useState } from 'react'
+
+import * as NotificationServices from '~/services/notification'
+import Button from '~/components/Button'
+import UserAvatar from '~/components/UserAvatar'
+import { listenEvent, sendEvent } from '~/helpers/events'
+import { handleAcceptFriend, showToast } from '~/project/services'
+import { NotificationData } from '~/type/type'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faCheck, faEllipsis, faTrash } from '@fortawesome/free-solid-svg-icons'
+import CustomTippy from '../CustomTippy'
+import PopperWrapper from '../PopperWrapper'
+import ConfirmModel from '../ConfirmModal'
+
+const NotificationItem = ({
+    notification,
+    notificationIcon,
+}: {
+    notification: NotificationData
+    notificationIcon: any
+}) => {
+    const [isAccept, setIsAccept] = useState(false)
+    const [isOpenConfirmModel, setIsOpenConfirmModel] = useState(false)
+
+    const tippyInstance = useRef<any>(null)
+
+    const tippyShow = (instance: any) => {
+        tippyInstance.current = instance
+    }
+
+    const handleAccept = async () => {
+        const response = await handleAcceptFriend(notification.notification_details.sender_user.id)
+        if (response) {
+            setIsAccept(true)
+        }
+    }
+
+    useEffect(() => {
+        const remove = listenEvent({
+            eventName: 'tippy:tippy-hidden',
+            handler: () => {
+                // If user accept friend request and tippy is hidden, delete notification
+                if (isAccept) {
+                    sendEvent({ eventName: 'notification:delete-notification', detail: notification.id })
+                }
+            },
+        })
+
+        return () => remove()
+    }, [isAccept, notification.id])
+
+    const handleReadNotification = async () => {
+        await NotificationServices.markAsRead(notification.id)
+        if (!notification.notification_details.is_read) {
+            sendEvent({
+                eventName: 'notification:update-read-status',
+                detail: { notificationId: notification.id, type: 'read' },
+            })
+        }
+        sendEvent({ eventName: 'tippy:hide' })
+    }
+
+    const handleDeleteNotification = async () => {
+        sendEvent({ eventName: 'notification:delete-notification', detail: notification.id })
+        setIsOpenConfirmModel(false)
+        await NotificationServices.deleteNotification(notification.id)
+        showToast({ message: 'Xóa thành công', type: 'success' })
+    }
+
+    const RenderMoreOptions = () => {
+        const buttonStyle =
+            'w-full !justify-start bg-transparent !py-2 !text-black hover:!bg-[rgba(0,0,0,0.1)] dark:!text-dark dark:hover:!bg-[rgba(255,255,255,0.1)]'
+
+        const handleToggleReadStatus = async (type: 'read' | 'unread') => {
+            switch (type) {
+                case 'read':
+                    await NotificationServices.markAsRead(notification.id)
+                    break
+                case 'unread':
+                    await NotificationServices.markAsUnread(notification.id)
+                    break
+            }
+
+            tippyInstance.current.hide()
+            sendEvent({
+                eventName: 'notification:update-read-status',
+                detail: { notificationId: notification.id, type },
+            })
+        }
+
+        const handleDeleteNotification = async () => {
+            setIsOpenConfirmModel(true)
+            sendEvent({ eventName: 'tippy:hide' })
+        }
+
+        return (
+            <PopperWrapper>
+                <>
+                    <Button
+                        buttonType="primary"
+                        leftIcon={<FontAwesomeIcon icon={faCheck} className="text-gray-400 dark:text-gray-600" />}
+                        className={buttonStyle}
+                        onClick={() => {
+                            const isRead = notification.notification_details.is_read ? 'unread' : 'read'
+
+                            handleToggleReadStatus(isRead)
+                        }}
+                    >
+                        {notification.notification_details.is_read ? 'Đánh dấu là chưa đọc' : 'Đánh dấu là đã đọc'}
+                    </Button>
+                    <Button
+                        buttonType="primary"
+                        leftIcon={<FontAwesomeIcon icon={faTrash} className="text-gray-400 dark:text-gray-600" />}
+                        className={buttonStyle}
+                        onClick={handleDeleteNotification}
+                    >
+                        Xóa
+                    </Button>
+                </>
+            </PopperWrapper>
+        )
+    }
+
+    return (
+        <>
+            <ConfirmModel
+                title="Bạn có chắc muốn xóa thông báo này?"
+                isOpen={isOpenConfirmModel}
+                closeModal={() => setIsOpenConfirmModel(false)}
+                onConfirm={handleDeleteNotification}
+            />
+            <div className="flex-center group relative gap-2">
+                <CustomTippy renderItem={RenderMoreOptions} onShow={tippyShow}>
+                    <div className="absolute right-2 top-1/2 opacity-0 group-hover:opacity-100">
+                        <Button buttonType="icon">
+                            <FontAwesomeIcon icon={faEllipsis} />
+                        </Button>
+                    </div>
+                </CustomTippy>
+                <Link
+                    href={`/user/@${notification.notification_details.sender_user.nickname}`}
+                    className="mt-4 flex gap-3"
+                    onClick={handleReadNotification}
+                >
+                    <div className="relative">
+                        <UserAvatar
+                            src={notification.notification_details.sender_user.avatar}
+                            size={56}
+                            className="aspect-square min-w-[56px]"
+                        />
+                        <div className="flex-center absolute bottom-1 right-[-6px] gap-2">
+                            <div
+                                className="flex-center h-7 w-7 rounded-full text-white"
+                                style={{
+                                    backgroundColor: notificationIcon[notification.type].backgroundColor,
+                                }}
+                            >
+                                {notificationIcon[notification.type].icon}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <p
+                            dangerouslySetInnerHTML={{
+                                __html: `
+                                ${notification.notification_details.message.replace(
+                                    `${notification.notification_details.sender_user.full_name.trim()}`,
+                                    `<span class="font-semibold">${notification.notification_details.sender_user.full_name.trim()}</span>`,
+                                )}`,
+                            }}
+                            className={`text-sm font-normal dark:font-light ${notification.notification_details.is_read ? 'text-gray-600 dark:text-gray-400' : 'text-gray-800 dark:text-gray-200'}`}
+                        ></p>
+                        <small
+                            className={`text-xs ${
+                                !notification.notification_details.is_read
+                                    ? 'text-primary'
+                                    : 'text-gray-600 dark:text-gray-400'
+                            } font-normal`}
+                        >
+                            {moment
+                                .tz(notification.notification_details.createdAt, 'Asia/Ho_Chi_Minh')
+                                .fromNow()
+                                .replace('trước', '')}
+                        </small>
+                    </div>
+                </Link>
+                {!notification.notification_details.is_read && (
+                    <button className="h-3 min-w-3 rounded-full bg-primary"></button>
+                )}
+            </div>
+
+            {notification.type === 'friend_request' && !isAccept && (
+                <div className="mt-5 flex items-center justify-center gap-2 px-12">
+                    <Button buttonType="primary" className="inline-block flex-1" onClick={handleAccept}>
+                        Chấp nhận
+                    </Button>
+                    <Button buttonType="rounded" className="inline-block flex-1">
+                        Xóa
+                    </Button>
+                </div>
+            )}
+            {isAccept && (
+                <p className="mt-4 text-sm font-normal text-gray-800 dark:font-light dark:text-gray-200">
+                    Đã chấp nhận lời mời kết bạn
+                </p>
+            )}
+        </>
+    )
+}
+
+export default memo(NotificationItem)

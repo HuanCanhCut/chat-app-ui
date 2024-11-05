@@ -1,7 +1,7 @@
 import Tippy from '@tippyjs/react'
 import { memo } from 'react'
 import { useSpring, motion } from 'framer-motion'
-
+import { sendEvent } from '~/helpers/events'
 interface CustomTippyProps {
     children: React.ReactElement
     trigger?: 'click' | 'focus' | 'manual' | 'mouseenter' | 'focusin'
@@ -27,6 +27,7 @@ interface CustomTippyProps {
     hideOnClick?: boolean
     timeDelayOpen?: number
     timeDelayClose?: number
+    handleHide?: () => void
     onShow?: (instance: any) => void
 }
 
@@ -69,6 +70,8 @@ export default memo(function CustomTippy({
 
         scale.set(initialScale)
         opacity.set(0)
+
+        sendEvent({ eventName: 'tippy:tippy-hidden', detail: true })
     }
 
     return (

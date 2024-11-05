@@ -106,6 +106,31 @@ body.ReactModal__Body--open {
     z-index: 999;
 }
 
+.Toastify__toast-container {
+    width: auto !important;
+    margin-top: 24px !important;
+}
+
+.custom-toast {
+    background-color: rgb(55, 55, 55) !important;
+    color: #fff !important;
+    font-size: 16px !important;
+    line-height: 1.5 !important;
+    min-height: auto !important;
+    padding: 8px 40px !important;
+    font-weight: 500 !important;
+    z-index: 9999999999;
+}
+
+.Toastify__toast-body {
+    padding: 0 !important;
+}
+
+.Toastify__toast-icon,
+.Toastify__close-button {
+    display: none !important;
+}
+
 .ReactModal__Overlay {
     opacity: 0;
     transition: opacity 200ms ease-in-out;

@@ -9,16 +9,17 @@ interface ShowToastProps {
     duration?: number
 }
 
-export const showToast = ({ message, type = 'success', duration = 4000 }: ShowToastProps) => {
+export const showToast = ({ message, type = 'success', duration }: ShowToastProps) => {
     return toast[type](message, {
-        position: 'top-right',
-        autoClose: duration,
-        hideProgressBar: false,
+        className: 'custom-toast',
+        position: 'top-center',
+        autoClose: duration || 2500,
+        hideProgressBar: true,
         closeOnClick: true,
         pauseOnHover: true,
         draggable: true,
         progress: undefined,
-        theme: 'dark',
+        theme: 'colored',
     })
 }
 

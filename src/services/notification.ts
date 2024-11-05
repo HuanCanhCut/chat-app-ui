@@ -24,9 +24,9 @@ export const getNotifications = async ({
     }
 }
 
-export const read = async (notification_id: number): Promise<AxiosResponse<void>> => {
+export const markAsRead = async (notification_id: number): Promise<AxiosResponse<void>> => {
     try {
-        return await request.patch(`/notifications/read`, { notification_id })
+        return await request.patch(`/notifications/mark-as-read`, { notification_id })
     } catch (error: any) {
         return error
     }
@@ -37,5 +37,21 @@ export const seen = async () => {
         return await request.patch(`/notifications/seen`)
     } catch (error) {
         console.log(error)
+    }
+}
+
+export const markAsUnread = async (notification_id: number): Promise<AxiosResponse<void>> => {
+    try {
+        return await request.patch(`/notifications/mark-as-unread`, { notification_id })
+    } catch (error: any) {
+        return error
+    }
+}
+
+export const deleteNotification = async (notification_id: number): Promise<AxiosResponse<void>> => {
+    try {
+        return await request.deleteMethod(`/notifications/${notification_id}`)
+    } catch (error: any) {
+        return error
     }
 }

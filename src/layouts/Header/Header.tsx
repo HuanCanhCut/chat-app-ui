@@ -22,7 +22,7 @@ import { HomeIcon, MessageIcon, UserGroupIcon } from '~/components/Icons'
 import AccountItem from '~/components/AccountItem'
 import MenuItem from './MenuItem'
 import CustomTippy from '~/components/CustomTippy'
-import Notification from '../../components/Notification'
+import Notification from '../../components/Notification/Notification'
 import { sendEvent } from '~/helpers/events'
 
 export interface MenuItemType {
