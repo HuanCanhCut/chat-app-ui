@@ -83,11 +83,12 @@ const NotificationItem = ({
                     break
             }
 
-            tippyInstance.current.hide()
             sendEvent({
                 eventName: 'notification:update-read-status',
                 detail: { notificationId: notification.id, type },
             })
+
+            tippyInstance.current.hide()
         }
 
         const handleDeleteNotification = async () => {

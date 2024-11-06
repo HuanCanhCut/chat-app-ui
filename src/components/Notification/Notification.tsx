@@ -1,14 +1,14 @@
 import { faBell, faUser } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
+import useSWR from 'swr'
+import { AxiosResponse } from 'axios'
 
 import * as notificationServices from '~/services/notification'
 import Button from '~/components/Button'
 import CustomTippy from '~/components/CustomTippy'
 import PopperWrapper from '~/components/PopperWrapper'
-import useSWR from 'swr'
 import config from '~/config'
-import { AxiosResponse } from 'axios'
 import { NotificationData, NotificationResponse } from '~/type/type'
 import { SendIcon } from '~/components/Icons'
 import NotificationItem from './NotificationItem'
@@ -18,7 +18,11 @@ const Notification = () => {
     const [currentTab, setCurrentTab] = useState<'all' | 'unread'>('all')
     const [notificationUnSeenCount, setNotificationUnSeenCount] = useState(0)
 
-    const { data: notifications, mutate } = useSWR<AxiosResponse<NotificationResponse>>(
+    interface CustomAxiosResponse<T> extends AxiosResponse<T> {
+        randomKey: string
+    }
+
+    const { data: notifications, mutate: mutateNotifications } = useSWR<CustomAxiosResponse<NotificationResponse>>(
         currentTab ? [config.apiEndpoint.notification.getNotifications, currentTab] : null,
         () => {
             return notificationServices.getNotifications({ page: 1, per_page: 10, type: currentTab })
@@ -86,6 +90,10 @@ const Notification = () => {
         const remove = listenEvent({
             eventName: 'notification:update-read-status',
             handler: ({ detail: { notificationId, type } }) => {
+                if (!notifications) {
+                    return
+                }
+
                 const newNotifications = notifications?.data.data.map((notification: NotificationData) => {
                     if (notification.id === notificationId) {
                         notification.notification_details.is_read = type === 'read'
@@ -93,27 +101,22 @@ const Notification = () => {
                     return notification
                 })
 
-                console.log({
-                    ...notifications,
-                    data: { ...notifications?.data, data: newNotifications || [] },
-                })
-
-                if (notifications) {
-                    mutate(
-                        {
-                            ...notifications,
-                            data: { ...notifications?.data, data: newNotifications || [] },
+                mutateNotifications(
+                    {
+                        ...notifications,
+                        randomKey: `${Math.random()}`, // Fix component not re-rendering when mutating
+                        data: {
+                            ...notifications?.data,
+                            data: newNotifications,
                         },
-                        {
-                            revalidate: false,
-                        },
-                    )
-                }
+                    },
+                    { revalidate: false },
+                )
             },
         })
 
         return remove
-    }, [mutate, notifications])
+    }, [mutateNotifications, notifications])
 
     useEffect(() => {
         const remove = listenEvent({
@@ -124,7 +127,7 @@ const Notification = () => {
                 )
 
                 if (notifications) {
-                    mutate(
+                    mutateNotifications(
                         {
                             ...notifications,
                             data: {
@@ -148,7 +151,7 @@ const Notification = () => {
         })
 
         return remove
-    }, [mutate, notifications])
+    }, [mutateNotifications, notifications])
 
     useEffect(() => {
         const remove = listenEvent({
