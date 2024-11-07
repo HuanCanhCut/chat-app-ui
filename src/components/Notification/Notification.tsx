@@ -32,7 +32,7 @@ const Notification = () => {
     // Count notification
     useMemo(() => {
         const count = notifications?.data.data.reduce((acc: number, curr: NotificationData) => {
-            return acc + (curr.notification_details.is_seen ? 0 : 1)
+            return acc + (curr.is_seen ? 0 : 1)
         }, 0)
 
         if (count) {
@@ -96,7 +96,7 @@ const Notification = () => {
 
                 const newNotifications = notifications?.data.data.map((notification: NotificationData) => {
                     if (notification.id === notificationId) {
-                        notification.notification_details.is_read = type === 'read'
+                        notification.is_read = type === 'read'
                     }
                     return notification
                 })

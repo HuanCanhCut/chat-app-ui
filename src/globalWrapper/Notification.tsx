@@ -2,19 +2,20 @@
 
 import { useEffect, useRef } from 'react'
 import socket from '~/utils/socket'
+import { NotificationEvent } from '~/enum/notification'
 
 const Notification = ({ children }: { children: React.ReactNode }) => {
     const audioRef = useRef<HTMLAudioElement>(null)
 
     useEffect(() => {
-        socket.on('notification', async () => {
+        socket.on(NotificationEvent.NEW_NOTIFICATION, async () => {
             try {
                 await audioRef.current?.play()
             } catch (e) {}
         })
 
         return () => {
-            socket.off('notification')
+            socket.off(NotificationEvent.NEW_NOTIFICATION)
         }
     }, [])
 

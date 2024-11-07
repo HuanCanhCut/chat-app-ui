@@ -31,7 +31,7 @@ const NotificationItem = ({
     }
 
     const handleAccept = async () => {
-        const response = await handleAcceptFriend(notification.notification_details.sender_user.id)
+        const response = await handleAcceptFriend(notification.sender_id)
         if (response) {
             setIsAccept(true)
         }
@@ -53,7 +53,7 @@ const NotificationItem = ({
 
     const handleReadNotification = async () => {
         await NotificationServices.markAsRead(notification.id)
-        if (!notification.notification_details.is_read) {
+        if (!notification.is_read) {
             sendEvent({
                 eventName: 'notification:update-read-status',
                 detail: { notificationId: notification.id, type: 'read' },
@@ -104,12 +104,12 @@ const NotificationItem = ({
                         leftIcon={<FontAwesomeIcon icon={faCheck} className="text-gray-400 dark:text-gray-600" />}
                         className={buttonStyle}
                         onClick={() => {
-                            const isRead = notification.notification_details.is_read ? 'unread' : 'read'
+                            const isRead = notification.is_read ? 'unread' : 'read'
 
                             handleToggleReadStatus(isRead)
                         }}
                     >
-                        {notification.notification_details.is_read ? 'Đánh dấu là chưa đọc' : 'Đánh dấu là đã đọc'}
+                        {notification.is_read ? 'Đánh dấu là chưa đọc' : 'Đánh dấu là đã đọc'}
                     </Button>
                     <Button
                         buttonType="primary"
@@ -132,7 +132,7 @@ const NotificationItem = ({
                 closeModal={() => setIsOpenConfirmModel(false)}
                 onConfirm={handleDeleteNotification}
             />
-            <div className="flex-center group relative gap-2">
+            <div className="group relative flex items-center gap-2">
                 <CustomTippy renderItem={RenderMoreOptions} onShow={tippyShow}>
                     <div className="absolute right-2 top-1/2 opacity-0 group-hover:opacity-100">
                         <Button buttonType="icon">
@@ -141,13 +141,13 @@ const NotificationItem = ({
                     </div>
                 </CustomTippy>
                 <Link
-                    href={`/user/@${notification.notification_details.sender_user.nickname}`}
-                    className="mt-4 flex gap-3"
+                    href={`/user/@${notification.sender_user.nickname}`}
+                    className={`mt-4 flex gap-3 ${notification.is_read ? 'pr-3' : ''}`}
                     onClick={handleReadNotification}
                 >
                     <div className="relative">
                         <UserAvatar
-                            src={notification.notification_details.sender_user.avatar}
+                            src={notification.sender_user.avatar}
                             size={56}
                             className="aspect-square min-w-[56px]"
                         />
@@ -167,30 +167,23 @@ const NotificationItem = ({
                         <p
                             dangerouslySetInnerHTML={{
                                 __html: `
-                                ${notification.notification_details.message.replace(
-                                    `${notification.notification_details.sender_user.full_name.trim()}`,
-                                    `<span class="font-semibold">${notification.notification_details.sender_user.full_name.trim()}</span>`,
+                                ${notification.message.replace(
+                                    `${notification.sender_user.full_name.trim()}`,
+                                    `<span class="font-semibold">${notification.sender_user.full_name.trim()}</span>`,
                                 )}`,
                             }}
-                            className={`text-sm font-normal dark:font-light ${notification.notification_details.is_read ? 'text-gray-600 dark:text-gray-400' : 'text-gray-800 dark:text-gray-200'}`}
+                            className={`text-sm font-normal dark:font-light ${notification.is_read ? 'text-gray-600 dark:text-gray-400' : 'text-gray-800 dark:text-gray-200'}`}
                         ></p>
                         <small
                             className={`text-xs ${
-                                !notification.notification_details.is_read
-                                    ? 'text-primary'
-                                    : 'text-gray-600 dark:text-gray-400'
+                                !notification.is_read ? 'text-primary' : 'text-gray-600 dark:text-gray-400'
                             } font-normal`}
                         >
-                            {moment
-                                .tz(notification.notification_details.createdAt, 'Asia/Ho_Chi_Minh')
-                                .fromNow()
-                                .replace('trước', '')}
+                            {moment.tz(notification.createdAt, 'Asia/Ho_Chi_Minh').fromNow().replace('trước', '')}
                         </small>
                     </div>
                 </Link>
-                {!notification.notification_details.is_read && (
-                    <button className="h-3 min-w-3 rounded-full bg-primary"></button>
-                )}
+                {!notification.is_read && <button className="h-3 min-w-3 rounded-full bg-primary"></button>}
             </div>
 
             {notification.type === 'friend_request' && !isAccept && (

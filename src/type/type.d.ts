@@ -53,22 +53,14 @@ interface FriendsResponse extends MetaPagination {
     data: FriendsShip[]
 }
 
-interface NotificationDetail {
+interface NotificationData {
     id: number
-    notification_id: number
+    recipient_id: number
     is_read: boolean
     is_seen: boolean
     message: string
     sender_id: number
     sender_user: UserModel
-    createdAt: Date
-    updatedAt: Date
-}
-
-interface NotificationData {
-    id: number
-    recipient_id: number
-    notification_details: NotificationDetail
     type: 'friend_request' | 'accept_friend_request' | 'message'
     createdAt: Date
     updatedAt: Date
