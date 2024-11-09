@@ -7,7 +7,6 @@ import { AxiosResponse } from 'axios'
 import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
 import useSWR from 'swr'
-import { useParams } from 'next/navigation'
 
 import * as friendService from '~/services/friendService'
 import Button from '~/components/Button'
@@ -27,14 +26,16 @@ interface UserProps {
 }
 
 export default function User({ currentUser, user }: UserProps) {
-    const { nickname } = useParams()
     const [isOpen, setIsOpen] = useState(false)
 
     // get friends of user
     const { data: friends, mutate: mutateFriends } = useSWR<AxiosResponse<FriendsResponse>>(
-        nickname ? [config.apiEndpoint.friend.getAllFriends, nickname] : null,
+        config.apiEndpoint.friend.getAllFriends,
         () => {
             return friendService.getFriends({ page: 1, user_id: user.data.data.id })
+        },
+        {
+            revalidateOnMount: true,
         },
     )
 

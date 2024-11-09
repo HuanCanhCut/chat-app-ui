@@ -32,6 +32,9 @@ export default function UserPage() {
         () => {
             return userService.getAnUser(nickname.slice(3) as string)
         },
+        {
+            revalidateOnMount: true,
+        },
     )
 
     useEffect(() => {

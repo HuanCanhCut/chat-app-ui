@@ -1,5 +1,4 @@
 import { AxiosResponse } from 'axios'
-import { useParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import useSWR from 'swr'
 
@@ -14,13 +13,15 @@ interface FriendListProps {
 }
 
 const FriendList = ({ user }: FriendListProps) => {
-    const { nickname } = useParams()
     const [page, setPage] = useState(1)
 
     const { data: friends, mutate: mutateFriends } = useSWR<AxiosResponse<FriendsResponse>>(
-        nickname ? [config.apiEndpoint.friend.getAllFriends, nickname] : null,
+        config.apiEndpoint.friend.getAllFriends,
         () => {
             return friendService.getFriends({ page, user_id: user.data.data.id })
+        },
+        {
+            revalidateOnMount: true,
         },
     )
 

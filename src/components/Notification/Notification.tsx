@@ -40,9 +40,7 @@ const Notification = () => {
         if (count) {
             setNotificationUnSeenCount(count)
         }
-
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [!!notifications?.data.data.length])
+    }, [notifications?.data.data])
 
     const tippyInstanceRef = useRef<InstanceType<any>>(null)
 
