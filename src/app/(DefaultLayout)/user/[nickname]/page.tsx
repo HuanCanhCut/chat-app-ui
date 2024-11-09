@@ -27,9 +27,12 @@ export default function UserPage() {
         data: user,
         isLoading,
         mutate,
-    } = useSWR<AxiosResponse<UserResponse>>(nickname ? [config.apiEndpoint.user.getAnUser, nickname] : null, () => {
-        return userService.getAnUser(nickname.slice(3) as string)
-    })
+    } = useSWR<AxiosResponse<UserResponse>>(
+        nickname ? [config.apiEndpoint.user.getAnUser, nickname] : config.apiEndpoint.user.getAnUser,
+        () => {
+            return userService.getAnUser(nickname.slice(3) as string)
+        },
+    )
 
     useEffect(() => {
         const remove = listenEvent({

@@ -13,6 +13,8 @@ import { NotificationData, NotificationResponse } from '~/type/type'
 import { SendIcon } from '~/components/Icons'
 import NotificationItem from './NotificationItem'
 import { listenEvent } from '~/helpers/events'
+import socket from '~/utils/socket'
+import { NotificationEvent } from '~/enum/notification'
 
 const Notification = () => {
     const [currentTab, setCurrentTab] = useState<'all' | 'unread'>('all')
@@ -85,6 +87,66 @@ const Notification = () => {
             setNotificationUnSeenCount(0)
         }
     }
+
+    // Listen event new notification
+    useEffect(() => {
+        socket.on(NotificationEvent.NEW_NOTIFICATION, (newNotification: { notification: NotificationData }) => {
+            if (!notifications) {
+                return
+            }
+
+            mutateNotifications({
+                ...notifications,
+                randomKey: `${Math.random()}`, // Fix component not re-rendering when mutating
+                data: {
+                    ...notifications?.data,
+                    data: [newNotification.notification, ...notifications?.data.data],
+                    meta: {
+                        ...notifications?.data.meta,
+                        pagination: {
+                            ...notifications?.data.meta.pagination,
+                            total: notifications.data.meta.pagination.total + 1,
+                            count: notifications.data.meta.pagination.count + 1,
+                        },
+                    },
+                },
+            })
+        })
+    }, [mutateNotifications, notifications])
+
+    // Listen event when remove a notification
+
+    useEffect(() => {
+        socket.on(NotificationEvent.REMOVE_NOTIFICATION, ({ notificationId }: { notificationId: number }) => {
+            if (!notifications) {
+                return
+            }
+
+            const newNotifications = notifications?.data.data.filter(
+                (notification: NotificationData) => notification.id !== notificationId,
+            )
+
+            mutateNotifications(
+                {
+                    ...notifications,
+                    randomKey: `${Math.random()}`, // Fix component not re-rendering when mutating
+                    data: {
+                        ...notifications?.data,
+                        data: newNotifications,
+                        meta: {
+                            ...notifications?.data.meta,
+                            pagination: {
+                                ...notifications?.data.meta.pagination,
+                                total: notifications.data.meta.pagination.total - 1,
+                                count: notifications.data.meta.pagination.count - 1,
+                            },
+                        },
+                    },
+                },
+                { revalidate: false },
+            )
+        })
+    }, [mutateNotifications, notifications])
 
     useEffect(() => {
         const remove = listenEvent({
