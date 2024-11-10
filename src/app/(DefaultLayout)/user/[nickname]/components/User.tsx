@@ -29,7 +29,7 @@ export default function User({ currentUser, user }: UserProps) {
 
     // get friends of user
     const { data: friends, mutate: mutateFriends } = useSWR<FriendsResponse | undefined>(
-        config.apiEndpoint.friend.getAllFriends,
+        user.data.nickname ? [config.apiEndpoint.friend.getAllFriends, user.data.nickname] : null,
         () => {
             return friendService.getFriends({ page: 1, user_id: user.data.id })
         },

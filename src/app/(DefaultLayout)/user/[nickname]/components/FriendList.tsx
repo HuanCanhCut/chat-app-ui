@@ -15,7 +15,7 @@ const FriendList = ({ user }: FriendListProps) => {
     const [page, setPage] = useState(1)
 
     const { data: friends, mutate: mutateFriends } = useSWR<FriendsResponse | undefined>(
-        config.apiEndpoint.friend.getAllFriends,
+        user.data.nickname ? [config.apiEndpoint.friend.getAllFriends, user.data.nickname] : null,
         () => {
             return friendService.getFriends({ page, user_id: user.data.id })
         },
