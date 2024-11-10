@@ -1,11 +1,12 @@
-import { AxiosResponse } from 'axios'
 import { UserResponse } from '~/type/type'
 import * as request from '~/utils/httpRequest'
 
-export const getAnUser = async (nickname: string): Promise<AxiosResponse<UserResponse>> => {
+export const getAnUser = async (nickname: string): Promise<UserResponse | undefined> => {
     try {
-        return await request.get(`users/@${nickname}`)
+        const response = await request.get(`users/@${nickname}`)
+
+        return response.data
     } catch (error: any) {
-        return error
+        console.log(error)
     }
 }

@@ -1,6 +1,5 @@
 import { faCamera, faXmark } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { AxiosResponse } from 'axios'
 import React, { useState, useRef, useEffect } from 'react'
 import useSWR, { mutate } from 'swr'
 import { SubmitHandler, useForm } from 'react-hook-form'
@@ -31,7 +30,7 @@ interface EditProfileProps {
 const defaultCoverPhoto = '/static/media/login-form.jpg'
 
 const EditProfile = ({ closeModal }: EditProfileProps) => {
-    const { data: currentUser } = useSWR<AxiosResponse<UserResponse>>(config.apiEndpoint.me.getCurrentUser, () => {
+    const { data: currentUser } = useSWR<UserResponse | undefined>(config.apiEndpoint.me.getCurrentUser, () => {
         return meService.getCurrentUser()
     })
 
@@ -102,15 +101,12 @@ const EditProfile = ({ closeModal }: EditProfileProps) => {
                 ...currentUser,
                 data: {
                     ...currentUser?.data,
-                    data: {
-                        ...currentUser?.data.data,
-                        first_name: firstName,
-                        last_name: lastName,
-                        full_name: data.full_name,
-                        nickname: data.nickname,
-                        avatar: avatar?.preview || currentUser?.data.data.avatar,
-                        cover_photo: coverPhoto?.preview || currentUser?.data.data.cover_photo,
-                    },
+                    first_name: firstName,
+                    last_name: lastName,
+                    full_name: data.full_name,
+                    nickname: data.nickname,
+                    avatar: avatar?.preview || currentUser?.data.avatar,
+                    cover_photo: coverPhoto?.preview || currentUser?.data.cover_photo,
                 },
             }
 
@@ -121,9 +117,9 @@ const EditProfile = ({ closeModal }: EditProfileProps) => {
 
             closeModal()
 
-            const response = await meService.updateCurrentUser(formData)
+            const response: void | undefined = await meService.updateCurrentUser(formData)
 
-            if (response.status === 200) {
+            if (response) {
                 showToast({ message: 'Cập nhật thành công' })
                 mutate(config.apiEndpoint.me.getCurrentUser)
             } else {
@@ -131,7 +127,7 @@ const EditProfile = ({ closeModal }: EditProfileProps) => {
             }
 
             // replace state to update url without reloading page
-            window.history.replaceState({}, '', `/user/@${newData.data.data.nickname}`)
+            window.history.replaceState({}, '', `/user/@${newData.data.nickname}`)
         } catch (error) {
             console.log(error)
         }
@@ -171,7 +167,7 @@ const EditProfile = ({ closeModal }: EditProfileProps) => {
                         {currentUser && (
                             <label htmlFor="avatar">
                                 <UserAvatar
-                                    src={avatar?.preview || currentUser.data.data.avatar}
+                                    src={avatar?.preview || currentUser.data.avatar}
                                     alt="avatar"
                                     size={130}
                                     className="mx-auto aspect-square w-[130px] cursor-pointer rounded-full border-2 border-gray-200 object-cover p-1 dark:border-gray-600 sm:w-[168px]"
@@ -202,7 +198,7 @@ const EditProfile = ({ closeModal }: EditProfileProps) => {
                         {currentUser && (
                             <label htmlFor="cover_photo">
                                 <CustomImage
-                                    src={coverPhoto?.preview || currentUser.data.data.cover_photo}
+                                    src={coverPhoto?.preview || currentUser.data.cover_photo}
                                     fallback={defaultCoverPhoto}
                                     className="mx-auto aspect-[12/5] w-[80%] cursor-pointer rounded-lg object-cover"
                                 />
@@ -236,7 +232,7 @@ const EditProfile = ({ closeModal }: EditProfileProps) => {
                                     control={control}
                                     type="text"
                                     placeholder={field.label}
-                                    defaultValue={currentUser?.data.data[field.type]}
+                                    defaultValue={currentUser?.data[field.type]}
                                     rules={{
                                         required: field.errorMessage,
                                     }}

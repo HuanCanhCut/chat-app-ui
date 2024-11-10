@@ -1,6 +1,5 @@
 'use client'
 
-import { AxiosResponse } from 'axios'
 import useSWR from 'swr'
 import Skeleton from 'react-loading-skeleton'
 import { useEffect } from 'react'
@@ -19,7 +18,7 @@ import { listenEvent } from '~/helpers/events'
 export default function UserPage() {
     const { nickname } = useParams()
 
-    const { data: currentUser } = useSWR<AxiosResponse<UserResponse>>(config.apiEndpoint.me.getCurrentUser, () => {
+    const { data: currentUser } = useSWR<UserResponse | undefined>(config.apiEndpoint.me.getCurrentUser, () => {
         return meService.getCurrentUser()
     })
 
@@ -27,7 +26,7 @@ export default function UserPage() {
         data: user,
         isLoading,
         mutate,
-    } = useSWR<AxiosResponse<UserResponse>>(
+    } = useSWR<UserResponse | undefined>(
         nickname ? [config.apiEndpoint.user.getAnUser, nickname] : config.apiEndpoint.user.getAnUser,
         () => {
             return userService.getAnUser(nickname.slice(3) as string)
@@ -41,15 +40,15 @@ export default function UserPage() {
         const remove = listenEvent({
             eventName: 'friend:change-friend-status',
             handler: ({ detail }) => {
-                if (!user?.data.data) {
+                if (!user?.data) {
                     return
                 }
 
-                const newData: AxiosResponse<UserResponse> = {
+                const newData: UserResponse = {
                     ...user,
                     data: {
                         ...user.data,
-                        data: { ...user.data.data, ...detail },
+                        ...detail,
                     },
                 }
 
@@ -87,13 +86,13 @@ export default function UserPage() {
     return (
         <div className="min-h-screen pb-4">
             <header className="bg-gray-100 dark:bg-darkGray">
-                {user?.status === 200 && currentUser?.status === 200 ? (
+                {user && currentUser ? (
                     <div className="w-1100px mx-auto max-w-[1100px]">
                         <CustomImage
                             src={
-                                currentUser.data.data.id === user.data.data.id
-                                    ? currentUser.data.data.cover_photo
-                                    : user.data.data.cover_photo
+                                currentUser.data.id === user.data.id
+                                    ? currentUser.data.cover_photo
+                                    : user.data.cover_photo
                             }
                             fallback="/static/media/login-form.jpg"
                             alt="user"
@@ -105,7 +104,7 @@ export default function UserPage() {
                             <button className="px-4 py-2 text-primary">Bạn bè</button>
                         </div>
                     </div>
-                ) : user?.status !== 200 && !isLoading ? (
+                ) : user && !isLoading ? (
                     <NotFound />
                 ) : (
                     <Loading />

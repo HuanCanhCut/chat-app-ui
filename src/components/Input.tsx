@@ -1,4 +1,4 @@
-import React, { forwardRef, JSXElementConstructor, MutableRefObject } from 'react'
+import React, { forwardRef, MutableRefObject } from 'react'
 import { Controller } from 'react-hook-form'
 
 interface Props {

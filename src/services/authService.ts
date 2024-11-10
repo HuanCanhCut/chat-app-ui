@@ -1,7 +1,7 @@
-import { AxiosResponse } from 'axios'
 import { UserModel } from '~/type/type'
 import config from '~/config'
 import * as request from '~/utils/httpRequest'
+import { AxiosResponse } from 'axios'
 
 interface RegisterProps {
     email: string
@@ -17,47 +17,55 @@ interface Response {
     }
 }
 
-export const register = async ({ email, password }: RegisterProps): Promise<AxiosResponse<Response>> => {
+export const register = async ({ email, password }: RegisterProps): Promise<Response | undefined> => {
     try {
-        return await request.post(config.apiEndpoint.auth.register, {
+        const response = await request.post(config.apiEndpoint.auth.register, {
             email,
             password,
         })
+
+        return response.data
     } catch (error: any) {
-        return error
+        console.log(error)
     }
 }
 
-export const login = async ({ email, password }: RegisterProps): Promise<AxiosResponse<Response>> => {
+export const login = async ({ email, password }: RegisterProps): Promise<Response | undefined> => {
     try {
-        return await request.post(config.apiEndpoint.auth.login, {
+        const response = await request.post(config.apiEndpoint.auth.login, {
             email,
             password,
         })
+
+        return response.data
     } catch (error: any) {
-        return error
+        console.log(error)
     }
 }
 
-export const logout = async (): Promise<AxiosResponse<Response>> => {
+export const logout = async (): Promise<Response | undefined> => {
     try {
-        return await request.post(config.apiEndpoint.auth.logout)
+        const response = await request.post(config.apiEndpoint.auth.logout)
+
+        return response.data
     } catch (error: any) {
-        return error
+        console.log(error)
     }
 }
 
-export const loginWithGoogle = async (token: string): Promise<AxiosResponse<Response>> => {
+export const loginWithGoogle = async (token: string): Promise<Response | undefined> => {
     try {
-        return await request.post(config.apiEndpoint.auth.loginWithToken, {
+        const response = await request.post(config.apiEndpoint.auth.loginWithToken, {
             token,
         })
+
+        return response.data
     } catch (error: any) {
         return error
     }
 }
 
-export const sendVerifyCode = async (email: string): Promise<AxiosResponse<Response>> => {
+export const sendVerifyCode = async (email: string): Promise<AxiosResponse<string>> => {
     try {
         return await request.post(config.apiEndpoint.auth.verify, {
             email,
@@ -71,18 +79,22 @@ export const resetPassword = async ({
     email,
     password,
     code,
+    onError,
 }: {
     email: string
     password: string
     code: string
-}): Promise<AxiosResponse<Response>> => {
+    onError?: (error: any) => void
+}): Promise<string | undefined> => {
     try {
-        return await request.post(config.apiEndpoint.auth.resetPassword, {
+        const response = await request.post(config.apiEndpoint.auth.resetPassword, {
             email,
             password,
             code,
         })
+
+        return response.data
     } catch (error: any) {
-        return error
+        onError?.(error)
     }
 }

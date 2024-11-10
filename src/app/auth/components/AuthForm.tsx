@@ -5,7 +5,6 @@ import { useForm, SubmitHandler } from 'react-hook-form'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons'
 import { signInWithPopup } from 'firebase/auth'
-import { AxiosResponse } from 'axios'
 
 import config from '~/config'
 import * as authServices from '~/services/authService'
@@ -52,21 +51,18 @@ const AuthForm = () => {
     const onSubmit: SubmitHandler<FieldValue> = (data) => {
         const handleLogin = async () => {
             try {
-                const response: AxiosResponse<Response> = await authServices.login({
+                const response: Response | undefined = await authServices.login({
                     email: data.email,
                     password: data.password,
                 })
 
-                switch (response.status) {
-                    case 200:
-                        showSuccess()
-                        localStorage.setItem('exp', JSON.stringify(response.data.meta?.pagination?.exp))
-                        break
-                    case 401:
-                        return setErrorMessage('Email hoặc mật khẩu không đúng')
-                    default:
-                        console.log(response)
+                if (response) {
+                    showSuccess()
+                    localStorage.setItem('exp', JSON.stringify(response.meta?.pagination?.exp))
+                    return
                 }
+
+                setErrorMessage('Email hoặc mật khẩu không đúng')
             } catch (error) {
                 console.log(error)
             }
@@ -79,22 +75,14 @@ const AuthForm = () => {
                     return
                 }
 
-                const response: AxiosResponse<Response> = await authServices.register({
+                const response: Response | undefined = await authServices.register({
                     email: data.email,
                     password: data.password,
                 })
 
-                if (response?.status === 201) {
-                    showSuccess()
-                    showToast({ message: 'Đăng kí tài khoản thành công' })
-                    return
+                if (!response) {
+                    showToast({ message: 'Đăng kí thất bại, vui lòng thử lại hoặc liên hệ admin để xử lí.' })
                 }
-
-                if (response?.status === 409) {
-                    return setErrorMessage('Tài khoản đã tồn tại.')
-                }
-
-                setErrorMessage('Đăng kí thất bại, vui lòng thử lại hoặc liên hệ admin để xử lí.')
             } catch (error) {
                 console.log(error)
             }
@@ -106,13 +94,16 @@ const AuthForm = () => {
                     return setErrorMessage('Nhập lại mật khẩu không khớp, vui lòng thử lại')
                 }
 
-                const response: AxiosResponse<Response> = await authServices.resetPassword({
+                const response: string | undefined = await authServices.resetPassword({
                     email: data.email,
                     password: data.password,
                     code: data.verifyCode,
+                    onError: (error: any) => {
+                        setErrorMessage(error?.response?.data?.message)
+                    },
                 })
 
-                if (response.status === 204) {
+                if (response) {
                     showToast({ message: 'Đổi mật khẩu thành công' })
                     setType('login')
                     setValue('email', '')
@@ -121,13 +112,6 @@ const AuthForm = () => {
                     setValue('rePassword', '')
                     return
                 }
-
-                if (response.status === 401) {
-                    setErrorMessage('Mã xác minh không đúng hoặc đã hết hạn')
-                    return
-                }
-
-                setErrorMessage('Đổi mật khẩu thất bại, vui lòng thử lại hoặc liên hệ admin để xử lí.')
             } catch (error) {
                 console.log(error)
             }
@@ -153,12 +137,12 @@ const AuthForm = () => {
             const { user }: any = await signInWithPopup(config.auth, config.googleProvider)
 
             if (user) {
-                const response: AxiosResponse<Response> = await authServices.loginWithGoogle(user.accessToken)
+                const response: Response | undefined = await authServices.loginWithGoogle(user.accessToken)
 
-                if (response.status === 200) {
+                if (response) {
                     showSuccess()
-                    if (response.data.meta) {
-                        localStorage.setItem('exp', JSON.stringify(response.data.meta.pagination.exp))
+                    if (response.meta) {
+                        localStorage.setItem('exp', JSON.stringify(response.meta.pagination.exp))
                     }
                 }
             }
@@ -286,7 +270,7 @@ const AuthForm = () => {
             <span className="text-center text-sm text-gray-500 dark:text-gray-400">
                 Bạn không có tài khoản?{' '}
                 <span
-                    className="cursor-pointer font-semibold text-error"
+                    className="cursor-pointer font-semibold text-primary"
                     onClick={() => setType(type === 'login' ? 'register' : 'login')}
                 >
                     {type === 'login' ? 'Đăng kí' : 'Đăng nhập'}

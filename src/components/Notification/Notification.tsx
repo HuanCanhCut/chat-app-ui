@@ -2,7 +2,6 @@ import { faBell, faUser } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import useSWR from 'swr'
-import { AxiosResponse } from 'axios'
 
 import * as notificationServices from '~/services/notification'
 import Button from '~/components/Button'
@@ -19,12 +18,9 @@ import { NotificationEvent } from '~/enum/notification'
 const Notification = () => {
     const [currentTab, setCurrentTab] = useState<'all' | 'unread'>('all')
     const [notificationUnSeenCount, setNotificationUnSeenCount] = useState(0)
+    const [reloadNotificationCount, setReloadNotificationCount] = useState(true)
 
-    interface CustomAxiosResponse<T> extends AxiosResponse<T> {
-        randomKey: string
-    }
-
-    const { data: notifications, mutate: mutateNotifications } = useSWR<CustomAxiosResponse<NotificationResponse>>(
+    const { data: notifications, mutate: mutateNotifications } = useSWR<NotificationResponse | undefined>(
         currentTab ? [config.apiEndpoint.notification.getNotifications, currentTab] : null,
         () => {
             return notificationServices.getNotifications({ page: 1, per_page: 10, type: currentTab })
@@ -33,14 +29,20 @@ const Notification = () => {
 
     // Count notification
     useMemo(() => {
-        const count = notifications?.data.data.reduce((acc: number, curr: NotificationData) => {
+        if (!reloadNotificationCount) {
+            return
+        }
+
+        const count = notifications?.data.reduce((acc: number, curr: NotificationData) => {
             return acc + (curr.is_seen ? 0 : 1)
         }, 0)
 
         if (count) {
             setNotificationUnSeenCount(count)
         }
-    }, [notifications?.data.data])
+
+        setReloadNotificationCount(false)
+    }, [notifications?.data, reloadNotificationCount])
 
     const tippyInstanceRef = useRef<InstanceType<any>>(null)
 
@@ -93,22 +95,24 @@ const Notification = () => {
                 return
             }
 
-            mutateNotifications({
-                ...notifications,
-                randomKey: `${Math.random()}`, // Fix component not re-rendering when mutating
-                data: {
-                    ...notifications?.data,
-                    data: [newNotification.notification, ...notifications?.data.data],
+            mutateNotifications(
+                {
+                    data: [newNotification.notification, ...notifications.data],
                     meta: {
-                        ...notifications?.data.meta,
+                        ...notifications?.meta,
                         pagination: {
-                            ...notifications?.data.meta.pagination,
-                            total: notifications.data.meta.pagination.total + 1,
-                            count: notifications.data.meta.pagination.count + 1,
+                            ...notifications?.meta.pagination,
+                            total: notifications.meta.pagination.total + 1,
+                            count: notifications.meta.pagination.count + 1,
                         },
                     },
                 },
-            })
+                {
+                    revalidate: false,
+                },
+            )
+
+            setReloadNotificationCount(true)
         })
     }, [mutateNotifications, notifications])
 
@@ -120,29 +124,26 @@ const Notification = () => {
                 return
             }
 
-            const newNotifications = notifications?.data.data.filter(
+            const newNotifications = notifications.data.filter(
                 (notification: NotificationData) => notification.id !== notificationId,
             )
 
             mutateNotifications(
                 {
-                    ...notifications,
-                    randomKey: `${Math.random()}`, // Fix component not re-rendering when mutating
-                    data: {
-                        ...notifications?.data,
-                        data: newNotifications,
-                        meta: {
-                            ...notifications?.data.meta,
-                            pagination: {
-                                ...notifications?.data.meta.pagination,
-                                total: notifications.data.meta.pagination.total - 1,
-                                count: notifications.data.meta.pagination.count - 1,
-                            },
+                    data: newNotifications,
+                    meta: {
+                        ...notifications?.meta,
+                        pagination: {
+                            ...notifications?.meta.pagination,
+                            total: notifications.meta.pagination.total - 1,
+                            count: notifications.meta.pagination.count - 1,
                         },
                     },
                 },
                 { revalidate: false },
             )
+
+            setReloadNotificationCount(true)
         })
     }, [mutateNotifications, notifications])
 
@@ -154,24 +155,17 @@ const Notification = () => {
                     return
                 }
 
-                const newNotifications = notifications?.data.data.map((notification: NotificationData) => {
-                    if (notification.id === notificationId) {
-                        notification.is_read = type === 'read'
-                    }
-                    return notification
-                })
-
-                mutateNotifications(
-                    {
-                        ...notifications,
-                        randomKey: `${Math.random()}`, // Fix component not re-rendering when mutating
-                        data: {
-                            ...notifications?.data,
-                            data: newNotifications,
-                        },
+                const newNotifications = {
+                    data: notifications?.data.map((notification: NotificationData) => ({
+                        ...notification,
+                        is_read: notification.id === notificationId ? type === 'read' : notification.is_read,
+                    })),
+                    meta: {
+                        ...notifications?.meta,
                     },
-                    { revalidate: false },
-                )
+                }
+
+                mutateNotifications(newNotifications, { revalidate: false })
             },
         })
 
@@ -182,23 +176,19 @@ const Notification = () => {
         const remove = listenEvent({
             eventName: 'notification:delete-notification',
             handler: ({ detail: notificationId }) => {
-                const newNotifications = notifications?.data.data.filter(
+                const newNotifications = notifications?.data.filter(
                     (notification: NotificationData) => notification.id !== notificationId,
                 )
 
                 if (notifications) {
                     mutateNotifications(
                         {
-                            ...notifications,
-                            data: {
-                                ...notifications?.data,
-                                data: newNotifications || [],
-                                meta: {
-                                    pagination: {
-                                        ...notifications?.data.meta.pagination,
-                                        total: notifications.data.meta.pagination.total - 1,
-                                        count: notifications.data.meta.pagination.count - 1,
-                                    },
+                            data: newNotifications || [],
+                            meta: {
+                                pagination: {
+                                    ...notifications?.meta.pagination,
+                                    total: notifications.meta.pagination.total - 1,
+                                    count: notifications.meta.pagination.count - 1,
                                 },
                             },
                         },
@@ -244,8 +234,8 @@ const Notification = () => {
                     </div>
                 </header>
                 <main className="mt-2">
-                    {notifications?.status === 200 &&
-                        notifications.data.data.map((notification: NotificationData) => {
+                    {notifications &&
+                        notifications.data.map((notification: NotificationData) => {
                             return (
                                 <React.Fragment key={notification.id}>
                                     <NotificationItem notification={notification} notificationIcon={notificationIcon} />
@@ -263,7 +253,7 @@ const Notification = () => {
                 <Button buttonType="icon" onClick={handleOpenNotification}>
                     <FontAwesomeIcon icon={faBell} className="text-lg sm:text-xl" />
                 </Button>
-                {notifications?.status === 200 && notificationUnSeenCount !== 0 && (
+                {notifications && notificationUnSeenCount !== 0 && (
                     <span className="flex-center absolute right-[-3px] top-[-3px] h-4 w-4 rounded-full bg-red-500 text-xs text-white">
                         {notificationUnSeenCount}
                     </span>

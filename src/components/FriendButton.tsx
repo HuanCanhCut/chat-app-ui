@@ -71,22 +71,20 @@ const FriendButton = ({ user, className = '' }: FriendButtonProps) => {
 
     const handleUnfriend = useCallback(async () => {
         try {
-            const response = await friendService.unfriend(user.id)
+            const response: string | undefined = await friendService.unfriend(user.id)
 
-            switch (response.status) {
-                case 200:
-                    sendEvent({ eventName: 'friend:get-new-friends', detail: user.id })
-                    sendEvent({
-                        eventName: 'friend:change-friend-status',
-                        detail: { is_friend: false, friend_request: false },
-                    })
-                    closeModal()
-                    break
-                default:
-                    showToast({ message: `Có lỗi xảy ra, vui lòng thử lại` })
-                    closeModal()
-                    break
+            if (response) {
+                sendEvent({ eventName: 'friend:get-new-friends', detail: user.id })
+                sendEvent({
+                    eventName: 'friend:change-friend-status',
+                    detail: { is_friend: false, friend_request: false },
+                })
+                closeModal()
+                return
             }
+
+            showToast({ message: `Có lỗi xảy ra, vui lòng thử lại` })
+            closeModal()
         } catch (error) {
             console.log(error)
         }

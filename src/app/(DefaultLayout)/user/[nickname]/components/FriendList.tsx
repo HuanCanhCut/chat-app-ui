@@ -1,4 +1,3 @@
-import { AxiosResponse } from 'axios'
 import { useEffect, useState } from 'react'
 import useSWR from 'swr'
 
@@ -9,16 +8,16 @@ import { FriendsResponse, FriendsShip, UserResponse } from '~/type/type'
 import Link from 'next/link'
 
 interface FriendListProps {
-    user: AxiosResponse<UserResponse>
+    user: UserResponse
 }
 
 const FriendList = ({ user }: FriendListProps) => {
     const [page, setPage] = useState(1)
 
-    const { data: friends, mutate: mutateFriends } = useSWR<AxiosResponse<FriendsResponse>>(
+    const { data: friends, mutate: mutateFriends } = useSWR<FriendsResponse | undefined>(
         config.apiEndpoint.friend.getAllFriends,
         () => {
-            return friendService.getFriends({ page, user_id: user.data.data.id })
+            return friendService.getFriends({ page, user_id: user.data.id })
         },
         {
             revalidateOnMount: true,
@@ -36,7 +35,7 @@ const FriendList = ({ user }: FriendListProps) => {
                 }
 
                 setPage((prevPage) => {
-                    return prevPage >= friends.data.meta.pagination.total_pages ? prevPage : prevPage + 1
+                    return prevPage >= friends.meta.pagination.total_pages ? prevPage : prevPage + 1
                 })
 
                 setTimeout(() => {
@@ -57,19 +56,16 @@ const FriendList = ({ user }: FriendListProps) => {
         }
 
         const getMoreFriends = async () => {
-            const res = await friendService.getFriends({ page, user_id: user.data.data.id })
+            const res = await friendService.getFriends({ page, user_id: user.data.id })
 
-            if (!friends?.data.data) {
+            if (!friends?.data) {
                 return
             }
 
-            if (res.status === 200) {
-                const newData: AxiosResponse<FriendsResponse> = {
+            if (res) {
+                const newData: FriendsResponse = {
                     ...res,
-                    data: {
-                        ...res.data,
-                        data: [...friends.data.data, ...res.data.data],
-                    },
+                    data: [...friends.data, ...res.data],
                 }
 
                 mutateFriends(newData, {
@@ -86,7 +82,7 @@ const FriendList = ({ user }: FriendListProps) => {
         <div className="mx-auto mt-4 max-w-[1100px] rounded-md bg-gray-100 p-4 dark:bg-darkGray">
             <h2>Bạn bè</h2>
             <div className="mt-8 grid grid-cols-1 gap-2 sm:grid-cols-2">
-                {friends?.data?.data?.map((friend: FriendsShip, index: number) => {
+                {friends?.data?.map((friend: FriendsShip, index: number) => {
                     return (
                         <Link
                             href={`/user/@${friend.user.nickname}`}

@@ -5,6 +5,6 @@ interface Routes<T> {
 export const routes: Routes<string> = {
     home: '/',
     user: '/user/',
-    login: '/login',
+    auth: '/auth',
     dashboard: '/dashboard',
 }

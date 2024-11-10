@@ -5,7 +5,6 @@ import { usePathname, useRouter } from 'next/navigation'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCircleDot, faMoon, faPen, faSignOut, IconDefinition } from '@fortawesome/free-solid-svg-icons'
 import useSWR from 'swr'
-import { AxiosResponse } from 'axios'
 import Skeleton from 'react-loading-skeleton'
 import Tippy from '@tippyjs/react'
 
@@ -57,7 +56,7 @@ export default function Header() {
     const pathname = usePathname()
     const router = useRouter()
 
-    const { data: currentUser, isLoading } = useSWR<AxiosResponse<UserResponse>>(
+    const { data: currentUser, isLoading } = useSWR<UserResponse | undefined>(
         config.apiEndpoint.me.getCurrentUser,
         () => {
             return meService.getCurrentUser()
@@ -75,7 +74,7 @@ export default function Header() {
             {
                 type: 'user',
                 icon: <UserGroupIcon />,
-                href: `/user/@${currentUser?.data?.data?.nickname}`,
+                href: `/user/@${currentUser?.data?.nickname}`,
                 tooltip: 'Tài khoản',
             },
         ]
@@ -87,7 +86,7 @@ export default function Header() {
                 sendEvent({ eventName: 'tippy:hide' })
                 authService.logout()
 
-                router.push(config.routes.login)
+                router.push(config.routes.auth)
                 router.refresh()
                 break
         }
@@ -103,8 +102,8 @@ export default function Header() {
                     <div className="border-b border-t border-gray-300 px-5 py-2 dark:border-gray-700">
                         <label className="font-semibold">Tài khoản</label>
                         <div className="flex items-center justify-between">
-                            {currentUser && <AccountItem user={currentUser?.data?.data} className="mt-2" />}
-                            <Button buttonType="icon" href={`/user/@${currentUser?.data?.data?.nickname}`}>
+                            {currentUser && <AccountItem user={currentUser?.data} className="mt-2" />}
+                            <Button buttonType="icon" href={`/user/@${currentUser?.data?.nickname}`}>
                                 <FontAwesomeIcon icon={faPen} className="text-sm" />
                             </Button>
                         </div>
@@ -176,7 +175,7 @@ export default function Header() {
                         {isLoading ? (
                             <Skeleton circle width={38} height={38} />
                         ) : (
-                            <UserAvatar src={currentUser?.data?.data?.avatar} />
+                            <UserAvatar src={currentUser?.data?.avatar} />
                         )}
                     </div>
                 </CustomTippy>

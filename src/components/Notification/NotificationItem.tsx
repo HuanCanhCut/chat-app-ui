@@ -31,7 +31,7 @@ const NotificationItem = ({
     }
 
     const handleAccept = async () => {
-        const response = await handleAcceptFriend(notification.sender_id)
+        const response: string | undefined = await handleAcceptFriend(notification.sender_id)
         if (response) {
             setIsAccept(true)
         }
@@ -52,13 +52,16 @@ const NotificationItem = ({
     }, [isAccept, notification.id])
 
     const handleReadNotification = async () => {
-        await NotificationServices.markAsRead(notification.id)
-        if (!notification.is_read) {
-            sendEvent({
-                eventName: 'notification:update-read-status',
-                detail: { notificationId: notification.id, type: 'read' },
-            })
+        if (notification.is_read) {
+            return
         }
+
+        await NotificationServices.markAsRead(notification.id)
+
+        sendEvent({
+            eventName: 'notification:update-read-status',
+            detail: { notificationId: notification.id, type: 'read' },
+        })
         sendEvent({ eventName: 'tippy:hide' })
     }
 
@@ -151,7 +154,7 @@ const NotificationItem = ({
                             size={56}
                             className="aspect-square min-w-[56px]"
                         />
-                        <div className="flex-center absolute bottom-1 right-[-6px] gap-2">
+                        <div className="flex-center absolute bottom-[-3px] right-0 gap-2">
                             <div
                                 className="flex-center h-7 w-7 rounded-full text-white"
                                 style={{

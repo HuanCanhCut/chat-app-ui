@@ -3,7 +3,6 @@
 import React, { memo } from 'react'
 import useSWR from 'swr'
 import Skeleton from 'react-loading-skeleton'
-import { AxiosResponse } from 'axios'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import config from '~/config'
@@ -16,7 +15,7 @@ import Tippy from '@tippyjs/react'
 
 const Header = () => {
     // fetch current user use swr
-    const { data: currentUser, isLoading } = useSWR<AxiosResponse<UserResponse>>(
+    const { data: currentUser, isLoading } = useSWR<UserResponse | undefined>(
         config.apiEndpoint.me.getCurrentUser,
         () => {
             return meService.getCurrentUser()
@@ -40,7 +39,7 @@ const Header = () => {
             <div className="flex w-full items-center justify-between">
                 {!isLoading ? (
                     <>
-                        <UserAvatar src={currentUser?.data?.data?.avatar} />
+                        <UserAvatar src={currentUser?.data?.avatar} />
                         <h3 className="text- text-xl font-semibold dark:text-dark">Huấn cánh cụt</h3>
 
                         <Tippy content="Hiện để cho đẹp :))))" hideOnClick={false} placement="bottom-start">
