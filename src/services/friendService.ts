@@ -1,3 +1,4 @@
+import { AxiosResponse } from 'axios'
 import { FriendsResponse } from '~/type/type'
 import * as request from '~/utils/httpRequest'
 
@@ -27,52 +28,42 @@ export const getFriends = async ({
     }
 }
 
-export const unfriend = async (userId: number): Promise<string | undefined> => {
+export const unfriend = async (userId: number): Promise<AxiosResponse<void>> => {
     try {
-        const response = await request.deleteMethod(`users/${userId}/unfriend`)
-
-        return response.data
+        return await request.deleteMethod(`users/${userId}/unfriend`)
     } catch (error: any) {
-        console.log(error)
+        throw error
     }
 }
 
-export const addFriend = async (userId: number): Promise<string | undefined> => {
+export const addFriend = async (userId: number): Promise<AxiosResponse<void>> => {
     try {
-        const response = await request.post(`users/${userId}/add`)
-
-        return response.data
+        return await request.post(`users/${userId}/add`)
     } catch (error: any) {
-        console.log(error)
+        throw error
     }
 }
 
-export const cancelFriendRequest = async (userId: number): Promise<string | undefined> => {
+export const cancelFriendRequest = async (userId: number): Promise<AxiosResponse<void>> => {
     try {
-        const response = await request.post(`users/${userId}/cancel`)
-
-        return response.data
+        return await request.post(`users/${userId}/cancel`)
     } catch (error: any) {
-        console.log(error)
+        throw error
     }
 }
 
-export const acceptFriend = async (userId: number): Promise<string | undefined> => {
+export const acceptFriend = async (userId: number): Promise<AxiosResponse<void>> => {
     try {
-        const response = await request.post(`users/${userId}/accept`)
-
-        return response.data
-    } catch (error) {
-        console.log(error)
+        return await request.post(`users/${userId}/accept`)
+    } catch (error: any) {
+        throw error
     }
 }
 
-export const rejectFriend = async (userId: number): Promise<string | undefined> => {
+export const rejectFriend = async (userId: number): Promise<AxiosResponse<void>> => {
     try {
-        const response = await request.post(`users/${userId}/reject`)
-
-        return response.data
-    } catch (error) {
-        console.log(error)
+        return await request.post(`users/${userId}/reject`)
+    } catch (error: any) {
+        throw error
     }
 }

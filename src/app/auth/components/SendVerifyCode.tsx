@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState, memo, MutableRefObject } from 'react'
+import handleApiError from '~/helpers/handleApiError'
 import { toast } from '~/helpers/toast'
 import * as authService from '~/services/authService'
 
@@ -48,26 +49,17 @@ const SendVerifyCode: React.FC<Props> = ({ emailRef }) => {
 
             const response = await authService.sendVerifyCode(emailRef.current?.value)
 
-            switch (response.status) {
-                case 204:
-                    toast(
-                        'Mã xác nhận đã được gửi đến email của bạn, nếu không thấy hãy kiểm tra thư rác hoặc spam',
-                        'success',
-                    )
-                    setSendSuccess(true)
-                    return
-                case 400:
-                    toast('Email không đúng định dạng', 'error')
-                    return
-                case 404:
-                    toast('Email không tồn tại trong hệ thống', 'error')
-                    return
-                default:
-                    toast('Có lỗi xảy ra, vui lòng thử lại sau hoặc liên hệ admin để xử lí', 'error')
-                    return
+            console.log(response)
+
+            if (response) {
+                toast(
+                    'Mã xác nhận đã được gửi đến email của bạn, nếu không thấy hãy kiểm tra thư rác hoặc spam',
+                    'success',
+                )
+                setSendSuccess(true)
             }
-        } catch (error) {
-            console.log(error)
+        } catch (error: any) {
+            handleApiError(error)
         }
     }
 

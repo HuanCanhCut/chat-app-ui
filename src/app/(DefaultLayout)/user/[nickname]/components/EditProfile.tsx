@@ -13,6 +13,7 @@ import { UserResponse } from '~/type/type'
 import Input from '~/components/Input'
 import { toast } from '~/helpers/toast'
 import UserAvatar from '~/components/UserAvatar'
+import handleApiError from '~/helpers/handleApiError'
 
 interface IFile extends File {
     preview: string
@@ -117,19 +118,15 @@ const EditProfile = ({ closeModal }: EditProfileProps) => {
 
             closeModal()
 
-            const response: void | undefined = await meService.updateCurrentUser(formData)
+            await meService.updateCurrentUser(formData)
 
-            if (response) {
-                toast('Cập nhật thành công')
-                mutate(config.apiEndpoint.me.getCurrentUser)
-            } else {
-                toast('Cập nhật thất bại', 'error')
-            }
+            toast('Cập nhật thành công')
+            mutate(config.apiEndpoint.me.getCurrentUser)
 
             // replace state to update url without reloading page
             window.history.replaceState({}, '', `/user/@${newData.data.nickname}`)
-        } catch (error) {
-            console.log(error)
+        } catch (error: any) {
+            handleApiError(error)
         }
     }
 

@@ -42,7 +42,7 @@ const AuthForm = () => {
     const onSubmit: SubmitHandler<FieldValue> = (data) => {
         const handleLogin = async () => {
             try {
-                const response: Response | undefined = await authServices.login({
+                const response: Response = await authServices.login({
                     email: data.email,
                     password: data.password,
                 })
@@ -54,8 +54,12 @@ const AuthForm = () => {
                 }
 
                 setErrorMessage('Email hoặc mật khẩu không đúng')
-            } catch (error) {
-                console.log(error)
+            } catch (error: any) {
+                if (error?.response?.data?.message) {
+                    setErrorMessage(error.response.data.message)
+                } else {
+                    setErrorMessage('Email hoặc mật khẩu không đúng')
+                }
             }
         }
 
@@ -71,11 +75,13 @@ const AuthForm = () => {
                     password: data.password,
                 })
 
-                if (!response) {
+                window.location.href = `/user/@${response.data.nickname}`
+            } catch (error: any) {
+                if (error?.response?.data?.message) {
+                    setErrorMessage(error.response.data.message)
+                } else {
                     toast('Đăng kí thất bại, vui lòng thử lại hoặc liên hệ admin để xử lí.', 'error')
                 }
-            } catch (error) {
-                console.log(error)
             }
         }
 
@@ -85,26 +91,24 @@ const AuthForm = () => {
                     return setErrorMessage('Nhập lại mật khẩu không khớp, vui lòng thử lại')
                 }
 
-                const response: string | undefined = await authServices.resetPassword({
+                await authServices.resetPassword({
                     email: data.email,
                     password: data.password,
                     code: data.verifyCode,
-                    onError: (error: any) => {
-                        setErrorMessage(error?.response?.data?.message)
-                    },
                 })
 
-                if (response) {
-                    toast('Đổi mật khẩu thành công')
-                    setType('login')
-                    setValue('email', '')
-                    setValue('password', '')
-                    setValue('verifyCode', '')
-                    setValue('rePassword', '')
-                    return
+                toast('Đổi mật khẩu thành công')
+                setType('login')
+                setValue('email', '')
+                setValue('password', '')
+                setValue('verifyCode', '')
+                setValue('rePassword', '')
+            } catch (error: any) {
+                if (error?.response?.data?.message) {
+                    setErrorMessage(error.response.data.message)
+                } else {
+                    setErrorMessage('Có lỗi xảy ra, vui lòng thử lại sau hoặc liên hệ admin để xử lí.')
                 }
-            } catch (error) {
-                console.log(error)
             }
         }
 
@@ -128,7 +132,7 @@ const AuthForm = () => {
             const { user }: any = await signInWithPopup(config.auth, config.googleProvider)
 
             if (user) {
-                const response: Response | undefined = await authServices.loginWithGoogle(user.accessToken)
+                const response: Response = await authServices.loginWithGoogle(user.accessToken)
 
                 if (response) {
                     window.location.reload()
@@ -137,8 +141,12 @@ const AuthForm = () => {
                     }
                 }
             }
-        } catch (error) {
-            console.log(error)
+        } catch (error: any) {
+            if (error?.response?.data?.message) {
+                setErrorMessage(error.response.data.message)
+            } else {
+                setErrorMessage('Đăng nhập thất bại, vui lòng thử lại hoặc liên hệ admin để xử lí.')
+            }
         }
     }
 

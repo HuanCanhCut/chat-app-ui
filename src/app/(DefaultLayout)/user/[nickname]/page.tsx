@@ -104,7 +104,7 @@ export default function UserPage() {
                             <button className="px-4 py-2 text-primary">Bạn bè</button>
                         </div>
                     </div>
-                ) : user && !isLoading ? (
+                ) : !user && !isLoading ? (
                     <NotFound />
                 ) : (
                     <Loading />

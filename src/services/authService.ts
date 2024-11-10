@@ -17,7 +17,7 @@ interface Response {
     }
 }
 
-export const register = async ({ email, password }: RegisterProps): Promise<Response | undefined> => {
+export const register = async ({ email, password }: RegisterProps): Promise<Response> => {
     try {
         const response = await request.post(config.apiEndpoint.auth.register, {
             email,
@@ -26,11 +26,11 @@ export const register = async ({ email, password }: RegisterProps): Promise<Resp
 
         return response.data
     } catch (error: any) {
-        console.log(error)
+        throw error
     }
 }
 
-export const login = async ({ email, password }: RegisterProps): Promise<Response | undefined> => {
+export const login = async ({ email, password }: RegisterProps): Promise<Response> => {
     try {
         const response = await request.post(config.apiEndpoint.auth.login, {
             email,
@@ -39,21 +39,19 @@ export const login = async ({ email, password }: RegisterProps): Promise<Respons
 
         return response.data
     } catch (error: any) {
-        console.log(error)
+        throw error
     }
 }
 
-export const logout = async (): Promise<Response | undefined> => {
+export const logout = async (): Promise<AxiosResponse<void>> => {
     try {
-        const response = await request.post(config.apiEndpoint.auth.logout)
-
-        return response.data
+        return await request.post(config.apiEndpoint.auth.logout)
     } catch (error: any) {
-        console.log(error)
+        throw error
     }
 }
 
-export const loginWithGoogle = async (token: string): Promise<Response | undefined> => {
+export const loginWithGoogle = async (token: string): Promise<Response> => {
     try {
         const response = await request.post(config.apiEndpoint.auth.loginWithToken, {
             token,
@@ -61,17 +59,17 @@ export const loginWithGoogle = async (token: string): Promise<Response | undefin
 
         return response.data
     } catch (error: any) {
-        return error
+        throw error
     }
 }
 
-export const sendVerifyCode = async (email: string): Promise<AxiosResponse<string>> => {
+export const sendVerifyCode = async (email: string): Promise<AxiosResponse<void>> => {
     try {
         return await request.post(config.apiEndpoint.auth.verify, {
             email,
         })
     } catch (error: any) {
-        return error
+        throw error
     }
 }
 
@@ -79,22 +77,18 @@ export const resetPassword = async ({
     email,
     password,
     code,
-    onError,
 }: {
     email: string
     password: string
     code: string
-    onError?: (error: any) => void
-}): Promise<string | undefined> => {
+}): Promise<AxiosResponse<void>> => {
     try {
-        const response = await request.post(config.apiEndpoint.auth.resetPassword, {
+        return await request.post(config.apiEndpoint.auth.resetPassword, {
             email,
             password,
             code,
         })
-
-        return response.data
     } catch (error: any) {
-        onError?.(error)
+        throw error
     }
 }

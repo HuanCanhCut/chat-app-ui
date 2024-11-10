@@ -128,8 +128,6 @@ const Notification = () => {
                 (notification: NotificationData) => notification.id !== notificationId,
             )
 
-            console.log(newNotifications)
-
             mutateNotifications(
                 {
                     data: newNotifications,

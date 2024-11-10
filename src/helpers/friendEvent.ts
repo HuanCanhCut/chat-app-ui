@@ -1,5 +1,6 @@
 import { sendEvent } from './events'
 import * as friendService from '~/services/friendService'
+import handleApiError from './handleApiError'
 
 export const handleAcceptFriend = async (userID: number) => {
     try {
@@ -8,8 +9,8 @@ export const handleAcceptFriend = async (userID: number) => {
             detail: { is_friend: true, friend_request: false },
         })
         return await friendService.acceptFriend(userID)
-    } catch (error) {
-        console.log(error)
+    } catch (error: any) {
+        handleApiError(error)
     }
 }
 
@@ -20,7 +21,7 @@ export const handleRejectFriendRequest = async (userID: number) => {
             detail: { is_friend: false, friend_request: false },
         })
         return await friendService.rejectFriend(userID)
-    } catch (error) {
-        console.log(error)
+    } catch (error: any) {
+        handleApiError(error)
     }
 }

@@ -26,42 +26,34 @@ export const getNotifications = async ({
     }
 }
 
-export const markAsRead = async (notification_id: number): Promise<string | undefined> => {
+export const markAsRead = async (notification_id: number): Promise<AxiosResponse<void>> => {
     try {
-        const response = await request.patch(`/notifications/mark-as-read`, { notification_id })
-
-        return response.data
+        return await request.patch(`/notifications/mark-as-read`, { notification_id })
     } catch (error: any) {
-        console.log(error)
+        throw error
     }
 }
 
-export const seen = async (): Promise<string | undefined> => {
+export const seen = async (): Promise<AxiosResponse<void>> => {
     try {
-        const response = await request.patch(`/notifications/seen`)
-
-        return response.data
-    } catch (error) {
-        console.log(error)
+        return await request.patch(`/notifications/seen`)
+    } catch (error: any) {
+        throw error
     }
 }
 
-export const markAsUnread = async (notification_id: number): Promise<string | undefined> => {
+export const markAsUnread = async (notification_id: number): Promise<AxiosResponse<void>> => {
     try {
-        const response = await request.patch(`/notifications/mark-as-unread`, { notification_id })
-
-        return response.data
+        return await request.patch(`/notifications/mark-as-unread`, { notification_id })
     } catch (error: any) {
-        console.log(error)
+        throw error
     }
 }
 
-export const deleteNotification = async (notification_id: number): Promise<string | undefined> => {
+export const deleteNotification = async (notification_id: number): Promise<AxiosResponse<void>> => {
     try {
-        const response = await request.deleteMethod(`/notifications/${notification_id}`)
-
-        return response.data
+        return await request.deleteMethod(`/notifications/${notification_id}`)
     } catch (error: any) {
-        console.log(error)
+        throw error
     }
 }

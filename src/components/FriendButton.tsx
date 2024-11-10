@@ -9,9 +9,9 @@ import * as friendService from '~/services/friendService'
 import PopperWrapper from './PopperWrapper'
 import { UserModel } from '~/type/type'
 import Button from './Button'
-import { toast } from '~/helpers/toast'
 import { handleAcceptFriend, handleRejectFriendRequest } from '~/helpers/friendEvent'
 import { sendEvent } from '~/helpers/events'
+import handleApiError from '~/helpers/handleApiError'
 
 interface FriendButtonProps {
     user: UserModel
@@ -29,8 +29,8 @@ const FriendButton = ({ user, className = '' }: FriendButtonProps) => {
             })
 
             return await friendService.addFriend(user.id)
-        } catch (error) {
-            console.log(error)
+        } catch (error: any) {
+            handleApiError(error)
         }
     }, [user])
 
@@ -41,8 +41,8 @@ const FriendButton = ({ user, className = '' }: FriendButtonProps) => {
                 detail: { sent_friend_request: false },
             })
             return await friendService.cancelFriendRequest(user.id)
-        } catch (error) {
-            console.log(error)
+        } catch (error: any) {
+            handleApiError(error)
         }
     }, [user.id])
 
@@ -60,22 +60,16 @@ const FriendButton = ({ user, className = '' }: FriendButtonProps) => {
 
     const handleUnfriend = useCallback(async () => {
         try {
-            const response: string | undefined = await friendService.unfriend(user.id)
+            await friendService.unfriend(user.id)
 
-            if (response) {
-                sendEvent({ eventName: 'friend:get-new-friends', detail: user.id })
-                sendEvent({
-                    eventName: 'friend:change-friend-status',
-                    detail: { is_friend: false, friend_request: false },
-                })
-                closeModal()
-                return
-            }
-
-            toast(`Có lỗi xảy ra, vui lòng thử lại`, 'error')
+            sendEvent({ eventName: 'friend:get-new-friends', detail: user.id })
+            sendEvent({
+                eventName: 'friend:change-friend-status',
+                detail: { is_friend: false, friend_request: false },
+            })
             closeModal()
-        } catch (error) {
-            console.log(error)
+        } catch (error: any) {
+            handleApiError(error)
         }
     }, [closeModal, user.id])
 
