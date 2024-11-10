@@ -9,7 +9,8 @@ import * as friendService from '~/services/friendService'
 import PopperWrapper from './PopperWrapper'
 import { UserModel } from '~/type/type'
 import Button from './Button'
-import { handleAcceptFriend, showToast } from '~/project/services'
+import { toast } from '~/helpers/toast'
+import { handleAcceptFriend, handleRejectFriendRequest } from '~/helpers/friendEvent'
 import { sendEvent } from '~/helpers/events'
 
 interface FriendButtonProps {
@@ -53,18 +54,6 @@ const FriendButton = ({ user, className = '' }: FriendButtonProps) => {
         }
     }, [setModalIsOpen, user.is_friend, handleAddFriend])
 
-    const handleRejectFriend = useCallback(async () => {
-        try {
-            sendEvent({
-                eventName: 'friend:change-friend-status',
-                detail: { is_friend: false, friend_request: false },
-            })
-            return await friendService.rejectFriend(user.id)
-        } catch (error) {
-            console.log(error)
-        }
-    }, [user.id])
-
     const closeModal = useCallback(() => {
         setModalIsOpen(false)
     }, [])
@@ -83,7 +72,7 @@ const FriendButton = ({ user, className = '' }: FriendButtonProps) => {
                 return
             }
 
-            showToast({ message: `Có lỗi xảy ra, vui lòng thử lại` })
+            toast(`Có lỗi xảy ra, vui lòng thử lại`, 'error')
             closeModal()
         } catch (error) {
             console.log(error)
@@ -150,7 +139,7 @@ const FriendButton = ({ user, className = '' }: FriendButtonProps) => {
                     >
                         Chấp nhận
                     </Button>
-                    <Button buttonType="rounded" onClick={handleRejectFriend}>
+                    <Button buttonType="rounded" onClick={() => handleRejectFriendRequest(user.id)}>
                         Hủy
                     </Button>
                 </>

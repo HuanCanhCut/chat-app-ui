@@ -11,7 +11,7 @@ import config from '~/config'
 import CustomImage from '~/components/Image'
 import { UserResponse } from '~/type/type'
 import Input from '~/components/Input'
-import { showToast } from '~/project/services'
+import { toast } from '~/helpers/toast'
 import UserAvatar from '~/components/UserAvatar'
 
 interface IFile extends File {
@@ -120,10 +120,10 @@ const EditProfile = ({ closeModal }: EditProfileProps) => {
             const response: void | undefined = await meService.updateCurrentUser(formData)
 
             if (response) {
-                showToast({ message: 'Cập nhật thành công' })
+                toast('Cập nhật thành công')
                 mutate(config.apiEndpoint.me.getCurrentUser)
             } else {
-                showToast({ message: 'Cập nhật thất bại', type: 'error' })
+                toast('Cập nhật thất bại', 'error')
             }
 
             // replace state to update url without reloading page

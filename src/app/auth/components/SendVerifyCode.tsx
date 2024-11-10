@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState, memo, MutableRefObject } from 'react'
-import { showToast } from '~/project/services'
+import { toast } from '~/helpers/toast'
 import * as authService from '~/services/authService'
 
 interface Props {
@@ -37,12 +37,12 @@ const SendVerifyCode: React.FC<Props> = ({ emailRef }) => {
             if (sendSuccess) return
 
             if (!emailRef.current?.value) {
-                showToast({ message: 'Email không được bỏ trống', type: 'error' })
+                toast('Email không được bỏ trống', 'error')
                 return
             }
 
             if (!/^\w+([\\.-]?\w+)*@\w+([\\.-]?\w+)*(\.\w{2,3})+$/.test(emailRef.current?.value)) {
-                showToast({ message: 'Email không đúng định dạng', type: 'error' })
+                toast('Email không đúng định dạng', 'error')
                 return
             }
 
@@ -50,24 +50,20 @@ const SendVerifyCode: React.FC<Props> = ({ emailRef }) => {
 
             switch (response.status) {
                 case 204:
-                    showToast({
-                        message:
-                            'Mã xác nhận đã được gửi đến email của bạn, nếu không thấy hãy kiểm tra thư rác hoặc spam',
-                        type: 'success',
-                    })
+                    toast(
+                        'Mã xác nhận đã được gửi đến email của bạn, nếu không thấy hãy kiểm tra thư rác hoặc spam',
+                        'success',
+                    )
                     setSendSuccess(true)
                     return
                 case 400:
-                    showToast({ message: 'Email không đúng định dạng', type: 'error' })
+                    toast('Email không đúng định dạng', 'error')
                     return
                 case 404:
-                    showToast({ message: 'Email không tồn tại trong hệ thống', type: 'error' })
+                    toast('Email không tồn tại trong hệ thống', 'error')
                     return
                 default:
-                    showToast({
-                        message: 'Có lỗi xảy ra, vui lòng thử lại sau hoặc liên hệ admin để xử lí',
-                        type: 'error',
-                    })
+                    toast('Có lỗi xảy ra, vui lòng thử lại sau hoặc liên hệ admin để xử lí', 'error')
                     return
             }
         } catch (error) {

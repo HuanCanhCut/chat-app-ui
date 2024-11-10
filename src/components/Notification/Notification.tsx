@@ -128,6 +128,8 @@ const Notification = () => {
                 (notification: NotificationData) => notification.id !== notificationId,
             )
 
+            console.log(newNotifications)
+
             mutateNotifications(
                 {
                     data: newNotifications,
@@ -145,6 +147,10 @@ const Notification = () => {
 
             setReloadNotificationCount(true)
         })
+
+        return () => {
+            socket.off(NotificationEvent.REMOVE_NOTIFICATION)
+        }
     }, [mutateNotifications, notifications])
 
     useEffect(() => {

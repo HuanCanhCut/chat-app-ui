@@ -9,7 +9,7 @@ import { signInWithPopup } from 'firebase/auth'
 import config from '~/config'
 import * as authServices from '~/services/authService'
 import { UserModel } from '~/type/type'
-import { showToast } from '~/project/services'
+import { toast } from '~/helpers/toast'
 import SendVerifyCode from './SendVerifyCode'
 import Input from '~/components/Input'
 
@@ -39,15 +39,6 @@ const AuthForm = () => {
 
     const [errorMessage, setErrorMessage] = useState<string>('')
 
-    const showSuccess = () => {
-        showToast({
-            message: 'Đăng nhập thành công.',
-        })
-
-        // reload page
-        window.location.reload()
-    }
-
     const onSubmit: SubmitHandler<FieldValue> = (data) => {
         const handleLogin = async () => {
             try {
@@ -57,7 +48,7 @@ const AuthForm = () => {
                 })
 
                 if (response) {
-                    showSuccess()
+                    window.location.reload()
                     localStorage.setItem('exp', JSON.stringify(response.meta?.pagination?.exp))
                     return
                 }
@@ -75,13 +66,13 @@ const AuthForm = () => {
                     return
                 }
 
-                const response: Response | undefined = await authServices.register({
+                const response = await authServices.register({
                     email: data.email,
                     password: data.password,
                 })
 
                 if (!response) {
-                    showToast({ message: 'Đăng kí thất bại, vui lòng thử lại hoặc liên hệ admin để xử lí.' })
+                    toast('Đăng kí thất bại, vui lòng thử lại hoặc liên hệ admin để xử lí.', 'error')
                 }
             } catch (error) {
                 console.log(error)
@@ -104,7 +95,7 @@ const AuthForm = () => {
                 })
 
                 if (response) {
-                    showToast({ message: 'Đổi mật khẩu thành công' })
+                    toast('Đổi mật khẩu thành công')
                     setType('login')
                     setValue('email', '')
                     setValue('password', '')
@@ -140,7 +131,7 @@ const AuthForm = () => {
                 const response: Response | undefined = await authServices.loginWithGoogle(user.accessToken)
 
                 if (response) {
-                    showSuccess()
+                    window.location.reload()
                     if (response.meta) {
                         localStorage.setItem('exp', JSON.stringify(response.meta.pagination.exp))
                     }

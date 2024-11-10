@@ -6,7 +6,8 @@ import * as NotificationServices from '~/services/notification'
 import Button from '~/components/Button'
 import UserAvatar from '~/components/UserAvatar'
 import { listenEvent, sendEvent } from '~/helpers/events'
-import { handleAcceptFriend, showToast } from '~/project/services'
+import { toast } from '~/helpers/toast'
+import { handleAcceptFriend, handleRejectFriendRequest } from '~/helpers/friendEvent'
 import { NotificationData } from '~/type/type'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCheck, faEllipsis, faTrash } from '@fortawesome/free-solid-svg-icons'
@@ -69,7 +70,7 @@ const NotificationItem = ({
         sendEvent({ eventName: 'notification:delete-notification', detail: notification.id })
         setIsOpenConfirmModel(false)
         await NotificationServices.deleteNotification(notification.id)
-        showToast({ message: 'Xóa thành công', type: 'success' })
+        toast('Xóa thành công', 'success')
     }
 
     const RenderMoreOptions = () => {
@@ -194,7 +195,11 @@ const NotificationItem = ({
                     <Button buttonType="primary" className="inline-block flex-1" onClick={handleAccept}>
                         Chấp nhận
                     </Button>
-                    <Button buttonType="rounded" className="inline-block flex-1">
+                    <Button
+                        buttonType="rounded"
+                        className="inline-block flex-1"
+                        onClick={() => handleRejectFriendRequest(notification.sender_id)}
+                    >
                         Xóa
                     </Button>
                 </div>

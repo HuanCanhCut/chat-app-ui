@@ -1,5 +1,5 @@
 import axios, { AxiosResponse } from 'axios'
-import { showToast } from '~/project/services'
+import { toast } from '~/helpers/toast'
 
 const request = axios.create({
     baseURL: process.env.NEXT_PUBLIC_BASE_URL,
@@ -36,10 +36,7 @@ request.interceptors.request.use(
                 console.log(error)
 
                 if (error.response.status === 401) {
-                    showToast({
-                        message: 'Refresh token đã hết hạn, vui lòng đăng nhập lại',
-                        type: 'warning',
-                    })
+                    toast('Refresh token đã hết hạn, vui lòng đăng nhập lại', 'warning')
                 }
                 localStorage.removeItem('exp')
             }
