@@ -14,16 +14,28 @@ import NotificationItem from './NotificationItem'
 import { listenEvent } from '~/helpers/events'
 import socket from '~/utils/socket'
 import { NotificationEvent } from '~/enum/notification'
+import Skeleton from 'react-loading-skeleton'
+
+const PER_PAGE = 6
 
 const Notification = () => {
     const [currentTab, setCurrentTab] = useState<'all' | 'unread'>('all')
     const [notificationUnSeenCount, setNotificationUnSeenCount] = useState(0)
     const [reloadNotificationCount, setReloadNotificationCount] = useState(true)
 
-    const { data: notifications, mutate: mutateNotifications } = useSWR<NotificationResponse | undefined>(
+    const [page, setPage] = useState(1)
+
+    const {
+        data: notifications,
+        mutate: mutateNotifications,
+        isLoading,
+    } = useSWR<NotificationResponse | undefined>(
         currentTab ? [config.apiEndpoint.notification.getNotifications, currentTab] : null,
         () => {
-            return notificationServices.getNotifications({ page: 1, per_page: 10, type: currentTab })
+            return notificationServices.getNotifications({ page, per_page: PER_PAGE, type: currentTab })
+        },
+        {
+            revalidateIfStale: true,
         },
     )
 
@@ -114,6 +126,7 @@ const Notification = () => {
 
             setReloadNotificationCount(true)
         })
+        // không off socket vì trong file layout có xử lí rồi
     }, [mutateNotifications, notifications])
 
     // Listen event when remove a notification
@@ -219,9 +232,48 @@ const Notification = () => {
         return remove
     }, [currentTab])
 
+    const handleSeeMore = () => {
+        setPage(page + 1)
+    }
+
+    useEffect(() => {
+        if (page <= 1) {
+            return
+        }
+
+        const getMoreNotifications = async () => {
+            const response = await notificationServices.getNotifications({ page, per_page: PER_PAGE, type: currentTab })
+
+            if (!notifications) {
+                return
+            }
+
+            if (response) {
+                mutateNotifications(
+                    {
+                        data: [...notifications.data, ...response.data],
+                        meta: {
+                            ...notifications?.meta,
+                            pagination: {
+                                ...notifications?.meta.pagination,
+                                count: notifications.meta.pagination.count + response.meta.pagination.count,
+                            },
+                        },
+                    },
+                    {
+                        revalidate: false,
+                    },
+                )
+            }
+        }
+
+        getMoreNotifications()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [page])
+
     const renderNotification = () => {
         return (
-            <PopperWrapper className="w-[400px] px-3 py-4">
+            <PopperWrapper className="w-[400px] px-3 py-4 [overflow:overlay]">
                 <header>
                     <h2 className="text-xl font-semibold">Thông báo</h2>
                     <div className="mt-4 flex items-center gap-2">
@@ -238,14 +290,38 @@ const Notification = () => {
                     </div>
                 </header>
                 <main className="mt-2">
-                    {notifications &&
-                        notifications.data.map((notification: NotificationData) => {
-                            return (
-                                <React.Fragment key={notification.id}>
-                                    <NotificationItem notification={notification} notificationIcon={notificationIcon} />
-                                </React.Fragment>
-                            )
-                        })}
+                    {notifications ? (
+                        <>
+                            {notifications.data.map((notification: NotificationData) => {
+                                return (
+                                    <React.Fragment key={notification.id}>
+                                        <NotificationItem
+                                            notification={notification}
+                                            notificationIcon={notificationIcon}
+                                        />
+                                    </React.Fragment>
+                                )
+                            })}
+                            {notifications.meta.pagination.count < notifications.meta.pagination.total && (
+                                <Button buttonType="rounded" className="mt-4 w-full" onClick={handleSeeMore}>
+                                    Xem thêm
+                                </Button>
+                            )}
+                        </>
+                    ) : (
+                        isLoading && (
+                            <>
+                                {[1, 2, 3, 4, 5, 6].map((_, index) => {
+                                    return (
+                                        <div key={index} className="flex items-center gap-2">
+                                            <Skeleton width={60} height={60} circle />
+                                            <Skeleton width={300} height={20} />
+                                        </div>
+                                    )
+                                })}
+                            </>
+                        )
+                    )}
                 </main>
             </PopperWrapper>
         )

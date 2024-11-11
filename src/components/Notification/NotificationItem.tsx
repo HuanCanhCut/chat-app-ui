@@ -136,9 +136,9 @@ const NotificationItem = ({
                 closeModal={() => setIsOpenConfirmModel(false)}
                 onConfirm={handleDeleteNotification}
             />
-            <div className="group relative flex items-center gap-2">
+            <div className="group relative mt-3 flex items-center gap-2">
                 <CustomTippy renderItem={RenderMoreOptions} onShow={tippyShow}>
-                    <div className="absolute right-2 top-1/2 opacity-0 group-hover:opacity-100">
+                    <div className="absolute right-4 top-1/2 mt-2 -translate-y-1/2 opacity-0 group-hover:opacity-100">
                         <Button buttonType="icon">
                             <FontAwesomeIcon icon={faEllipsis} />
                         </Button>
@@ -176,7 +176,7 @@ const NotificationItem = ({
                                     `<span class="font-semibold">${notification.sender_user.full_name.trim()}</span>`,
                                 )}`,
                             }}
-                            className={`text-sm font-normal dark:font-light ${notification.is_read ? 'text-gray-600 dark:text-gray-400' : 'text-gray-800 dark:text-gray-200'}`}
+                            className={`pr-4 text-sm font-normal dark:font-light ${notification.is_read ? 'text-gray-600 dark:text-gray-400' : 'text-gray-800 dark:text-gray-200'}`}
                         ></p>
                         <small
                             className={`text-xs ${
@@ -187,7 +187,9 @@ const NotificationItem = ({
                         </small>
                     </div>
                 </Link>
-                {!notification.is_read && <button className="h-3 min-w-3 rounded-full bg-primary"></button>}
+                {!notification.is_read && (
+                    <button className="ml-auto mt-4 h-3 min-w-3 rounded-full bg-primary"></button>
+                )}
             </div>
 
             {notification.type === 'friend_request' && !isAccept && (
