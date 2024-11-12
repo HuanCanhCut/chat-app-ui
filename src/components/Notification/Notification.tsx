@@ -6,7 +6,7 @@ import useSWR from 'swr'
 import * as notificationServices from '~/services/notification'
 import Button from '~/components/Button/Button'
 import CustomTippy from '~/components/CustomTippy/CustomTippy'
-import PopperWrapper from '~/components/PopperWrapper/PopperWrapper'
+import PopperWrapper from '~/components/PopperWrapper'
 import config from '~/config'
 import { NotificationData, NotificationResponse } from '~/type/type'
 import { SendIcon } from '~/components/Icons/Icons'
@@ -331,7 +331,7 @@ const Notification = () => {
         <CustomTippy renderItem={renderNotification} onShow={tippyShow}>
             <div className="relative">
                 <Button buttonType="icon" onClick={handleOpenNotification}>
-                    <FontAwesomeIcon icon={faBell} className="text-lg sm:text-xl" />
+                    <FontAwesomeIcon icon={faBell} className="text-lg sm:text-xl" width={20} height={20} />
                 </Button>
                 {notifications && notificationUnSeenCount !== 0 && (
                     <span className="flex-center absolute right-[-3px] top-[-3px] h-4 w-4 rounded-full bg-red-500 text-xs text-white">

@@ -5,7 +5,6 @@ import { usePathname, useRouter } from 'next/navigation'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCircleDot, faMoon, faPen, faSignOut, IconDefinition } from '@fortawesome/free-solid-svg-icons'
 import useSWR from 'swr'
-import Skeleton from 'react-loading-skeleton'
 import Tippy from '@tippyjs/react'
 
 import * as authService from '~/services/authService'
@@ -56,12 +55,9 @@ export default function Header() {
     const pathname = usePathname()
     const router = useRouter()
 
-    const { data: currentUser, isLoading } = useSWR<UserResponse | undefined>(
-        config.apiEndpoint.me.getCurrentUser,
-        () => {
-            return meService.getCurrentUser()
-        },
-    )
+    const { data: currentUser } = useSWR<UserResponse | undefined>(config.apiEndpoint.me.getCurrentUser, () => {
+        return meService.getCurrentUser()
+    })
 
     const NAV_ITEMS = useMemo(() => {
         return [
@@ -149,20 +145,16 @@ export default function Header() {
             </nav>
 
             <div className="flex items-center gap-4">
-                {isLoading ? (
-                    <Skeleton circle width={38} height={38} />
-                ) : (
-                    <>
-                        <Notification />
-                        <Tippy content="Messenger">
-                            <div>
-                                <Button buttonType="icon" href={config.routes.dashboard}>
-                                    <MessageIcon />
-                                </Button>
-                            </div>
-                        </Tippy>
-                    </>
-                )}
+                <>
+                    <Notification />
+                    <Tippy content="Messenger">
+                        <div>
+                            <Button buttonType="icon" href={config.routes.dashboard}>
+                                <MessageIcon />
+                            </Button>
+                        </div>
+                    </Tippy>
+                </>
                 <CustomTippy
                     trigger="click"
                     renderItem={renderTooltip}
@@ -172,11 +164,7 @@ export default function Header() {
                     timeDelayClose={250}
                 >
                     <div>
-                        {isLoading ? (
-                            <Skeleton circle width={38} height={38} />
-                        ) : (
-                            <UserAvatar src={currentUser?.data?.avatar} />
-                        )}
+                        <UserAvatar src={currentUser?.data?.avatar} />
                     </div>
                 </CustomTippy>
             </div>
