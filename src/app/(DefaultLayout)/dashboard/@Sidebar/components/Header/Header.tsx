@@ -7,9 +7,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import config from '~/config'
 import * as meService from '~/services/meService'
-import UserAvatar from '~/components/UserAvatar'
+import UserAvatar from '~/components/UserAvatar/UserAvatar'
 import { UserResponse } from '~/type/type'
-import Search from '~/components/Search'
+import Search from '~/components/Search/Search'
 import { faEllipsis } from '@fortawesome/free-solid-svg-icons'
 import Tippy from '@tippyjs/react'
 

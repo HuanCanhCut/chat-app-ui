@@ -1,9 +1,9 @@
 import { UserModel } from '~/type/type'
-import PopperWrapper from './PopperWrapper'
-import UserAvatar from './UserAvatar'
-import Button from './Button'
-import { MessageIcon } from './Icons'
-import FriendButton from './FriendButton'
+import PopperWrapper from '~/components/PopperWrapper/PopperWrapper'
+import UserAvatar from '~/components/UserAvatar/UserAvatar'
+import Button from '~/components/Button/Button'
+import { MessageIcon } from '~/components/Icons/Icons'
+import FriendButton from '~/components/FriendButton'
 
 interface AccountPreviewProps {
     user: UserModel

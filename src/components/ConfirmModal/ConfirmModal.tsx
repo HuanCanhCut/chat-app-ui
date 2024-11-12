@@ -1,5 +1,5 @@
-import Button from './Button'
-import PopperWrapper from './PopperWrapper'
+import Button from '~/components/Button'
+import PopperWrapper from '~/components/PopperWrapper/PopperWrapper'
 import ReactModal from 'react-modal'
 
 interface ConfirmModelProps {

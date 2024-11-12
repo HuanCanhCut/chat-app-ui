@@ -5,6 +5,15 @@ import socket from '~/utils/socket'
 import { NotificationEvent } from '~/enum/notification'
 
 const Notification = ({ children }: { children: React.ReactNode }) => {
+    // connect to socket
+    useEffect(() => {
+        socket.connect()
+
+        return () => {
+            socket.disconnect()
+        }
+    }, [])
+
     const audioRef = useRef<HTMLAudioElement>(null)
 
     useEffect(() => {

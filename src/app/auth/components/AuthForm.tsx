@@ -11,7 +11,7 @@ import * as authServices from '~/services/authService'
 import { UserModel } from '~/type/type'
 import { toast } from '~/helpers/toast'
 import SendVerifyCode from './SendVerifyCode'
-import Input from '~/components/Input'
+import Input from '~/components/Input/Input'
 
 export interface FieldValue {
     email: string

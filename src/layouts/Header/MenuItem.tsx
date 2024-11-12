@@ -1,8 +1,8 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
-import SwitchButton from '~/components/SwitchButton'
+import SwitchButton from '~/components/SwitchButton/SwitchButton'
 import { useState } from 'react'
-import Button from '~/components/Button'
+import Button from '~/components/Button/Button'
 import useThemeStore from '~/zustand/useThemeStore'
 import { MenuItemType } from './Header'
 

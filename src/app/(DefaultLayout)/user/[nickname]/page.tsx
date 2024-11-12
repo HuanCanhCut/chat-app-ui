@@ -5,7 +5,7 @@ import Skeleton from 'react-loading-skeleton'
 import { useEffect } from 'react'
 import { useParams } from 'next/navigation'
 
-import CustomImage from '~/components/Image'
+import CustomImage from '~/components/Image/Image'
 import config from '~/config'
 import { UserResponse } from '~/type/type'
 import * as meService from '~/services/meService'

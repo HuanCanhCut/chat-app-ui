@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import useSWR from 'swr'
 
 import * as friendService from '~/services/friendService'
-import UserAvatar from '~/components/UserAvatar'
+import UserAvatar from '~/components/UserAvatar/UserAvatar'
 import config from '~/config'
 import { FriendsResponse, FriendsShip, UserResponse } from '~/type/type'
 import Link from 'next/link'
