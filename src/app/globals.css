@@ -5,7 +5,8 @@
 @tailwind utilities;
 
 :root {
-    --header-height: 64px;
+    --header-height: 60px;
+    --header-height-mobile: 90px;
 }
 
 @layer base {

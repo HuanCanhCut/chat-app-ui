@@ -5,29 +5,16 @@ import Link from 'next/link'
 import useThemeStore from '~/zustand/useThemeStore'
 import config from '~/config'
 
-export default function Logo() {
+export default function Logo({ className = '' }: { className?: string }) {
     const { theme } = useThemeStore()
 
     return (
         <>
-            <Link href={config.routes.dashboard}>
+            <Link href={config.routes.dashboard} className={className}>
                 <Image
                     src={theme === 'dark' ? '/static/media/dark-logo.png' : '/static/media/light-logo.png'}
                     sizes="1000px"
-                    className="hidden h-auto w-[120px] cursor-pointer sm:mx-0 sm:block"
-                    alt="logo"
-                    width="0"
-                    height="0"
-                    priority
-                    quality={100}
-                />
-            </Link>
-
-            <Link href={config.routes.dashboard} className="block sm:hidden">
-                <Image
-                    src={theme === 'dark' ? '/static/media/dark-logo-min.png' : '/static/media/light-logo-min.png'}
-                    sizes="1000px"
-                    className="block h-auto w-[37px] cursor-pointer sm:mx-0 sm:hidden"
+                    className="h-auto w-[35px] cursor-pointer sm:w-[40px]"
                     alt="logo"
                     width="0"
                     height="0"
