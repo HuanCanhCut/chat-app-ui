@@ -32,7 +32,6 @@ const Header = () => {
                     </Tippy>
                 </>
             </div>
-            <Search placeholder="Tìm kiếm trên Huấn Cánh Cụt" />
         </header>
     )
 }

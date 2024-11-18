@@ -1,4 +1,4 @@
-import Tippy from '@tippyjs/react'
+import Tippy from '@tippyjs/react/headless'
 import { memo } from 'react'
 import { useSpring, motion } from 'framer-motion'
 import { sendEvent } from '~/helpers/events'
@@ -75,23 +75,20 @@ export default memo(function CustomTippy({
     }
 
     return (
-        //Using a wrapper <div> or <span> tag around the reference element solves this by creating a new parentNode context.
-        <div>
-            <Tippy
-                trigger={trigger}
-                animation={true}
-                interactive
-                delay={[timeDelayOpen, timeDelayClose]}
-                offset={[offsetX, offsetY]}
-                hideOnClick={hideOnClick}
-                placement={placement}
-                render={render}
-                onMount={onMount}
-                onHide={onHide}
-                onShow={onShow}
-            >
-                {children}
-            </Tippy>
-        </div>
+        <Tippy
+            trigger={trigger}
+            animation={true}
+            interactive
+            delay={[timeDelayOpen, timeDelayClose]}
+            offset={[offsetX, offsetY]}
+            hideOnClick={hideOnClick}
+            placement={placement}
+            render={render}
+            onMount={onMount}
+            onHide={onHide}
+            onShow={onShow}
+        >
+            {children}
+        </Tippy>
     )
 })

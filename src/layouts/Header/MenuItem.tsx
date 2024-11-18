@@ -4,7 +4,7 @@ import SwitchButton from '~/components/SwitchButton/SwitchButton'
 import { useState } from 'react'
 import Button from '~/components/Button/Button'
 import useThemeStore from '~/zustand/useThemeStore'
-import { MenuItemType } from './Header'
+import { MenuItemType } from './Interaction/Interaction'
 
 interface MenuItemProps {
     item: MenuItemType

@@ -69,3 +69,14 @@ interface NotificationData {
 interface NotificationResponse extends MetaPagination {
     data: NotificationData[]
 }
+
+interface SearchHistoryData {
+    id: number
+    user_id: number
+    user_search_id: number
+    user_search: UserModel
+}
+
+interface SearchHistory {
+    data: SearchHistoryData[]
+}

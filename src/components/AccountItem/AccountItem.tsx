@@ -1,20 +1,28 @@
 import { memo } from 'react'
 import { UserModel } from '~/type/type'
 import UserAvatar from '~/components/UserAvatar/UserAvatar'
+import Link from 'next/link'
 
 interface AccountItemProps {
     className?: string
     user: UserModel
+    onClick?: (user?: UserModel) => void
 }
 
-export default memo(function AccountItem({ className = '', user }: AccountItemProps) {
+const AccountItem: React.FC<AccountItemProps> = ({ className = '', user, onClick = () => {} }) => {
     return (
-        <div className={`flex items-center ${className}`}>
-            <UserAvatar size={56} src={user.avatar} />
+        <Link
+            className={`flex items-center ${className}`}
+            href={`/user/@${user.nickname}`}
+            onClick={() => onClick(user)}
+        >
+            <UserAvatar size={50} src={user.avatar} />
             <div className="ml-3">
                 <h4 className="text-base font-medium">{user.full_name}</h4>
                 <p className="text-xs text-gray-500">{user.nickname}</p>
             </div>
-        </div>
+        </Link>
     )
-})
+}
+
+export default memo(AccountItem)
