@@ -1,5 +1,4 @@
 import { UserModel } from '~/type/type'
-import config from '~/config'
 import * as request from '~/utils/httpRequest'
 import { AxiosResponse } from 'axios'
 
@@ -19,7 +18,7 @@ interface Response {
 
 export const register = async ({ email, password }: RegisterProps): Promise<Response> => {
     try {
-        const response = await request.post(config.apiEndpoint.auth.register, {
+        const response = await request.post('/auth/register', {
             email,
             password,
         })
@@ -32,7 +31,7 @@ export const register = async ({ email, password }: RegisterProps): Promise<Resp
 
 export const login = async ({ email, password }: RegisterProps): Promise<Response> => {
     try {
-        const response = await request.post(config.apiEndpoint.auth.login, {
+        const response = await request.post('/auth/login', {
             email,
             password,
         })
@@ -45,7 +44,7 @@ export const login = async ({ email, password }: RegisterProps): Promise<Respons
 
 export const logout = async (): Promise<AxiosResponse<void>> => {
     try {
-        return await request.post(config.apiEndpoint.auth.logout)
+        return await request.post('/auth/logout')
     } catch (error: any) {
         throw error
     }
@@ -53,7 +52,7 @@ export const logout = async (): Promise<AxiosResponse<void>> => {
 
 export const loginWithGoogle = async (token: string): Promise<Response> => {
     try {
-        const response = await request.post(config.apiEndpoint.auth.loginWithToken, {
+        const response = await request.post('/auth/loginwithtoken', {
             token,
         })
 
@@ -65,7 +64,7 @@ export const loginWithGoogle = async (token: string): Promise<Response> => {
 
 export const sendVerifyCode = async (email: string): Promise<AxiosResponse<void>> => {
     try {
-        return await request.post(config.apiEndpoint.auth.verify, {
+        return await request.post('/auth/verify', {
             email,
         })
     } catch (error: any) {
@@ -83,7 +82,7 @@ export const resetPassword = async ({
     code: string
 }): Promise<AxiosResponse<void>> => {
     try {
-        return await request.post(config.apiEndpoint.auth.resetPassword, {
+        return await request.post('/auth/reset-password', {
             email,
             password,
             code,

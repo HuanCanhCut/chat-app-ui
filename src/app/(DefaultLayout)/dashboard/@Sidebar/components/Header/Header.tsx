@@ -4,17 +4,16 @@ import React, { memo } from 'react'
 import useSWR from 'swr'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
-import config from '~/config'
 import * as meService from '~/services/meService'
 import UserAvatar from '~/components/UserAvatar/UserAvatar'
 import { UserResponse } from '~/type/type'
-import Search from '~/components/Search/Search'
 import { faEllipsis } from '@fortawesome/free-solid-svg-icons'
 import Tippy from '@tippyjs/react'
+import SWRKey from '~/enum/SWRKey'
 
 const Header = () => {
     // fetch current user use swr
-    const { data: currentUser } = useSWR<UserResponse | undefined>(config.apiEndpoint.me.getCurrentUser, () => {
+    const { data: currentUser } = useSWR<UserResponse | undefined>(SWRKey.GET_CURRENT_USER, () => {
         return meService.getCurrentUser()
     })
 

@@ -13,11 +13,11 @@ import { MessageIcon } from '~/components/Icons/Icons'
 import UserAvatar from '~/components/UserAvatar/UserAvatar'
 import { FriendsResponse, FriendsShip, UserModel, UserResponse } from '~/type/type'
 import EditProfile from './EditProfile'
-import config from '~/config'
 import CustomTippy from '~/components/CustomTippy/CustomTippy'
 import AccountPreview from '~/components/AccountPreview'
 import { listenEvent } from '~/helpers/events'
 import FriendButton from '~/components/FriendButton'
+import SWRKey from '~/enum/SWRKey'
 
 interface UserProps {
     currentUser: UserResponse
@@ -29,7 +29,7 @@ export default function User({ currentUser, user }: UserProps) {
 
     // get friends of user
     const { data: friends, mutate: mutateFriends } = useSWR<FriendsResponse | undefined>(
-        user.data.nickname ? [config.apiEndpoint.friend.getAllFriends, user.data.nickname] : null,
+        user.data.nickname ? [SWRKey.GET_ALL_FRIENDS, user.data.nickname] : null,
         () => {
             return friendService.getFriends({ page: 1, user_id: user.data.id })
         },

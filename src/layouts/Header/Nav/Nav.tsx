@@ -8,10 +8,11 @@ import config from '~/config'
 import { UserResponse } from '~/type/type'
 import * as meService from '~/services/meService'
 import NavLink from '~/components/NavLink'
+import SWRKey from '~/enum/SWRKey'
 const NavBar = () => {
     const pathname = usePathname()
 
-    const { data: currentUser } = useSWR<UserResponse | undefined>(config.apiEndpoint.me.getCurrentUser, () => {
+    const { data: currentUser } = useSWR<UserResponse | undefined>(SWRKey.GET_CURRENT_USER, () => {
         return meService.getCurrentUser()
     })
 

@@ -19,6 +19,7 @@ import PopperWrapper from '~/components/PopperWrapper'
 import { sendEvent } from '~/helpers/events'
 import AccountItem from '~/components/AccountItem'
 import MenuItem from '../MenuItem'
+import SWRKey from '~/enum/SWRKey'
 
 export interface MenuItemType {
     type: 'theme' | 'status' | 'logout'
@@ -50,7 +51,7 @@ const MENU_ITEMS: MenuItemType[] = [
 
 const Interaction = () => {
     const router = useRouter()
-    const { data: currentUser } = useSWR<UserResponse | undefined>(config.apiEndpoint.me.getCurrentUser, () => {
+    const { data: currentUser } = useSWR<UserResponse | undefined>(SWRKey.GET_CURRENT_USER, () => {
         return meService.getCurrentUser()
     })
 

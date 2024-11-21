@@ -3,9 +3,9 @@ import useSWR from 'swr'
 
 import * as friendService from '~/services/friendService'
 import UserAvatar from '~/components/UserAvatar/UserAvatar'
-import config from '~/config'
 import { FriendsResponse, FriendsShip, UserResponse } from '~/type/type'
 import Link from 'next/link'
+import SWRKey from '~/enum/SWRKey'
 
 interface FriendListProps {
     user: UserResponse
@@ -15,7 +15,7 @@ const FriendList = ({ user }: FriendListProps) => {
     const [page, setPage] = useState(1)
 
     const { data: friends, mutate: mutateFriends } = useSWR<FriendsResponse | undefined>(
-        user.data.nickname ? [config.apiEndpoint.friend.getAllFriends, user.data.nickname] : null,
+        user.data.nickname ? [SWRKey.GET_ALL_FRIENDS, user.data.nickname] : null,
         () => {
             return friendService.getFriends({ page, user_id: user.data.id })
         },

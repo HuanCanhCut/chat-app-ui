@@ -7,13 +7,13 @@ import { SubmitHandler, useForm } from 'react-hook-form'
 import * as meService from '~/services/meService'
 import Button from '~/components/Button/Button'
 import PopperWrapper from '~/components/PopperWrapper/PopperWrapper'
-import config from '~/config'
 import CustomImage from '~/components/Image/Image'
 import { UserResponse } from '~/type/type'
 import Input from '~/components/Input/Input'
 import { toast } from '~/helpers/toast'
 import UserAvatar from '~/components/UserAvatar/UserAvatar'
 import handleApiError from '~/helpers/handleApiError'
+import SWRKey from '~/enum/SWRKey'
 
 interface IFile extends File {
     preview: string
@@ -31,7 +31,7 @@ interface EditProfileProps {
 const defaultCoverPhoto = '/static/media/login-form.jpg'
 
 const EditProfile = ({ closeModal }: EditProfileProps) => {
-    const { data: currentUser } = useSWR<UserResponse | undefined>(config.apiEndpoint.me.getCurrentUser, () => {
+    const { data: currentUser } = useSWR<UserResponse | undefined>(SWRKey.GET_CURRENT_USER, () => {
         return meService.getCurrentUser()
     })
 
@@ -112,7 +112,7 @@ const EditProfile = ({ closeModal }: EditProfileProps) => {
             }
 
             // fake update
-            mutate(config.apiEndpoint.me.getCurrentUser, newData, {
+            mutate(SWRKey.GET_CURRENT_USER, newData, {
                 revalidate: false,
             })
 
@@ -121,7 +121,7 @@ const EditProfile = ({ closeModal }: EditProfileProps) => {
             await meService.updateCurrentUser(formData)
 
             toast('Cập nhật thành công')
-            mutate(config.apiEndpoint.me.getCurrentUser)
+            mutate(SWRKey.GET_CURRENT_USER)
 
             // replace state to update url without reloading page
             window.history.replaceState({}, '', `/user/@${newData.data.nickname}`)

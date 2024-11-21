@@ -1,5 +1,4 @@
 import { UserModel } from '~/type/type'
-import config from '~/config'
 import * as request from '~/utils/httpRequest'
 import { AxiosResponse } from 'axios'
 
@@ -14,7 +13,7 @@ interface Response {
 
 export const getCurrentUser = async (): Promise<Response | undefined> => {
     try {
-        const response = await request.get(config.apiEndpoint.me.getCurrentUser)
+        const response = await request.get('/me')
 
         return response.data
     } catch (error: any) {
@@ -24,7 +23,7 @@ export const getCurrentUser = async (): Promise<Response | undefined> => {
 
 export const updateCurrentUser = async (formData: FormData): Promise<AxiosResponse<void>> => {
     try {
-        return await request.patch(config.apiEndpoint.me.updateCurrentUser, formData)
+        return await request.patch('/me/update', formData)
     } catch (error: any) {
         throw error
     }

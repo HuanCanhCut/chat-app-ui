@@ -7,7 +7,6 @@ import * as notificationServices from '~/services/notification'
 import Button from '~/components/Button/Button'
 import CustomTippy from '~/components/CustomTippy/CustomTippy'
 import PopperWrapper from '~/components/PopperWrapper'
-import config from '~/config'
 import { NotificationData, NotificationResponse } from '~/type/type'
 import { SendIcon } from '~/components/Icons/Icons'
 import NotificationItem from './NotificationItem'
@@ -15,6 +14,7 @@ import { listenEvent } from '~/helpers/events'
 import socket from '~/utils/socket'
 import { NotificationEvent } from '~/enum/notification'
 import Skeleton from 'react-loading-skeleton'
+import SWRKey from '~/enum/SWRKey'
 
 const PER_PAGE = 6
 
@@ -30,7 +30,7 @@ const Notification = () => {
         mutate: mutateNotifications,
         isLoading,
     } = useSWR<NotificationResponse | undefined>(
-        currentTab ? [config.apiEndpoint.notification.getNotifications, currentTab] : null,
+        currentTab ? [SWRKey.GET_NOTIFICATIONS, currentTab] : null,
         () => {
             return notificationServices.getNotifications({ page, per_page: PER_PAGE, type: currentTab })
         },

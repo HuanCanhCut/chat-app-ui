@@ -19,11 +19,10 @@ function SwitchButton({ isOn = true, onClick, className, ...props }: Props) {
                 isOn ? 'justify-end bg-[#0be09b]' : 'justify-start bg-[#fe2c55]'
             }`}
             onClick={onClick}
-            data-ison={isOn}
             {...props}
         >
             <motion.span
-                className="ml-[-0.5px] mr-[0.5px] mt-[1px] h-[19px] w-[19px] rounded-full bg-white shadow-sm"
+                className="h-[19px] w-[19px] rounded-full bg-white shadow-sm"
                 layout
                 transition={spring}
             ></motion.span>

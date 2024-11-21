@@ -6,7 +6,6 @@ import { useEffect } from 'react'
 import { useParams } from 'next/navigation'
 
 import CustomImage from '~/components/Image'
-import config from '~/config'
 import { UserResponse } from '~/type/type'
 import * as meService from '~/services/meService'
 import * as userService from '~/services/userService'
@@ -14,11 +13,12 @@ import User from './components/User'
 import FriendList from './components/FriendList'
 import NotFound from '~/app/not-found'
 import { listenEvent } from '~/helpers/events'
+import SWRKey from '~/enum/SWRKey'
 
 export default function UserPage() {
     const { nickname } = useParams()
 
-    const { data: currentUser } = useSWR<UserResponse | undefined>(config.apiEndpoint.me.getCurrentUser, () => {
+    const { data: currentUser } = useSWR<UserResponse | undefined>(SWRKey.GET_CURRENT_USER, () => {
         return meService.getCurrentUser()
     })
 
@@ -27,7 +27,7 @@ export default function UserPage() {
         isLoading,
         mutate,
     } = useSWR<UserResponse | undefined>(
-        nickname ? [config.apiEndpoint.user.getAnUser, nickname] : config.apiEndpoint.user.getAnUser,
+        nickname ? [SWRKey.GET_AN_USER, nickname] : SWRKey.GET_AN_USER,
         () => {
             return userService.getAnUser(nickname.slice(3) as string)
         },
