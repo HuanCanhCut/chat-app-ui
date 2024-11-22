@@ -1,5 +1,5 @@
 import axios, { AxiosResponse } from 'axios'
-import { toast } from '~/helpers/toast'
+import { toast } from '~/utils/toast'
 
 const request = axios.create({
     baseURL: process.env.NEXT_PUBLIC_BASE_URL,

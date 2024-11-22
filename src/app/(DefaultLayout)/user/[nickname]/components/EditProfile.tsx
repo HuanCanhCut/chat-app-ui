@@ -1,19 +1,19 @@
 import { faCamera, faXmark } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import React, { useState, useRef, useEffect } from 'react'
-import useSWR, { mutate } from 'swr'
+import { mutate } from 'swr'
 import { SubmitHandler, useForm } from 'react-hook-form'
 
 import * as meService from '~/services/meService'
 import Button from '~/components/Button/Button'
 import PopperWrapper from '~/components/PopperWrapper/PopperWrapper'
 import CustomImage from '~/components/Image/Image'
-import { UserResponse } from '~/type/type'
 import Input from '~/components/Input/Input'
-import { toast } from '~/helpers/toast'
+import { toast } from '~/utils/toast'
 import UserAvatar from '~/components/UserAvatar/UserAvatar'
 import handleApiError from '~/helpers/handleApiError'
 import SWRKey from '~/enum/SWRKey'
+import getCurrentUser from '~/zustand/getCurrentUser'
 
 interface IFile extends File {
     preview: string
@@ -31,9 +31,7 @@ interface EditProfileProps {
 const defaultCoverPhoto = '/static/media/login-form.jpg'
 
 const EditProfile = ({ closeModal }: EditProfileProps) => {
-    const { data: currentUser } = useSWR<UserResponse | undefined>(SWRKey.GET_CURRENT_USER, () => {
-        return meService.getCurrentUser()
-    })
+    const { currentUser } = getCurrentUser()
 
     const { handleSubmit, control } = useForm<FieldValue>()
 

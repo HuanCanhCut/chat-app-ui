@@ -1,4 +1,4 @@
-import { toast as toastify } from 'react-toastify'
+import { Bounce, toast as toastify } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 
 export const toast = (
@@ -7,13 +7,14 @@ export const toast = (
     duration?: number,
 ) => {
     return toastify[type](message, {
-        position: 'top-center',
+        position: 'top-right',
         autoClose: duration || 2500,
-        hideProgressBar: true,
+        hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: true,
         draggable: true,
         progress: undefined,
-        theme: 'colored',
+        theme: document.documentElement.classList.contains('dark') ? 'dark' : 'light',
+        transition: Bounce,
     })
 }

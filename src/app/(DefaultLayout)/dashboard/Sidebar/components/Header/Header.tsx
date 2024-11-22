@@ -1,21 +1,21 @@
 'use client'
 
 import React, { memo } from 'react'
-import useSWR from 'swr'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
-import * as meService from '~/services/meService'
 import UserAvatar from '~/components/UserAvatar/UserAvatar'
-import { UserResponse } from '~/type/type'
 import { faEllipsis } from '@fortawesome/free-solid-svg-icons'
 import Tippy from '@tippyjs/react'
-import SWRKey from '~/enum/SWRKey'
+import Search from './Search'
+import getCurrentUser from '~/zustand/getCurrentUser'
 
-const Header = () => {
-    // fetch current user use swr
-    const { data: currentUser } = useSWR<UserResponse | undefined>(SWRKey.GET_CURRENT_USER, () => {
-        return meService.getCurrentUser()
-    })
+interface Props {
+    setSearchMode: (value: boolean) => void
+    searchMode: boolean
+}
+
+const Header: React.FC<Props> = ({ setSearchMode, searchMode }) => {
+    const { currentUser } = getCurrentUser()
 
     return (
         <header className="p-3 sm:pr-6">
@@ -31,6 +31,7 @@ const Header = () => {
                     </Tippy>
                 </>
             </div>
+            <Search setSearchMode={setSearchMode} searchMode={searchMode} />
         </header>
     )
 }

@@ -1,20 +1,15 @@
 import { useMemo } from 'react'
 import Tippy from '@tippyjs/react'
 import { usePathname } from 'next/navigation'
-import useSWR from 'swr'
 
 import { HomeIcon, UserGroupIcon } from '~/components/Icons'
 import config from '~/config'
-import { UserResponse } from '~/type/type'
-import * as meService from '~/services/meService'
 import NavLink from '~/components/NavLink'
-import SWRKey from '~/enum/SWRKey'
+import getCurrentUser from '~/zustand/getCurrentUser'
 const NavBar = () => {
     const pathname = usePathname()
 
-    const { data: currentUser } = useSWR<UserResponse | undefined>(SWRKey.GET_CURRENT_USER, () => {
-        return meService.getCurrentUser()
-    })
+    const { currentUser } = getCurrentUser()
 
     const NAV_ITEMS = useMemo(() => {
         return [

@@ -116,7 +116,7 @@ const Search: React.FC<SearchProps> = ({ placeholder = 'Tìm kiếm', className 
             render={renderResult}
             placement="bottom-start"
         >
-            <div className={`bg-lightGrays relative rounded-3xl pl-3 dark:bg-[#313233] sm:pl-10 ${className}`}>
+            <div className={`relative rounded-3xl bg-[#f0f2f5] pl-3 dark:bg-[#313233] sm:pl-10 ${className}`}>
                 <input
                     type="text"
                     placeholder={placeholder}

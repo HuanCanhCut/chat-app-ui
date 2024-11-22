@@ -1,4 +1,4 @@
-import { toast } from './toast'
+import { toast } from '../utils/toast'
 
 const handleApiError = (error: any) => {
     if (error?.response?.data?.message) {

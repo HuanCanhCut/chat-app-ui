@@ -9,7 +9,7 @@ import * as friendService from '~/services/friendService'
 import PopperWrapper from '~/components/PopperWrapper/PopperWrapper'
 import { UserModel } from '~/type/type'
 import Button from '~/components/Button/Button'
-import { handleAcceptFriend, handleRejectFriendRequest } from '~/helpers/friendEvent'
+import { handleAcceptFriend, handleRejectFriendRequest } from '~/utils/friendEvent'
 import { sendEvent } from '~/helpers/events'
 import handleApiError from '~/helpers/handleApiError'
 

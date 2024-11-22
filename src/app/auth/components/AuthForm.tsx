@@ -9,7 +9,7 @@ import { signInWithPopup } from 'firebase/auth'
 import config from '~/config'
 import * as authServices from '~/services/authService'
 import { UserModel } from '~/type/type'
-import { toast } from '~/helpers/toast'
+import { toast } from '~/utils/toast'
 import SendVerifyCode from './SendVerifyCode'
 import Input from '~/components/Input/Input'
 

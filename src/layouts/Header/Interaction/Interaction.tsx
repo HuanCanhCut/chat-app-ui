@@ -20,6 +20,7 @@ import { sendEvent } from '~/helpers/events'
 import AccountItem from '~/components/AccountItem'
 import MenuItem from '../MenuItem'
 import SWRKey from '~/enum/SWRKey'
+import getCurrentUser from '~/zustand/getCurrentUser'
 
 export interface MenuItemType {
     type: 'theme' | 'status' | 'logout'
@@ -51,9 +52,7 @@ const MENU_ITEMS: MenuItemType[] = [
 
 const Interaction = () => {
     const router = useRouter()
-    const { data: currentUser } = useSWR<UserResponse | undefined>(SWRKey.GET_CURRENT_USER, () => {
-        return meService.getCurrentUser()
-    })
+    const { currentUser } = getCurrentUser()
 
     const handleChoose = (type: MenuItemType['type']) => {
         switch (type) {

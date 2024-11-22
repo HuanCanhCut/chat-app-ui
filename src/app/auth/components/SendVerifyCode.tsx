@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, memo, MutableRefObject } from 'react'
 import handleApiError from '~/helpers/handleApiError'
-import { toast } from '~/helpers/toast'
+import { toast } from '~/utils/toast'
 import * as authService from '~/services/authService'
 
 interface Props {

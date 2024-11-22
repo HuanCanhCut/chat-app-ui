@@ -7,20 +7,18 @@ import { useParams } from 'next/navigation'
 
 import CustomImage from '~/components/Image'
 import { UserResponse } from '~/type/type'
-import * as meService from '~/services/meService'
 import * as userService from '~/services/userService'
 import User from './components/User'
 import FriendList from './components/FriendList'
 import NotFound from '~/app/not-found'
 import { listenEvent } from '~/helpers/events'
 import SWRKey from '~/enum/SWRKey'
+import getCurrentUser from '~/zustand/getCurrentUser'
 
 export default function UserPage() {
     const { nickname } = useParams()
 
-    const { data: currentUser } = useSWR<UserResponse | undefined>(SWRKey.GET_CURRENT_USER, () => {
-        return meService.getCurrentUser()
-    })
+    const { currentUser } = getCurrentUser()
 
     const {
         data: user,

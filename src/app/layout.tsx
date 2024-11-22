@@ -12,6 +12,7 @@ import 'react-loading-skeleton/dist/skeleton.css'
 import 'tippy.js/dist/tippy.css'
 import 'moment/locale/vi'
 import 'react-toastify/dist/ReactToastify.css'
+import GetCurrentUser from '~/components/GlobalWrapper/GetCurrentUser'
 
 const inter = Inter({ subsets: ['latin'] })
 function RootLayout({
@@ -32,7 +33,9 @@ function RootLayout({
                         shouldRetryOnError: false,
                     }}
                 >
-                    <Notification>{children}</Notification>
+                    <GetCurrentUser>
+                        <Notification>{children}</Notification>
+                    </GetCurrentUser>
                     <ToastContainer />
                 </SWRConfig>
             </body>
