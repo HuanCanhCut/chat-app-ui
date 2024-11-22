@@ -6,19 +6,13 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import UserAvatar from '~/components/UserAvatar/UserAvatar'
 import { faEllipsis } from '@fortawesome/free-solid-svg-icons'
 import Tippy from '@tippyjs/react'
-import Search from './Search'
 import getCurrentUser from '~/zustand/getCurrentUser'
 
-interface Props {
-    setSearchMode: (value: boolean) => void
-    searchMode: boolean
-}
-
-const Header: React.FC<Props> = ({ setSearchMode, searchMode }) => {
+const Header: React.FC = () => {
     const { currentUser } = getCurrentUser()
 
     return (
-        <header className="p-3 sm:pr-6">
+        <header className="mb-3 p-1">
             <div className="flex w-full items-center justify-between">
                 <>
                     <UserAvatar src={currentUser?.data?.avatar} />
@@ -31,7 +25,6 @@ const Header: React.FC<Props> = ({ setSearchMode, searchMode }) => {
                     </Tippy>
                 </>
             </div>
-            <Search setSearchMode={setSearchMode} searchMode={searchMode} />
         </header>
     )
 }

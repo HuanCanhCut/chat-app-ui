@@ -1,15 +1,21 @@
 'use client'
 
-import { useState } from 'react'
 import Header from './components/Header'
+import Friends from './components/Friends'
+import { useState } from 'react'
+import Search from './components/Search'
 
-export default function Sidebar() {
+const Sidebar = () => {
     const [searchMode, setSearchMode] = useState(false)
-
     return (
-        <aside className="break-all [overflow:overlay]">
-            <Header setSearchMode={setSearchMode} searchMode={searchMode} />
-            {/* {searchMode ? <SearchResult setSearchMode={setSearchMode} searchMode={searchMode} /> : <Friends />} */}
+        <aside className="h-full break-all p-2 [overflow:overlay]">
+            <Header />
+            <div className="relative">
+                <Search setSearchMode={setSearchMode} searchMode={searchMode} />
+                <Friends />
+            </div>
         </aside>
     )
 }
+
+export default Sidebar
