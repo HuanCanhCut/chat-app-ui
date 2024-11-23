@@ -16,7 +16,7 @@ const Friends = () => {
     })
 
     return (
-        <div className="absolute mt-4 w-full">
+        <div className="mt-4 w-full">
             {friends?.data?.map((friend) => <AccountItem className="w-full" key={friend?.id} user={friend.user} />)}
         </div>
     )

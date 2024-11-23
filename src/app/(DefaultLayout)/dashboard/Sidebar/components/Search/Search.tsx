@@ -19,9 +19,7 @@ const Search: React.FC<Props> = ({ setSearchMode, searchMode }) => {
     const { currentUser } = getCurrentUser()
 
     const [searchResult, setSearchResult] = useState<UserModel[]>([])
-
     const [searchValue, setSearchValue] = useState('')
-
     const debounceValue = useDebounce(searchValue, 250)
 
     const { data: friends } = useSWR<FriendsResponse | undefined>(
@@ -36,7 +34,7 @@ const Search: React.FC<Props> = ({ setSearchMode, searchMode }) => {
     useEffect(() => {
         if (debounceValue && friends) {
             const result = friends.data.filter((friend) => {
-                return friend.user.full_name.includes(debounceValue)
+                return friend.user.full_name.toLowerCase().includes(debounceValue.toLowerCase())
             })
 
             const userResult = result.map((friend) => {
@@ -46,6 +44,10 @@ const Search: React.FC<Props> = ({ setSearchMode, searchMode }) => {
             setSearchResult(userResult)
         }
     }, [debounceValue, friends])
+
+    useEffect(() => {
+        console.log(searchResult)
+    }, [searchResult])
 
     return (
         <>
@@ -69,7 +71,7 @@ const Search: React.FC<Props> = ({ setSearchMode, searchMode }) => {
                         value={searchValue}
                         onChange={(e) => setSearchValue(e.target.value)}
                         onFocus={() => setSearchMode(true)}
-                        onBlur={(e) => {
+                        onBlur={() => {
                             setSearchMode(false)
                             setSearchValue('')
                             setSearchResult([])
@@ -78,7 +80,7 @@ const Search: React.FC<Props> = ({ setSearchMode, searchMode }) => {
                 </div>
             </div>
             {searchMode && (
-                <div className="absolute left-0 z-50 h-[calc(100vh-210px)] w-full pt-4 [overflow:overlay] dark:bg-dark sm:h-[calc(100vh-180px)]">
+                <div className="absolute bottom-0 left-0 top-20 w-full pt-4 [overflow:overlay] dark:bg-dark sm:h-[calc(100vh-180px)]">
                     {searchResult.map((user) => (
                         <div
                             key={user.id}

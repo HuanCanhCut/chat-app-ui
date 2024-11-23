@@ -4,14 +4,14 @@ import { UserResponse } from '~/type/type'
 
 interface CurrentUserState {
     currentUser: UserResponse | null
-    dispatch: (currentUser: UserResponse | null) => void
+    dispatch: (currentUser: UserResponse | null | undefined) => void
 }
 
 const getCurrentUser = create<CurrentUserState>()(
     persist(
         (set) => ({
             currentUser: null,
-            dispatch: (currentUser) => set({ currentUser }),
+            dispatch: (currentUser) => set({ currentUser: currentUser || null }),
         }),
         {
             name: 'current-user-storage',

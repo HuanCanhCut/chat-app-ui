@@ -8,9 +8,9 @@ import Search from './components/Search'
 const Sidebar = () => {
     const [searchMode, setSearchMode] = useState(false)
     return (
-        <aside className="h-full break-all p-2 [overflow:overlay]">
+        <aside className="flex h-full flex-col break-all p-2 [overflow:overlay]">
             <Header />
-            <div className="relative">
+            <div className="relative flex-grow [overflow:overlay]">
                 <Search setSearchMode={setSearchMode} searchMode={searchMode} />
                 <Friends />
             </div>

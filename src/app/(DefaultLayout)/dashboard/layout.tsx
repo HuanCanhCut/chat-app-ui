@@ -12,8 +12,8 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     const [infoIsOpen, setInfoIsOpen] = useState(true)
 
     return (
-        <div className="flex h-full max-h-[calc(100vh-var(--header-mobile-height))] w-full dark:bg-dark dark:text-dark sm:max-h-[calc(100vh-var(--header-height))]">
-            <div className="w-full flex-shrink-0 overflow-y-auto sm:w-80">{<Sidebar />}</div>
+        <div className="flex h-screen max-h-[calc(100vh-var(--header-height-mobile))] w-full dark:bg-dark dark:text-dark sm:max-h-[calc(100vh-var(--header-height))]">
+            <div className="h-full w-full flex-shrink-0 overflow-y-auto sm:w-80">{<Sidebar />}</div>
             <div className="hidden flex-grow overflow-y-auto sm:block">
                 <div className="flex">
                     <div className={`flex-grow ${infoIsOpen ? 'w-2/3' : 'w-full'}`}>{children}</div>
