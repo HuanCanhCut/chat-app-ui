@@ -147,7 +147,11 @@ export default function User({ currentUser, user }: UserProps) {
                     <>
                         <FriendButton user={user.data} />
                         {user.data.is_friend && (
-                            <Button buttonType="primary" leftIcon={<MessageIcon />}>
+                            <Button
+                                buttonType="primary"
+                                leftIcon={<MessageIcon />}
+                                href={`/message/${user.data?.conversation?.uuid}`}
+                            >
                                 Nhắn tin
                             </Button>
                         )}

@@ -60,7 +60,7 @@ const FriendButton = ({ user, className = '' }: FriendButtonProps) => {
 
     const handleUnfriend = useCallback(async () => {
         try {
-            await friendService.unfriend(user.id)
+            await friendService.unfriend(user.id, user?.conversation?.uuid || '')
 
             sendEvent({ eventName: 'friend:get-new-friends', detail: user.id })
             sendEvent({
@@ -71,7 +71,7 @@ const FriendButton = ({ user, className = '' }: FriendButtonProps) => {
         } catch (error: any) {
             handleApiError(error)
         }
-    }, [closeModal, user.id])
+    }, [closeModal, user?.conversation?.uuid, user.id])
 
     return (
         <>

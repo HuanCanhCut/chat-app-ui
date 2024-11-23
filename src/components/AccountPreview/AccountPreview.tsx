@@ -24,7 +24,12 @@ const AccountPreview = ({ user, currentUser }: AccountPreviewProps) => {
                 {currentUser.id !== user.id && (
                     <div className="mt-4 flex items-center gap-2">
                         <FriendButton user={user} className="flex-1" />
-                        <Button buttonType="primary" className="flex-1" leftIcon={<MessageIcon />}>
+                        <Button
+                            buttonType="primary"
+                            className="flex-1"
+                            leftIcon={<MessageIcon />}
+                            href={`/message/${user?.conversation?.uuid}`}
+                        >
                             Nhắn tin
                         </Button>
                     </div>

@@ -45,13 +45,9 @@ const Search: React.FC<Props> = ({ setSearchMode, searchMode }) => {
         }
     }, [debounceValue, friends])
 
-    useEffect(() => {
-        console.log(searchResult)
-    }, [searchResult])
-
     return (
         <>
-            <div className="mt-6 flex items-center gap-2">
+            <div className="mt-3 flex items-center gap-2">
                 {searchMode && (
                     <FontAwesomeIcon
                         icon={faArrowLeft}
@@ -80,7 +76,7 @@ const Search: React.FC<Props> = ({ setSearchMode, searchMode }) => {
                 </div>
             </div>
             {searchMode && (
-                <div className="absolute bottom-0 left-0 top-20 w-full pt-4 [overflow:overlay] dark:bg-dark sm:h-[calc(100vh-180px)]">
+                <div className="top-15 absolute bottom-0 left-0 w-full pt-4 [overflow:overlay] dark:bg-dark sm:h-[calc(100vh-180px)]">
                     {searchResult.map((user) => (
                         <div
                             key={user.id}

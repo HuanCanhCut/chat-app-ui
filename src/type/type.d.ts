@@ -16,6 +16,23 @@ export interface UserModel extends Timestamp {
     is_friend: boolean
     friend_request: boolean
     sent_friend_request: boolean
+    conversation: Conversation
+}
+
+interface Conversation extends Timestamp {
+    id: number
+    is_group: boolean
+    name?: string
+    avatar?: string
+    uuid: string
+    conversation_members: ConversationMember[]
+}
+
+interface ConversationMember extends Timestamp {
+    id: number
+    user_id: number
+    conversation_id: number
+    joined_at: Date
 }
 
 interface UserResponse {
