@@ -100,7 +100,7 @@ const Interaction = () => {
                 <Notification />
                 <Tippy content="Messenger">
                     <div>
-                        <Button buttonType="icon" href={config.routes.dashboard}>
+                        <Button buttonType="icon" href={config.routes.message}>
                             <MessageIcon />
                         </Button>
                     </div>

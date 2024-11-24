@@ -17,6 +17,7 @@ enum SWRKey {
     GET_CURRENT_USER = '/me',
     UPDATE_CURRENT_USER = '/me/update',
     GET_NOTIFICATIONS = '/notifications',
+    GET_CONVERSATIONS = '/conversations',
 }
 
 export default SWRKey

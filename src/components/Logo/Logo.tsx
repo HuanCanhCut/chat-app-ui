@@ -10,7 +10,7 @@ export default function Logo({ className = '' }: { className?: string }) {
 
     return (
         <>
-            <Link href={config.routes.dashboard} className={className}>
+            <Link href={config.routes.message} className={className}>
                 <Image
                     src={theme === 'dark' ? '/static/media/dark-logo.png' : '/static/media/light-logo.png'}
                     sizes="1000px"

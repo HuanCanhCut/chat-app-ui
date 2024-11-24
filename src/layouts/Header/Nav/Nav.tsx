@@ -16,7 +16,7 @@ const NavBar = () => {
             {
                 type: 'home',
                 icon: <HomeIcon />,
-                href: config.routes.dashboard,
+                href: config.routes.message,
                 tooltip: 'Trang chủ',
             },
             {

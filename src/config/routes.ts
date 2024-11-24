@@ -6,5 +6,5 @@ export const routes: Routes<string> = {
     home: '/',
     user: '/user/',
     auth: '/auth',
-    dashboard: '/dashboard',
+    message: '/message',
 }

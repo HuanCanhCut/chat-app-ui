@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { routes } from './config/routes'
 
-const privateRoutes = [routes.dashboard, routes.user]
+const privateRoutes = [routes.message, routes.user]
 const authRoutes = [routes.auth]
 
 // This function can be marked `async` if using `await` inside
@@ -13,7 +13,7 @@ export async function middleware(request: NextRequest) {
 
     if (pathname === routes.home) {
         if (token) {
-            return NextResponse.redirect(new URL(routes.dashboard, request.url))
+            return NextResponse.redirect(new URL(routes.message, request.url))
         } else {
             return NextResponse.redirect(new URL(routes.auth, request.url))
         }
@@ -21,7 +21,7 @@ export async function middleware(request: NextRequest) {
 
     // Kiểm tra nếu đang ở auth route mà đã có token
     if (authRoutes.some((path) => pathname.startsWith(path)) && token) {
-        return NextResponse.redirect(new URL(routes.dashboard, request.url))
+        return NextResponse.redirect(new URL(routes.message, request.url))
     }
 
     // Kiểm tra nếu đang ở private route và không có token
@@ -34,5 +34,5 @@ export async function middleware(request: NextRequest) {
 
 // See "Matching Paths" below to learn more
 export const config = {
-    matcher: [routes.dashboard, routes.home, routes.auth, routes.user],
+    matcher: [routes.message, routes.home, routes.auth, routes.user],
 }

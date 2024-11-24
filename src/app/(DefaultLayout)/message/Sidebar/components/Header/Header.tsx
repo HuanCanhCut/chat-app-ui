@@ -12,7 +12,7 @@ const Header: React.FC = () => {
     const { currentUser } = getCurrentUser()
 
     return (
-        <header className="p-1">
+        <header className="p-1 pr-2">
             <div className="flex w-full items-center justify-between">
                 <>
                     <UserAvatar src={currentUser?.data?.avatar} />

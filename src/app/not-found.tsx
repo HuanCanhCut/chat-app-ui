@@ -17,7 +17,7 @@ const NotFound = () => {
                             Lỗi này thường do chủ sở hữu chỉ chia sẻ nội dung với một nhóm nhỏ, thay đổi người được xem
                             hoặc đã xóa nội dung.
                         </p>
-                        <Button buttonType="primary" className="mt-4" onClick={() => router.push('/dashboard')}>
+                        <Button buttonType="primary" className="mt-4" onClick={() => router.push('/message')}>
                             Đi đến trang chủ
                         </Button>
                         <p className="mt-4 cursor-pointer text-primary hover:underline" onClick={() => router.back()}>
