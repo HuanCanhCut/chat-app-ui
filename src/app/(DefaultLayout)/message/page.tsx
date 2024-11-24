@@ -1,15 +1,25 @@
-import { Metadata } from 'next'
-import NoChatSelected from './NoChatSelected'
+'use client'
 
-export const metadata: Metadata = {
-    title: 'Message | Huấn Cánh Cụt',
-    description: 'Message Huấn Cánh Cụt',
-}
+import Image from 'next/image'
+import useThemeStore from '~/zustand/useThemeStore'
 
 const Message: React.FC = () => {
+    const { theme } = useThemeStore()
     return (
         <div className="[overflow: overlay] h-full max-h-[calc(100vh-var(--header-mobile-height))] sm:max-h-[calc(100vh-var(--header-height))]">
-            <NoChatSelected />
+            <div className="flex h-full flex-col items-center justify-center">
+                <Image
+                    src={
+                        theme === 'dark'
+                            ? '/static/media/no-chat-selected-light.png'
+                            : '/static/media/no-chat-selected-dark.png'
+                    }
+                    alt="no-chat-selected"
+                    width={200}
+                    height={200}
+                />
+                <h2>Chưa có đoạn chat nào được chọn</h2>
+            </div>
         </div>
     )
 }

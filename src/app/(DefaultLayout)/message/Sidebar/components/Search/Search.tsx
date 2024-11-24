@@ -48,7 +48,8 @@ const Search: React.FC<Props> = ({ setSearchMode, searchMode }) => {
 
     const renderResult = () => {
         return (
-            <div className="h-[calc(100vh-210px)] w-screen [overflow:overlay] dark:bg-dark sm:h-[calc(100vh-180px)] sm:w-[calc(var(--sidebar-width)-20px)]">
+            // 20px: padding left and right
+            <div className="h-[calc(100vh-210px)] w-[calc(100vw-20px)] [overflow:overlay] dark:bg-dark sm:h-[calc(100vh-180px)] md:w-[calc(var(--sidebar-width-tablet)-20px)] lg:w-[calc(var(--sidebar-width)-20px)]">
                 {searchResult.map((user) => (
                     <div
                         key={user.id}
@@ -63,7 +64,7 @@ const Search: React.FC<Props> = ({ setSearchMode, searchMode }) => {
     }
 
     return (
-        <>
+        <div>
             <Tippy interactive visible={searchMode} placement="bottom-start" render={renderResult}>
                 <div className="mt-3 flex items-center gap-2">
                     {searchMode && (
@@ -76,7 +77,7 @@ const Search: React.FC<Props> = ({ setSearchMode, searchMode }) => {
                         />
                     )}
 
-                    <div className="mr-2 flex flex-1 items-center rounded-3xl bg-[#f0f2f5] px-4 pl-3 dark:bg-[#313233]">
+                    <div className="mr-2 flex flex-1 items-center rounded-3xl bg-lightGray px-4 pl-3 dark:bg-[#313233]">
                         <FontAwesomeIcon icon={faSearch} width={16} height={16} />
                         <input
                             type="text"
@@ -94,7 +95,7 @@ const Search: React.FC<Props> = ({ setSearchMode, searchMode }) => {
                     </div>
                 </div>
             </Tippy>
-        </>
+        </div>
     )
 }
 

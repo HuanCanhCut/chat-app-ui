@@ -7,7 +7,8 @@
 :root {
     --header-height: 60px;
     --header-height-mobile: 90px;
-    --sidebar-width: 350px;
+    --sidebar-width: 330px;
+    --sidebar-width-tablet: 280px;
 }
 
 @layer base {

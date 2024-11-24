@@ -8,18 +8,41 @@ import * as conversationService from '~/services/conversationService'
 import ConversationItem from './ConversationItem'
 import useThemeStore from '~/zustand/useThemeStore'
 import Image from 'next/image'
+import Skeleton from 'react-loading-skeleton'
 
 const Friends = () => {
     const { theme } = useThemeStore()
-    const { data: conversations } = useSWR(SWRKey.GET_CONVERSATIONS, () => {
+    const { data: conversations, isLoading } = useSWR(SWRKey.GET_CONVERSATIONS, () => {
         return conversationService.getConversations({ page: 1 })
     })
 
+    const Loading = () => {
+        return (
+            <>
+                <div className="mt-4 flex items-center gap-2">
+                    <Skeleton width={56} height={56} circle />
+                    <div>
+                        <Skeleton width={200} height={20} />
+                        <Skeleton width={160} height={20} />
+                    </div>
+                </div>
+            </>
+        )
+    }
+
     return (
-        <div className="mt-4 h-full w-full">
-            {conversations && conversations.data.length > 0 ? (
+        <div className="h-full w-full pt-4">
+            {isLoading ? (
+                [1, 2, 3, 4, 5, 6, 7].map((_, index) => {
+                    return <Loading key={index} />
+                })
+            ) : conversations && conversations.data.length > 0 ? (
                 conversations.data.map((conversation, index) => {
-                    return <ConversationItem key={index} conversation={conversation} />
+                    return (
+                        <div key={index} className="pr-2">
+                            <ConversationItem conversation={conversation} />
+                        </div>
+                    )
                 })
             ) : (
                 <div className="flex h-full flex-col items-center justify-center">
