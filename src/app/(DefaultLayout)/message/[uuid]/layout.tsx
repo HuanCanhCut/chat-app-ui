@@ -1,4 +1,3 @@
-import NoChatSelected from './NoChatSelected'
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
@@ -6,8 +5,8 @@ export const metadata: Metadata = {
     description: 'Message Huấn Cánh Cụt',
 }
 
-const Message: React.FC = () => {
-    return <NoChatSelected />
+const ChatLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+    return <>{children}</>
 }
 
-export default Message
+export default ChatLayout

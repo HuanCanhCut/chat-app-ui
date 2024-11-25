@@ -20,7 +20,7 @@ const MessagePage = () => {
                 <Message className="flex-grow" />
                 <EnterMessage />
             </div>
-            {infoOpen && <Info className="hidden w-[220px] md:block lg:w-[250px]" />}
+            {infoOpen && <Info className={`${infoOpen ? 'block' : 'hidden'} w-[220px] md:block lg:w-[250px]`} />}
         </div>
     )
 }
