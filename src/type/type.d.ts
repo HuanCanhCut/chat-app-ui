@@ -17,6 +17,7 @@ export interface UserModel extends Timestamp {
     friend_request: boolean
     sent_friend_request: boolean
     conversation: ConversationModel
+    is_online: boolean
 }
 
 interface ConversationModel extends Timestamp {

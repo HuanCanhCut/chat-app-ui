@@ -6,6 +6,7 @@ import { SWRConfig } from 'swr'
 import { ToastContainer } from 'react-toastify'
 import useThemeStore from '~/zustand/useThemeStore'
 import { useEffect } from 'react'
+import Socket from './Socket'
 
 const GlobalSWRConfig = ({ children }: { children: React.ReactNode }) => {
     const { theme } = useThemeStore()
@@ -24,7 +25,9 @@ const GlobalSWRConfig = ({ children }: { children: React.ReactNode }) => {
             }}
         >
             <GetCurrentUser>
-                <Notification>{children}</Notification>
+                <Socket>
+                    <Notification>{children}</Notification>
+                </Socket>
             </GetCurrentUser>
             <ToastContainer />
         </SWRConfig>

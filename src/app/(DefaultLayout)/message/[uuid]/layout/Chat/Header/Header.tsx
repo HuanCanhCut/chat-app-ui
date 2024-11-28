@@ -9,7 +9,7 @@ import SWRKey from '~/enum/SWRKey'
 import * as conversationServices from '~/services/conversationService'
 import UserAvatar from '~/components/UserAvatar'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCircleInfo } from '@fortawesome/free-solid-svg-icons'
+import { faChevronLeft, faCircleInfo } from '@fortawesome/free-solid-svg-icons'
 
 interface HeaderProps {
     className?: string
@@ -27,6 +27,9 @@ const Header: React.FC<HeaderProps> = ({ className = '', toggleInfo }) => {
     const { data: conversation } = useSWR(SWRKey.GET_CONVERSATIONS, () => {
         return conversationServices.getConversations({ page: 1 })
     })
+
+    // nếu không phải group thì lấy user đầu tiên trong conversation_members
+    const conversationMember = currentConversation?.conversation_members[0].user
 
     useEffect(() => {
         if (conversation?.data) {
@@ -47,23 +50,42 @@ const Header: React.FC<HeaderProps> = ({ className = '', toggleInfo }) => {
         <div
             className={`${className} flex items-center justify-between px-2 py-1 shadow-sm shadow-gray-200 dark:shadow-neutral-800`}
         >
-            <div
-                className="flex h-full cursor-pointer items-center gap-3 rounded-lg p-2 hover:bg-lightGray dark:hover:bg-darkGray"
-                onClick={handleNavigate}
-            >
-                <UserAvatar
-                    src={
-                        currentConversation?.is_group
-                            ? currentConversation.avatar
-                            : currentConversation?.conversation_members[0].user.avatar
-                    }
-                    size={40}
-                />
-                <h4 className="font-semibold">
-                    {currentConversation?.is_group
-                        ? currentConversation.name
-                        : currentConversation?.conversation_members[0].user.full_name}
-                </h4>
+            <div className="flex items-center">
+                <div
+                    className="flex-center cursor-pointer rounded-lg px-2 py-2 hover:bg-lightGray dark:hover:bg-darkGray md:hidden"
+                    onClick={() => router.push('/message')}
+                >
+                    <FontAwesomeIcon
+                        icon={faChevronLeft}
+                        className="text-xl dark:text-gray-500"
+                        width={22}
+                        height={22}
+                    />
+                </div>
+                <div
+                    className="flex h-full cursor-pointer items-center gap-3 rounded-lg p-2 hover:bg-lightGray dark:hover:bg-darkGray"
+                    onClick={handleNavigate}
+                >
+                    <div className="relative">
+                        <UserAvatar
+                            src={
+                                currentConversation?.is_group ? currentConversation.avatar : conversationMember?.avatar
+                            }
+                            size={40}
+                        />
+                        {!currentConversation?.is_group && conversationMember?.is_online && (
+                            <div className="absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-white bg-green-500 dark:border-dark"></div>
+                        )}
+                    </div>
+                    <div>
+                        <h4 className="font-semibold">
+                            {currentConversation?.is_group ? currentConversation.name : conversationMember?.full_name}
+                        </h4>
+                        {!currentConversation?.is_group && conversationMember?.is_online && (
+                            <span className="text-xs font-normal text-gray-700 dark:text-gray-400">Đang hoạt động</span>
+                        )}
+                    </div>
+                </div>
             </div>
             <div className="flex items-center">
                 <FontAwesomeIcon

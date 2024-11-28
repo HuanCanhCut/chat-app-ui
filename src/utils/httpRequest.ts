@@ -1,5 +1,4 @@
 import axios, { AxiosResponse } from 'axios'
-import { toast } from '~/utils/toast'
 
 const request = axios.create({
     baseURL: process.env.NEXT_PUBLIC_BASE_URL,
@@ -35,9 +34,6 @@ request.interceptors.request.use(
             } catch (error: any) {
                 console.log(error)
 
-                if (error.response.status === 401) {
-                    toast('Refresh token đã hết hạn, vui lòng đăng nhập lại', 'warning')
-                }
                 localStorage.removeItem('exp')
             }
         }

@@ -24,7 +24,7 @@ const Search: React.FC<Props> = ({ setSearchMode, searchMode }) => {
     const debounceValue = useDebounce(searchValue, 250)
 
     const { data: friends } = useSWR<FriendsResponse | undefined>(
-        currentUser ? [SWRKey.GET_ALL_FRIENDS, currentUser] : null,
+        currentUser?.data.nickname ? [SWRKey.GET_ALL_FRIENDS, currentUser.data.nickname] : null,
         () => {
             if (currentUser) {
                 return friendService.getFriends({ user_id: currentUser.data.id })
