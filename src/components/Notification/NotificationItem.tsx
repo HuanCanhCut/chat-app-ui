@@ -1,6 +1,8 @@
-import moment from 'moment-timezone'
+import 'moment/locale/vi'
 import Link from 'next/link'
 import { memo, useEffect, useRef, useState } from 'react'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faCheck, faEllipsis, faTrash } from '@fortawesome/free-solid-svg-icons'
 
 import * as NotificationServices from '~/services/notification'
 import Button from '~/components/Button/Button'
@@ -9,11 +11,10 @@ import { listenEvent, sendEvent } from '~/helpers/events'
 import { toast } from '~/utils/toast'
 import { handleAcceptFriend, handleRejectFriendRequest } from '~/utils/friendEvent'
 import { NotificationData } from '~/type/type'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCheck, faEllipsis, faTrash } from '@fortawesome/free-solid-svg-icons'
 import CustomTippy from '../CustomTippy/CustomTippy'
 import PopperWrapper from '../PopperWrapper/PopperWrapper'
 import ConfirmModel from '../ConfirmModal'
+import { momentTimezone } from '~/utils/moment'
 
 const NotificationItem = ({
     notification,
@@ -183,7 +184,7 @@ const NotificationItem = ({
                                 !notification.is_read ? 'text-primary' : 'text-gray-600 dark:text-gray-400'
                             } font-normal`}
                         >
-                            {moment.tz(notification.createdAt, 'Asia/Ho_Chi_Minh').fromNow().replace('trước', '')}
+                            {momentTimezone(notification.createdAt)}
                         </small>
                     </div>
                 </Link>

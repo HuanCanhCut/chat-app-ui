@@ -28,13 +28,9 @@ export const getFriends = async ({
     }
 }
 
-export const unfriend = async (userId: number, conversation_uuid: string): Promise<AxiosResponse<void>> => {
+export const unfriend = async (userId: number): Promise<AxiosResponse<void>> => {
     try {
-        return await request.deleteMethod(`users/${userId}/unfriend`, {
-            params: {
-                conversation_uuid,
-            },
-        })
+        return await request.deleteMethod(`users/${userId}/unfriend`)
     } catch (error: any) {
         throw error
     }

@@ -3,7 +3,6 @@ import { Inter } from 'next/font/google'
 import './globals.css'
 import 'react-loading-skeleton/dist/skeleton.css'
 import 'tippy.js/dist/tippy.css'
-import 'moment/locale/vi'
 import 'react-toastify/dist/ReactToastify.css'
 import GlobalSWRConfig from '~/components/GlobalWrapper/GlobalSWRConfig'
 

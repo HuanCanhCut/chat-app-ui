@@ -12,14 +12,14 @@ interface AccountItemProps {
 const AccountItem: React.FC<AccountItemProps> = ({ className = '', user, onClick = () => {} }) => {
     return (
         <Link
-            className={`flex items-center ${className}`}
+            className={`flex items-center ${className} max-w-full overflow-hidden`}
             href={`/user/@${user.nickname}`}
             onClick={() => onClick(user)}
         >
             <UserAvatar size={50} src={user.avatar} />
-            <div className="ml-3">
-                <h4 className="text-base font-medium">{user.full_name}</h4>
-                <p className="text-xs text-gray-500">{user.nickname}</p>
+            <div className="ml-3 max-w-full overflow-hidden">
+                <h4 className="truncate text-base font-medium">{user.full_name}</h4>
+                <p className="truncate text-xs text-gray-500">{user.nickname}</p>
             </div>
         </Link>
     )

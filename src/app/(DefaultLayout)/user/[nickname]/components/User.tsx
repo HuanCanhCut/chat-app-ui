@@ -90,8 +90,8 @@ export default function User({ currentUser, user }: UserProps) {
                 size={168}
                 className="absolute top-[-100px] w-[130px] border-4 border-white dark:border-[#242526] sm:top-[-30px] sm:w-[168px]"
             />
-            <div className="mt-4 flex flex-col gap-2 sm:ml-[180px] sm:mt-0 sm:flex-1">
-                <h1 className="m-0 mt-2 font-semibold">
+            <div className="mt-4 flex flex-col gap-2 overflow-hidden pr-4 sm:ml-[180px] sm:mt-0 sm:flex-1">
+                <h1 className="m-0 mt-2 line-clamp-2 overflow-hidden text-ellipsis font-semibold">
                     {currentUser.data.id === user.data.id ? currentUser.data.full_name : user.data.full_name || 'ㅤ'}
                 </h1>
                 <p className="text-base text-gray-700 dark:text-gray-400">

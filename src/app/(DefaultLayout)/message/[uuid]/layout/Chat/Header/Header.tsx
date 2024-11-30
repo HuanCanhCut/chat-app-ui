@@ -52,7 +52,7 @@ const Header: React.FC<HeaderProps> = ({ className = '', toggleInfo }) => {
         >
             <div className="flex items-center">
                 <div
-                    className="flex-center cursor-pointer rounded-lg px-2 py-2 hover:bg-lightGray dark:hover:bg-darkGray md:hidden"
+                    className="flex-center cursor-pointer rounded-lg px-1 py-1 hover:bg-lightGray dark:hover:bg-darkGray md:hidden"
                     onClick={() => router.push('/message')}
                 >
                     <FontAwesomeIcon
@@ -66,7 +66,7 @@ const Header: React.FC<HeaderProps> = ({ className = '', toggleInfo }) => {
                     className="flex h-full cursor-pointer items-center gap-3 rounded-lg p-2 hover:bg-lightGray dark:hover:bg-darkGray"
                     onClick={handleNavigate}
                 >
-                    <div className="relative">
+                    <div className="relative flex-shrink-0">
                         <UserAvatar
                             src={
                                 currentConversation?.is_group ? currentConversation.avatar : conversationMember?.avatar
@@ -78,7 +78,7 @@ const Header: React.FC<HeaderProps> = ({ className = '', toggleInfo }) => {
                         )}
                     </div>
                     <div>
-                        <h4 className="font-semibold">
+                        <h4 className="max-w-[150px] truncate whitespace-nowrap font-semibold xs:max-w-[200px] sm:max-w-[250px] md:max-w-[350px]">
                             {currentConversation?.is_group ? currentConversation.name : conversationMember?.full_name}
                         </h4>
                         {!currentConversation?.is_group && conversationMember?.is_online && (

@@ -2,7 +2,9 @@ interface Timestamp {
     createdAt: Date
     updatedAt: Date
 }
-
+/**
+ * User model
+ */
 export interface UserModel extends Timestamp {
     id: number
     first_name: string
@@ -20,6 +22,18 @@ export interface UserModel extends Timestamp {
     is_online: boolean
 }
 
+interface UserResponse {
+    data: UserModel
+    meta?: {
+        pagination: {
+            exp: number
+        }
+    }
+}
+
+/**
+ * Conversation model
+ */
 interface ConversationModel extends Timestamp {
     id: number
     is_group: boolean
@@ -27,10 +41,11 @@ interface ConversationModel extends Timestamp {
     avatar?: string
     uuid: string
     conversation_members: ConversationMember[]
+    messages: MessageModel[]
 }
 
 interface ConversationResponse {
-    data: Conversation[]
+    data: ConversationModel[]
 }
 
 interface ConversationMember extends Timestamp {
@@ -41,14 +56,29 @@ interface ConversationMember extends Timestamp {
     joined_at: Date
 }
 
-interface UserResponse {
-    data: UserModel
-    meta?: {
-        pagination: {
-            exp: number
-        }
-    }
+/**
+ * Message model
+ */
+
+interface MessageModel extends Timestamp {
+    id: number
+    conversation_id: number
+    content: string
+    sender_id: number
+    sender: UserModel
+    message_status: MessageStatus[]
 }
+
+interface MessageStatus extends Timestamp {
+    id: number
+    message_id: number
+    user_id: number
+    status: 'sent' | 'delivered' | 'read'
+}
+
+/**
+ * Friends model
+ */
 
 interface FriendsShip {
     id: number
@@ -60,6 +90,13 @@ interface FriendsShip {
     user: UserModel
 }
 
+interface FriendsResponse extends MetaPagination {
+    data: FriendsShip[]
+}
+
+/**
+ * Meta pagination
+ */
 interface MetaPagination {
     meta: {
         pagination: {
@@ -72,9 +109,9 @@ interface MetaPagination {
     }
 }
 
-interface FriendsResponse extends MetaPagination {
-    data: FriendsShip[]
-}
+/**
+ * Notification model
+ */
 
 interface NotificationData {
     id: number
@@ -92,6 +129,10 @@ interface NotificationData {
 interface NotificationResponse extends MetaPagination {
     data: NotificationData[]
 }
+
+/**
+ * Search history model
+ */
 
 interface SearchHistoryData {
     id: number

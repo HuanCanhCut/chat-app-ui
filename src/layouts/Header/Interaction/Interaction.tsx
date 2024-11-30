@@ -2,7 +2,6 @@ import React from 'react'
 import { MessageIcon } from '~/components/Icons'
 import Tippy from '@tippyjs/react'
 import UserAvatar from '~/components/UserAvatar/UserAvatar'
-import useSWR from 'swr'
 import { useRouter } from 'next/navigation'
 import { faSignOut, faCircleDot, faPen } from '@fortawesome/free-solid-svg-icons'
 import { faMoon, IconDefinition } from '@fortawesome/free-solid-svg-icons'
@@ -12,14 +11,11 @@ import Button from '~/components/Button'
 import config from '~/config'
 import Notification from '~/components/Notification/Notification'
 import CustomTippy from '~/components/CustomTippy/CustomTippy'
-import { UserResponse } from '~/type/type'
-import * as meService from '~/services/meService'
 import * as authService from '~/services/authService'
 import PopperWrapper from '~/components/PopperWrapper'
 import { sendEvent } from '~/helpers/events'
 import AccountItem from '~/components/AccountItem'
 import MenuItem from '../MenuItem'
-import SWRKey from '~/enum/SWRKey'
 import getCurrentUser from '~/zustand/getCurrentUser'
 
 export interface MenuItemType {
@@ -68,16 +64,20 @@ const Interaction = () => {
 
     const renderTooltip = () => {
         return (
-            <PopperWrapper className="min-w-[320px] text-sm">
+            <PopperWrapper className="min-w-[320px] max-w-[320px] text-sm">
                 <header className="p-2">
                     <h4 className="text-center font-semibold">Tùy chọn</h4>
                 </header>
                 <section>
                     <div className="border-b border-t border-gray-300 px-5 py-2 dark:border-gray-700">
                         <label className="font-semibold">Tài khoản</label>
-                        <div className="flex items-center justify-between">
+                        <div className="flex max-w-full items-center justify-between overflow-hidden">
                             {currentUser && <AccountItem user={currentUser?.data} className="mt-2" />}
-                            <Button buttonType="icon" href={`/user/@${currentUser?.data?.nickname}`}>
+                            <Button
+                                buttonType="icon"
+                                className="flex-shrink-0"
+                                href={`/user/@${currentUser?.data?.nickname}`}
+                            >
                                 <FontAwesomeIcon icon={faPen} className="text-sm" />
                             </Button>
                         </div>
@@ -114,7 +114,7 @@ const Interaction = () => {
                 timeDelayOpen={50}
                 timeDelayClose={250}
             >
-                <div>
+                <div className="flex-shrink-0">
                     <UserAvatar src={currentUser?.data?.avatar} className="w-[32px] sm:w-[36px]" />
                 </div>
             </CustomTippy>
