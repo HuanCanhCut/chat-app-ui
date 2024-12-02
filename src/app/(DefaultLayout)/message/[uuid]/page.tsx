@@ -17,10 +17,12 @@ const MessagePage = () => {
         <div className="flex h-full">
             <div className="flex flex-grow flex-col">
                 <Header toggleInfo={toggleInfo} />
-                <Message className="flex-grow" />
+                <Message />
                 <EnterMessage />
             </div>
-            {infoOpen && <Info className={`${infoOpen ? 'block' : 'hidden'} w-[220px] md:block lg:w-[250px]`} />}
+            {infoOpen && (
+                <Info className={`${infoOpen ? 'block' : 'hidden'} min-w-[250px] md:block lg:min-w-[280px]`} />
+            )}
         </div>
     )
 }

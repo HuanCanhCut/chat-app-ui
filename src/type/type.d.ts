@@ -69,11 +69,16 @@ interface MessageModel extends Timestamp {
     message_status: MessageStatus[]
 }
 
+interface MessageResponse extends MetaPagination {
+    data: MessageModel[]
+}
+
 interface MessageStatus extends Timestamp {
     id: number
     message_id: number
     user_id: number
     status: 'sent' | 'delivered' | 'read'
+    receiver: UserModel
 }
 
 /**

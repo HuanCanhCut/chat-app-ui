@@ -42,7 +42,7 @@ const ConversationItem: React.FC<Props> = ({ conversation, className = '' }) => 
                         <span className="truncate pr-1">
                             {currentUser?.data.id === conversation.messages[0]?.sender_id
                                 ? `Bạn: ${conversation.messages[0]?.content}`
-                                : `${conversation.is_group ? '' : conversation.messages[0]?.sender.full_name + ': '} ${conversation.messages[0]?.content}`}
+                                : `${!conversation.is_group ? '' : conversation.messages[0]?.sender.full_name + ': '} ${conversation.messages[0]?.content}`}
                         </span>
                         <span className="flex-shrink-0"> · {momentTimezone(conversation.messages[0]?.createdAt)}</span>
                     </div>

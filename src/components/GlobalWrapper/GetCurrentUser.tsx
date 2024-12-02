@@ -12,9 +12,7 @@ const GetCurrentUser = ({ children }: { children: React.ReactNode }) => {
     })
 
     useEffect(() => {
-        if (currentUser) {
-            dispatch(currentUser)
-        }
+        dispatch(currentUser)
     }, [currentUser, dispatch])
 
     return <>{children}</>

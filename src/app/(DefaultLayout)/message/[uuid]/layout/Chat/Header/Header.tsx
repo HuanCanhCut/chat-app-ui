@@ -24,7 +24,7 @@ const Header: React.FC<HeaderProps> = ({ className = '', toggleInfo }) => {
     const uuid = pathname.split('/')[2]
     const [currentConversation, setCurrentConversation] = useState<ConversationModel>()
 
-    const { data: conversation } = useSWR(SWRKey.GET_CONVERSATIONS, () => {
+    const { data: conversations } = useSWR(SWRKey.GET_CONVERSATIONS, () => {
         return conversationServices.getConversations({ page: 1 })
     })
 
@@ -32,13 +32,13 @@ const Header: React.FC<HeaderProps> = ({ className = '', toggleInfo }) => {
     const conversationMember = currentConversation?.conversation_members[0].user
 
     useEffect(() => {
-        if (conversation?.data) {
-            const currentConversation = conversation.data.find((conversation) => conversation.uuid === uuid)
+        if (conversations?.data) {
+            const currentConversation = conversations.data.find((conversation) => conversation.uuid === uuid)
             if (currentConversation) {
                 setCurrentConversation(currentConversation)
             }
         }
-    }, [conversation?.data, pathname, uuid])
+    }, [conversations?.data, pathname, uuid])
 
     const handleNavigate = () => {
         if (!currentConversation?.is_group) {

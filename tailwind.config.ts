@@ -31,6 +31,7 @@ const config: Config = {
                 dark: '#18191a',
                 lightGray: '#f0f2f5',
                 darkGray: '#242526',
+                'milk-tea': '#997651 ',
             },
             textColor: {
                 dark: '#ffffffe6',
