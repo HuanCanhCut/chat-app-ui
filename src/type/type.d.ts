@@ -149,3 +149,11 @@ interface SearchHistoryData {
 interface SearchHistory {
     data: SearchHistoryData[]
 }
+
+/**
+ * Socket model
+ */
+
+interface SocketMessage {
+    conversation: ConversationModel
+}

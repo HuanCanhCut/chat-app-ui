@@ -38,6 +38,7 @@ enum SWRKey {
      * Conversation
      */
     GET_CONVERSATIONS = '/conversations',
+    GET_CONVERSATION_BY_UUID = '/conversations/:uuid',
 
     /**
      * Message

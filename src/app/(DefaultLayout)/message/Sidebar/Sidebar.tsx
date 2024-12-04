@@ -1,7 +1,7 @@
 'use client'
 
 import Header from './components/Header'
-import Friends from './components/Friends'
+import Friends from './components/Conversations'
 import { useState } from 'react'
 import Search from './components/Search'
 

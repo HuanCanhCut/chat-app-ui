@@ -1,7 +1,7 @@
 'use client'
 
 import GetCurrentUser from '~/components/GlobalWrapper/GetCurrentUser'
-import Notification from '~/components/GlobalWrapper/Notification'
+import Sound from '~/components/GlobalWrapper/Sound'
 import { SWRConfig } from 'swr'
 import { ToastContainer } from 'react-toastify'
 import useThemeStore from '~/zustand/useThemeStore'
@@ -26,7 +26,7 @@ const GlobalSWRConfig = ({ children }: { children: React.ReactNode }) => {
         >
             <GetCurrentUser>
                 <Socket>
-                    <Notification>{children}</Notification>
+                    <Sound>{children}</Sound>
                 </Socket>
             </GetCurrentUser>
             <ToastContainer />

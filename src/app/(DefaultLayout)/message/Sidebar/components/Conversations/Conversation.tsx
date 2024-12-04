@@ -12,8 +12,13 @@ import Skeleton from 'react-loading-skeleton'
 
 const Friends = () => {
     const { theme } = useThemeStore()
-    const { data: conversations, isLoading } = useSWR(SWRKey.GET_CONVERSATIONS, () => {
-        return conversationService.getConversations({ page: 1 })
+    const { data: conversations, isLoading } = useSWR(SWRKey.GET_CONVERSATIONS, async () => {
+        const response = await conversationService.getConversations({ page: 1 })
+        const groupConversationsByUuid = response?.data?.reduce<Record<string, any>>((acc, conversation) => {
+            acc[conversation.uuid] = conversation
+            return acc
+        }, {})
+        return groupConversationsByUuid
     })
 
     const Loading = () => {
@@ -36,11 +41,11 @@ const Friends = () => {
                 [1, 2, 3, 4, 5, 6, 7].map((_, index) => {
                     return <Loading key={index} />
                 })
-            ) : conversations && conversations.data.length > 0 ? (
-                conversations.data.map((conversation, index) => {
+            ) : conversations && Object.keys(conversations).length > 0 ? (
+                Object.keys(conversations).map((uuid) => {
                     return (
-                        <div key={index} className="pr-2">
-                            <ConversationItem conversation={conversation} />
+                        <div key={uuid} className="pr-2">
+                            <ConversationItem conversation={conversations[uuid]} />
                         </div>
                     )
                 })

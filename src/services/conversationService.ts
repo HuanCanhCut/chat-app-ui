@@ -1,4 +1,4 @@
-import { ConversationResponse } from '~/type/type'
+import { ConversationModel, ConversationResponse } from '~/type/type'
 import * as request from '~/utils/httpRequest'
 
 export const getConversations = async ({
@@ -15,6 +15,19 @@ export const getConversations = async ({
                 per_page,
             },
         })
+        return response.data
+    } catch (error: any) {
+        console.log(error)
+    }
+}
+
+export const getConversationByUuid = async ({
+    uuid,
+}: {
+    uuid: string
+}): Promise<{ data: ConversationModel } | undefined> => {
+    try {
+        const response = await request.get(`/conversations/${uuid}`)
         return response.data
     } catch (error: any) {
         console.log(error)

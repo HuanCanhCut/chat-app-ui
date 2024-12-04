@@ -17,6 +17,7 @@ const config: Config = {
             screens: {
                 xxs: '340px',
                 xs: '480px',
+                bp900: '900px',
             },
             colors: {
                 primary: '#0866ff',

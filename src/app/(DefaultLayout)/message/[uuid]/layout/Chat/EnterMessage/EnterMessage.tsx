@@ -20,19 +20,17 @@ const EnterMessage: React.FC<EnterMessageProps> = ({ className = '' }) => {
 
     const handleEnterMessage = (e: React.KeyboardEvent<HTMLDivElement>) => {
         if (e.key === 'Enter') {
-            if (!uuid) return
-            if (!messageValue.trim().length) return
-
             handleEmitMessage(uuid as string)
-
-            if (inputRef.current) {
-                inputRef.current.value = ''
-            }
         }
     }
 
     const handleEmitMessage = (conversationUuid: string) => {
+        if (!uuid) return
+        if (!messageValue.trim().length) return
+
         socket.emit(ChatEvent.NEW_MESSAGE, { conversationUuid, message: messageValue })
+
+        setMessageValue('')
     }
 
     useEffect(() => {
@@ -48,12 +46,9 @@ const EnterMessage: React.FC<EnterMessageProps> = ({ className = '' }) => {
     }, [])
 
     return (
-        <div
-            className={`${className} flex items-center justify-between gap-3 px-4 py-2 pb-4`}
-            onKeyDown={handleEnterMessage}
-        >
-            <div className="flex items-center">
-                <FontAwesomeIcon icon={faImage} className="cursor-pointer text-xl" />
+        <div className={`${className} flex items-center justify-between gap-2 p-2 pb-4`} onKeyDown={handleEnterMessage}>
+            <div className="flex cursor-pointer items-center p-2">
+                <FontAwesomeIcon icon={faImage} className="text-xl" />
             </div>
             <div className="relative flex flex-grow">
                 <input
@@ -65,11 +60,20 @@ const EnterMessage: React.FC<EnterMessageProps> = ({ className = '' }) => {
                     autoFocus
                     onChange={(e) => setMessageValue(e.target.value)}
                 />
-                <button className="absolute right-3 top-1/2 -translate-y-1/2 leading-[1px]">
+                <button className="absolute right-1 top-1/2 -translate-y-1/2 rounded-full p-1 leading-[1px] hover:bg-gray-300 dark:hover:bg-darkGray">
                     <FontAwesomeIcon icon={faSmile} className="text-xl" />
                 </button>
             </div>
-            {messageValue.length ? <SendHorizontalIcon /> : <button className="text-xl">🤣</button>}
+            {messageValue.length ? (
+                <button
+                    className="rounded-full p-2 hover:bg-lightGray dark:hover:bg-darkGray"
+                    onClick={() => handleEmitMessage(uuid as string)}
+                >
+                    <SendHorizontalIcon />
+                </button>
+            ) : (
+                <button className="text-xl">🤣</button>
+            )}
         </div>
     )
 }
