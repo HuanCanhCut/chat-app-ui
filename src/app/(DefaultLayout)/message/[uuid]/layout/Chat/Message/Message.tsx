@@ -72,9 +72,10 @@ const Message: React.FC = () => {
                 if (!messages?.data) {
                     return
                 }
+
                 mutateMessages(
                     {
-                        data: [data.conversation.messages[0], ...messages?.data],
+                        data: [data.conversation.last_message, ...messages?.data],
                         meta: messages?.meta,
                     },
                     {

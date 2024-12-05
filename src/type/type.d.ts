@@ -41,7 +41,7 @@ interface ConversationModel extends Timestamp {
     avatar?: string
     uuid: string
     conversation_members: ConversationMember[]
-    messages: MessageModel[]
+    last_message: MessageModel
 }
 
 interface ConversationResponse {

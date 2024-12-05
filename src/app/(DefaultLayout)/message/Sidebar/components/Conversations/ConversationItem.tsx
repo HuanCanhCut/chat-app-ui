@@ -40,11 +40,11 @@ const ConversationItem: React.FC<Props> = ({ conversation, className = '' }) => 
                     <p className="truncate font-medium">{conversation.name || userMember.full_name}</p>
                     <div className="flex items-center text-xs font-normal text-gray-600 dark:text-gray-400">
                         <span className="truncate pr-1">
-                            {currentUser?.data.id === conversation.messages[0]?.sender_id
-                                ? `Bạn: ${conversation.messages[0]?.content}`
-                                : `${!conversation.is_group ? '' : conversation.messages[0]?.sender.full_name + ': '} ${conversation.messages[0]?.content}`}
+                            {currentUser?.data.id === conversation.last_message?.sender_id
+                                ? `Bạn: ${conversation.last_message?.content}`
+                                : `${!conversation.is_group ? '' : conversation.last_message?.sender.full_name + ': '} ${conversation.last_message?.content}`}
                         </span>
-                        <span className="flex-shrink-0"> · {momentTimezone(conversation.messages[0]?.createdAt)}</span>
+                        <span className="flex-shrink-0"> · {momentTimezone(conversation.last_message?.createdAt)}</span>
                     </div>
                 </div>
             </Link>

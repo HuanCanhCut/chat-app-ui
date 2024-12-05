@@ -29,7 +29,7 @@ const Header: React.FC<HeaderProps> = ({ className = '', toggleInfo, conversatio
         >
             <div className="flex items-center">
                 <div
-                    className="flex-center cursor-pointer rounded-lg px-1 py-1 hover:bg-lightGray dark:hover:bg-darkGray md:hidden"
+                    className="flex-center cursor-pointer rounded-lg px-1 py-1 hover:bg-lightGray dark:hover:bg-darkGray bp900:hidden"
                     onClick={() => router.push('/message')}
                 >
                     <FontAwesomeIcon
