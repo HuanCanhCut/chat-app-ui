@@ -1,7 +1,7 @@
 'use client'
 
 import Header from './components/Header'
-import Friends from './components/Conversations'
+import Conversations from './components/Conversations'
 import { useState } from 'react'
 import Search from './components/Search'
 
@@ -12,7 +12,7 @@ const Sidebar = () => {
             <Header />
             <Search setSearchMode={setSearchMode} searchMode={searchMode} />
             <div className="relative flex-grow [overflow:overlay]">
-                <Friends />
+                <Conversations />
             </div>
         </aside>
     )

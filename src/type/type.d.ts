@@ -76,7 +76,7 @@ interface MessageResponse extends MetaPagination {
 interface MessageStatus extends Timestamp {
     id: number
     message_id: number
-    user_id: number
+    receiver_id: number
     status: 'sent' | 'delivered' | 'read'
     receiver: UserModel
 }

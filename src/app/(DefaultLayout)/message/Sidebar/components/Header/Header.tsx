@@ -1,21 +1,28 @@
 'use client'
 
-import React, { memo } from 'react'
+import React, { memo, useCallback } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-
-import UserAvatar from '~/components/UserAvatar/UserAvatar'
 import { faEllipsis } from '@fortawesome/free-solid-svg-icons'
 import Tippy from '@tippyjs/react'
+import { useRouter } from 'next/navigation'
+
+import UserAvatar from '~/components/UserAvatar/UserAvatar'
 import getCurrentUser from '~/zustand/getCurrentUser'
 
 const Header: React.FC = () => {
     const { currentUser } = getCurrentUser()
 
+    const router = useRouter()
+
+    const handleNavigateToProfile = useCallback(() => {
+        router.push(`/user/@${currentUser?.data?.nickname}`)
+    }, [currentUser?.data?.nickname, router])
+
     return (
         <header className="p-1 pr-2">
             <div className="flex w-full items-center justify-between">
                 <>
-                    <UserAvatar src={currentUser?.data?.avatar} />
+                    <UserAvatar src={currentUser?.data?.avatar} onClick={handleNavigateToProfile} />
                     <h3 className="text- text-xl font-semibold dark:text-dark">Huấn cánh cụt</h3>
 
                     <Tippy content="Hiện để cho đẹp :))))" hideOnClick={false} placement="bottom-start">

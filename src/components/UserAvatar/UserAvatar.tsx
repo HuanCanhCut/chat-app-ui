@@ -9,11 +9,19 @@ interface Props {
     size?: number
     className?: string
     style?: React.CSSProperties
+    onClick?: () => void
 }
 
 const defaultAvatar = '/static/media/default-avatar.jpg'
 
-export default memo(function UserAvatar({ src = defaultAvatar, size = 36, alt = 'avatar', className, style }: Props) {
+const UserAvatar = ({
+    src = defaultAvatar,
+    size = 36,
+    alt = 'avatar',
+    className,
+    style,
+    onClick = () => {},
+}: Props) => {
     const [fallback, setFallback] = useState<string>()
 
     const handleError = () => {
@@ -28,6 +36,7 @@ export default memo(function UserAvatar({ src = defaultAvatar, size = 36, alt = 
         <Image
             src={fallback || src}
             onError={handleError}
+            onClick={onClick}
             alt={alt}
             width={size}
             height={size}
@@ -37,4 +46,6 @@ export default memo(function UserAvatar({ src = defaultAvatar, size = 36, alt = 
             style={style}
         />
     )
-})
+}
+
+export default memo(UserAvatar)

@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
+import { useState } from 'react'
 import UserAvatar from '~/components/UserAvatar'
 import { ConversationModel } from '~/type/type'
 import { momentTimezone } from '~/utils/moment'
@@ -17,7 +18,7 @@ const ConversationItem: React.FC<Props> = ({ conversation, className = '' }) => 
 
     const isActive = uuid === conversation.uuid
 
-    // nếu không phải group thì lấy user đầu tiên trong conversation_members
+    // if not group then get first user in conversation_members
     const userMember = conversation.conversation_members[0].user
 
     return (

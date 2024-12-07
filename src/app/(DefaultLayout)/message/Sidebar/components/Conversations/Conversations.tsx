@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react'
+import React, { useEffect } from 'react'
 import useSWR from 'swr'
 
 import SWRKey from '~/enum/SWRKey'
@@ -9,10 +9,18 @@ import ConversationItem from './ConversationItem'
 import useThemeStore from '~/zustand/useThemeStore'
 import Image from 'next/image'
 import Skeleton from 'react-loading-skeleton'
+import socket from '~/helpers/socket'
+import { ChatEvent } from '~/enum/chat'
+import { SocketMessage } from '~/type/type'
 
-const Friends = () => {
+const Conversations = () => {
     const { theme } = useThemeStore()
-    const { data: conversations, isLoading } = useSWR(SWRKey.GET_CONVERSATIONS, async () => {
+
+    const {
+        data: conversations,
+        isLoading,
+        mutate: mutateConversations,
+    } = useSWR(SWRKey.GET_CONVERSATIONS, async () => {
         const response = await conversationService.getConversations({ page: 1 })
         const groupConversationsByUuid = response?.data?.reduce<Record<string, any>>((acc, conversation) => {
             acc[conversation.uuid] = conversation
@@ -34,6 +42,24 @@ const Friends = () => {
             </>
         )
     }
+
+    useEffect(() => {
+        socket.on(ChatEvent.NEW_MESSAGE, (data: SocketMessage) => {
+            if (conversations?.[data.conversation.uuid]) {
+                delete conversations[data.conversation.uuid]
+            }
+
+            mutateConversations(
+                {
+                    [data.conversation.uuid]: data.conversation,
+                    ...conversations,
+                },
+                {
+                    revalidate: false,
+                },
+            )
+        })
+    }, [conversations, mutateConversations])
 
     return (
         <div className="h-full w-full pt-4">
@@ -60,6 +86,7 @@ const Friends = () => {
                         alt="empty-conversation"
                         width={100}
                         height={100}
+                        priority
                     />
                     <h2>Không có tin nhắn nào</h2>
                     <p className="mt-2 text-sm text-gray-500">Tin nhắn mới sẽ hiển thị ở đây</p>
@@ -69,4 +96,4 @@ const Friends = () => {
     )
 }
 
-export default Friends
+export default Conversations
