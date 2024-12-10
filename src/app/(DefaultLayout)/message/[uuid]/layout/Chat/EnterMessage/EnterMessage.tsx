@@ -7,7 +7,7 @@ import { SendHorizontalIcon } from '~/components/Icons'
 import { listenEvent } from '~/helpers/events'
 import { useParams } from 'next/navigation'
 import socket from '~/helpers/socket'
-import { ChatEvent } from '~/enum/chat'
+import { ChatEvent } from '~/enum/socket/chat'
 
 interface EnterMessageProps {
     className?: string

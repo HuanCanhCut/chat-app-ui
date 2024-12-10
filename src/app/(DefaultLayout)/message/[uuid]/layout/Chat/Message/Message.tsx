@@ -1,17 +1,18 @@
 import { useParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import useSWR from 'swr'
-
+import InfiniteScroll from 'react-infinite-scroll-component'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 import * as messageServices from '~/services/message'
-import { ChatEvent } from '~/enum/chat'
+
+import { ChatEvent } from '~/enum/socket/chat'
 import SWRKey from '~/enum/SWRKey'
 import { sendEvent } from '~/helpers/events'
 import socket from '~/helpers/socket'
 import getCurrentUser from '~/zustand/getCurrentUser'
-import InfiniteScroll from 'react-infinite-scroll-component'
 import { MessageResponse, SocketMessage } from '~/type/type'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faSpinner } from '@fortawesome/free-solid-svg-icons'
+import MessageItem from './MessageItem'
 
 const Message: React.FC = () => {
     const { uuid } = useParams()
@@ -94,7 +95,7 @@ const Message: React.FC = () => {
                     next={() => {
                         setPage(page + 1)
                     }}
-                    className="flex flex-col-reverse gap-1 px-2 py-3"
+                    className="flex flex-col-reverse gap-[2.5px] px-2 py-3"
                     hasMore={
                         messages?.meta.pagination.current_page &&
                         messages?.meta.pagination.total_pages &&
@@ -112,16 +113,13 @@ const Message: React.FC = () => {
                     scrollableTarget="message-scrollable"
                 >
                     {messages?.data.map((message, index) => (
-                        <p
-                            className={`max-w-[80%] rounded-3xl px-4 py-1.5 font-light text-white ${
-                                message.sender_id === currentUser?.data?.id
-                                    ? 'self-end bg-milk-tea'
-                                    : 'self-start bg-[#313233]'
-                            }`}
+                        <MessageItem
                             key={index}
-                        >
-                            <span className="max-w-fit break-words">{message.content}</span>
-                        </p>
+                            message={message}
+                            index={index}
+                            messages={messages?.data}
+                            currentUser={currentUser?.data}
+                        />
                     ))}
                 </InfiniteScroll>
             </div>

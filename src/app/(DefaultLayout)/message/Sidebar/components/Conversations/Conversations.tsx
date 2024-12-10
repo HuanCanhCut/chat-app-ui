@@ -10,8 +10,9 @@ import useThemeStore from '~/zustand/useThemeStore'
 import Image from 'next/image'
 import Skeleton from 'react-loading-skeleton'
 import socket from '~/helpers/socket'
-import { ChatEvent } from '~/enum/chat'
+import { ChatEvent } from '~/enum/socket/chat'
 import { SocketMessage } from '~/type/type'
+import { listenEvent } from '~/helpers/events'
 
 const Conversations = () => {
     const { theme } = useThemeStore()
@@ -59,6 +60,22 @@ const Conversations = () => {
                 },
             )
         })
+    }, [conversations, mutateConversations])
+
+    // update last message is read
+    useEffect(() => {
+        const remove = listenEvent({
+            eventName: 'message:read-message',
+            handler: ({ detail: conversationUuid }) => {
+                if (conversations?.[conversationUuid]) {
+                    const newData = conversations[conversationUuid]
+                    newData.last_message.is_read = true
+                    mutateConversations({ ...conversations, [conversationUuid]: newData }, { revalidate: false })
+                }
+            },
+        })
+
+        return remove
     }, [conversations, mutateConversations])
 
     return (

@@ -1,6 +1,5 @@
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
-import { useState } from 'react'
 import UserAvatar from '~/components/UserAvatar'
 import { ConversationModel } from '~/type/type'
 import { momentTimezone } from '~/utils/moment'
@@ -21,6 +20,9 @@ const ConversationItem: React.FC<Props> = ({ conversation, className = '' }) => 
     // if not group then get first user in conversation_members
     const userMember = conversation.conversation_members[0].user
 
+    const isRead =
+        conversation.last_message.sender_id !== currentUser?.data.id ? conversation.last_message.is_read : true
+
     return (
         <>
             <Link
@@ -39,13 +41,15 @@ const ConversationItem: React.FC<Props> = ({ conversation, className = '' }) => 
                 </div>
                 <div className="ml-3 overflow-hidden">
                     <p className="truncate font-medium">{conversation.name || userMember.full_name}</p>
-                    <div className="flex items-center text-xs font-normal text-gray-600 dark:text-gray-400">
+                    <div
+                        className={`flex items-center text-xs font-normal ${isRead ? 'text-gray-600 dark:text-gray-400' : 'text-gray-800 dark:text-gray-200'} `}
+                    >
                         <span className="truncate pr-1">
                             {currentUser?.data.id === conversation.last_message?.sender_id
                                 ? `Bạn: ${conversation.last_message?.content}`
                                 : `${!conversation.is_group ? '' : conversation.last_message?.sender.full_name + ': '} ${conversation.last_message?.content}`}
                         </span>
-                        <span className="flex-shrink-0"> · {momentTimezone(conversation.last_message?.createdAt)}</span>
+                        <span className="flex-shrink-0">· {momentTimezone(conversation.last_message?.created_at)}</span>
                     </div>
                 </div>
             </Link>

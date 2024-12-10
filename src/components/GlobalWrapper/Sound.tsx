@@ -2,8 +2,8 @@
 
 import { useEffect, useRef } from 'react'
 import socket from '~/helpers/socket'
-import { NotificationEvent } from '~/enum/notification'
-import { ChatEvent } from '~/enum/chat'
+import { NotificationEvent } from '~/enum/socket/notification'
+import { ChatEvent } from '~/enum/socket/chat'
 import getCurrentUser from '~/zustand/getCurrentUser'
 import { SocketMessage } from '~/type/type'
 

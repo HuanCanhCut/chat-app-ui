@@ -75,20 +75,22 @@ export default memo(function CustomTippy({
     }
 
     return (
-        <Tippy
-            trigger={trigger}
-            animation={true}
-            interactive
-            delay={[timeDelayOpen, timeDelayClose]}
-            offset={[offsetX, offsetY]}
-            hideOnClick={hideOnClick}
-            placement={placement}
-            render={render}
-            onMount={onMount}
-            onHide={onHide}
-            onShow={onShow}
-        >
-            {children}
-        </Tippy>
+        <div>
+            <Tippy
+                trigger={trigger}
+                animation={true}
+                interactive
+                delay={[timeDelayOpen, timeDelayClose]}
+                offset={[offsetX, offsetY]}
+                hideOnClick={hideOnClick}
+                placement={placement}
+                render={render}
+                onMount={onMount}
+                onHide={onHide}
+                onShow={onShow}
+            >
+                {children}
+            </Tippy>
+        </div>
     )
 })

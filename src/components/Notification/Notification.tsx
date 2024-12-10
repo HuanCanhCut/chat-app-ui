@@ -12,7 +12,7 @@ import { SendIcon } from '~/components/Icons/Icons'
 import NotificationItem from './NotificationItem'
 import { listenEvent } from '~/helpers/events'
 import socket from '~/helpers/socket'
-import { NotificationEvent } from '~/enum/notification'
+import { NotificationEvent } from '~/enum/socket/notification'
 import Skeleton from 'react-loading-skeleton'
 import SWRKey from '~/enum/SWRKey'
 

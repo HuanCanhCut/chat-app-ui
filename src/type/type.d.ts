@@ -1,6 +1,6 @@
 interface Timestamp {
-    createdAt: Date
-    updatedAt: Date
+    created_at: Date
+    updated_at: Date
 }
 /**
  * User model
@@ -67,6 +67,7 @@ interface MessageModel extends Timestamp {
     sender_id: number
     sender: UserModel
     message_status: MessageStatus[]
+    is_read: boolean
 }
 
 interface MessageResponse extends MetaPagination {
@@ -85,13 +86,11 @@ interface MessageStatus extends Timestamp {
  * Friends model
  */
 
-interface FriendsShip {
+interface FriendsShip extends Timestamp {
     id: number
     user_id: number
     friend_id: number
     status: string
-    createdAt: Date
-    updatedAt: Date
     user: UserModel
 }
 
@@ -118,7 +117,7 @@ interface MetaPagination {
  * Notification model
  */
 
-interface NotificationData {
+interface NotificationData extends Timestamp {
     id: number
     recipient_id: number
     is_read: boolean
@@ -127,8 +126,6 @@ interface NotificationData {
     sender_id: number
     sender_user: UserModel
     type: 'friend_request' | 'accept_friend_request' | 'message'
-    createdAt: Date
-    updatedAt: Date
 }
 
 interface NotificationResponse extends MetaPagination {
@@ -139,7 +136,7 @@ interface NotificationResponse extends MetaPagination {
  * Search history model
  */
 
-interface SearchHistoryData {
+interface SearchHistoryData extends Timestamp {
     id: number
     user_id: number
     user_search_id: number

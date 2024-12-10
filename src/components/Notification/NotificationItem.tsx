@@ -184,7 +184,7 @@ const NotificationItem = ({
                                 !notification.is_read ? 'text-primary' : 'text-gray-600 dark:text-gray-400'
                             } font-normal`}
                         >
-                            {momentTimezone(notification.createdAt)}
+                            {momentTimezone(notification.created_at)}
                         </small>
                     </div>
                 </Link>
