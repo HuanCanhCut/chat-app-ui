@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
+import { useEffect, useMemo } from 'react'
 import UserAvatar from '~/components/UserAvatar'
 import { ConversationModel } from '~/type/type'
 import { momentTimezone } from '~/utils/moment'
@@ -17,11 +18,20 @@ const ConversationItem: React.FC<Props> = ({ conversation, className = '' }) => 
 
     const isActive = uuid === conversation.uuid
 
-    // if not group then get first user in conversation_members
-    const userMember = conversation.conversation_members[0].user
+    // if not group then get user !== current user in conversation_members
+    const userMember = useMemo(() => {
+        return conversation.conversation_members.find((member) => member.user_id !== currentUser?.data.id)?.user
+    }, [conversation.conversation_members, currentUser?.data.id])
 
     const isRead =
         conversation.last_message.sender_id !== currentUser?.data.id ? conversation.last_message.is_read : true
+
+    useEffect(() => {
+        console.log({
+            conversation,
+            isRead: conversation.last_message.is_read,
+        })
+    }, [conversation])
 
     return (
         <>
@@ -31,16 +41,16 @@ const ConversationItem: React.FC<Props> = ({ conversation, className = '' }) => 
             >
                 <div className="relative flex-shrink-0">
                     <UserAvatar
-                        src={conversation?.avatar || userMember.avatar}
+                        src={conversation?.avatar || userMember?.avatar}
                         size={56}
                         className="h-[48px] w-[48px] lg:h-[56px] lg:w-[56px]"
                     />
-                    {!conversation.is_group && userMember.is_online && (
+                    {!conversation.is_group && userMember?.is_online && (
                         <div className="absolute bottom-0 right-0 h-4 w-4 rounded-full border-2 border-white bg-green-500 dark:border-dark"></div>
                     )}
                 </div>
                 <div className="ml-3 overflow-hidden">
-                    <p className="truncate font-medium">{conversation.name || userMember.full_name}</p>
+                    <p className="truncate font-medium">{conversation.name || userMember?.full_name}</p>
                     <div
                         className={`flex items-center text-xs font-normal ${isRead ? 'text-gray-600 dark:text-gray-400' : 'text-gray-800 dark:text-gray-200'} `}
                     >

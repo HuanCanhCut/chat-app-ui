@@ -68,8 +68,15 @@ const Conversations = () => {
             eventName: 'message:read-message',
             handler: ({ detail: conversationUuid }) => {
                 if (conversations?.[conversationUuid]) {
-                    const newData = conversations[conversationUuid]
-                    newData.last_message.is_read = true
+                    const newData = {
+                        ...conversations[conversationUuid],
+                        last_message: {
+                            ...conversations[conversationUuid].last_message,
+                            is_read: true,
+                        },
+                    }
+                    mutateConversations({ ...conversations, [conversationUuid]: newData }, { revalidate: false })
+
                     mutateConversations({ ...conversations, [conversationUuid]: newData }, { revalidate: false })
                 }
             },

@@ -7,7 +7,7 @@ import { useEffect, useRef } from 'react'
 
 import { MessageModel, UserModel } from '~/type/type'
 import UserAvatar from '~/components/UserAvatar'
-import useElementOnScreen from '~/hooks/useElementOnScreen'
+import useVisible from '~/hooks/useVisible'
 import socket from '~/helpers/socket'
 import { ChatEvent } from '~/enum/socket/chat'
 import { useParams } from 'next/navigation'
@@ -28,7 +28,7 @@ const MessageItem = ({
 
     const options = { root: null, rootMargin: '0px', threshold: 0.5 }
     const firstMessageRef = useRef<HTMLDivElement>(null)
-    const isFirstMessageVisible: boolean = useElementOnScreen(options, firstMessageRef)
+    const isFirstMessageVisible: boolean = useVisible(options, firstMessageRef)
 
     useEffect(() => {
         if (isFirstMessageVisible) {
@@ -36,7 +36,7 @@ const MessageItem = ({
 
             sendEvent({ eventName: 'message:read-message', detail: uuid as string })
         }
-    }, [isFirstMessageVisible, uuid])
+    }, [isFirstMessageVisible, uuid, messages])
 
     const diffTime =
         index > 0 &&

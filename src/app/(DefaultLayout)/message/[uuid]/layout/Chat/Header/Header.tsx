@@ -5,6 +5,7 @@ import UserAvatar from '~/components/UserAvatar'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronLeft, faCircleInfo } from '@fortawesome/free-solid-svg-icons'
 import { ConversationModel } from '~/type/type'
+import getCurrentUser from '~/zustand/getCurrentUser'
 
 interface HeaderProps {
     className?: string
@@ -13,15 +14,20 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ className = '', toggleInfo, conversation }) => {
+    const { currentUser } = getCurrentUser()
     const router = useRouter()
 
     const handleNavigate = () => {
         if (!conversation?.is_group) {
-            router.push(`/user/@${conversation?.conversation_members[0].user.nickname}`)
+            const member = conversation?.conversation_members.find((member) => member.user_id !== currentUser?.data.id)
+
+            router.push(`/user/@${member?.user.nickname}`)
         }
     }
 
-    const conversationMember = conversation?.conversation_members[0].user
+    const conversationMember = conversation?.conversation_members.find(
+        (member) => member.user_id !== currentUser?.data.id,
+    )?.user
 
     return (
         <div

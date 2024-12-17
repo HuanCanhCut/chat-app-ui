@@ -35,8 +35,6 @@ const Sound = ({ children }: { children: React.ReactNode }) => {
 
                 if (data.conversation.last_message.sender_id === currentUser?.data.id) return
 
-                console.log({ sender_id: data.conversation.last_message.sender_id, currentUser: currentUser })
-
                 audioRef.current.src = '/static/audio/new-message.mp3'
                 await audioRef.current?.play()
             } catch (error) {}
