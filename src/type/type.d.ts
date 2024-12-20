@@ -5,7 +5,7 @@ interface Timestamp {
 /**
  * User model
  */
-export interface UserModel extends Timestamp {
+export interface UserModel<K = any, V = any> extends Timestamp {
     id: number
     first_name: string
     last_name: string
@@ -20,6 +20,7 @@ export interface UserModel extends Timestamp {
     sent_friend_request: boolean
     conversation: ConversationModel
     is_online: boolean
+    [key: K]: V
 }
 
 interface UserResponse {
@@ -79,7 +80,7 @@ interface MessageStatus extends Timestamp {
     message_id: number
     receiver_id: number
     status: 'sent' | 'delivered' | 'read'
-    receiver: UserModel
+    receiver: UserModel<'last_read_message_id', number> & { last_read_message_id: number }
 }
 
 /**

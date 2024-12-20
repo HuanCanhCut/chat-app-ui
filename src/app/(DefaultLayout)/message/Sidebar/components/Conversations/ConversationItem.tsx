@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
-import { useEffect, useMemo } from 'react'
+import { useMemo } from 'react'
 import UserAvatar from '~/components/UserAvatar'
 import { ConversationModel } from '~/type/type'
 import { momentTimezone } from '~/utils/moment'
@@ -25,13 +25,6 @@ const ConversationItem: React.FC<Props> = ({ conversation, className = '' }) => 
 
     const isRead =
         conversation.last_message.sender_id !== currentUser?.data.id ? conversation.last_message.is_read : true
-
-    useEffect(() => {
-        console.log({
-            conversation,
-            isRead: conversation.last_message.is_read,
-        })
-    }, [conversation])
 
     return (
         <>

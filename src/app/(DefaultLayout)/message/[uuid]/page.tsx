@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import useSWR from 'swr'
+import { useParams } from 'next/navigation'
 
 import * as conversationServices from '~/services/conversationService'
 import Header from './layout/Chat/Header'
@@ -9,7 +10,6 @@ import Message from './layout/Chat/Message'
 import EnterMessage from './layout/Chat/EnterMessage'
 import Info from './layout/Info/Info'
 import SWRKey from '~/enum/SWRKey'
-import { useParams } from 'next/navigation'
 
 const MessagePage = () => {
     const { uuid } = useParams()

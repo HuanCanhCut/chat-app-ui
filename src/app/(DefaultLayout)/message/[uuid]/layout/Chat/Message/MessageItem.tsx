@@ -5,7 +5,7 @@ import Tippy from '@tippyjs/react'
 import moment from 'moment-timezone'
 import { useEffect, useRef } from 'react'
 
-import { MessageModel, UserModel } from '~/type/type'
+import { MessageModel, MessageStatus, UserModel } from '~/type/type'
 import UserAvatar from '~/components/UserAvatar'
 import useVisible from '~/hooks/useVisible'
 import socket from '~/helpers/socket'
@@ -69,10 +69,11 @@ const MessageItem = ({
         return moment(new Date(time)).locale('vi').format('DD [Tháng] MM, YYYY')
     }
     return (
-        <>
+        <div>
             <p className={`mb-2 text-center text-xs text-gray-400 ${Number(diffTime) < 10 ? 'hidden' : 'block'}`}>
                 {handleFormatTimeBetweenTwoMessage(message.created_at)}
             </p>
+
             <div
                 className={`group flex w-full items-center gap-3 ${message.sender_id === currentUser?.id ? 'justify-end' : 'justify-start'}`}
             >
@@ -93,8 +94,10 @@ const MessageItem = ({
                 <Tippy content={handleFormatTime(message.created_at)} placement="left">
                     <p
                         ref={index === 0 ? firstMessageRef : null}
-                        className={`w-fit max-w-[80%] rounded-3xl px-4 py-1.5 font-light text-white ${
-                            message.sender_id === currentUser?.id ? 'bg-milk-tea' : 'bg-[#313233]'
+                        className={`w-fit max-w-[80%] rounded-3xl px-4 py-1.5 font-light ${
+                            message.sender_id === currentUser?.id
+                                ? 'bg-milk-tea text-white'
+                                : 'bg-lightGray text-black dark:bg-[#313233] dark:text-dark'
                         }`}
                         key={index}
                     >
@@ -102,7 +105,14 @@ const MessageItem = ({
                     </p>
                 </Tippy>
             </div>
-        </>
+            <div className="flex justify-end">
+                {message.message_status.map((status: MessageStatus, index: number) => {
+                    if (status.receiver.last_read_message_id === message.id && status.receiver_id !== currentUser?.id) {
+                        return <UserAvatar key={index} src={status.receiver.avatar} size={14} className="my-1 mr-2" />
+                    }
+                })}
+            </div>
+        </div>
     )
 }
 
