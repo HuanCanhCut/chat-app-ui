@@ -11,7 +11,7 @@ import SWRKey from '~/enum/SWRKey'
 import { sendEvent } from '~/helpers/events'
 import socket from '~/helpers/socket'
 import getCurrentUser from '~/zustand/getCurrentUser'
-import { MessageResponse, SocketMessage } from '~/type/type'
+import { MessageModel, MessageResponse, SocketMessage } from '~/type/type'
 import MessageItem from './MessageItem'
 
 const Message: React.FC = () => {
@@ -85,7 +85,32 @@ const Message: React.FC = () => {
                 )
             }
         })
-    }, [messages?.data, messages?.meta, mutateMessages, uuid])
+    }, [messages, mutateMessages, uuid])
+
+    useEffect(() => {
+        socket.on(ChatEvent.UPDATE_READ_MESSAGE, (data: MessageModel) => {
+            if (!messages?.data) {
+                return
+            }
+
+            const newMessages = messages?.data.map((message) => {
+                if (message.id === data.id) {
+                    return data
+                }
+
+                return message
+            })
+
+            mutateMessages({
+                data: newMessages,
+                meta: messages?.meta,
+            })
+        })
+
+        return () => {
+            socket.off(ChatEvent.UPDATE_READ_MESSAGE)
+        }
+    }, [messages, mutateMessages])
 
     return (
         <div className="flex-grow overflow-hidden" onKeyDown={handleEnterMessage}>
