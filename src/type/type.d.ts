@@ -81,6 +81,7 @@ interface MessageStatus extends Timestamp {
     receiver_id: number
     status: 'sent' | 'delivered' | 'read'
     receiver: UserModel<'last_read_message_id', number> & { last_read_message_id: number }
+    read_at: Date
 }
 
 /**

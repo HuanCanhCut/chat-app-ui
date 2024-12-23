@@ -128,24 +128,38 @@ const MessageItem = ({
                     if (status.receiver.last_read_message_id === message.id) {
                         if (status.receiver_id !== currentUser?.id && messages[0].sender_id === currentUser?.id) {
                             return (
-                                <UserAvatar
-                                    key={index}
-                                    src={status.receiver.avatar}
-                                    size={14}
-                                    className="my-1 mr-[1px]"
-                                />
+                                <div key={index}>
+                                    <Tippy
+                                        content={`${status.receiver.full_name} đã xem lúc ${handleFormatTime(status.read_at)}`}
+                                    >
+                                        <span>
+                                            <UserAvatar
+                                                src={status.receiver.avatar}
+                                                size={14}
+                                                className="my-1 mr-[1px]"
+                                            />
+                                        </span>
+                                    </Tippy>
+                                </div>
                             )
                         } else if (
                             status.receiver_id === currentUser?.id &&
                             messages[0].sender_id !== currentUser?.id
                         ) {
                             return (
-                                <UserAvatar
-                                    key={index}
-                                    src={message.sender.avatar}
-                                    size={14}
-                                    className="my-1 mr-[1px]"
-                                />
+                                <div key={index}>
+                                    <Tippy
+                                        content={`${message.sender.full_name} đã xem lúc ${handleFormatTime(status.read_at)}`}
+                                    >
+                                        <span>
+                                            <UserAvatar
+                                                src={message.sender.avatar}
+                                                size={14}
+                                                className="my-1 mr-[1px]"
+                                            />
+                                        </span>
+                                    </Tippy>
+                                </div>
                             )
                         }
                     }
