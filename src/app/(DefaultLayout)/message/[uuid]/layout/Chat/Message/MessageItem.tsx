@@ -3,7 +3,8 @@ import { faSmile } from '@fortawesome/free-regular-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Tippy from '@tippyjs/react'
 import moment from 'moment-timezone'
-import { useEffect, useRef } from 'react'
+import React, { useEffect, useRef } from 'react'
+import { EmojiStyle } from 'emoji-picker-react'
 
 import { MessageModel, MessageStatus, UserModel } from '~/type/type'
 import UserAvatar from '~/components/UserAvatar'
@@ -80,6 +81,15 @@ const MessageItem = ({
         if (isSameWeek) return moment(new Date(time)).locale('vi').format('HH:mm ddd')
         return moment(new Date(time)).locale('vi').format('DD [Tháng] MM, YYYY')
     }
+
+    const isOnlyIcon = new RegExp(/^[^\w\s]+$/u).test(message.content.trim())
+
+    if (isOnlyIcon) {
+        console.log(
+            `https://cdn.jsdelivr.net/npm/emoji-datasource-${EmojiStyle.FACEBOOK}/img/${EmojiStyle.FACEBOOK}/64/${message.content.codePointAt(0)!.toString(16)}.png`,
+        )
+    }
+
     return (
         <div>
             <p className={`mb-2 text-center text-xs text-gray-400 ${Number(diffTime) < 10 ? 'hidden' : 'block'}`}>
@@ -104,17 +114,34 @@ const MessageItem = ({
                 </div>
                 {message.sender_id !== currentUser?.id && <UserAvatar src={message.sender.avatar} size={28} />}
                 <Tippy content={handleFormatTime(message.created_at)} placement="left">
-                    <p
-                        ref={index === 0 ? firstMessageRef : null}
-                        className={`w-fit max-w-[80%] rounded-3xl px-4 py-1.5 font-light ${
-                            message.sender_id === currentUser?.id
-                                ? 'bg-milk-tea text-white'
-                                : 'bg-lightGray text-black dark:bg-[#313233] dark:text-dark'
-                        }`}
-                        key={index}
-                    >
-                        <span className="max-w-fit break-words">{message.content}</span>
-                    </p>
+                    <React.Fragment>
+                        {isOnlyIcon ? (
+                            // replace empty string with space
+                            <p
+                                ref={index === 0 ? firstMessageRef : null}
+                                className={`w-fit max-w-[80%] rounded-3xl px-4 py-1.5 font-light ${
+                                    message.sender_id === currentUser?.id
+                                        ? 'bg-milk-tea text-white'
+                                        : 'bg-lightGray text-black dark:bg-[#313233] dark:text-dark'
+                                }`}
+                                key={index}
+                            >
+                                <span className="max-w-fit break-words">{message.content}</span>
+                            </p>
+                        ) : (
+                            <p
+                                ref={index === 0 ? firstMessageRef : null}
+                                className={`w-fit max-w-[80%] rounded-3xl px-4 py-1.5 font-light ${
+                                    message.sender_id === currentUser?.id
+                                        ? 'bg-milk-tea text-white'
+                                        : 'bg-lightGray text-black dark:bg-[#313233] dark:text-dark'
+                                }`}
+                                key={index}
+                            >
+                                <span className="max-w-fit break-words">{message.content}</span>
+                            </p>
+                        )}
+                    </React.Fragment>
                 </Tippy>
             </div>
 

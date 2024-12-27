@@ -62,8 +62,9 @@ export default memo(function CustomTippy({
     }
 
     const onHide = ({ unmount }: { unmount: any }) => {
-        scale.on('change', (value) => {
+        const cleanup = scale.on('change', (value) => {
             if (value <= initialScale) {
+                cleanup()
                 unmount()
             }
         })

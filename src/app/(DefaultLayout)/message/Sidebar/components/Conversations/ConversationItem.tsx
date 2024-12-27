@@ -1,6 +1,5 @@
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
-import { useMemo } from 'react'
 import UserAvatar from '~/components/UserAvatar'
 import { ConversationModel } from '~/type/type'
 import { momentTimezone } from '~/utils/moment'
@@ -19,9 +18,7 @@ const ConversationItem: React.FC<Props> = ({ conversation, className = '' }) => 
     const isActive = uuid === conversation.uuid
 
     // if not group then get user !== current user in conversation_members
-    const userMember = useMemo(() => {
-        return conversation.conversation_members.find((member) => member.user_id !== currentUser?.data.id)?.user
-    }, [conversation.conversation_members, currentUser?.data.id])
+    const userMember = conversation.conversation_members.find((member) => member.user_id !== currentUser?.data.id)?.user
 
     const isRead =
         conversation.last_message.sender_id !== currentUser?.data.id ? conversation.last_message.is_read : true
