@@ -10,6 +10,7 @@ import { useParams } from 'next/navigation'
 import socket from '~/helpers/socket'
 import { ChatEvent } from '~/enum/socket/chat'
 import { EmojiClickData } from 'emoji-picker-react'
+import Tippy from '@tippyjs/react'
 
 interface EnterMessageProps {
     className?: string
@@ -72,12 +73,14 @@ const EnterMessage: React.FC<EnterMessageProps> = ({ className = '' }) => {
                     onChange={(e) => setMessageValue(e.target.value)}
                 />
                 <Emoji isOpen={isOpenEmoji} setIsOpen={setIsOpenEmoji} onEmojiClick={handleEmojiClick}>
-                    <button
-                        className="absolute right-1 top-1/2 -translate-y-1/2 rounded-full p-1 leading-[1px] hover:bg-gray-300 dark:hover:bg-darkGray"
-                        onClick={handleToggleEmoji}
-                    >
-                        <FontAwesomeIcon icon={faSmile} className="text-xl" />
-                    </button>
+                    <Tippy content="Chọn biểu tượng cảm xúc">
+                        <button
+                            className="absolute right-1 top-1/2 -translate-y-1/2 rounded-full p-1 leading-[1px] hover:bg-gray-300 dark:hover:bg-darkGray"
+                            onClick={handleToggleEmoji}
+                        >
+                            <FontAwesomeIcon icon={faSmile} className="text-xl" />
+                        </button>
+                    </Tippy>
                 </Emoji>
             </div>
             {messageValue.length ? (

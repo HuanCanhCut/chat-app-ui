@@ -28,7 +28,7 @@ interface EmojiProps {
 
 const Emoji: React.FC<EmojiProps> = ({
     children,
-    isOpen,
+    isOpen = false,
     placement = 'top-start',
     setIsOpen,
     onEmojiClick,

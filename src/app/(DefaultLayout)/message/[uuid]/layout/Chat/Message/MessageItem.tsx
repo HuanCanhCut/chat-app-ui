@@ -4,7 +4,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Tippy from '@tippyjs/react'
 import moment from 'moment-timezone'
 import React, { useEffect, useRef } from 'react'
-import { EmojiStyle } from 'emoji-picker-react'
 
 import { MessageModel, MessageStatus, UserModel } from '~/type/type'
 import UserAvatar from '~/components/UserAvatar'
@@ -16,12 +15,12 @@ import { sendEvent } from '~/helpers/events'
 
 const MessageItem = ({
     message,
-    index,
+    messageIndex,
     messages,
     currentUser,
 }: {
     message: MessageModel
-    index: number
+    messageIndex: number
     messages: MessageModel[]
     currentUser: UserModel | undefined
 }) => {
@@ -52,21 +51,21 @@ const MessageItem = ({
     }, [isFirstMessageVisible, currentUser?.id, message.id, message.sender_id, uuid, messages])
 
     const diffTime =
-        index > 0 &&
+        messageIndex > 0 &&
         Math.abs(
             moment
-                .tz(messages[index].created_at, 'UTC')
-                .diff(moment.tz(messages[index - 1].created_at, 'UTC'), 'minutes'),
+                .tz(messages[messageIndex].created_at, 'UTC')
+                .diff(moment.tz(messages[messageIndex - 1].created_at, 'UTC'), 'minutes'),
         )
 
     const handleFormatTimeBetweenTwoMessage = (time: Date) => {
         const isSameDay =
-            index > 0 &&
-            moment(new Date(message.created_at)).isSame(moment(new Date(messages[index - 1].created_at)), 'day')
+            messageIndex > 0 &&
+            moment(new Date(message.created_at)).isSame(moment(new Date(messages[messageIndex - 1].created_at)), 'day')
 
         const isSameWeek =
-            index > 0 &&
-            moment(new Date(message.created_at)).isSame(moment(new Date(messages[index - 1].created_at)), 'week')
+            messageIndex > 0 &&
+            moment(new Date(message.created_at)).isSame(moment(new Date(messages[messageIndex - 1].created_at)), 'week')
 
         if (isSameDay) return moment(new Date(time)).locale('vi').format('HH:mm')
         if (isSameWeek) return moment(new Date(time)).locale('vi').format('HH:mm ddd')
@@ -84,18 +83,8 @@ const MessageItem = ({
 
     const isOnlyIcon = new RegExp(/^[^\w\s]+$/u).test(message.content.trim())
 
-    if (isOnlyIcon) {
-        console.log(
-            `https://cdn.jsdelivr.net/npm/emoji-datasource-${EmojiStyle.FACEBOOK}/img/${EmojiStyle.FACEBOOK}/64/${message.content.codePointAt(0)!.toString(16)}.png`,
-        )
-    }
-
     return (
         <div>
-            <p className={`mb-2 text-center text-xs text-gray-400 ${Number(diffTime) < 10 ? 'hidden' : 'block'}`}>
-                {handleFormatTimeBetweenTwoMessage(message.created_at)}
-            </p>
-
             <div
                 className={`group flex w-full items-center gap-3 ${message.sender_id === currentUser?.id ? 'justify-end' : 'justify-start'}`}
             >
@@ -116,27 +105,26 @@ const MessageItem = ({
                 <Tippy content={handleFormatTime(message.created_at)} placement="left">
                     <React.Fragment>
                         {isOnlyIcon ? (
-                            // replace empty string with space
                             <p
-                                ref={index === 0 ? firstMessageRef : null}
-                                className={`w-fit max-w-[80%] rounded-3xl px-4 py-1.5 font-light ${
+                                data-message-id={message.id}
+                                ref={messageIndex === 0 ? firstMessageRef : null}
+                                className={`w-fit max-w-[80%] rounded-3xl px-4 py-1.5 font-light [word-break:break-word] ${
                                     message.sender_id === currentUser?.id
                                         ? 'bg-milk-tea text-white'
                                         : 'bg-lightGray text-black dark:bg-[#313233] dark:text-dark'
                                 }`}
-                                key={index}
                             >
                                 <span className="max-w-fit break-words">{message.content}</span>
                             </p>
                         ) : (
                             <p
-                                ref={index === 0 ? firstMessageRef : null}
-                                className={`w-fit max-w-[80%] rounded-3xl px-4 py-1.5 font-light ${
+                                data-message-id={message.id}
+                                ref={messageIndex === 0 ? firstMessageRef : null}
+                                className={`w-fit max-w-[80%] rounded-3xl px-4 py-1.5 font-light [word-break:break-word] ${
                                     message.sender_id === currentUser?.id
                                         ? 'bg-milk-tea text-white'
                                         : 'bg-lightGray text-black dark:bg-[#313233] dark:text-dark'
                                 }`}
-                                key={index}
                             >
                                 <span className="max-w-fit break-words">{message.content}</span>
                             </p>
@@ -152,46 +140,25 @@ const MessageItem = ({
                         return
                     }
 
-                    if (status.receiver.last_read_message_id === message.id) {
-                        if (status.receiver_id !== currentUser?.id && messages[0].sender_id === currentUser?.id) {
-                            return (
-                                <div key={index}>
-                                    <Tippy
-                                        content={`${status.receiver.full_name} đã xem lúc ${handleFormatTime(status.read_at)}`}
-                                    >
-                                        <span>
-                                            <UserAvatar
-                                                src={status.receiver.avatar}
-                                                size={14}
-                                                className="my-1 mr-[1px]"
-                                            />
-                                        </span>
-                                    </Tippy>
-                                </div>
-                            )
-                        } else if (
-                            status.receiver_id === currentUser?.id &&
-                            messages[0].sender_id !== currentUser?.id
-                        ) {
-                            return (
-                                <div key={index}>
-                                    <Tippy
-                                        content={`${message.sender.full_name} đã xem lúc ${handleFormatTime(status.read_at)}`}
-                                    >
-                                        <span>
-                                            <UserAvatar
-                                                src={message.sender.avatar}
-                                                size={14}
-                                                className="my-1 mr-[1px]"
-                                            />
-                                        </span>
-                                    </Tippy>
-                                </div>
-                            )
-                        }
+                    if (status.receiver.last_read_message_id === message.id && status.receiver_id !== currentUser?.id) {
+                        return (
+                            <React.Fragment key={index}>
+                                <Tippy
+                                    content={`${status.receiver.full_name} đã xem lúc ${handleFormatTime(status.read_at)}`}
+                                >
+                                    <span>
+                                        <UserAvatar src={status.receiver.avatar} size={14} className="my-1 ml-1" />
+                                    </span>
+                                </Tippy>
+                            </React.Fragment>
+                        )
                     }
                 })}
             </div>
+
+            <p className={`mb-2 text-center text-xs text-gray-400 ${Number(diffTime) < 10 ? 'hidden' : 'block'}`}>
+                {handleFormatTimeBetweenTwoMessage(message.created_at)}
+            </p>
         </div>
     )
 }

@@ -1,5 +1,5 @@
 import { useParams } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import useSWR from 'swr'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -101,6 +101,8 @@ const Message: React.FC = () => {
                 return message
             })
 
+            console.log(newMessages)
+
             mutateMessages({
                 data: newMessages,
                 meta: messages?.meta,
@@ -138,13 +140,14 @@ const Message: React.FC = () => {
                     scrollableTarget="message-scrollable"
                 >
                     {messages?.data.map((message, index) => (
-                        <MessageItem
-                            key={index}
-                            message={message}
-                            index={index}
-                            messages={messages?.data}
-                            currentUser={currentUser?.data}
-                        />
+                        <React.Fragment key={index}>
+                            <MessageItem
+                                message={message}
+                                messageIndex={index}
+                                messages={messages?.data}
+                                currentUser={currentUser?.data}
+                            />
+                        </React.Fragment>
                     ))}
                 </InfiniteScroll>
             </div>
