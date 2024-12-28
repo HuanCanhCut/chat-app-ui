@@ -31,10 +31,11 @@ const MessageItem = ({
     const isFirstMessageVisible: boolean = useVisible(options, firstMessageRef)
 
     useEffect(() => {
-        if (isFirstMessageVisible && currentUser?.id !== message.sender_id) {
-            // If you haven't seen it, then emit. If you have seen it, then forget it.
+        if (isFirstMessageVisible) {
+            // If haven't seen it, then emit
             if (message.id === messages[0].id) {
                 for (const status of messages[0].message_status) {
+                    // If have seen it, then skip it.
                     if (status.receiver_id === currentUser?.id && status.receiver.last_read_message_id === message.id) {
                         return
                     }
