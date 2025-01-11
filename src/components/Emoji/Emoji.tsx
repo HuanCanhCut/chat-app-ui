@@ -5,9 +5,10 @@ import { Theme } from 'emoji-picker-react'
 import HeadlessTippy from '@tippyjs/react/headless'
 
 import Picker from '~/helpers/picker'
-import useThemeStore from '~/zustand/useThemeStore'
 
 import './Emoji.css'
+import { getCurrentTheme } from '~/redux/selector'
+import { useAppSelector } from '~/redux'
 
 interface EmojiProps {
     children: React.ReactElement
@@ -34,7 +35,7 @@ const Emoji: React.FC<EmojiProps> = ({
     onEmojiClick,
     placeholder = 'Tìm kiếm biểu tượng cảm xúc',
 }) => {
-    const { theme } = useThemeStore()
+    const theme = useAppSelector(getCurrentTheme)
 
     const category = [
         {

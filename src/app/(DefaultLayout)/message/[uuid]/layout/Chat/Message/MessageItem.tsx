@@ -13,6 +13,8 @@ import { ChatEvent } from '~/enum/socket/chat'
 import { useParams } from 'next/navigation'
 import { sendEvent } from '~/helpers/events'
 
+const BETWEEN_TIME_MESSAGE = 7 // minute
+
 const MessageItem = ({
     message,
     messageIndex,
@@ -60,16 +62,12 @@ const MessageItem = ({
         )
 
     const handleFormatTimeBetweenTwoMessage = (time: Date) => {
-        const isSameDay =
-            messageIndex > 0 &&
-            moment(new Date(message.created_at)).isSame(moment(new Date(messages[messageIndex - 1].created_at)), 'day')
-
-        const isSameWeek =
-            messageIndex > 0 &&
-            moment(new Date(message.created_at)).isSame(moment(new Date(messages[messageIndex - 1].created_at)), 'week')
+        const isSameDay = moment(new Date(time)).isSame(moment(new Date()), 'day')
+        const isSameWeek = moment(new Date(time)).isSame(moment(new Date()), 'week')
 
         if (isSameDay) return moment(new Date(time)).locale('vi').format('HH:mm')
         if (isSameWeek) return moment(new Date(time)).locale('vi').format('HH:mm ddd')
+
         return moment(new Date(time)).locale('vi').format('DD [Tháng] MM, YYYY')
     }
 
@@ -157,8 +155,11 @@ const MessageItem = ({
                 })}
             </div>
 
-            <p className={`mb-2 text-center text-xs text-gray-400 ${Number(diffTime) < 10 ? 'hidden' : 'block'}`}>
-                {handleFormatTimeBetweenTwoMessage(message.created_at)}
+            {/* Show time between two message if the time is greater than 7 minutes */}
+            <p
+                className={`mb-2 text-center text-xs text-gray-400 ${Number(diffTime) < BETWEEN_TIME_MESSAGE ? 'hidden' : 'block'}`}
+            >
+                {messageIndex > 0 && handleFormatTimeBetweenTwoMessage(messages[messageIndex - 1].created_at)}
             </p>
         </div>
     )

@@ -13,7 +13,8 @@ import { toast } from '~/utils/toast'
 import UserAvatar from '~/components/UserAvatar/UserAvatar'
 import handleApiError from '~/helpers/handleApiError'
 import SWRKey from '~/enum/SWRKey'
-import getCurrentUser from '~/zustand/getCurrentUser'
+import { useAppSelector } from '~/redux'
+import { getCurrentUser } from '~/redux/selector'
 
 interface IFile extends File {
     preview: string
@@ -31,7 +32,7 @@ interface EditProfileProps {
 const defaultCoverPhoto = '/static/media/login-form.jpg'
 
 const EditProfile = ({ closeModal }: EditProfileProps) => {
-    const { currentUser } = getCurrentUser()
+    const currentUser = useAppSelector(getCurrentUser)
 
     const { handleSubmit, control } = useForm<FieldValue>()
 

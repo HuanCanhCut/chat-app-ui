@@ -6,7 +6,8 @@ import useSWR from 'swr'
 import SWRKey from '~/enum/SWRKey'
 import * as conversationService from '~/services/conversationService'
 import ConversationItem from './ConversationItem'
-import useThemeStore from '~/zustand/useThemeStore'
+import { useAppSelector } from '~/redux'
+import { getCurrentTheme } from '~/redux/selector'
 import Image from 'next/image'
 import Skeleton from 'react-loading-skeleton'
 import socket from '~/helpers/socket'
@@ -15,7 +16,7 @@ import { SocketMessage } from '~/type/type'
 import { listenEvent } from '~/helpers/events'
 
 const Conversations = () => {
-    const { theme } = useThemeStore()
+    const theme = useAppSelector(getCurrentTheme)
 
     const {
         data: conversations,

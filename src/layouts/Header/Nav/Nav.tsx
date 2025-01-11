@@ -5,11 +5,12 @@ import { usePathname } from 'next/navigation'
 import { HomeIcon, UserGroupIcon } from '~/components/Icons'
 import config from '~/config'
 import NavLink from '~/components/NavLink'
-import getCurrentUser from '~/zustand/getCurrentUser'
+import { getCurrentUser } from '~/redux/selector'
+import { useAppSelector } from '~/redux'
+
 const NavBar = () => {
     const pathname = usePathname()
-
-    const { currentUser } = getCurrentUser()
+    const currentUser = useAppSelector(getCurrentUser)
 
     const NAV_ITEMS = useMemo(() => {
         return [

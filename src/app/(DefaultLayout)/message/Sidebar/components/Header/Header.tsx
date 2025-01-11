@@ -7,12 +7,13 @@ import Tippy from '@tippyjs/react'
 import { useRouter } from 'next/navigation'
 
 import UserAvatar from '~/components/UserAvatar/UserAvatar'
-import getCurrentUser from '~/zustand/getCurrentUser'
+import { useAppSelector } from '~/redux'
+import { getCurrentUser } from '~/redux/selector'
 
 const Header: React.FC = () => {
-    const { currentUser } = getCurrentUser()
-
     const router = useRouter()
+
+    const currentUser = useAppSelector(getCurrentUser)
 
     const handleNavigateToProfile = useCallback(() => {
         router.push(`/user/@${currentUser?.data?.nickname}`)

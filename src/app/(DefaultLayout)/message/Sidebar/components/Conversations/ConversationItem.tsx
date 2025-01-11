@@ -3,7 +3,8 @@ import { useParams } from 'next/navigation'
 import UserAvatar from '~/components/UserAvatar'
 import { ConversationModel } from '~/type/type'
 import { momentTimezone } from '~/utils/moment'
-import getCurrentUser from '~/zustand/getCurrentUser'
+import { useAppSelector } from '~/redux'
+import { getCurrentUser } from '~/redux/selector'
 
 interface Props {
     conversation: ConversationModel
@@ -11,7 +12,7 @@ interface Props {
 }
 
 const ConversationItem: React.FC<Props> = ({ conversation, className = '' }) => {
-    const { currentUser } = getCurrentUser()
+    const currentUser = useAppSelector(getCurrentUser)
 
     const { uuid } = useParams()
 
@@ -42,7 +43,7 @@ const ConversationItem: React.FC<Props> = ({ conversation, className = '' }) => 
                 <div className="ml-3 overflow-hidden">
                     <p className="truncate font-medium">{conversation.name || userMember?.full_name}</p>
                     <div
-                        className={`flex items-center text-xs font-normal ${isRead ? 'text-gray-600 dark:text-gray-400' : 'text-gray-800 dark:text-gray-200'} `}
+                        className={`flex items-center text-xs font-normal ${isRead ? 'text-gray-600 dark:text-gray-400' : 'font-medium text-black dark:text-gray-200'} `}
                     >
                         <span className="truncate pr-1">
                             {currentUser?.data.id === conversation.last_message?.sender_id

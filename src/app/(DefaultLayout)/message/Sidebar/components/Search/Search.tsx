@@ -7,7 +7,8 @@ import Tippy from '@tippyjs/react/headless'
 import * as friendService from '~/services/friendService'
 import SWRKey from '~/enum/SWRKey'
 import { FriendsResponse, UserModel } from '~/type/type'
-import getCurrentUser from '~/zustand/getCurrentUser'
+import { useAppSelector } from '~/redux'
+import { getCurrentUser } from '~/redux/selector'
 import useDebounce from '~/hooks/useDebounce'
 import UserAvatar from '~/components/UserAvatar'
 
@@ -17,7 +18,7 @@ interface Props {
 }
 
 const Search: React.FC<Props> = ({ setSearchMode, searchMode }) => {
-    const { currentUser } = getCurrentUser()
+    const currentUser = useAppSelector(getCurrentUser)
 
     const [searchResult, setSearchResult] = useState<UserModel[]>([])
     const [searchValue, setSearchValue] = useState('')

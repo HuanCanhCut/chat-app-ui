@@ -2,11 +2,12 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import useThemeStore from '~/zustand/useThemeStore'
 import config from '~/config'
+import { useAppSelector } from '~/redux'
+import { getCurrentTheme } from '~/redux/selector'
 
 export default function Logo({ className = '' }: { className?: string }) {
-    const { theme } = useThemeStore()
+    const theme = useAppSelector(getCurrentTheme)
 
     return (
         <>

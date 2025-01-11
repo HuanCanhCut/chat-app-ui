@@ -10,13 +10,14 @@ import { ChatEvent } from '~/enum/socket/chat'
 import SWRKey from '~/enum/SWRKey'
 import { sendEvent } from '~/helpers/events'
 import socket from '~/helpers/socket'
-import getCurrentUser from '~/zustand/getCurrentUser'
 import { MessageModel, MessageResponse, SocketMessage } from '~/type/type'
 import MessageItem from './MessageItem'
+import { useAppSelector } from '~/redux'
+import { getCurrentUser } from '~/redux/selector'
 
 const Message: React.FC = () => {
     const { uuid } = useParams()
-    const { currentUser } = getCurrentUser()
+    const currentUser = useAppSelector(getCurrentUser)
 
     const [page, setPage] = useState(1)
 
@@ -100,8 +101,6 @@ const Message: React.FC = () => {
 
                 return message
             })
-
-            console.log(newMessages)
 
             mutateMessages({
                 data: newMessages,

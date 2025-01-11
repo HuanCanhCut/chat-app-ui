@@ -5,7 +5,8 @@ import UserAvatar from '~/components/UserAvatar'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronLeft, faCircleInfo } from '@fortawesome/free-solid-svg-icons'
 import { ConversationModel } from '~/type/type'
-import getCurrentUser from '~/zustand/getCurrentUser'
+import { useAppSelector } from '~/redux'
+import { getCurrentUser } from '~/redux/selector'
 
 interface HeaderProps {
     className?: string
@@ -14,7 +15,7 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ className = '', toggleInfo, conversation }) => {
-    const { currentUser } = getCurrentUser()
+    const currentUser = useAppSelector(getCurrentUser)
     const router = useRouter()
 
     const handleNavigate = () => {

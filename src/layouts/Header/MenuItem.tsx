@@ -3,8 +3,10 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import SwitchButton from '~/components/SwitchButton/SwitchButton'
 import { useState } from 'react'
 import Button from '~/components/Button/Button'
-import useThemeStore from '~/zustand/useThemeStore'
+
 import { MenuItemType } from './Interaction/Interaction'
+import { actions, useAppDispatch, useAppSelector } from '~/redux'
+import { getCurrentTheme } from '~/redux/selector'
 
 interface MenuItemProps {
     item: MenuItemType
@@ -12,12 +14,14 @@ interface MenuItemProps {
 }
 
 export default function MenuItem({ item, onChoose }: MenuItemProps) {
-    const { theme, setTheme } = useThemeStore()
+    const theme = useAppSelector(getCurrentTheme)
+    const dispatch = useAppDispatch()
+
     const [isOn, setIsOn] = useState(theme === 'dark')
 
     const handleSwitch = () => {
         setIsOn(!isOn)
-        setTheme(isOn ? 'light' : 'dark')
+        dispatch(actions.setTheme(isOn ? 'light' : 'dark'))
         document.documentElement.classList.toggle('dark')
     }
 

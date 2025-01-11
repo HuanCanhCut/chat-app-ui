@@ -13,12 +13,13 @@ import FriendList from './components/FriendList'
 import NotFound from '~/app/not-found'
 import { listenEvent } from '~/helpers/events'
 import SWRKey from '~/enum/SWRKey'
-import getCurrentUser from '~/zustand/getCurrentUser'
+import { useAppSelector } from '~/redux'
+import { getCurrentUser } from '~/redux/selector'
 
 export default function UserPage() {
     const { nickname } = useParams()
 
-    const { currentUser } = getCurrentUser()
+    const currentUser = useAppSelector(getCurrentUser)
 
     const {
         data: user,

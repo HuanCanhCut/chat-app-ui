@@ -16,7 +16,8 @@ import PopperWrapper from '~/components/PopperWrapper'
 import { sendEvent } from '~/helpers/events'
 import AccountItem from '~/components/AccountItem'
 import MenuItem from '../MenuItem'
-import getCurrentUser from '~/zustand/getCurrentUser'
+import { getCurrentUser } from '~/redux/selector'
+import { useAppSelector } from '~/redux'
 
 export interface MenuItemType {
     type: 'theme' | 'status' | 'logout'
@@ -48,7 +49,7 @@ const MENU_ITEMS: MenuItemType[] = [
 
 const Interaction = () => {
     const router = useRouter()
-    const { currentUser } = getCurrentUser()
+    const currentUser = useAppSelector(getCurrentUser)
 
     const handleChoose = (type: MenuItemType['type']) => {
         switch (type) {
