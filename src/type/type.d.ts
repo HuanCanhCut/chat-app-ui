@@ -20,6 +20,7 @@ export interface UserModel<K = any, V = any> extends Timestamp {
     sent_friend_request: boolean
     conversation: ConversationModel
     is_online: boolean
+    last_online_at: Date
     [key: K]: V
 }
 

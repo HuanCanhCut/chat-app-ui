@@ -1,9 +1,7 @@
 'use client'
 
-import Sound from '~/components/GlobalWrapper/Sound'
 import { SWRConfig } from 'swr'
 import { ToastContainer } from 'react-toastify'
-import Socket from './Socket'
 
 const GlobalSWRConfig = ({ children }: { children: React.ReactNode }) => {
     return (
@@ -15,9 +13,7 @@ const GlobalSWRConfig = ({ children }: { children: React.ReactNode }) => {
                 shouldRetryOnError: false,
             }}
         >
-            <Socket>
-                <Sound>{children}</Sound>
-            </Socket>
+            {children}
             <ToastContainer />
         </SWRConfig>
     )

@@ -94,10 +94,7 @@ export default function User({ currentUser, user }: UserProps) {
                 <h1 className="m-0 mt-2 line-clamp-2 overflow-hidden text-ellipsis font-semibold">
                     {currentUser.data.id === user.data.id ? currentUser.data.full_name : user.data.full_name || 'ㅤ'}
                 </h1>
-                <p className="text-base text-gray-700 dark:text-gray-400">
-                    {currentUser.data.id === user.data.id ? currentUser.data.friends_count : user?.data.friends_count}{' '}
-                    người bạn
-                </p>
+                <p className="text-base text-gray-700 dark:text-gray-400">{user?.data.friends_count} người bạn</p>
                 <div className="hidden sm:flex">
                     {friends?.data?.map((friend: FriendsShip, index) => {
                         // 7 là số lượng bạn bè tối đa hiển thị

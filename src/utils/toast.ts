@@ -1,5 +1,4 @@
 import { Bounce, toast as toastify } from 'react-toastify'
-import 'react-toastify/dist/ReactToastify.css'
 
 export const toast = (
     message: string,

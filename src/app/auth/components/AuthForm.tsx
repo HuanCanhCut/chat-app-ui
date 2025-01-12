@@ -1,5 +1,5 @@
 'use client'
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import { useForm, SubmitHandler } from 'react-hook-form'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -38,6 +38,12 @@ const AuthForm = () => {
     const { handleSubmit, control, setValue } = useForm<FieldValue>()
 
     const [errorMessage, setErrorMessage] = useState<string>('')
+
+    useEffect(() => {
+        if (emailRef.current) {
+            emailRef.current.focus()
+        }
+    }, [])
 
     const onSubmit: SubmitHandler<FieldValue> = (data) => {
         const handleLogin = async () => {
@@ -176,6 +182,7 @@ const AuthForm = () => {
                     }}
                     placeholder="Nhập email của bạn"
                     type="text"
+                    defaultValue="tronghuandev@gmail.com"
                     ref={emailRef}
                 />
 
@@ -221,6 +228,7 @@ const AuthForm = () => {
                         setShowIcon={() => {
                             setShowPassword(!showPassword)
                         }}
+                        defaultValue="huancanhcut"
                     />
                 </div>
 

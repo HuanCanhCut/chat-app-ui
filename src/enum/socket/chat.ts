@@ -3,4 +3,5 @@ export enum ChatEvent {
     NEW_MESSAGE = 'new_message',
     READ_MESSAGE = 'read_message',
     UPDATE_READ_MESSAGE = 'update_read_message',
+    USER_STATUS = 'user_status',
 }

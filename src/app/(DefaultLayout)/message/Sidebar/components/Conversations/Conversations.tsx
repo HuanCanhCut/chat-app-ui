@@ -12,7 +12,7 @@ import Image from 'next/image'
 import Skeleton from 'react-loading-skeleton'
 import socket from '~/helpers/socket'
 import { ChatEvent } from '~/enum/socket/chat'
-import { SocketMessage } from '~/type/type'
+import { ConversationModel, SocketMessage } from '~/type/type'
 import { listenEvent } from '~/helpers/events'
 
 const Conversations = () => {
@@ -60,6 +60,42 @@ const Conversations = () => {
                     revalidate: false,
                 },
             )
+        })
+    }, [conversations, mutateConversations])
+
+    useEffect(() => {
+        type UserStatus = {
+            user_id: number
+            is_online: boolean
+            last_online_at: string | null
+        }
+
+        socket.on(ChatEvent.USER_STATUS, (data: UserStatus) => {
+            for (const key in conversations) {
+                const conversation: ConversationModel = conversations[key]
+
+                if (!conversation.is_group) {
+                    const hasUser = conversation.conversation_members.find((member) => member.user_id === data.user_id)
+
+                    if (hasUser) {
+                        mutateConversations(
+                            {
+                                ...conversations,
+                                [key]: {
+                                    ...conversation,
+                                    conversation_members: conversation.conversation_members.map((member) => {
+                                        if (member.user_id === data.user_id) {
+                                            return { ...member, user: { ...member.user, is_online: data.is_online } }
+                                        }
+                                        return member
+                                    }),
+                                },
+                            },
+                            { revalidate: false },
+                        )
+                    }
+                }
+            }
         })
     }, [conversations, mutateConversations])
 
