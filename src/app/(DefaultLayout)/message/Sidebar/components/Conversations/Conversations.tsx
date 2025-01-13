@@ -11,7 +11,7 @@ import { getCurrentTheme } from '~/redux/selector'
 import Image from 'next/image'
 import Skeleton from 'react-loading-skeleton'
 import socket from '~/helpers/socket'
-import { ChatEvent } from '~/enum/socket/chat'
+import { SocketEvent } from '~/enum/SocketEvent'
 import { ConversationModel, SocketMessage } from '~/type/type'
 import { listenEvent } from '~/helpers/events'
 
@@ -46,7 +46,7 @@ const Conversations = () => {
     }
 
     useEffect(() => {
-        socket.on(ChatEvent.NEW_MESSAGE, (data: SocketMessage) => {
+        socket.on(SocketEvent.NEW_MESSAGE, (data: SocketMessage) => {
             if (conversations?.[data.conversation.uuid]) {
                 delete conversations[data.conversation.uuid]
             }
@@ -70,7 +70,7 @@ const Conversations = () => {
             last_online_at: string | null
         }
 
-        socket.on(ChatEvent.USER_STATUS, (data: UserStatus) => {
+        socket.on(SocketEvent.USER_STATUS, (data: UserStatus) => {
             for (const key in conversations) {
                 const conversation: ConversationModel = conversations[key]
 

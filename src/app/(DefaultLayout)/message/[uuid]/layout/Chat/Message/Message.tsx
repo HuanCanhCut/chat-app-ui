@@ -6,7 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 import * as messageServices from '~/services/message'
 
-import { ChatEvent } from '~/enum/socket/chat'
+import { SocketEvent } from '~/enum/SocketEvent'
 import SWRKey from '~/enum/SWRKey'
 import { sendEvent } from '~/helpers/events'
 import socket from '~/helpers/socket'
@@ -27,7 +27,7 @@ const Message: React.FC = () => {
 
     // Join room when component mount
     useEffect(() => {
-        socket.emit(ChatEvent.JOIN_ROOM, uuid)
+        socket.emit(SocketEvent.JOIN_ROOM, uuid)
     }, [uuid])
 
     const handleEnterMessage = (e: React.KeyboardEvent<HTMLDivElement>) => {
@@ -69,7 +69,7 @@ const Message: React.FC = () => {
 
     // Listen new message event
     useEffect(() => {
-        socket.on(ChatEvent.NEW_MESSAGE, (data: SocketMessage) => {
+        socket.on(SocketEvent.NEW_MESSAGE, (data: SocketMessage) => {
             if (data.conversation.uuid === uuid) {
                 if (!messages?.data) {
                     return
@@ -89,7 +89,7 @@ const Message: React.FC = () => {
     }, [messages, mutateMessages, uuid])
 
     useEffect(() => {
-        socket.on(ChatEvent.UPDATE_READ_MESSAGE, (data: MessageModel) => {
+        socket.on(SocketEvent.UPDATE_READ_MESSAGE, (data: MessageModel) => {
             if (!messages?.data) {
                 return
             }
@@ -109,7 +109,7 @@ const Message: React.FC = () => {
         })
 
         return () => {
-            socket.off(ChatEvent.UPDATE_READ_MESSAGE)
+            socket.off(SocketEvent.UPDATE_READ_MESSAGE)
         }
     }, [messages, mutateMessages])
 

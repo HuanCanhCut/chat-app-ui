@@ -12,7 +12,7 @@ import { SendIcon } from '~/components/Icons/Icons'
 import NotificationItem from './NotificationItem'
 import { listenEvent } from '~/helpers/events'
 import socket from '~/helpers/socket'
-import { NotificationEvent } from '~/enum/socket/notification'
+import { SocketEvent } from '~/enum/SocketEvent'
 import Skeleton from 'react-loading-skeleton'
 import SWRKey from '~/enum/SWRKey'
 
@@ -102,7 +102,7 @@ const Notification = () => {
 
     // Listen event new notification
     useEffect(() => {
-        socket.on(NotificationEvent.NEW_NOTIFICATION, (newNotification: { notification: NotificationData }) => {
+        socket.on(SocketEvent.NEW_NOTIFICATION, (newNotification: { notification: NotificationData }) => {
             if (!notifications) {
                 return
             }
@@ -132,7 +132,7 @@ const Notification = () => {
     // Listen event when remove a notification
 
     useEffect(() => {
-        socket.on(NotificationEvent.REMOVE_NOTIFICATION, ({ notificationId }: { notificationId: number }) => {
+        socket.on(SocketEvent.REMOVE_NOTIFICATION, ({ notificationId }: { notificationId: number }) => {
             if (!notifications) {
                 return
             }
@@ -160,7 +160,7 @@ const Notification = () => {
         })
 
         return () => {
-            socket.off(NotificationEvent.REMOVE_NOTIFICATION)
+            socket.off(SocketEvent.REMOVE_NOTIFICATION)
         }
     }, [mutateNotifications, notifications])
 

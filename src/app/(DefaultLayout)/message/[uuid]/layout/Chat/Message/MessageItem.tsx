@@ -9,7 +9,7 @@ import { MessageModel, MessageStatus, UserModel } from '~/type/type'
 import UserAvatar from '~/components/UserAvatar'
 import useVisible from '~/hooks/useVisible'
 import socket from '~/helpers/socket'
-import { ChatEvent } from '~/enum/socket/chat'
+import { SocketEvent } from '~/enum/SocketEvent'
 import { useParams } from 'next/navigation'
 import { sendEvent } from '~/helpers/events'
 
@@ -44,7 +44,7 @@ const MessageItem = ({
                 }
             }
 
-            socket.emit(ChatEvent.READ_MESSAGE, {
+            socket.emit(SocketEvent.READ_MESSAGE, {
                 conversationUuid: uuid as string,
                 messageId: message.id,
             })

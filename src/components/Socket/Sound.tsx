@@ -2,8 +2,7 @@
 
 import { useEffect, useRef } from 'react'
 import socket from '~/helpers/socket'
-import { NotificationEvent } from '~/enum/socket/notification'
-import { ChatEvent } from '~/enum/socket/chat'
+import { SocketEvent } from '~/enum/SocketEvent'
 import { getCurrentUser } from '~/redux/selector'
 import { useAppSelector } from '~/redux'
 import { SocketMessage } from '~/type/type'
@@ -14,7 +13,7 @@ const Sound = ({ children }: { children: React.ReactNode }) => {
     const audioRef = useRef<HTMLAudioElement>(null)
 
     useEffect(() => {
-        socket.on(NotificationEvent.NEW_NOTIFICATION, async () => {
+        socket.on(SocketEvent.NEW_NOTIFICATION, async () => {
             try {
                 if (!audioRef.current) return
                 audioRef.current.src = '/static/audio/notify.mp3'
@@ -23,14 +22,14 @@ const Sound = ({ children }: { children: React.ReactNode }) => {
         })
 
         return () => {
-            socket.off(NotificationEvent.NEW_NOTIFICATION)
+            socket.off(SocketEvent.NEW_NOTIFICATION)
         }
     }, [])
 
     // listen new message event
     useEffect(() => {
         if (!currentUser) return
-        socket.on(ChatEvent.NEW_MESSAGE, async (data: SocketMessage) => {
+        socket.on(SocketEvent.NEW_MESSAGE, async (data: SocketMessage) => {
             try {
                 if (!audioRef.current) return
 

@@ -8,7 +8,7 @@ import { SendHorizontalIcon } from '~/components/Icons'
 import { listenEvent } from '~/helpers/events'
 import { useParams } from 'next/navigation'
 import socket from '~/helpers/socket'
-import { ChatEvent } from '~/enum/socket/chat'
+import { SocketEvent } from '~/enum/SocketEvent'
 import { EmojiClickData } from 'emoji-picker-react'
 import Tippy from '@tippyjs/react'
 
@@ -32,7 +32,7 @@ const EnterMessage: React.FC<EnterMessageProps> = ({ className = '' }) => {
         if (!uuid) return
         if (!messageValue.trim().length) return
 
-        socket.emit(ChatEvent.NEW_MESSAGE, { conversationUuid, message: messageValue })
+        socket.emit(SocketEvent.NEW_MESSAGE, { conversationUuid, message: messageValue })
 
         setMessageValue('')
     }
