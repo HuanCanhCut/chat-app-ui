@@ -7,7 +7,10 @@ import { faChevronLeft, faCircleInfo } from '@fortawesome/free-solid-svg-icons'
 import { ConversationModel } from '~/type/type'
 import { useAppSelector } from '~/redux'
 import { getCurrentUser } from '~/redux/selector'
-import { momentTimezone } from '~/utils/moment'
+import { useEffect, useState } from 'react'
+import socket from '~/helpers/socket'
+import { SocketEvent } from '~/enum/SocketEvent'
+import moment from 'moment-timezone'
 
 interface HeaderProps {
     className?: string
@@ -30,6 +33,26 @@ const Header: React.FC<HeaderProps> = ({ className = '', toggleInfo, conversatio
     const conversationMember = conversation?.conversation_members.find(
         (member) => member.user_id !== currentUser?.data.id,
     )?.user
+
+    const dateDiff = (date: Date) => {
+        return moment.tz(new Date(Date.now()).toISOString(), 'Asia/Ho_Chi_Minh').diff(date, 'minutes')
+    }
+
+    const [lastOnlineTime, setLastOnlineTime] = useState<number | null>(null)
+
+    useEffect(() => {
+        if (conversationMember) {
+            setLastOnlineTime(dateDiff(conversationMember?.last_online_at))
+        }
+    }, [conversationMember])
+
+    useEffect(() => {
+        socket.on(SocketEvent.USER_OFFLINE_TIMER, (data) => {
+            if (data.user_id === conversationMember?.id) {
+                setLastOnlineTime(dateDiff(data.last_online_at))
+            }
+        })
+    }, [conversationMember?.id])
 
     return (
         <div
@@ -68,8 +91,7 @@ const Header: React.FC<HeaderProps> = ({ className = '', toggleInfo, conversatio
                             <span className="text-xs font-normal text-gray-700 dark:text-gray-400">
                                 {conversationMember?.is_online
                                     ? 'Đang hoạt động'
-                                    : conversationMember?.last_online_at &&
-                                      `Hoạt động ${momentTimezone(conversationMember.last_online_at)} trước`}
+                                    : lastOnlineTime && `Hoạt động ${lastOnlineTime} phút trước`}
                             </span>
                         )}
                     </div>

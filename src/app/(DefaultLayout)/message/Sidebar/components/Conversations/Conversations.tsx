@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import useSWR from 'swr'
 
 import SWRKey from '~/enum/SWRKey'
@@ -12,8 +12,14 @@ import Image from 'next/image'
 import Skeleton from 'react-loading-skeleton'
 import socket from '~/helpers/socket'
 import { SocketEvent } from '~/enum/SocketEvent'
-import { ConversationModel, SocketMessage } from '~/type/type'
+import { ConversationMember, ConversationModel, SocketMessage } from '~/type/type'
 import { listenEvent } from '~/helpers/events'
+
+type UserStatus = {
+    user_id: number
+    is_online: boolean
+    last_online_at: string | null
+}
 
 const Conversations = () => {
     const theme = useAppSelector(getCurrentTheme)
@@ -30,6 +36,8 @@ const Conversations = () => {
         }, {})
         return groupConversationsByUuid
     })
+
+    const [conversationUserMap, setConversationUserMap] = useState<Record<string, string>>({})
 
     const Loading = () => {
         return (
@@ -64,40 +72,75 @@ const Conversations = () => {
     }, [conversations, mutateConversations])
 
     useEffect(() => {
-        type UserStatus = {
-            user_id: number
-            is_online: boolean
-            last_online_at: string | null
-        }
-
         socket.on(SocketEvent.USER_STATUS, (data: UserStatus) => {
-            for (const key in conversations) {
-                const conversation: ConversationModel = conversations[key]
+            if (conversationUserMap[data.user_id]) {
+                if (!conversations) {
+                    return
+                }
 
-                if (!conversation.is_group) {
-                    const hasUser = conversation.conversation_members.find((member) => member.user_id === data.user_id)
+                // if conversation has been deleted
+                if (!conversations[conversationUserMap[data.user_id]]) {
+                    return
+                }
 
-                    if (hasUser) {
-                        mutateConversations(
-                            {
-                                ...conversations,
-                                [key]: {
-                                    ...conversation,
-                                    conversation_members: conversation.conversation_members.map((member) => {
-                                        if (member.user_id === data.user_id) {
-                                            return { ...member, user: { ...member.user, is_online: data.is_online } }
-                                        }
-                                        return member
-                                    }),
-                                },
-                            },
-                            { revalidate: false },
+                mutateConversations(
+                    {
+                        ...conversations,
+                        [conversationUserMap[data.user_id]]: {
+                            ...conversations[conversationUserMap[data.user_id]],
+                            conversation_members: conversations[
+                                conversationUserMap[data.user_id]
+                            ].conversation_members.map((member: ConversationMember) => {
+                                if (member.user_id === data.user_id) {
+                                    return { ...member, user: { ...member.user, is_online: data.is_online } }
+                                }
+                                return member
+                            }),
+                        },
+                    },
+                    {
+                        revalidate: false,
+                    },
+                )
+            } else {
+                for (const key in conversations) {
+                    const conversation: ConversationModel = conversations[key]
+
+                    if (!conversation.is_group) {
+                        const hasUser = conversation.conversation_members.find(
+                            (member) => member.user_id === data.user_id,
                         )
+
+                        if (hasUser) {
+                            mutateConversations(
+                                {
+                                    ...conversations,
+                                    [key]: {
+                                        ...conversation,
+                                        conversation_members: conversation.conversation_members.map((member) => {
+                                            if (member.user_id === data.user_id) {
+                                                return {
+                                                    ...member,
+                                                    user: { ...member.user, is_online: data.is_online },
+                                                }
+                                            }
+                                            return member
+                                        }),
+                                    },
+                                },
+                                { revalidate: false },
+                            )
+
+                            setConversationUserMap((prev) => ({
+                                ...prev,
+                                [data.user_id]: key,
+                            }))
+                        }
                     }
                 }
             }
         })
-    }, [conversations, mutateConversations])
+    }, [conversationUserMap, conversations, mutateConversations])
 
     // update last message is read
     useEffect(() => {
@@ -112,7 +155,6 @@ const Conversations = () => {
                             is_read: true,
                         },
                     }
-                    mutateConversations({ ...conversations, [conversationUuid]: newData }, { revalidate: false })
 
                     mutateConversations({ ...conversations, [conversationUuid]: newData }, { revalidate: false })
                 }

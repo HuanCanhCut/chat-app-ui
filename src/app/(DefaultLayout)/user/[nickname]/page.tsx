@@ -15,6 +15,8 @@ import { listenEvent } from '~/helpers/events'
 import SWRKey from '~/enum/SWRKey'
 import { useAppSelector } from '~/redux'
 import { getCurrentUser } from '~/redux/selector'
+import socket from '~/helpers/socket'
+import { SocketEvent } from '~/enum/SocketEvent'
 
 export default function UserPage() {
     const { nickname } = useParams()
@@ -34,6 +36,24 @@ export default function UserPage() {
             revalidateOnMount: true,
         },
     )
+
+    useEffect(() => {
+        socket.on(SocketEvent.USER_STATUS, (data) => {
+            if (!user) {
+                return
+            }
+
+            if (data.user_id === user.data.id) {
+                mutate({
+                    ...user,
+                    data: {
+                        ...user.data,
+                        is_online: data.is_online,
+                    },
+                })
+            }
+        })
+    }, [mutate, user])
 
     useEffect(() => {
         const remove = listenEvent({

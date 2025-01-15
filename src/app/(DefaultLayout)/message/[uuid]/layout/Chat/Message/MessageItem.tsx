@@ -61,22 +61,13 @@ const MessageItem = ({
                 .diff(moment.tz(messages[messageIndex - 1].created_at, 'UTC'), 'minutes'),
         )
 
-    const handleFormatTimeBetweenTwoMessage = (time: Date) => {
-        const isSameDay = moment(new Date(time)).isSame(moment(new Date()), 'day')
-        const isSameWeek = moment(new Date(time)).isSame(moment(new Date()), 'week')
-
-        if (isSameDay) return moment(new Date(time)).locale('vi').format('HH:mm')
-        if (isSameWeek) return moment(new Date(time)).locale('vi').format('HH:mm ddd')
-
-        return moment(new Date(time)).locale('vi').format('DD [Tháng] MM, YYYY')
-    }
-
     const handleFormatTime = (time: Date) => {
         const isSameDay = moment(new Date(time)).isSame(moment(new Date()), 'day')
         const isSameWeek = moment(new Date(time)).isSame(moment(new Date()), 'week')
 
         if (isSameDay) return moment(new Date(time)).locale('vi').format('HH:mm')
         if (isSameWeek) return moment(new Date(time)).locale('vi').format('HH:mm ddd')
+
         return moment(new Date(time)).locale('vi').format('DD [Tháng] MM, YYYY')
     }
 
@@ -159,7 +150,7 @@ const MessageItem = ({
             <p
                 className={`mb-2 text-center text-xs text-gray-400 ${Number(diffTime) < BETWEEN_TIME_MESSAGE ? 'hidden' : 'block'}`}
             >
-                {messageIndex > 0 && handleFormatTimeBetweenTwoMessage(messages[messageIndex - 1].created_at)}
+                {messageIndex > 0 && handleFormatTime(messages[messageIndex - 1].created_at)}
             </p>
         </div>
     )
