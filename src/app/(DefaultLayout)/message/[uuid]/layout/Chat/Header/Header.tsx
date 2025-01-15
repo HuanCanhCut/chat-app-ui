@@ -35,10 +35,19 @@ const Header: React.FC<HeaderProps> = ({ className = '', toggleInfo, conversatio
     )?.user
 
     const dateDiff = (date: Date) => {
+        console.log('Header', date)
         return moment.tz(new Date(Date.now()).toISOString(), 'Asia/Ho_Chi_Minh').diff(date, 'minutes')
     }
 
     const [lastOnlineTime, setLastOnlineTime] = useState<number | null>(null)
+
+    const handleFormatTime = (time: number) => {
+        if (time < 60) {
+            return `${time} phút trước`
+        }
+
+        return `${Math.floor(time / 60)} giờ trước`
+    }
 
     useEffect(() => {
         if (conversationMember) {
@@ -56,7 +65,7 @@ const Header: React.FC<HeaderProps> = ({ className = '', toggleInfo, conversatio
 
     return (
         <div
-            className={`${className} flex items-center justify-between px-2 py-1 shadow-sm shadow-gray-200 dark:shadow-neutral-800`}
+            className={`${className} flex items-center justify-between px-2 py-1 shadow-sm shadow-gray-200 dark:[box-shadow:1px_2px_4px_rgba(0,0,0,0.1)]`}
         >
             <div className="flex items-center">
                 <div
@@ -88,10 +97,10 @@ const Header: React.FC<HeaderProps> = ({ className = '', toggleInfo, conversatio
                             {conversation?.is_group ? conversation?.name : conversationMember?.full_name}
                         </h4>
                         {!conversation?.is_group && (
-                            <span className="text-xs font-normal text-gray-700 dark:text-gray-400">
+                            <span className="text-xs font-normal text-zinc-700 dark:text-gray-400">
                                 {conversationMember?.is_online
                                     ? 'Đang hoạt động'
-                                    : lastOnlineTime && `Hoạt động ${lastOnlineTime} phút trước`}
+                                    : lastOnlineTime && `Hoạt động ${handleFormatTime(lastOnlineTime)}`}
                             </span>
                         )}
                     </div>

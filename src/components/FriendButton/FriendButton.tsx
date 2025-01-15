@@ -85,7 +85,7 @@ const FriendButton = ({ user, className = '' }: FriendButtonProps) => {
             >
                 <PopperWrapper className="w-[600px] px-0 pb-4">
                     <>
-                        <header className="relative border-b border-gray-300 py-4 text-center dark:border-gray-700">
+                        <header className="relative border-b border-gray-300 py-4 text-center dark:border-zinc-700">
                             <h2>Hủy kết bạn với {user.full_name}</h2>
                             <Button
                                 buttonType="icon"
@@ -96,7 +96,7 @@ const FriendButton = ({ user, className = '' }: FriendButtonProps) => {
                             </Button>
                         </header>
                         <main className="px-4">
-                            <p className="mt-2 text-sm text-gray-700 dark:text-gray-300">
+                            <p className="mt-2 text-sm text-zinc-700 dark:text-zinc-300">
                                 Bạn có chắc chắn muốn hủy kết bạn với {user.full_name} không?
                             </p>
                             <div className="mt-8 flex justify-end gap-2">

@@ -182,7 +182,6 @@ const AuthForm = () => {
                     }}
                     placeholder="Nhập email của bạn"
                     type="text"
-                    defaultValue="tronghuandev@gmail.com"
                     ref={emailRef}
                 />
 
@@ -228,7 +227,6 @@ const AuthForm = () => {
                         setShowIcon={() => {
                             setShowPassword(!showPassword)
                         }}
-                        defaultValue="huancanhcut"
                     />
                 </div>
 

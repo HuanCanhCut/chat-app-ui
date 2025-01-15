@@ -23,15 +23,18 @@ const config: Config = {
                 primary: '#0866ff',
                 error: '#ff453a',
                 dark: '#18191a',
-                darkGray: '#242526',
+                darkGray: '#252728',
+            },
+            borderColor: {
+                dark: '#212223',
             },
             outline: {
                 none: 'none',
             },
             backgroundColor: {
-                dark: '#18191a',
+                dark: '#212223',
                 lightGray: '#f0f2f5',
-                darkGray: '#242526',
+                darkGray: '#252728',
                 'milk-tea': '#ab885d',
             },
             textColor: {

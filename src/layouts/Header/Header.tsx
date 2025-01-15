@@ -15,7 +15,7 @@ export default function Header() {
     const [isOpen, setIsOpen] = useState(false) // Search Modal
 
     const headerStyle: string =
-        'fixed left-0 right-0 top-0 z-20 w-full justify-between bg-white px-3 shadow-sm shadow-[#0000001f] dark:bg-darkGray dark:text-dark dark:shadow-[#ffffff1f]'
+        'fixed left-0 right-0 top-0 z-20 w-full border-b dark:border-zinc-700 justify-between bg-white px-3 dark:bg-dark dark:text-dark'
 
     const closeModal = useCallback(() => {
         setIsOpen(false)

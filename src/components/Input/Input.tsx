@@ -15,7 +15,7 @@ interface Props {
     defaultValue?: string
 }
 
-const IconClasses = 'absolute right-3 top-1/2 translate-y-[-50%] leading-none text-gray-700'
+const IconClasses = 'absolute right-3 top-1/2 translate-y-[-50%] leading-none text-zinc-700'
 
 // eslint-disable-next-line react/display-name
 const Input = forwardRef<HTMLInputElement, Props>(
@@ -46,7 +46,7 @@ const Input = forwardRef<HTMLInputElement, Props>(
                         <>
                             <div className="relative">
                                 <input
-                                    className={`w-full rounded-lg border border-gray-300 bg-gray-100 p-2 outline-none dark:border-gray-700 dark:bg-darkGray`}
+                                    className={`w-full rounded-lg border border-gray-300 bg-gray-100 p-2 outline-none dark:border-zinc-700 dark:bg-darkGray`}
                                     placeholder={placeholder}
                                     {...field}
                                     type={type}

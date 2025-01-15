@@ -85,20 +85,20 @@ export default function User({ currentUser, user }: UserProps) {
             >
                 <EditProfile closeModal={closeModal} />
             </ReactModal>
-            <div className="absolute top-[-100px] w-[130px] rounded-full border-4 border-white dark:border-[#242526] sm:top-[-30px] sm:w-[168px]">
+            <div className="absolute top-[-100px] w-[130px] rounded-full border-4 border-white dark:border-dark sm:top-[-30px] sm:w-[168px]">
                 <UserAvatar
                     src={currentUser.data.id === user.data.id ? currentUser.data.avatar : user.data.avatar}
                     size={168}
                 />
                 {user.data.is_online && (
-                    <div className="absolute bottom-0 right-0 rounded-full border-4 border-white bg-green-500 p-3 dark:border-[#242526] sm:bottom-2 sm:right-1"></div>
+                    <div className="absolute bottom-0 right-0 rounded-full border-4 border-white bg-green-500 p-3 dark:border-dark sm:bottom-2 sm:right-1"></div>
                 )}
             </div>
             <div className="mt-4 flex flex-col gap-2 overflow-hidden pr-4 sm:ml-[180px] sm:mt-0 sm:flex-1">
                 <h1 className="m-0 mt-2 line-clamp-2 overflow-hidden text-ellipsis font-semibold">
                     {currentUser.data.id === user.data.id ? currentUser.data.full_name : user.data.full_name || 'ㅤ'}
                 </h1>
-                <p className="text-base text-gray-700 dark:text-gray-400">{user?.data.friends_count} người bạn</p>
+                <p className="text-gr ay-700 text-base dark:text-gray-400">{user?.data.friends_count} người bạn</p>
                 <div className="hidden sm:flex">
                     {friends?.data?.map((friend: FriendsShip, index) => {
                         // 7 là số lượng bạn bè tối đa hiển thị

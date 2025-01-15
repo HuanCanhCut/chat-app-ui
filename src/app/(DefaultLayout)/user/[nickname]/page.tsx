@@ -103,8 +103,8 @@ export default function UserPage() {
     }
 
     return (
-        <div className="min-h-screen pb-4">
-            <header className="bg-gray-100 dark:bg-darkGray">
+        <div className="min-h-screen bg-gray-100 pb-4 dark:bg-[#1c1c1d]">
+            <header className="bg-white [box-shadow:1px_2px_4px_rgba(0,0,0,0.1)] dark:bg-dark">
                 {user && currentUser ? (
                     <div className="w-1100px mx-auto max-w-[1100px]">
                         <CustomImage
@@ -119,7 +119,7 @@ export default function UserPage() {
                             style={{ width: '100%', height: 'auto' }}
                         />
                         {user && currentUser && <User currentUser={currentUser} user={user} />}
-                        <div className="mt-0 w-full border-t border-gray-300 py-2 dark:border-gray-700 sm:mt-10">
+                        <div className="mt-0 w-full border-t border-gray-300 py-2 dark:border-zinc-700 sm:mt-10">
                             <button className="px-4 py-2 text-primary">Bạn bè</button>
                         </div>
                     </div>

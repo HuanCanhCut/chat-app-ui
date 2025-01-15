@@ -79,7 +79,7 @@ const FriendList = ({ user }: FriendListProps) => {
     }, [page])
 
     return (
-        <div className="mx-auto mt-4 max-w-[1100px] rounded-md bg-gray-100 p-4 dark:bg-darkGray">
+        <div className="mx-auto mt-4 max-w-[1100px] rounded-md bg-white p-4 [box-shadow:1px_2px_4px_rgba(0,0,0,0.1)] dark:bg-dark">
             <h2>Bạn bè</h2>
             <div className="mt-8 grid grid-cols-1 gap-2 sm:grid-cols-2">
                 {friends?.data?.map((friend: FriendsShip, index: number) => {
@@ -87,7 +87,7 @@ const FriendList = ({ user }: FriendListProps) => {
                         <Link
                             href={`/user/@${friend.user.nickname}`}
                             key={index}
-                            className="flex items-center rounded-md border border-gray-200 px-2 py-4 dark:border-gray-800"
+                            className="flex items-center rounded-md border border-zinc-200 px-2 py-4 dark:border-zinc-800"
                         >
                             <UserAvatar src={friend.user.avatar} className="rounded-lg" size={70} />
                             <div>

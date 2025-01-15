@@ -70,7 +70,7 @@ const Interaction = () => {
                     <h4 className="text-center font-semibold">Tùy chọn</h4>
                 </header>
                 <section>
-                    <div className="border-b border-t border-gray-300 px-5 py-2 dark:border-gray-700">
+                    <div className="border-b border-t border-gray-300 px-5 py-2 dark:border-zinc-700">
                         <label className="font-semibold">Tài khoản</label>
                         <div className="flex max-w-full items-center justify-between overflow-hidden">
                             {currentUser && <AccountItem user={currentUser?.data} className="mt-2" />}

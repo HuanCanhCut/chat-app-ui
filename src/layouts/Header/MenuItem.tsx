@@ -31,7 +31,7 @@ export default function MenuItem({ item, onChoose }: MenuItemProps) {
 
     return (
         <div
-            className={`flex w-full cursor-pointer items-center justify-between gap-2 px-5 py-2 hover:bg-gray-100 dark:hover:bg-[#2d2d2f] ${item.line ? 'border-t border-gray-300 dark:border-gray-700' : ''}`}
+            className={`flex w-full cursor-pointer items-center justify-between gap-2 px-5 py-2 hover:bg-gray-100 dark:hover:bg-[#2d2d2f] ${item.line ? 'border-t border-gray-300 dark:border-zinc-700' : ''}`}
             onClick={handleChoose}
         >
             <div className="flex items-center gap-2">
