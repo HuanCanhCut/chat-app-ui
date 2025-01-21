@@ -35,7 +35,6 @@ const Header: React.FC<HeaderProps> = ({ className = '', toggleInfo, conversatio
     )?.user
 
     const dateDiff = (date: Date) => {
-        console.log('Header', date)
         return moment.tz(new Date(Date.now()).toISOString(), 'Asia/Ho_Chi_Minh').diff(date, 'minutes')
     }
 
@@ -50,8 +49,8 @@ const Header: React.FC<HeaderProps> = ({ className = '', toggleInfo, conversatio
     }
 
     useEffect(() => {
-        if (conversationMember) {
-            setLastOnlineTime(dateDiff(conversationMember?.last_online_at))
+        if (conversationMember && conversationMember.last_online_at) {
+            setLastOnlineTime(dateDiff(conversationMember.last_online_at))
         }
     }, [conversationMember])
 

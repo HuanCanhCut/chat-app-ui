@@ -18,6 +18,7 @@ const NoChatSelected = () => {
                     alt="no-chat-selected"
                     width={200}
                     height={200}
+                    priority
                 />
                 <h2>Chưa có đoạn chat nào được chọn</h2>
             </div>

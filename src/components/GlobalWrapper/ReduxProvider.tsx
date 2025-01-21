@@ -7,8 +7,10 @@ import useSWR from 'swr'
 import SWRKey from '~/enum/SWRKey'
 import * as meServices from '~/services/meService'
 import { actions } from '~/redux'
+import { useRouter } from 'next/navigation'
 
 export default function ReduxProvider({ children }: { children: React.ReactNode }) {
+    const router = useRouter()
     const storeRef = useRef<AppStore>()
 
     const { data: currentUser } = useSWR(SWRKey.GET_CURRENT_USER, () => {
@@ -30,8 +32,14 @@ export default function ReduxProvider({ children }: { children: React.ReactNode 
 
         document.documentElement.classList.toggle('dark', currentTheme === 'dark')
 
+        if (!currentUser) {
+            storeRef.current.dispatch(actions.setCurrentUser(null))
+            router.push('/auth')
+            return
+        }
+
         storeRef.current.dispatch(actions.setCurrentUser(currentUser))
-    }, [currentUser])
+    }, [currentUser, router])
 
     return <Provider store={storeRef.current}>{children}</Provider>
 }

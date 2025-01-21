@@ -33,7 +33,7 @@ const NavBar = () => {
         <nav className="relative flex h-full items-center">
             {NAV_ITEMS.map((item, index) => {
                 return (
-                    <Tippy content={item.tooltip} key={index}>
+                    <Tippy content={item.tooltip} key={index} delay={[250, 0]}>
                         <div
                             className={`aspect-[16/9] h-full border-b-2 ${pathname === item.href ? 'border-b-2 border-primary' : 'border-transparent'}`}
                         >
