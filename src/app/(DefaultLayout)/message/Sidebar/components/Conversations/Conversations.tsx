@@ -55,19 +55,39 @@ const Conversations = () => {
 
     useEffect(() => {
         socket.on(SocketEvent.NEW_MESSAGE, (data: SocketMessage) => {
+            let conversationData
+
             if (conversations?.[data.conversation.uuid]) {
+                conversationData = conversations[data.conversation.uuid]
                 delete conversations[data.conversation.uuid]
             }
 
-            mutateConversations(
-                {
-                    [data.conversation.uuid]: data.conversation,
-                    ...conversations,
+            if (!conversationData) {
+                return
+            }
+
+            const conversationMutate = {
+                [data.conversation.uuid]: {
+                    ...conversationData,
+                    conversation_members: conversationData.conversation_members.map(
+                        (member: ConversationMember, index: number) => {
+                            return {
+                                ...member,
+                                user: {
+                                    ...member.user,
+                                    is_online: conversationData.conversation_members[index].user.is_online,
+                                    last_online_at: conversationData.conversation_members[index].user.last_online_at,
+                                },
+                            }
+                        },
+                    ),
                 },
-                {
-                    revalidate: false,
-                },
-            )
+                ...conversations,
+            }
+
+            mutateConversations(conversationMutate, {
+                revalidate: false,
+            })
         })
     }, [conversations, mutateConversations])
 
@@ -121,7 +141,10 @@ const Conversations = () => {
                                             if (member.user_id === data.user_id) {
                                                 return {
                                                     ...member,
-                                                    user: { ...member.user, is_online: data.is_online },
+                                                    user: {
+                                                        ...member.user,
+                                                        is_online: data.is_online,
+                                                    },
                                                 }
                                             }
                                             return member

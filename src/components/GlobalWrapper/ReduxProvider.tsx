@@ -14,7 +14,13 @@ export default function ReduxProvider({ children }: { children: React.ReactNode 
     const storeRef = useRef<AppStore>()
 
     const { data: currentUser } = useSWR(SWRKey.GET_CURRENT_USER, () => {
-        return meServices.getCurrentUser()
+        const currentUser = meServices.getCurrentUser()
+
+        if (!currentUser) {
+            router.push('/auth')
+            return null
+        }
+        return currentUser
     })
 
     if (!storeRef.current) {
@@ -31,12 +37,6 @@ export default function ReduxProvider({ children }: { children: React.ReactNode 
         storeRef.current.dispatch(actions.setTheme(currentTheme))
 
         document.documentElement.classList.toggle('dark', currentTheme === 'dark')
-
-        if (!currentUser) {
-            storeRef.current.dispatch(actions.setCurrentUser(null))
-            router.push('/auth')
-            return
-        }
 
         storeRef.current.dispatch(actions.setCurrentUser(currentUser))
     }, [currentUser, router])
