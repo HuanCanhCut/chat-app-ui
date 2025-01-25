@@ -15,6 +15,7 @@ import CustomTippy from '../CustomTippy/CustomTippy'
 import PopperWrapper from '../PopperWrapper/PopperWrapper'
 import ConfirmModel from '../ConfirmModal'
 import { momentTimezone } from '~/utils/moment'
+import config from '~/config'
 
 const NotificationItem = ({
     notification,
@@ -146,7 +147,7 @@ const NotificationItem = ({
                     </div>
                 </CustomTippy>
                 <Link
-                    href={`/user/@${notification.sender_user.nickname}`}
+                    href={`${config.routes.user}/@${notification.sender_user.nickname}`}
                     className={`mt-4 flex gap-3 ${notification.is_read ? 'pr-3' : ''}`}
                     onClick={handleReadNotification}
                 >

@@ -8,6 +8,7 @@ import SWRKey from '~/enum/SWRKey'
 import * as meServices from '~/services/meService'
 import { actions } from '~/redux'
 import { useRouter } from 'next/navigation'
+import config from '~/config'
 
 export default function ReduxProvider({ children }: { children: React.ReactNode }) {
     const router = useRouter()
@@ -17,7 +18,7 @@ export default function ReduxProvider({ children }: { children: React.ReactNode 
         const currentUser = meServices.getCurrentUser()
 
         if (!currentUser) {
-            router.push('/auth')
+            router.push(config.routes.auth)
             return null
         }
         return currentUser

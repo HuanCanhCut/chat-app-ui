@@ -23,7 +23,7 @@ const NavBar = () => {
             {
                 type: 'user',
                 icon: <UserGroupIcon />,
-                href: `/user/@${currentUser?.data?.nickname}`,
+                href: `${config.routes.user}/@${currentUser?.data?.nickname}`,
                 tooltip: 'Tài khoản',
             },
         ]

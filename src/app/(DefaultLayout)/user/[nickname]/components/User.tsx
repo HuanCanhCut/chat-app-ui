@@ -18,6 +18,7 @@ import AccountPreview from '~/components/AccountPreview'
 import { listenEvent } from '~/helpers/events'
 import FriendButton from '~/components/FriendButton'
 import SWRKey from '~/enum/SWRKey'
+import config from '~/config'
 
 interface UserProps {
     currentUser: UserResponse
@@ -117,7 +118,7 @@ export default function User({ currentUser, user }: UserProps) {
                                     timeDelayClose={100}
                                     placement="top"
                                 >
-                                    <Link href={`/user/@${friend.user.nickname}`}>
+                                    <Link href={`${config.routes.user}/@${friend.user.nickname}`}>
                                         <UserAvatar
                                             src={friend.user.avatar}
                                             size={36}

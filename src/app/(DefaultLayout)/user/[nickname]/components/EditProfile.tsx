@@ -15,6 +15,7 @@ import handleApiError from '~/helpers/handleApiError'
 import SWRKey from '~/enum/SWRKey'
 import { useAppSelector } from '~/redux'
 import { getCurrentUser } from '~/redux/selector'
+import config from '~/config'
 
 interface IFile extends File {
     preview: string
@@ -123,7 +124,7 @@ const EditProfile = ({ closeModal }: EditProfileProps) => {
             mutate(SWRKey.GET_CURRENT_USER)
 
             // replace state to update url without reloading page
-            window.history.replaceState({}, '', `/user/@${newData.data.nickname}`)
+            window.history.replaceState({}, '', `${config.routes.user}/@${newData.data.nickname}`)
         } catch (error: any) {
             handleApiError(error)
         }

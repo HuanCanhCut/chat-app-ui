@@ -9,6 +9,7 @@ import { useRouter } from 'next/navigation'
 import UserAvatar from '~/components/UserAvatar/UserAvatar'
 import { useAppSelector } from '~/redux'
 import { getCurrentUser } from '~/redux/selector'
+import config from '~/config'
 
 const Header: React.FC = () => {
     const router = useRouter()
@@ -16,7 +17,7 @@ const Header: React.FC = () => {
     const currentUser = useAppSelector(getCurrentUser)
 
     const handleNavigateToProfile = useCallback(() => {
-        router.push(`/user/@${currentUser?.data?.nickname}`)
+        router.push(`${config.routes.user}/@${currentUser?.data?.nickname}`)
     }, [currentUser?.data?.nickname, router])
 
     return (

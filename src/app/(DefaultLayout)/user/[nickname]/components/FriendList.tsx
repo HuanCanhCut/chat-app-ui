@@ -6,6 +6,7 @@ import UserAvatar from '~/components/UserAvatar/UserAvatar'
 import { FriendsResponse, FriendsShip, UserResponse } from '~/type/type'
 import Link from 'next/link'
 import SWRKey from '~/enum/SWRKey'
+import config from '~/config'
 
 interface FriendListProps {
     user: UserResponse
@@ -85,7 +86,7 @@ const FriendList = ({ user }: FriendListProps) => {
                 {friends?.data?.map((friend: FriendsShip, index: number) => {
                     return (
                         <Link
-                            href={`/user/@${friend.user.nickname}`}
+                            href={`${config.routes.user}/@${friend.user.nickname}`}
                             key={index}
                             className="flex items-center rounded-md border border-zinc-200 px-2 py-4 dark:border-zinc-800"
                         >

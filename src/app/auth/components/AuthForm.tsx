@@ -81,7 +81,7 @@ const AuthForm = () => {
                     password: data.password,
                 })
 
-                window.location.href = `/user/@${response.data.nickname}`
+                window.location.href = `${config.routes.user}/@${response.data.nickname}`
             } catch (error: any) {
                 if (error?.response?.data?.message) {
                     setErrorMessage(error.response.data.message)

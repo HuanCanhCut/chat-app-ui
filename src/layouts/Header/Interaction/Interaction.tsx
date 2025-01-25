@@ -77,7 +77,7 @@ const Interaction = () => {
                             <Button
                                 buttonType="icon"
                                 className="flex-shrink-0"
-                                href={`/user/@${currentUser?.data?.nickname}`}
+                                href={`${config.routes.user}/@${currentUser?.data?.nickname}`}
                             >
                                 <FontAwesomeIcon icon={faPen} className="text-sm" />
                             </Button>

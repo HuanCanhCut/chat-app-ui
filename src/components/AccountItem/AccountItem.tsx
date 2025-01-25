@@ -2,6 +2,7 @@ import { memo } from 'react'
 import { UserModel } from '~/type/type'
 import UserAvatar from '~/components/UserAvatar/UserAvatar'
 import Link from 'next/link'
+import config from '~/config'
 
 interface AccountItemProps {
     className?: string
@@ -13,7 +14,7 @@ const AccountItem: React.FC<AccountItemProps> = ({ className = '', user, onClick
     return (
         <Link
             className={`flex items-center ${className} max-w-full overflow-hidden`}
-            href={`/user/@${user.nickname}`}
+            href={`${config.routes.user}/@${user.nickname}`}
             onClick={() => onClick(user)}
         >
             <UserAvatar size={50} src={user.avatar} />

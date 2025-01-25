@@ -4,7 +4,7 @@ interface Routes<T> {
 
 export const routes: Routes<string> = {
     home: '/',
-    user: '/user/',
+    user: '/user',
     auth: '/auth',
     message: '/message',
 }

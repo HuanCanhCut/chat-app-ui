@@ -11,6 +11,7 @@ import { useEffect, useState } from 'react'
 import socket from '~/helpers/socket'
 import { SocketEvent } from '~/enum/SocketEvent'
 import moment from 'moment-timezone'
+import config from '~/config'
 
 interface HeaderProps {
     className?: string
@@ -26,7 +27,7 @@ const Header: React.FC<HeaderProps> = ({ className = '', toggleInfo, conversatio
         if (!conversation?.is_group) {
             const member = conversation?.conversation_members.find((member) => member.user_id !== currentUser?.data.id)
 
-            router.push(`/user/@${member?.user.nickname}`)
+            router.push(`${config.routes.user}/@${member?.user.nickname}`)
         }
     }
 
