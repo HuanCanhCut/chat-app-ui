@@ -100,13 +100,9 @@ const MessageItem = ({
                                 <p
                                     data-message-id={message.id}
                                     ref={messageIndex === 0 ? firstMessageRef : null}
-                                    className={`w-fit max-w-[80%] rounded-3xl px-4 py-1.5 font-light [word-break:break-word] ${
-                                        message.sender_id === currentUser?.id
-                                            ? 'bg-milk-tea text-white'
-                                            : 'bg-lightGray text-black dark:bg-[#313233] dark:text-dark'
-                                    }`}
+                                    className={`w-fit max-w-[80%] rounded-3xl font-light [word-break:break-word]`}
                                 >
-                                    <span className="max-w-fit break-words">{message.content}</span>
+                                    <span className="max-w-fit break-words text-3xl">{message.content}</span>
                                 </p>
                             ) : (
                                 <p
@@ -123,7 +119,7 @@ const MessageItem = ({
                             )
                         ) : message.type === 'image' ? (
                             <div
-                                className={`flex w-full ${JSON.parse(message.content).length > 1 ? 'max-w-[50%]' : 'max-w-[35%]'} flex-wrap gap-2 [word-break:break-word]`}
+                                className={`flex w-full ${JSON.parse(message.content).length > 1 ? 'max-w-[60%] sm:max-w-[55%] md:max-w-[50%] lg:max-w-[45%] xl:max-w-[40%]' : 'max-w-[60%] sm:max-w-[40%] md:max-w-[35%] lg:max-w-[30%] xl:max-w-[25%]'} flex-wrap gap-1 overflow-hidden rounded-3xl [word-break:break-word]`}
                             >
                                 {JSON.parse(message.content).map((url: string, index: number) => (
                                     <div className="flex-1" key={index}>
@@ -132,7 +128,7 @@ const MessageItem = ({
                                             alt="message"
                                             width={10000} // Avoid image breakage
                                             height={10000} // Avoid image breakage
-                                            className="h-full w-full min-w-[160px] cursor-pointer rounded-3xl object-cover"
+                                            className={`sm:min-w-[150px] ${JSON.parse(message.content).length === 1 && 'min-w-[240px]'} h-full w-full min-w-[180px] cursor-pointer rounded-md object-cover`}
                                             priority
                                             quality={100}
                                         />
@@ -148,6 +144,10 @@ const MessageItem = ({
                 {message.message_status.map((status: MessageStatus, index: number) => {
                     // Only show 6 users who have read the message
                     if (index > 6) {
+                        return
+                    }
+
+                    if (status.receiver.last_read_message_id !== message.id && status.status !== 'sending') {
                         return
                     }
 
@@ -168,6 +168,7 @@ const MessageItem = ({
                             </React.Fragment>
                         )
                     }
+
                     if (status.receiver_id !== currentUser?.id) {
                         const statusMessages = {
                             sent: 'Đã gửi',
@@ -190,7 +191,7 @@ const MessageItem = ({
 
             {/* Show time between two message if the time is greater than 7 minutes */}
             <p
-                className={`mb-2 text-center text-xs text-gray-400 ${Number(diffTime) < BETWEEN_TIME_MESSAGE ? 'hidden' : 'block'}`}
+                className={`my-3 text-center text-xs text-gray-400 ${Number(diffTime) < BETWEEN_TIME_MESSAGE ? 'hidden' : 'block'}`}
             >
                 {messageIndex > 0 && handleFormatTime(messages[messageIndex - 1].created_at)}
             </p>

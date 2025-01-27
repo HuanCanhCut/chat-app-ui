@@ -277,7 +277,7 @@ const InputMessage: React.FC<InputMessageProps> = () => {
                         </div>
                     )}
                     <textarea
-                        className={`max-h-[140px] min-h-[36px] w-full resize-none rounded-2xl bg-lightGray px-4 py-1 pr-12 pt-[6px] outline-none dark:bg-[#333334] ${images.length && 'rounded-t-none'}`}
+                        className={`max-h-[140px] min-h-[36px] w-full resize-none rounded-3xl bg-lightGray px-4 py-1 pr-12 pt-[6px] outline-none dark:bg-[#333334] ${images.length && 'rounded-t-none'}`}
                         value={messageValue}
                         autoFocus
                         onChange={handleInputChange}
