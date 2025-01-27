@@ -7,12 +7,17 @@ import { EmojiClickData } from 'emoji-picker-react'
 import Tippy from '@tippyjs/react'
 import { useParams } from 'next/navigation'
 
+import * as conversationServices from '~/services/conversationService'
 import { SendHorizontalIcon } from '~/components/Icons'
-import { listenEvent } from '~/helpers/events'
+import { listenEvent, sendEvent } from '~/helpers/events'
 import socket from '~/helpers/socket'
 import { SocketEvent } from '~/enum/SocketEvent'
 import { faFolderPlus, faXmark } from '@fortawesome/free-solid-svg-icons'
 import Image from 'next/image'
+import { useAppSelector } from '~/redux'
+import { getCurrentUser } from '~/redux/selector'
+import useSWR from 'swr'
+import SWRKey from '~/enum/SWRKey'
 
 interface InputMessageProps {
     className?: string
@@ -24,6 +29,12 @@ interface IFile extends File {
 
 const InputMessage: React.FC<InputMessageProps> = () => {
     const { uuid } = useParams()
+
+    const currentUser = useAppSelector(getCurrentUser)
+
+    const { data: conversation } = useSWR(uuid ? [SWRKey.GET_CONVERSATION_BY_UUID, uuid] : null, () => {
+        return conversationServices.getConversationByUuid({ uuid: uuid as string })
+    })
 
     const inputRef = useRef<HTMLInputElement>(null)
     const textareaRef = useRef<HTMLTextAreaElement>(null)
@@ -39,10 +50,42 @@ const InputMessage: React.FC<InputMessageProps> = () => {
     }
 
     const handleEmitMessage = async (conversationUuid: string) => {
+        const messageDetails = (type: string, content: string) => {
+            return {
+                conversationUuid,
+                message: {
+                    content: content,
+                    sender_id: currentUser.data.id,
+                    type,
+                    is_preview: true,
+                    created_at: new Date().toISOString(),
+                    updated_at: new Date().toISOString(),
+                    sender: currentUser.data,
+                    message_status: conversation?.data.conversation_members.map((conversation) => {
+                        return {
+                            receiver_id: conversation.user_id,
+                            status: 'sending',
+                            is_revoked: false,
+                            revoked_type: null,
+                            read_at: null,
+                            created_at: new Date().toISOString(),
+                            updated_at: new Date().toISOString(),
+                            receiver: conversation.user,
+                        }
+                    }),
+                },
+            }
+        }
+
         if (!uuid) return
 
         if (messageValue.trim().length) {
             socket.emit(SocketEvent.NEW_MESSAGE, { conversationUuid, message: messageValue })
+
+            sendEvent({
+                eventName: 'message:emit-message',
+                detail: messageDetails('text', messageValue),
+            })
         }
 
         if (images.length) {
@@ -73,14 +116,19 @@ const InputMessage: React.FC<InputMessageProps> = () => {
                 socket.emit(SocketEvent.NEW_MESSAGE, { conversationUuid, message: payload })
             }
 
-            // revoke object url of image
-            if (images.length) {
-                images.forEach((file) => {
-                    file.preview && URL.revokeObjectURL(file.preview)
-                })
-            }
-
             setImages([])
+
+            sendEvent({
+                eventName: 'message:emit-message',
+                detail: messageDetails(
+                    'image',
+                    JSON.stringify(
+                        images.map((image) => {
+                            return image.preview
+                        }),
+                    ),
+                ),
+            })
         }
 
         setMessageValue('')
@@ -102,7 +150,7 @@ const InputMessage: React.FC<InputMessageProps> = () => {
             },
         })
 
-        return () => remove()
+        return remove
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
@@ -177,7 +225,7 @@ const InputMessage: React.FC<InputMessageProps> = () => {
             <div
                 className={`flex cursor-pointer items-center p-2 ${images.length > 0 || textareaRows() > 1 ? 'self-end' : 'self-center'}`}
             >
-                <Tippy content="Đính kèm hình ảnh">
+                <Tippy delay={[200, 0]} content="Đính kèm hình ảnh có kích thước tối đa là 10MB">
                     <div className="flex-center" onClick={handleOpenUploadImage}>
                         <div className="cursor-pointer leading-none">
                             <FontAwesomeIcon icon={faImage} className="text-xl" />

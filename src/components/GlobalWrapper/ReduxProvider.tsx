@@ -21,6 +21,7 @@ export default function ReduxProvider({ children }: { children: React.ReactNode 
             router.push(config.routes.auth)
             return null
         }
+
         return currentUser
     })
 

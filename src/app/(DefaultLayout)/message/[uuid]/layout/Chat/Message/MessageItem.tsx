@@ -12,6 +12,7 @@ import socket from '~/helpers/socket'
 import { SocketEvent } from '~/enum/SocketEvent'
 import { useParams } from 'next/navigation'
 import { sendEvent } from '~/helpers/events'
+import Image from 'next/image'
 
 const BETWEEN_TIME_MESSAGE = 7 // minute
 
@@ -71,7 +72,7 @@ const MessageItem = ({
         return moment(new Date(time)).locale('vi').format('DD [Tháng] MM, YYYY')
     }
 
-    const isOnlyIcon = new RegExp(/^[^\w\s]+$/u).test(message.content.trim())
+    const isOnlyIcon = message.type === 'text' && new RegExp(/^[^\w\s]+$/u).test(message.content.trim())
 
     return (
         <div>
@@ -94,31 +95,51 @@ const MessageItem = ({
                 {message.sender_id !== currentUser?.id && <UserAvatar src={message.sender.avatar} size={28} />}
                 <Tippy content={handleFormatTime(message.created_at)} placement="left">
                     <React.Fragment>
-                        {isOnlyIcon ? (
-                            <p
-                                data-message-id={message.id}
-                                ref={messageIndex === 0 ? firstMessageRef : null}
-                                className={`w-fit max-w-[80%] rounded-3xl px-4 py-1.5 font-light [word-break:break-word] ${
-                                    message.sender_id === currentUser?.id
-                                        ? 'bg-milk-tea text-white'
-                                        : 'bg-lightGray text-black dark:bg-[#313233] dark:text-dark'
-                                }`}
+                        {message.type === 'text' ? (
+                            isOnlyIcon ? (
+                                <p
+                                    data-message-id={message.id}
+                                    ref={messageIndex === 0 ? firstMessageRef : null}
+                                    className={`w-fit max-w-[80%] rounded-3xl px-4 py-1.5 font-light [word-break:break-word] ${
+                                        message.sender_id === currentUser?.id
+                                            ? 'bg-milk-tea text-white'
+                                            : 'bg-lightGray text-black dark:bg-[#313233] dark:text-dark'
+                                    }`}
+                                >
+                                    <span className="max-w-fit break-words">{message.content}</span>
+                                </p>
+                            ) : (
+                                <p
+                                    data-message-id={message.id}
+                                    ref={messageIndex === 0 ? firstMessageRef : null}
+                                    className={`w-fit max-w-[80%] rounded-3xl px-4 py-1.5 font-light [word-break:break-word] ${
+                                        message.sender_id === currentUser?.id
+                                            ? 'bg-milk-tea text-white'
+                                            : 'bg-lightGray text-black dark:bg-[#313233] dark:text-dark'
+                                    }`}
+                                >
+                                    <span className="max-w-fit break-words">{message.content}</span>
+                                </p>
+                            )
+                        ) : message.type === 'image' ? (
+                            <div
+                                className={`flex w-full ${JSON.parse(message.content).length > 1 ? 'max-w-[50%]' : 'max-w-[35%]'} flex-wrap gap-2 [word-break:break-word]`}
                             >
-                                <span className="max-w-fit break-words">{message.content}</span>
-                            </p>
-                        ) : (
-                            <p
-                                data-message-id={message.id}
-                                ref={messageIndex === 0 ? firstMessageRef : null}
-                                className={`w-fit max-w-[80%] rounded-3xl px-4 py-1.5 font-light [word-break:break-word] ${
-                                    message.sender_id === currentUser?.id
-                                        ? 'bg-milk-tea text-white'
-                                        : 'bg-lightGray text-black dark:bg-[#313233] dark:text-dark'
-                                }`}
-                            >
-                                <span className="max-w-fit break-words">{message.content}</span>
-                            </p>
-                        )}
+                                {JSON.parse(message.content).map((url: string, index: number) => (
+                                    <div className="flex-1" key={index}>
+                                        <Image
+                                            src={url}
+                                            alt="message"
+                                            width={10000} // Avoid image breakage
+                                            height={10000} // Avoid image breakage
+                                            className="h-full w-full min-w-[160px] cursor-pointer rounded-3xl object-cover"
+                                            priority
+                                            quality={100}
+                                        />
+                                    </div>
+                                ))}
+                            </div>
+                        ) : null}
                     </React.Fragment>
                 </Tippy>
             </div>
@@ -130,7 +151,11 @@ const MessageItem = ({
                         return
                     }
 
-                    if (status.receiver.last_read_message_id === message.id && status.receiver_id !== currentUser?.id) {
+                    if (
+                        status.receiver.last_read_message_id === message.id &&
+                        status.receiver_id !== currentUser?.id &&
+                        status.status === 'read'
+                    ) {
                         return (
                             <React.Fragment key={index}>
                                 <Tippy
@@ -142,6 +167,23 @@ const MessageItem = ({
                                 </Tippy>
                             </React.Fragment>
                         )
+                    }
+                    if (status.receiver_id !== currentUser?.id) {
+                        const statusMessages = {
+                            sent: 'Đã gửi',
+                            delivered: 'Đã nhận',
+                            sending: 'Đang gửi',
+                        }
+
+                        const message = statusMessages[status.status as keyof typeof statusMessages]
+
+                        if (message) {
+                            return (
+                                <p key={index} className="mt-[2px] text-xs font-light text-zinc-400">
+                                    {message}
+                                </p>
+                            )
+                        }
                     }
                 })}
             </div>

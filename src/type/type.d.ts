@@ -70,6 +70,7 @@ interface MessageModel extends Timestamp {
     sender: UserModel
     message_status: MessageStatus[]
     is_read: boolean
+    type: 'text' | 'image'
 }
 
 interface MessageResponse extends MetaPagination {
@@ -80,7 +81,7 @@ interface MessageStatus extends Timestamp {
     id: number
     message_id: number
     receiver_id: number
-    status: 'sent' | 'delivered' | 'read'
+    status: 'sent' | 'delivered' | 'read' | 'sending'
     receiver: UserModel<'last_read_message_id', number> & { last_read_message_id: number }
     read_at: Date
 }

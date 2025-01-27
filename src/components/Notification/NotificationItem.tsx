@@ -51,7 +51,7 @@ const NotificationItem = ({
             },
         })
 
-        return () => remove()
+        return remove
     }, [isAccept, notification.id])
 
     const handleReadNotification = async () => {

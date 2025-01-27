@@ -8,7 +8,7 @@ import * as messageServices from '~/services/message'
 
 import { SocketEvent } from '~/enum/SocketEvent'
 import SWRKey from '~/enum/SWRKey'
-import { sendEvent } from '~/helpers/events'
+import { listenEvent, sendEvent } from '~/helpers/events'
 import socket from '~/helpers/socket'
 import { MessageModel, MessageResponse, SocketMessage } from '~/type/type'
 import MessageItem from './MessageItem'
@@ -29,6 +29,31 @@ const Message: React.FC = () => {
     useEffect(() => {
         socket.emit(SocketEvent.JOIN_ROOM, uuid)
     }, [uuid])
+
+    useEffect(() => {
+        const remove = listenEvent({
+            eventName: 'message:emit-message',
+            handler: ({ detail }) => {
+                if (detail.conversationUuid === uuid) {
+                    if (!messages?.data) {
+                        return
+                    }
+
+                    mutateMessages(
+                        {
+                            data: [detail.message, ...messages?.data],
+                            meta: messages?.meta,
+                        },
+                        {
+                            revalidate: false,
+                        },
+                    )
+                }
+            },
+        })
+
+        return remove
+    }, [messages?.data, messages?.meta, mutateMessages, uuid])
 
     const handleEnterMessage = (e: React.KeyboardEvent<HTMLDivElement>) => {
         if (e.key === 'Enter') {
@@ -73,6 +98,24 @@ const Message: React.FC = () => {
             if (data.conversation.uuid === uuid) {
                 if (!messages?.data) {
                     return
+                }
+
+                // revoke object url of image
+                for (const message of messages.data) {
+                    if (message.type === 'image') {
+                        JSON.parse(message.content).forEach((url: string) => {
+                            if (url.startsWith('blob:')) {
+                                URL.revokeObjectURL(url)
+                            }
+                        })
+                    }
+                }
+
+                // @ts-ignore
+                const previewMessageIndex = messages.data.findIndex((message) => message.is_preview)
+
+                if (previewMessageIndex !== -1) {
+                    messages.data.splice(previewMessageIndex, 1)
                 }
 
                 mutateMessages(
