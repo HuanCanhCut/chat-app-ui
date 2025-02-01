@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, memo } from 'react'
+import React, { useEffect, useRef, useState, memo, useCallback } from 'react'
 import Image from 'next/image'
 import { faChevronLeft, faChevronRight, faDownload, faXmark } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -20,11 +20,12 @@ interface MessageImagesModelData {
     meta: MetaPagination['meta'] | undefined
 }
 
-const PER_PAGE = 1
+const PER_PAGE = 10
 
 const MessageImagesModel = ({ onClose, imageUrl }: MessageImagesModelProps) => {
     const { uuid } = useParams()
     const scrollableRef = useRef<HTMLDivElement>(null)
+    const imageRefs = useRef<(HTMLImageElement | null)[]>([])
 
     const [currentUrl, setCurrentUrl] = useState(imageUrl)
 
@@ -134,7 +135,83 @@ const MessageImagesModel = ({ onClose, imageUrl }: MessageImagesModelProps) => {
         if (index > middleIndex && page < (images?.meta?.pagination.total_pages || 0)) {
             setPage(page + 1)
         }
+
+        // scroll to the target image
+        const targetImage = imageRefs.current[index]
+
+        if (targetImage) {
+            targetImage.scrollIntoView({ behavior: 'smooth', inline: 'center' })
+        }
     }
+
+    const handlePreviousImage = useCallback(() => {
+        const imageIndex = images?.data?.findIndex((image) => image === currentUrl)
+
+        if (imageIndex === 0 || !imageIndex) return
+
+        const targetImage = imageRefs.current[imageIndex - 1]
+
+        if (targetImage) {
+            targetImage.scrollIntoView({ behavior: 'smooth', inline: 'center' })
+        }
+
+        setCurrentUrl(images?.data?.[imageIndex - 1] || '')
+    }, [currentUrl, images?.data])
+
+    const handleNextImage = useCallback(() => {
+        if (!images?.data) return
+
+        const imageIndex = images?.data?.findIndex((image) => image === currentUrl)
+
+        if (imageIndex === images?.data?.length - 1) {
+            return
+        }
+
+        if (imageIndex === -1) return
+
+        const targetImage = imageRefs.current[imageIndex + 1]
+
+        if (targetImage) {
+            targetImage.scrollIntoView({ behavior: 'smooth', inline: 'center' })
+        }
+
+        setCurrentUrl(images?.data?.[imageIndex + 1] || '')
+    }, [currentUrl, images?.data])
+
+    useEffect(() => {
+        if (imageRefs.current.length === 0) return
+
+        const currentImageIndex = images?.data?.findIndex((image) => image === currentUrl)
+
+        if (currentImageIndex === -1 || currentImageIndex === undefined) return
+
+        const targetImage = imageRefs.current[currentImageIndex]
+
+        if (targetImage) {
+            targetImage.scrollIntoView({ behavior: 'smooth', inline: 'center' })
+        }
+    }, [currentUrl, images?.data])
+
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            switch (e.key) {
+                case 'ArrowLeft':
+                    handlePreviousImage()
+                    break
+                case 'ArrowRight':
+                    handleNextImage()
+                    break
+                default:
+                    break
+            }
+        }
+
+        window.addEventListener('keydown', handleKeyDown)
+
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown)
+        }
+    }, [handleNextImage, handlePreviousImage, onClose])
 
     return (
         <div className="fixed bottom-0 left-0 right-0 top-0 bg-black">
@@ -174,7 +251,10 @@ const MessageImagesModel = ({ onClose, imageUrl }: MessageImagesModelProps) => {
                     </div>
                 </header>
                 <main className="flex w-full flex-1 items-center justify-between overflow-hidden">
-                    <div className="flex-center group h-full cursor-pointer bg-[rgb(0,0,0)] bg-opacity-10 p-4 transition-all duration-200 hover:-translate-x-1">
+                    <div
+                        className="flex-center group h-full cursor-pointer bg-[rgb(0,0,0)] bg-opacity-10 p-4 transition-all duration-200 hover:-translate-x-1"
+                        onClick={handlePreviousImage}
+                    >
                         <button className="flex-center h-10 w-10 rounded-full bg-[#40403f] bg-opacity-70 transition-all duration-200 group-hover:bg-[#595b5b]">
                             <FontAwesomeIcon
                                 icon={faChevronLeft}
@@ -189,10 +269,13 @@ const MessageImagesModel = ({ onClose, imageUrl }: MessageImagesModelProps) => {
                             width={5000}
                             height={5000}
                             quality={100}
-                            className="h-auto max-h-full w-auto max-w-[55%]"
+                            className="h-auto max-h-full w-auto max-w-[55%] select-none"
                         />
                     )}
-                    <div className="flex-center group h-full cursor-pointer bg-[rgb(0,0,0)] bg-opacity-10 p-4 transition-all duration-200 hover:translate-x-1">
+                    <div
+                        className="flex-center group h-full cursor-pointer bg-[rgb(0,0,0)] bg-opacity-10 p-4 transition-all duration-200 hover:translate-x-1"
+                        onClick={handleNextImage}
+                    >
                         <button className="flex-center h-10 w-10 rounded-full bg-[#40403f] bg-opacity-70 transition-all duration-200 group-hover:bg-[#595b5b]">
                             <FontAwesomeIcon
                                 icon={faChevronRight}
@@ -204,7 +287,7 @@ const MessageImagesModel = ({ onClose, imageUrl }: MessageImagesModelProps) => {
                 <footer id="message-images-scrollable" className="flex-center h-16 px-4">
                     <div
                         ref={scrollableRef}
-                        className="flex items-center gap-3 [overflow-x:overlay]"
+                        className="flex items-center gap-3 overflow-x-auto"
                         onScroll={handleScroll}
                     >
                         {images?.data?.map((image, index) => {
@@ -215,9 +298,14 @@ const MessageImagesModel = ({ onClose, imageUrl }: MessageImagesModelProps) => {
                                     width={100}
                                     height={100}
                                     key={index}
-                                    className="mb-1 h-10 w-10 cursor-pointer rounded-md"
+                                    className={`mb-1 h-10 w-10 cursor-pointer select-none rounded-md ${
+                                        currentUrl === image ? 'opacity-100 brightness-100' : 'opacity-80 brightness-50'
+                                    }`}
                                     priority
                                     quality={100}
+                                    ref={(el) => {
+                                        imageRefs.current[index] = el
+                                    }}
                                     onClick={() => handleChooseImage(image, index)}
                                 />
                             )

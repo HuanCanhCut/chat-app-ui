@@ -38,6 +38,7 @@ const MessageItem = ({
     const [openImageModal, setOpenImageModal] = useState({
         isOpen: false,
         image: '',
+        messageId: 0,
     })
 
     useEffect(() => {
@@ -79,7 +80,7 @@ const MessageItem = ({
         return moment(new Date(time)).locale('vi').format('DD [Tháng] MM, YYYY')
     }
 
-    const handleOpenImageModal = (url: string) => {
+    const handleOpenImageModal = (url: string, messageId: number) => {
         if (url.startsWith('blob:http')) {
             return
         }
@@ -87,6 +88,7 @@ const MessageItem = ({
         setOpenImageModal({
             isOpen: true,
             image: url,
+            messageId,
         })
     }
 
@@ -94,6 +96,7 @@ const MessageItem = ({
         setOpenImageModal({
             isOpen: false,
             image: '',
+            messageId: 0,
         })
     }, [])
 
@@ -168,7 +171,7 @@ const MessageItem = ({
                                             className={`sm:min-w-[150px] ${JSON.parse(message.content).length === 1 && 'min-w-[240px]'} h-full w-full min-w-[180px] cursor-pointer rounded-md object-cover`}
                                             priority
                                             quality={100}
-                                            onClick={() => handleOpenImageModal(url)}
+                                            onClick={() => handleOpenImageModal(url, message.id)}
                                         />
                                     </div>
                                 ))}
