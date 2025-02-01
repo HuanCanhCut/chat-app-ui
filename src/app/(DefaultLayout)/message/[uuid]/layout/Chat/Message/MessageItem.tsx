@@ -3,16 +3,18 @@ import { faSmile } from '@fortawesome/free-regular-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Tippy from '@tippyjs/react'
 import moment from 'moment-timezone'
-import React, { useEffect, useRef } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
+import Image from 'next/image'
+import { useParams } from 'next/navigation'
+import ReactModal from 'react-modal'
 
 import { MessageModel, MessageStatus, UserModel } from '~/type/type'
 import UserAvatar from '~/components/UserAvatar'
 import useVisible from '~/hooks/useVisible'
 import socket from '~/helpers/socket'
 import { SocketEvent } from '~/enum/SocketEvent'
-import { useParams } from 'next/navigation'
 import { sendEvent } from '~/helpers/events'
-import Image from 'next/image'
+import MessageImagesModel from './MessageImagesModel'
 
 const BETWEEN_TIME_MESSAGE = 7 // minute
 
@@ -32,6 +34,11 @@ const MessageItem = ({
     const options = { root: null, rootMargin: '0px', threshold: 0.5 }
     const firstMessageRef = useRef<HTMLDivElement>(null)
     const isFirstMessageVisible: boolean = useVisible(options, firstMessageRef)
+
+    const [openImageModal, setOpenImageModal] = useState({
+        isOpen: false,
+        image: '',
+    })
 
     useEffect(() => {
         if (isFirstMessageVisible) {
@@ -72,10 +79,40 @@ const MessageItem = ({
         return moment(new Date(time)).locale('vi').format('DD [Tháng] MM, YYYY')
     }
 
+    const handleOpenImageModal = (url: string) => {
+        if (url.startsWith('blob:http')) {
+            return
+        }
+
+        setOpenImageModal({
+            isOpen: true,
+            image: url,
+        })
+    }
+
+    const handleCloseImageModal = useCallback(() => {
+        setOpenImageModal({
+            isOpen: false,
+            image: '',
+        })
+    }, [])
+
     const isOnlyIcon = message.type === 'text' && new RegExp(/^[^\w\s]+$/u).test(message.content.trim())
 
     return (
         <div>
+            {message.type === 'image' && (
+                <ReactModal
+                    isOpen={openImageModal.isOpen}
+                    ariaHideApp={false}
+                    overlayClassName="overlay"
+                    closeTimeoutMS={200}
+                    onRequestClose={handleCloseImageModal}
+                    className="fixed bottom-0 left-0 right-0 top-0"
+                >
+                    <MessageImagesModel onClose={handleCloseImageModal} imageUrl={openImageModal.image} />
+                </ReactModal>
+            )}
             <div
                 className={`group flex w-full items-center gap-3 ${message.sender_id === currentUser?.id ? 'justify-end' : 'justify-start'}`}
             >
@@ -131,6 +168,7 @@ const MessageItem = ({
                                             className={`sm:min-w-[150px] ${JSON.parse(message.content).length === 1 && 'min-w-[240px]'} h-full w-full min-w-[180px] cursor-pointer rounded-md object-cover`}
                                             priority
                                             quality={100}
+                                            onClick={() => handleOpenImageModal(url)}
                                         />
                                     </div>
                                 ))}

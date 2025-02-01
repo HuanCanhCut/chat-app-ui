@@ -17,9 +17,9 @@ function RootLayout({
     return (
         <html lang="en">
             <body className={`${inter.className} text-black dark:text-dark`}>
-                <ReduxProvider>
-                    <GlobalSWRConfig>{children}</GlobalSWRConfig>
-                </ReduxProvider>
+                <GlobalSWRConfig>
+                    <ReduxProvider>{children}</ReduxProvider>
+                </GlobalSWRConfig>
             </body>
         </html>
     )

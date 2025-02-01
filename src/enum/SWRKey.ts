@@ -44,6 +44,7 @@ enum SWRKey {
      * Message
      */
     GET_MESSAGES = '/messages/:conversationUuid',
+    GET_MESSAGE_IMAGES = '/messages/:conversationUuid/images',
 }
 
 export default SWRKey

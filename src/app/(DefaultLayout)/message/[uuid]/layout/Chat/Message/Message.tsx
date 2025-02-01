@@ -166,9 +166,7 @@ const Message: React.FC = () => {
                     }}
                     className="flex flex-col-reverse gap-[2.5px] px-2 py-3"
                     hasMore={
-                        messages?.meta.pagination.current_page &&
-                        messages?.meta.pagination.total_pages &&
-                        messages?.meta.pagination.current_page < messages?.meta.pagination.total_pages
+                        messages && messages?.meta.pagination.current_page < messages?.meta.pagination.total_pages
                             ? true
                             : false
                     }
