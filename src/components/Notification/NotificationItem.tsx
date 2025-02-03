@@ -4,7 +4,7 @@ import { memo, useEffect, useRef, useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCheck, faEllipsis, faTrash } from '@fortawesome/free-solid-svg-icons'
 
-import * as NotificationServices from '~/services/notification'
+import * as NotificationServices from '~/services/notificationService'
 import Button from '~/components/Button/Button'
 import UserAvatar from '~/components/UserAvatar/UserAvatar'
 import { listenEvent, sendEvent } from '~/helpers/events'

@@ -1,7 +1,6 @@
 'use client'
 
 import { SWRConfig } from 'swr'
-import { ToastContainer } from 'react-toastify'
 
 const GlobalSWRConfig = ({ children }: { children: React.ReactNode }) => {
     return (
@@ -14,7 +13,6 @@ const GlobalSWRConfig = ({ children }: { children: React.ReactNode }) => {
             }}
         >
             {children}
-            <ToastContainer />
         </SWRConfig>
     )
 }

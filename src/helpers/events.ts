@@ -1,4 +1,4 @@
-export const sendEvent = ({ eventName, detail }: { eventName: string; detail?: any }) => {
+export const sendEvent = ({ eventName, detail }: { eventName: string; detail: any }) => {
     document.dispatchEvent(new CustomEvent(eventName, { detail }))
 }
 
@@ -8,7 +8,7 @@ export const listenEvent = ({
     context = document,
 }: {
     eventName: string
-    handler: ({ detail }: { detail?: any }) => void
+    handler: ({ detail }: CustomEvent<any>) => void
     context?: any
 }) => {
     context.addEventListener(eventName, handler)

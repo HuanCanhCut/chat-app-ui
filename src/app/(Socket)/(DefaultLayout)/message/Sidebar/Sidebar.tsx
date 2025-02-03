@@ -1,9 +1,9 @@
 'use client'
 
-import Header from './components/Header'
-import Conversations from './components/Conversations'
+import Header from './Header'
+import Conversations from './Conversations'
 import { useState } from 'react'
-import Search from './components/Search'
+import Search from './Search'
 
 const Sidebar = () => {
     const [searchMode, setSearchMode] = useState(false)

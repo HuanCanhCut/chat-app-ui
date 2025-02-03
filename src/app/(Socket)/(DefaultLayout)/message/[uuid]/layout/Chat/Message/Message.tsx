@@ -4,7 +4,7 @@ import useSWR from 'swr'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSpinner } from '@fortawesome/free-solid-svg-icons'
-import * as messageServices from '~/services/message'
+import * as messageServices from '~/services/messageService'
 
 import { SocketEvent } from '~/enum/SocketEvent'
 import SWRKey from '~/enum/SWRKey'
@@ -21,9 +21,15 @@ const Message: React.FC = () => {
 
     const [page, setPage] = useState(1)
 
-    const { data: messages, mutate: mutateMessages } = useSWR(uuid ? [SWRKey.GET_MESSAGES, uuid] : null, () => {
-        return messageServices.getMessages({ conversationUuid: uuid as string, page: page })
-    })
+    const { data: messages, mutate: mutateMessages } = useSWR(
+        uuid ? [SWRKey.GET_MESSAGES, uuid] : null,
+        () => {
+            return messageServices.getMessages({ conversationUuid: uuid as string, page: page })
+        },
+        {
+            revalidateOnMount: true,
+        },
+    )
 
     // Join room when component mount
     useEffect(() => {

@@ -28,14 +28,20 @@ const Conversations = () => {
         data: conversations,
         isLoading,
         mutate: mutateConversations,
-    } = useSWR(SWRKey.GET_CONVERSATIONS, async () => {
-        const response = await conversationService.getConversations({ page: 1 })
-        const groupConversationsByUuid = response?.data?.reduce<Record<string, any>>((acc, conversation) => {
-            acc[conversation.uuid] = conversation
-            return acc
-        }, {})
-        return groupConversationsByUuid
-    })
+    } = useSWR(
+        SWRKey.GET_CONVERSATIONS,
+        async () => {
+            const response = await conversationService.getConversations({ page: 1 })
+            const groupConversationsByUuid = response?.data?.reduce<Record<string, any>>((acc, conversation) => {
+                acc[conversation.uuid] = conversation
+                return acc
+            }, {})
+            return groupConversationsByUuid
+        },
+        {
+            revalidateOnMount: true,
+        },
+    )
 
     const [conversationUserMap, setConversationUserMap] = useState<Record<string, string>>({})
 
@@ -63,7 +69,7 @@ const Conversations = () => {
             }
 
             if (!conversationData) {
-                return
+                conversationData = data.conversation
             }
 
             const conversationMutate = {
@@ -89,7 +95,8 @@ const Conversations = () => {
                 revalidate: false,
             })
         })
-    }, [conversations, mutateConversations])
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [mutateConversations])
 
     useEffect(() => {
         socket.on(SocketEvent.USER_STATUS, (data: UserStatus) => {

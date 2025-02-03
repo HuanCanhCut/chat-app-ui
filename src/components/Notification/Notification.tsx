@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import useSWR from 'swr'
 
-import * as notificationServices from '~/services/notification'
+import * as notificationServices from '~/services/notificationService'
 import Button from '~/components/Button/Button'
 import CustomTippy from '~/components/CustomTippy/CustomTippy'
 import PopperWrapper from '~/components/PopperWrapper'

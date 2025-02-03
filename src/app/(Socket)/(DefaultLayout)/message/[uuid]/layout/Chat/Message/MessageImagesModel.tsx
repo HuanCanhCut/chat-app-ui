@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Tippy from '@tippyjs/react'
 import useSWR from 'swr'
 
-import * as messageServices from '~/services/message'
+import * as messageServices from '~/services/messageService'
 import SWRKey from '~/enum/SWRKey'
 import { useParams } from 'next/navigation'
 import { MessageModel, MetaPagination } from '~/type/type'
