@@ -20,7 +20,7 @@ interface MessageImagesModelData {
     meta: MetaPagination['meta'] | undefined
 }
 
-const PER_PAGE = 10
+const PER_PAGE = 30
 
 const MessageImagesModel = ({ onClose, imageUrl }: MessageImagesModelProps) => {
     const { uuid } = useParams()

@@ -100,7 +100,9 @@ const MessageItem = ({
         })
     }, [])
 
-    const isOnlyIcon = message.type === 'text' && new RegExp(/^[^\w\s]+$/u).test(message.content.trim())
+    const isOnlyIcon =
+        message.type === 'text' &&
+        new RegExp(/^(\p{Emoji_Presentation}|\p{Emoji}\uFE0F|\p{Emoji_Modifier_Base})+$/u).test(message.content.trim())
 
     return (
         <div>
@@ -159,7 +161,11 @@ const MessageItem = ({
                             )
                         ) : message.type === 'image' ? (
                             <div
-                                className={`flex w-full ${JSON.parse(message.content).length > 1 ? 'max-w-[60%] sm:max-w-[55%] md:max-w-[50%] lg:max-w-[45%] xl:max-w-[40%]' : 'max-w-[60%] sm:max-w-[40%] md:max-w-[35%] lg:max-w-[30%] xl:max-w-[25%]'} flex-wrap gap-1 overflow-hidden rounded-3xl [word-break:break-word]`}
+                                className={`flex w-full ${
+                                    JSON.parse(message.content).length > 1
+                                        ? 'max-w-[60%] sm:max-w-[55%] md:max-w-[50%] lg:max-w-[45%] xl:max-w-[40%]'
+                                        : 'max-w-[60%] sm:max-w-[40%] md:max-w-[35%] lg:max-w-[30%] xl:max-w-[25%]'
+                                } flex-wrap gap-1 overflow-hidden rounded-3xl [word-break:break-word]`}
                             >
                                 {JSON.parse(message.content).map((url: string, index: number) => (
                                     <div className="flex-1" key={index}>
@@ -168,7 +174,7 @@ const MessageItem = ({
                                             alt="message"
                                             width={10000} // Avoid image breakage
                                             height={10000} // Avoid image breakage
-                                            className={`sm:min-w-[150px] ${JSON.parse(message.content).length === 1 && 'min-w-[240px]'} h-full w-full min-w-[180px] cursor-pointer rounded-md object-cover`}
+                                            className={`max-h-[260px] sm:min-w-[150px] ${JSON.parse(message.content).length === 1 && 'min-w-[240px]'} h-full w-full min-w-[180px] cursor-pointer rounded-md object-cover`}
                                             priority
                                             quality={100}
                                             onClick={() => handleOpenImageModal(url, message.id)}

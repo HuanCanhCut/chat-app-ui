@@ -80,7 +80,7 @@ const InputMessage: React.FC<InputMessageProps> = () => {
         if (!uuid) return
 
         if (messageValue.trim().length) {
-            socket.emit(SocketEvent.NEW_MESSAGE, { conversationUuid, message: messageValue })
+            socket.emit(SocketEvent.NEW_MESSAGE, { conversationUuid, message: messageValue, type: 'text' })
 
             sendEvent({
                 eventName: 'message:emit-message',
@@ -89,34 +89,25 @@ const InputMessage: React.FC<InputMessageProps> = () => {
         }
 
         if (images.length) {
-            const readFileAsDataURL = (
-                file: IFile,
-            ): Promise<{ fileName: string; fileType: string; fileData: string | ArrayBuffer | null }> => {
-                return new Promise((resolve, reject) => {
-                    const reader = new FileReader()
+            const uploadToCloudinary = async (file: File, folder: string, publicId: string) => {
+                const UPLOAD_PRESET = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET as string
 
-                    reader.onload = () => {
-                        resolve({
-                            fileName: file.name,
-                            fileType: file.type,
-                            fileData: reader.result, // Đây là base64 string
-                        })
-                    }
+                const formData = new FormData()
+                formData.append('file', file)
+                formData.append('upload_preset', UPLOAD_PRESET)
+                formData.append('folder', folder)
+                formData.append('public_id', publicId)
 
-                    reader.onerror = (error) => reject(error)
+                const response = await fetch(
+                    `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_NAME}/image/upload`,
+                    {
+                        method: 'POST',
+                        body: formData,
+                    },
+                )
 
-                    // Không cần tạo thêm Blob vì FileReader có thể trực tiếp xử lý File
-                    reader.readAsDataURL(file)
-                })
+                return await response.json()
             }
-
-            const payload = await Promise.all(images.map((image) => readFileAsDataURL(image)))
-
-            if (payload.length) {
-                socket.emit(SocketEvent.NEW_MESSAGE, { conversationUuid, message: payload })
-            }
-
-            setImages([])
 
             sendEvent({
                 eventName: 'message:emit-message',
@@ -128,6 +119,24 @@ const InputMessage: React.FC<InputMessageProps> = () => {
                         }),
                     ),
                 ),
+            })
+
+            setImages([])
+
+            const payload = await Promise.all(
+                images.map((image) =>
+                    uploadToCloudinary(
+                        image,
+                        'chat-app/message',
+                        `${uuid}-${image.name}-${Math.random().toString().substring(2, 15)}`,
+                    ),
+                ),
+            )
+
+            socket.emit(SocketEvent.NEW_MESSAGE, {
+                conversationUuid,
+                message: JSON.stringify(payload.map((item) => item.secure_url)),
+                type: 'image',
             })
         }
 

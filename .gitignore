@@ -30,6 +30,9 @@ yarn-error.log*
 .env*.local
 
 .env
+.env.*
+#ignore all env files in the project except .env.example
+!*.env.example
 
 # vercel
 .vercel
