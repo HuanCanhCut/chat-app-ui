@@ -4,31 +4,32 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Tippy from '@tippyjs/react'
 import moment from 'moment-timezone'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import Image from 'next/image'
 import { useParams } from 'next/navigation'
 import ReactModal from 'react-modal'
 
-import { MessageModel, MessageStatus, UserModel } from '~/type/type'
+import CustomImage from '~/components/Image/Image'
+import Emoji from '~/components/Emoji'
+import { MessageModel, MessageResponse, MessageStatus, UserModel } from '~/type/type'
 import UserAvatar from '~/components/UserAvatar'
 import useVisible from '~/hooks/useVisible'
 import socket from '~/helpers/socket'
 import { SocketEvent } from '~/enum/SocketEvent'
 import { sendEvent } from '~/helpers/events'
-import MessageImagesModel from './MessageImagesModel'
+import MessageImagesModel from './Modal/MessageImagesModal'
+import { KeyedMutator } from 'swr'
+import ReactionModal from './Modal/ReactionModal'
 
 const BETWEEN_TIME_MESSAGE = 7 // minute
 
-const MessageItem = ({
-    message,
-    messageIndex,
-    messages,
-    currentUser,
-}: {
+interface MessageItemProps {
     message: MessageModel
     messageIndex: number
-    messages: MessageModel[]
+    messages: MessageResponse
     currentUser: UserModel | undefined
-}) => {
+    mutateMessage: KeyedMutator<MessageResponse | undefined>
+}
+
+const MessageItem = ({ message, messageIndex, messages, currentUser }: MessageItemProps) => {
     const { uuid } = useParams()
 
     const options = { root: null, rootMargin: '0px', threshold: 0.5 }
@@ -40,12 +41,19 @@ const MessageItem = ({
         image: '',
         messageId: 0,
     })
+    const [openReactionModal, setOpenReactionModal] = useState({
+        isOpen: false,
+        messageId: 0,
+    })
+
+    // open emoji-picker reaction
+    const [isOpenReaction, setIsOpenReaction] = useState(false)
 
     useEffect(() => {
         if (isFirstMessageVisible) {
             // If haven't seen it, then emit
-            if (message.id === messages[0].id) {
-                for (const status of messages[0].message_status) {
+            if (message.id === messages.data[0].id) {
+                for (const status of messages.data[0].message_status) {
                     // If have seen it, then skip it.
                     if (status.receiver_id === currentUser?.id && status.receiver.last_read_message_id === message.id) {
                         return
@@ -66,8 +74,8 @@ const MessageItem = ({
         messageIndex > 0 &&
         Math.abs(
             moment
-                .tz(messages[messageIndex].created_at, 'UTC')
-                .diff(moment.tz(messages[messageIndex - 1].created_at, 'UTC'), 'minutes'),
+                .tz(messages.data[messageIndex].created_at, 'UTC')
+                .diff(moment.tz(messages.data[messageIndex - 1].created_at, 'UTC'), 'minutes'),
         )
 
     const handleFormatTime = (time: Date) => {
@@ -104,6 +112,28 @@ const MessageItem = ({
         message.type === 'text' &&
         new RegExp(/^(\p{Emoji_Presentation}|\p{Emoji}\uFE0F|\p{Emoji_Modifier_Base})+$/u).test(message.content.trim())
 
+    const handleOpenReaction = () => {
+        setIsOpenReaction(!isOpenReaction)
+    }
+
+    const handleChooseReaction = () => {
+        setIsOpenReaction(false)
+    }
+
+    const handleCloseReactionModal = useCallback(() => {
+        setOpenReactionModal({
+            isOpen: false,
+            messageId: 0,
+        })
+    }, [])
+
+    const handleOpenReactionModal = (messageId: number) => {
+        setOpenReactionModal({
+            isOpen: true,
+            messageId,
+        })
+    }
+
     return (
         <div>
             {message.type === 'image' && (
@@ -118,21 +148,44 @@ const MessageItem = ({
                     <MessageImagesModel onClose={handleCloseImageModal} imageUrl={openImageModal.image} />
                 </ReactModal>
             )}
+
+            <ReactModal
+                isOpen={openReactionModal.isOpen}
+                ariaHideApp={false}
+                overlayClassName="overlay"
+                closeTimeoutMS={200}
+                onRequestClose={handleCloseReactionModal}
+                className="modal"
+            >
+                <ReactionModal onClose={handleCloseReactionModal} messageId={openReactionModal.messageId} />
+            </ReactModal>
+
             <div
-                className={`group flex w-full items-center gap-3 ${message.sender_id === currentUser?.id ? 'justify-end' : 'justify-start'}`}
+                className={`group relative flex w-full items-center gap-3 ${message?.top_reaction && 'mb-[10px]'} ${message.sender_id === currentUser?.id ? 'justify-end' : 'justify-start'}`}
             >
                 <div
-                    className={`flex items-center gap-2 opacity-0 transition-opacity duration-100 group-hover:opacity-100 ${message.sender_id === currentUser?.id ? 'order-first' : 'order-last'}`}
+                    className={`flex items-center gap-2 ${!isOpenReaction && 'opacity-0'} transition-opacity duration-100 group-hover:opacity-100 ${message.sender_id === currentUser?.id ? 'order-first' : 'order-last flex-row-reverse'}`}
                 >
-                    <button className="flex-center h-6 w-6 rounded-full text-gray-500 hover:bg-gray-200 dark:text-gray-500 dark:hover:bg-gray-800">
+                    <button className="flex-center h-7 w-7 rounded-full text-gray-500 hover:bg-gray-200 dark:text-gray-500 dark:hover:bg-zinc-800">
                         <FontAwesomeIcon icon={faEllipsisVertical} />
                     </button>
-                    <button className="flex-center h-6 w-6 rounded-full text-gray-500 hover:bg-gray-200 dark:text-gray-500 dark:hover:bg-gray-800">
+                    <button className="flex-center h-7 w-7 rounded-full text-gray-500 hover:bg-gray-200 dark:text-gray-500 dark:hover:bg-zinc-800">
                         <FontAwesomeIcon icon={faShare} />
                     </button>
-                    <button className="flex-center h-6 w-6 rounded-full text-gray-500 hover:bg-gray-200 dark:text-gray-500 dark:hover:bg-gray-800">
-                        <FontAwesomeIcon icon={faSmile} />
-                    </button>
+                    <Emoji
+                        isOpen={isOpenReaction}
+                        placement="top-start"
+                        setIsOpen={setIsOpenReaction}
+                        onEmojiClick={handleChooseReaction}
+                        isReaction={true}
+                    >
+                        <button
+                            className="flex-center h-7 w-7 rounded-full text-gray-500 hover:bg-gray-200 dark:text-gray-500 dark:hover:bg-zinc-800"
+                            onClick={handleOpenReaction}
+                        >
+                            <FontAwesomeIcon icon={faSmile} />
+                        </button>
+                    </Emoji>
                 </div>
                 {message.sender_id !== currentUser?.id && <UserAvatar src={message.sender.avatar} size={28} />}
                 <Tippy content={handleFormatTime(message.created_at)} placement="left">
@@ -169,11 +222,9 @@ const MessageItem = ({
                             >
                                 {JSON.parse(message.content).map((url: string, index: number) => (
                                     <div className="flex-1" key={index}>
-                                        <Image
+                                        <CustomImage
                                             src={url}
                                             alt="message"
-                                            width={10000} // Avoid image breakage
-                                            height={10000} // Avoid image breakage
                                             className={`max-h-[260px] sm:min-w-[150px] ${JSON.parse(message.content).length === 1 && 'min-w-[240px]'} h-full w-full min-w-[180px] cursor-pointer rounded-md object-cover`}
                                             priority
                                             quality={100}
@@ -185,9 +236,48 @@ const MessageItem = ({
                         ) : null}
                     </React.Fragment>
                 </Tippy>
+
+                {/* Show reaction */}
+                <Tippy
+                    content={
+                        <div>
+                            {message?.top_reaction?.map((reaction, index) => {
+                                return (
+                                    <p className="font-light leading-5" key={index}>
+                                        {reaction.user_reaction_name}
+                                    </p>
+                                )
+                            })}
+
+                            {message?.total_reactions > 2 && (
+                                <p className="font-light leading-5">và {message?.total_reactions - 2} người khác...</p>
+                            )}
+                        </div>
+                    }
+                >
+                    <div
+                        className="absolute right-1 top-3/4 flex cursor-pointer items-center rounded-full bg-white py-[2px] shadow-sm shadow-zinc-300 dark:bg-zinc-800 dark:shadow-zinc-700"
+                        onClick={() => {
+                            handleOpenReactionModal(message.id)
+                        }}
+                    >
+                        {message?.top_reaction?.map((reaction, index) => {
+                            return (
+                                <span className="text-sm leading-none" key={index}>
+                                    {reaction.react}
+                                </span>
+                            )
+                        })}
+                        {message?.total_reactions !== 0 && (
+                            <span className="mx-1 text-xs leading-none text-gray-500 dark:text-zinc-400">
+                                {message?.total_reactions}
+                            </span>
+                        )}
+                    </div>
+                </Tippy>
             </div>
 
-            <div className="flex justify-end pr-2">
+            <div className={`flex justify-end pr-2`}>
                 {message.message_status.map((status: MessageStatus, index: number) => {
                     // Only show 6 users who have read the message
                     if (index > 6) {
@@ -240,7 +330,7 @@ const MessageItem = ({
             <p
                 className={`my-3 text-center text-xs text-gray-400 ${Number(diffTime) < BETWEEN_TIME_MESSAGE ? 'hidden' : 'block'}`}
             >
-                {messageIndex > 0 && handleFormatTime(messages[messageIndex - 1].created_at)}
+                {messageIndex > 0 && handleFormatTime(messages.data[messageIndex - 1].created_at)}
             </p>
         </div>
     )

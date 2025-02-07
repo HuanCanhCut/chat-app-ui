@@ -29,7 +29,9 @@ const Button = ({
             ? 'border border-gray-300 px-4 py-[6px] rounded-md  dark:hover:bg-[rgba(255,255,255,0.05)] hover:bg-[rgba(0,0,0,0.05)]'
             : ''
     const buttonIconClass =
-        buttonType === 'icon' ? 'h-7 w-7 xxs:h-9  xxs:w-9 flex-center rounded-full bg-lightGray dark:bg-[#313233]' : ''
+        buttonType === 'icon'
+            ? 'h-7 w-7 xxs:h-9  xxs:w-9 flex-center rounded-full bg-lightGray dark:bg-[#313233] hover:bg-[#99999936] dark:hover:bg-[#3e4141]'
+            : ''
     const roundedClass = buttonType === 'rounded' ? 'rounded-md px-4 py-[6px] dark:bg-[#313233] bg-gray-200' : ''
 
     if (href) {

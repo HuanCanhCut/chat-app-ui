@@ -13,11 +13,11 @@ import { listenEvent, sendEvent } from '~/helpers/events'
 import socket from '~/helpers/socket'
 import { SocketEvent } from '~/enum/SocketEvent'
 import { faFolderPlus, faXmark } from '@fortawesome/free-solid-svg-icons'
-import Image from 'next/image'
 import { useAppSelector } from '~/redux'
 import { getCurrentUser } from '~/redux/selector'
 import useSWR from 'swr'
 import SWRKey from '~/enum/SWRKey'
+import CustomImage from '~/components/Image/Image'
 
 interface InputMessageProps {
     className?: string
@@ -261,16 +261,15 @@ const InputMessage: React.FC<InputMessageProps> = () => {
                             {images.map((image, index) => {
                                 return (
                                     <div key={index} className="relative flex-shrink-0">
-                                        <Image
-                                            key={index}
-                                            src={image.preview || ''}
+                                        <CustomImage
+                                            src={image.preview}
                                             alt="image"
                                             width={48}
                                             height={48}
-                                            priority
-                                            style={{ objectFit: 'cover', width: '48px', height: '48px' }}
-                                            quality={100}
                                             className="rounded-lg"
+                                            style={{ objectFit: 'cover', width: '48px', height: '48px' }}
+                                            priority
+                                            quality={100}
                                         />
                                         <button
                                             onClick={() => {

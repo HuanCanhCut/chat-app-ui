@@ -1,19 +1,14 @@
 import Image from 'next/image'
 import { memo, useState } from 'react'
 
-interface Props {
+interface Props extends Omit<React.ComponentPropsWithoutRef<typeof Image>, 'src'> {
     src?: string
     fallback?: string
-    alt?: string
-    width?: number
-    height?: number
-    className?: string
-    style?: React.CSSProperties
 }
 
-const defaultAvatar = '/static/media/default-avatar.jpg'
+const defaultAvatar = '/static/media/fallback_img.jpg'
 
-const CustomImage = ({
+export default memo(function CustomImage({
     src,
     fallback: customFallback = defaultAvatar,
     width = 1000,
@@ -21,7 +16,8 @@ const CustomImage = ({
     alt = 'avatar',
     className,
     style,
-}: Props) => {
+    ...props
+}: Props) {
     const [fallback, setFallback] = useState<string>()
 
     const handleError = () => {
@@ -31,6 +27,7 @@ const CustomImage = ({
     if (!src) {
         src = customFallback
     }
+
     return (
         <Image
             src={fallback || src}
@@ -42,8 +39,7 @@ const CustomImage = ({
             priority
             style={style}
             quality={100}
+            {...props}
         />
     )
-}
-
-export default memo(CustomImage)
+})

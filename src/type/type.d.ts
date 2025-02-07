@@ -2,9 +2,7 @@ interface Timestamp {
     created_at: Date
     updated_at: Date
 }
-/**
- * User model
- */
+// ========================================== User model ==========================================
 export interface UserModel<K = any, V = any> extends Timestamp {
     id: number
     first_name: string
@@ -33,9 +31,7 @@ interface UserResponse {
     }
 }
 
-/**
- * Conversation model
- */
+// ========================================== Conversation model ==========================================
 interface ConversationModel extends Timestamp {
     id: number
     is_group: boolean
@@ -58,9 +54,7 @@ interface ConversationMember extends Timestamp {
     joined_at: Date
 }
 
-/**
- * Message model
- */
+// ========================================== Message model ==========================================
 
 interface MessageModel extends Timestamp {
     id: number
@@ -71,6 +65,8 @@ interface MessageModel extends Timestamp {
     message_status: MessageStatus[]
     is_read: boolean
     type: 'text' | 'image'
+    top_reaction?: { react: string; user_reaction_name: string }[]
+    total_reactions: number
 }
 
 interface MessageResponse extends MetaPagination {
@@ -86,9 +82,21 @@ interface MessageStatus extends Timestamp {
     read_at: Date
 }
 
-/**
- * Friends model
- */
+// ========================================== Message reaction model ==========================================
+
+interface MessageReactionModel extends Timestamp {
+    id: number
+    message_id: number
+    user_id: number
+    react: string
+    user_reaction: UserModel
+}
+
+interface MessageReactionResponse extends MetaPagination {
+    data: MessageReactionModel[]
+}
+
+// ========================================== Friends model ==========================================
 
 interface FriendsShip extends Timestamp {
     id: number
@@ -102,9 +110,7 @@ interface FriendsResponse extends MetaPagination {
     data: FriendsShip[]
 }
 
-/**
- * Meta pagination
- */
+// ========================================== Meta pagination ==========================================
 interface MetaPagination {
     meta: {
         pagination: {
@@ -117,9 +123,7 @@ interface MetaPagination {
     }
 }
 
-/**
- * Notification model
- */
+// ========================================== Notification model ==========================================
 
 interface NotificationData extends Timestamp {
     id: number
@@ -136,9 +140,7 @@ interface NotificationResponse extends MetaPagination {
     data: NotificationData[]
 }
 
-/**
- * Search history model
- */
+// ========================================== Search history model ==========================================
 
 interface SearchHistoryData extends Timestamp {
     id: number
@@ -151,9 +153,7 @@ interface SearchHistory {
     data: SearchHistoryData[]
 }
 
-/**
- * Socket model
- */
+// ========================================== Socket model ==========================================
 
 interface SocketMessage {
     conversation: ConversationModel

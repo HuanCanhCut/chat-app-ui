@@ -25,6 +25,7 @@ interface EmojiProps {
     setIsOpen: (value: boolean) => void
     placeholder?: string
     onEmojiClick: (emojiData: EmojiClickData, event: MouseEvent) => void
+    isReaction?: boolean
 }
 
 const Emoji: React.FC<EmojiProps> = ({
@@ -34,6 +35,7 @@ const Emoji: React.FC<EmojiProps> = ({
     setIsOpen,
     onEmojiClick,
     placeholder = 'Tìm kiếm biểu tượng cảm xúc',
+    isReaction = false,
 }) => {
     const theme = useAppSelector(getCurrentTheme)
 
@@ -87,6 +89,7 @@ const Emoji: React.FC<EmojiProps> = ({
                     height={350}
                     width={Math.min(380, Number(window.innerWidth - 40))}
                     lazyLoadEmojis
+                    reactionsDefaultOpen={isReaction}
                 />
             </div>
         )

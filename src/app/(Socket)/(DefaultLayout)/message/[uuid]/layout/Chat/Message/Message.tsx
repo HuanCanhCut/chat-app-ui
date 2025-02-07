@@ -21,7 +21,7 @@ const Message: React.FC = () => {
 
     const [page, setPage] = useState(1)
 
-    const { data: messages, mutate: mutateMessages } = useSWR(
+    const { data: messages, mutate: mutateMessages } = useSWR<MessageResponse | undefined>(
         uuid ? [SWRKey.GET_MESSAGES, uuid] : null,
         () => {
             return messageServices.getMessages({ conversationUuid: uuid as string, page: page })
@@ -190,8 +190,9 @@ const Message: React.FC = () => {
                             <MessageItem
                                 message={message}
                                 messageIndex={index}
-                                messages={messages?.data}
+                                messages={messages}
                                 currentUser={currentUser?.data}
+                                mutateMessage={mutateMessages}
                             />
                         </React.Fragment>
                     ))}
