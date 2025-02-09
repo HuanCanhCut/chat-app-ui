@@ -151,16 +151,89 @@ const Message: React.FC = () => {
                 return message
             })
 
-            mutateMessages({
-                data: newMessages,
-                meta: messages?.meta,
-            })
+            mutateMessages(
+                {
+                    data: newMessages,
+                    meta: messages?.meta,
+                },
+                {
+                    revalidate: false,
+                },
+            )
         })
 
         return () => {
             socket.off(SocketEvent.UPDATE_READ_MESSAGE)
         }
     }, [messages, mutateMessages])
+
+    useEffect(() => {
+        socket.on(SocketEvent.REACT_MESSAGE, (data) => {
+            if (!messages?.data) {
+                return
+            }
+
+            const newMessages = messages.data.map((message) => {
+                if (message.id === data.reaction.message_id) {
+                    return {
+                        ...message,
+                        top_reactions: data.top_reactions,
+                        total_reactions: data.total_reactions,
+                    }
+                }
+
+                return message
+            })
+
+            mutateMessages(
+                {
+                    data: newMessages,
+                    meta: messages.meta,
+                },
+                {
+                    revalidate: false,
+                },
+            )
+        })
+
+        return () => {
+            socket.off(SocketEvent.REACT_MESSAGE)
+        }
+    }, [messages?.data, messages?.meta, mutateMessages])
+
+    useEffect(() => {
+        socket.on(SocketEvent.REMOVE_REACTION, (data) => {
+            if (!messages?.data) {
+                return
+            }
+
+            const newMessages = messages.data.map((message) => {
+                if (message.id === data.message_id) {
+                    return {
+                        ...message,
+                        top_reactions: data.top_reactions,
+                        total_reactions: data.total_reactions,
+                    }
+                }
+
+                return message
+            })
+
+            mutateMessages(
+                {
+                    data: newMessages,
+                    meta: messages.meta,
+                },
+                {
+                    revalidate: false,
+                },
+            )
+        })
+
+        return () => {
+            socket.off(SocketEvent.REMOVE_REACTION)
+        }
+    }, [messages?.data, messages?.meta, mutateMessages])
 
     return (
         <div className="flex-grow overflow-hidden" onKeyDown={handleEnterMessage}>

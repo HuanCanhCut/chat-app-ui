@@ -12,8 +12,10 @@ import UserAvatar from '~/components/UserAvatar'
 import { useAppSelector } from '~/redux'
 import { getCurrentUser } from '~/redux/selector'
 import { MessageReactionModel } from '~/type/type'
-import { useRouter } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import InfiniteScroll from 'react-infinite-scroll-component'
+import socket from '~/helpers/socket'
+import { SocketEvent } from '~/enum/SocketEvent'
 
 interface Props {
     onClose: () => void
@@ -23,6 +25,8 @@ interface Props {
 const PER_PAGE = 7
 
 const ReactionModal: React.FC<Props> = ({ onClose, messageId }) => {
+    const { uuid } = useParams()
+
     const router = useRouter()
 
     const currentUser = useAppSelector(getCurrentUser)
@@ -30,14 +34,23 @@ const ReactionModal: React.FC<Props> = ({ onClose, messageId }) => {
     const [currentTab, setCurrentTab] = useState('all')
     const [page, setPage] = useState(1)
 
-    const { data: reactionTypes } = useSWR(messageId ? [SWRKey.GET_REACTIONS, messageId] : null, () => {
-        return messageServices.getReactionTypes({ messageId })
-    })
+    const { data: reactionTypes, mutate: mutateReactionTypes } = useSWR(
+        messageId ? [SWRKey.GET_REACTIONS, messageId] : null,
+        () => {
+            return messageServices.getReactionTypes({ messageId })
+        },
+        {
+            revalidateOnMount: true,
+        },
+    )
 
     const { data: reactions, mutate: mutateReactions } = useSWR(
         currentTab ? [SWRKey.GET_REACTIONS, currentTab] : null,
         () => {
             return messageServices.getReactions({ messageId, type: currentTab, page, per_page: PER_PAGE })
+        },
+        {
+            revalidateOnMount: true,
         },
     )
 
@@ -48,11 +61,13 @@ const ReactionModal: React.FC<Props> = ({ onClose, messageId }) => {
                 label: 'Tất cả',
                 count: reactionTypes?.reduce((acc, reaction) => acc + reaction.count, 0),
             },
-            ...(reactionTypes?.map((reaction) => ({
-                type: reaction.react,
-                label: reaction.react,
-                count: reaction.count,
-            })) || []),
+            ...(reactionTypes
+                ?.filter((reaction) => reaction.count > 0)
+                .map((reaction) => ({
+                    type: reaction.react,
+                    label: reaction.react,
+                    count: reaction.count,
+                })) || []),
         ]
     }, [reactionTypes])
 
@@ -63,7 +78,12 @@ const ReactionModal: React.FC<Props> = ({ onClose, messageId }) => {
 
     const handleChooseReaction = (reaction: MessageReactionModel) => {
         if (reaction.user_id === currentUser?.data.id) {
-            //
+            socket.emit(SocketEvent.REMOVE_REACTION, {
+                message_id: messageId,
+                user_reaction_id: currentUser.data.id,
+                conversation_uuid: uuid,
+                react: reaction.react,
+            })
         } else {
             router.push(`${config.routes.user}/@${reaction.user_reaction.nickname}`)
         }
@@ -100,6 +120,43 @@ const ReactionModal: React.FC<Props> = ({ onClose, messageId }) => {
         getMoreReactions()
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [messageId, mutateReactions, page])
+
+    useEffect(() => {
+        socket.on(SocketEvent.REMOVE_REACTION, (data) => {
+            if (!reactions?.data) {
+                return
+            }
+
+            if (data.message_id === messageId) {
+                const newReactions = reactions?.data.filter((reaction) => reaction.user_id !== currentUser.data.id)
+
+                const newReactionTypes = reactionTypes?.map((reaction) => {
+                    if (reaction.react === data.react) {
+                        return {
+                            ...reaction,
+                            count: reaction.count - 1,
+                        }
+                    }
+
+                    return reaction
+                })
+
+                mutateReactionTypes(newReactionTypes, {
+                    revalidate: false,
+                })
+
+                mutateReactions(
+                    {
+                        data: newReactions,
+                        meta: reactions?.meta,
+                    },
+                    {
+                        revalidate: false,
+                    },
+                )
+            }
+        })
+    }, [currentUser.data.id, messageId, mutateReactionTypes, mutateReactions, reactionTypes, reactions])
 
     return (
         <PopperWrapper className="w-[548px] max-w-[calc(100vw-40px)] !p-0">

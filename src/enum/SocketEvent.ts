@@ -10,4 +10,8 @@ export enum SocketEvent {
     // ------------------------------- Notification -------------------------------
     NEW_NOTIFICATION = 'notification:new',
     REMOVE_NOTIFICATION = 'notification:remove',
+
+    // ------------------------------- Reaction -------------------------------
+    REACT_MESSAGE = 'message:react',
+    REMOVE_REACTION = 'message:remove_reaction',
 }

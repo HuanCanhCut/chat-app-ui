@@ -65,7 +65,7 @@ interface MessageModel extends Timestamp {
     message_status: MessageStatus[]
     is_read: boolean
     type: 'text' | 'image'
-    top_reaction?: { react: string; user_reaction_name: string }[]
+    top_reactions?: { react: string; user_reaction: UserModel }[]
     total_reactions: number
 }
 

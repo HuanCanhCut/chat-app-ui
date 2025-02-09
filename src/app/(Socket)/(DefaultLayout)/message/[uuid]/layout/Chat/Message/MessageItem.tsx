@@ -18,6 +18,7 @@ import { sendEvent } from '~/helpers/events'
 import MessageImagesModel from './Modal/MessageImagesModal'
 import { KeyedMutator } from 'swr'
 import ReactionModal from './Modal/ReactionModal'
+import { EmojiClickData } from 'emoji-picker-react'
 
 const BETWEEN_TIME_MESSAGE = 7 // minute
 
@@ -49,6 +50,14 @@ const MessageItem = ({ message, messageIndex, messages, currentUser }: MessageIt
     // open emoji-picker reaction
     const [isOpenReaction, setIsOpenReaction] = useState(false)
 
+    const diffTime =
+        messageIndex > 0 &&
+        Math.abs(
+            moment
+                .tz(messages.data[messageIndex].created_at, 'UTC')
+                .diff(moment.tz(messages.data[messageIndex - 1].created_at, 'UTC'), 'minutes'),
+        )
+
     useEffect(() => {
         if (isFirstMessageVisible) {
             // If haven't seen it, then emit
@@ -69,14 +78,6 @@ const MessageItem = ({ message, messageIndex, messages, currentUser }: MessageIt
             sendEvent({ eventName: 'message:read-message', detail: uuid as string })
         }
     }, [isFirstMessageVisible, currentUser?.id, message.id, message.sender_id, uuid, messages])
-
-    const diffTime =
-        messageIndex > 0 &&
-        Math.abs(
-            moment
-                .tz(messages.data[messageIndex].created_at, 'UTC')
-                .diff(moment.tz(messages.data[messageIndex - 1].created_at, 'UTC'), 'minutes'),
-        )
 
     const handleFormatTime = (time: Date) => {
         const isSameDay = moment(new Date(time)).isSame(moment(new Date()), 'day')
@@ -116,8 +117,15 @@ const MessageItem = ({ message, messageIndex, messages, currentUser }: MessageIt
         setIsOpenReaction(!isOpenReaction)
     }
 
-    const handleChooseReaction = () => {
+    const handleChooseReaction = (EmojiClickData: EmojiClickData) => {
         setIsOpenReaction(false)
+
+        socket.emit(SocketEvent.REACT_MESSAGE, {
+            conversation_uuid: uuid as string,
+            message_id: message.id,
+            react: EmojiClickData.emoji,
+            user_react_id: currentUser?.id,
+        })
     }
 
     const handleCloseReactionModal = useCallback(() => {
@@ -161,7 +169,7 @@ const MessageItem = ({ message, messageIndex, messages, currentUser }: MessageIt
             </ReactModal>
 
             <div
-                className={`group relative flex w-full items-center gap-3 ${message?.top_reaction && 'mb-[10px]'} ${message.sender_id === currentUser?.id ? 'justify-end' : 'justify-start'}`}
+                className={`group relative flex w-full items-center gap-3 ${message?.top_reactions && 'mb-[10px]'} ${message.sender_id === currentUser?.id ? 'justify-end' : 'justify-start'}`}
             >
                 <div
                     className={`flex items-center gap-2 ${!isOpenReaction && 'opacity-0'} transition-opacity duration-100 group-hover:opacity-100 ${message.sender_id === currentUser?.id ? 'order-first' : 'order-last flex-row-reverse'}`}
@@ -241,10 +249,10 @@ const MessageItem = ({ message, messageIndex, messages, currentUser }: MessageIt
                 <Tippy
                     content={
                         <div>
-                            {message?.top_reaction?.map((reaction, index) => {
+                            {message?.top_reactions?.map((reaction, index) => {
                                 return (
                                     <p className="font-light leading-5" key={index}>
-                                        {reaction.user_reaction_name}
+                                        {reaction.user_reaction.full_name}
                                     </p>
                                 )
                             })}
@@ -261,7 +269,7 @@ const MessageItem = ({ message, messageIndex, messages, currentUser }: MessageIt
                             handleOpenReactionModal(message.id)
                         }}
                     >
-                        {message?.top_reaction?.map((reaction, index) => {
+                        {message?.top_reactions?.map((reaction, index) => {
                             return (
                                 <span className="text-sm leading-none" key={index}>
                                     {reaction.react}
