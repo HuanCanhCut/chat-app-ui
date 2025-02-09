@@ -138,34 +138,63 @@ const Message: React.FC = () => {
     }, [messages, mutateMessages, uuid])
 
     useEffect(() => {
-        socket.on(SocketEvent.UPDATE_READ_MESSAGE, (data: MessageModel) => {
-            if (!messages?.data) {
-                return
-            }
-
-            const newMessages = messages?.data.map((message) => {
-                if (message.id === data.id) {
-                    return data
+        socket.on(
+            SocketEvent.UPDATE_READ_MESSAGE,
+            ({ message: data, user_read_id }: { message: MessageModel; user_read_id: number }) => {
+                if (!messages?.data) {
+                    return
                 }
 
-                return message
-            })
+                let lastReadMessageId = 0
 
-            mutateMessages(
-                {
-                    data: newMessages,
-                    meta: messages?.meta,
-                },
-                {
-                    revalidate: false,
-                },
-            )
-        })
+                const newMessages = messages?.data.map((message) => {
+                    if (message.id === data.id) {
+                        return data
+                    }
+
+                    if (Number(user_read_id) !== currentUser?.data?.id) {
+                        lastReadMessageId = data.id
+                    }
+
+                    return {
+                        ...message,
+                        message_status: message.message_status.map((status) => {
+                            if (status?.receiver_id !== currentUser?.data?.id) {
+                                return {
+                                    ...status,
+                                    receiver: {
+                                        ...status.receiver,
+                                        last_read_message_id: !!lastReadMessageId
+                                            ? lastReadMessageId
+                                            : status.receiver.last_read_message_id,
+                                    },
+                                    status: 'read' as const,
+                                    read_at: new Date(),
+                                }
+                            }
+                            return status
+                        }),
+                    }
+                })
+
+                console.log({ lastReadMessageId, newMessages })
+
+                mutateMessages(
+                    {
+                        data: newMessages,
+                        meta: messages?.meta,
+                    },
+                    {
+                        revalidate: false,
+                    },
+                )
+            },
+        )
 
         return () => {
             socket.off(SocketEvent.UPDATE_READ_MESSAGE)
         }
-    }, [messages, mutateMessages])
+    }, [currentUser?.data?.id, messages?.data, messages?.meta, mutateMessages])
 
     useEffect(() => {
         socket.on(SocketEvent.REACT_MESSAGE, (data) => {

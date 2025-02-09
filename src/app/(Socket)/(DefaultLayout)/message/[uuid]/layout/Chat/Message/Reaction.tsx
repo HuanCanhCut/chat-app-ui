@@ -7,7 +7,7 @@ interface ReactionProps {
 }
 
 const Reaction = ({ message, handleOpenReactionModal }: ReactionProps) => {
-    return message.top_reactions?.length !== 0 ? (
+    return message.top_reactions && message.top_reactions.length !== 0 ? (
         <Tippy
             content={
                 <div>
