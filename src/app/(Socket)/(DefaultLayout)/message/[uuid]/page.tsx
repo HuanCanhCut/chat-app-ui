@@ -7,7 +7,7 @@ import { useParams } from 'next/navigation'
 import * as conversationServices from '~/services/conversationService'
 import Header from './layout/Chat/Header'
 import Message from './layout/Chat/Message'
-import EnterMessage from './layout/Chat/InputMessage'
+import InputMessage from './layout/Chat/InputMessage'
 import Info from './layout/Info/Info'
 import SWRKey from '~/enum/SWRKey'
 import socket from '~/helpers/socket'
@@ -60,11 +60,11 @@ const MessagePage = () => {
     }
 
     return (
-        <div className="flex h-full">
-            <div className="flex flex-grow flex-col">
+        <div className="flex h-full max-w-full">
+            <div className="flex max-w-full flex-grow flex-col">
                 <Header toggleInfo={toggleInfo} conversation={conversation?.data} />
                 <Message />
-                <EnterMessage />
+                <InputMessage />
             </div>
             {infoOpen && (
                 <Info className={`${infoOpen ? 'block' : 'hidden'} min-w-[280px] md:block lg:min-w-[320px]`} />

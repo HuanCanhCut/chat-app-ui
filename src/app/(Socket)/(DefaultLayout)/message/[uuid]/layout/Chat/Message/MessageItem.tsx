@@ -19,6 +19,7 @@ import MessageImagesModel from './Modal/MessageImagesModal'
 import { KeyedMutator } from 'swr'
 import ReactionModal from './Modal/ReactionModal'
 import { EmojiClickData } from 'emoji-picker-react'
+import Reaction from './Reaction'
 
 const BETWEEN_TIME_MESSAGE = 7 // minute
 
@@ -200,88 +201,60 @@ const MessageItem = ({ message, messageIndex, messages, currentUser }: MessageIt
                     <React.Fragment>
                         {message.type === 'text' ? (
                             isOnlyIcon ? (
-                                <p
+                                <div
                                     data-message-id={message.id}
                                     ref={messageIndex === 0 ? firstMessageRef : null}
-                                    className={`w-fit max-w-[80%] rounded-3xl font-light [word-break:break-word]`}
+                                    className={`relative w-fit max-w-[80%] rounded-3xl font-light [word-break:break-word]`}
                                 >
                                     <span className="max-w-fit break-words text-3xl">{message.content}</span>
-                                </p>
+
+                                    <Reaction message={message} handleOpenReactionModal={handleOpenReactionModal} />
+                                </div>
                             ) : (
-                                <p
+                                <div
                                     data-message-id={message.id}
                                     ref={messageIndex === 0 ? firstMessageRef : null}
-                                    className={`w-fit max-w-[80%] rounded-3xl px-4 py-1.5 font-light [word-break:break-word] ${
+                                    className={`relative w-fit max-w-[80%] rounded-3xl px-4 py-1.5 font-light [word-break:break-word] ${
                                         message.sender_id === currentUser?.id
                                             ? 'bg-milk-tea text-white'
                                             : 'bg-lightGray text-black dark:bg-[#313233] dark:text-dark'
                                     }`}
                                 >
                                     <span className="max-w-fit break-words">{message.content}</span>
-                                </p>
+
+                                    <Reaction message={message} handleOpenReactionModal={handleOpenReactionModal} />
+                                </div>
                             )
                         ) : message.type === 'image' ? (
                             <div
-                                className={`flex w-full ${
+                                ref={messageIndex === 0 ? firstMessageRef : null}
+                                className={`relative w-full ${
                                     JSON.parse(message.content).length > 1
-                                        ? 'max-w-[60%] sm:max-w-[55%] md:max-w-[50%] lg:max-w-[45%] xl:max-w-[40%]'
+                                        ? 'max-w-[60%] sm:max-w-[55%] md:max-w-[50%] lg:max-w-[45%] xl:max-w-[35%]'
                                         : 'max-w-[60%] sm:max-w-[40%] md:max-w-[35%] lg:max-w-[30%] xl:max-w-[25%]'
-                                } flex-wrap gap-1 overflow-hidden rounded-3xl [word-break:break-word]`}
+                                }`}
                             >
-                                {JSON.parse(message.content).map((url: string, index: number) => (
-                                    <div className="flex-1" key={index}>
-                                        <CustomImage
-                                            src={url}
-                                            alt="message"
-                                            className={`max-h-[260px] sm:min-w-[150px] ${JSON.parse(message.content).length === 1 && 'min-w-[240px]'} h-full w-full min-w-[180px] cursor-pointer rounded-md object-cover`}
-                                            priority
-                                            quality={100}
-                                            onClick={() => handleOpenImageModal(url, message.id)}
-                                        />
-                                    </div>
-                                ))}
+                                <div
+                                    className={`flex w-full flex-wrap gap-1 overflow-hidden rounded-3xl [word-break:break-word]`}
+                                >
+                                    {JSON.parse(message.content).map((url: string, index: number) => (
+                                        <div className="flex-1" key={index}>
+                                            <CustomImage
+                                                src={url}
+                                                alt="message"
+                                                className={`max-h-[260px] sm:min-w-[150px] ${JSON.parse(message.content).length === 1 ? 'min-w-[240px]' : 'aspect-square'} h-full w-full min-w-[180px] cursor-pointer rounded-md object-cover`}
+                                                priority
+                                                quality={100}
+                                                onClick={() => handleOpenImageModal(url, message.id)}
+                                            />
+                                        </div>
+                                    ))}
+                                </div>
+
+                                <Reaction message={message} handleOpenReactionModal={handleOpenReactionModal} />
                             </div>
                         ) : null}
                     </React.Fragment>
-                </Tippy>
-
-                {/* Show reaction */}
-                <Tippy
-                    content={
-                        <div>
-                            {message?.top_reactions?.map((reaction, index) => {
-                                return (
-                                    <p className="font-light leading-5" key={index}>
-                                        {reaction.user_reaction.full_name}
-                                    </p>
-                                )
-                            })}
-
-                            {message?.total_reactions > 2 && (
-                                <p className="font-light leading-5">và {message?.total_reactions - 2} người khác...</p>
-                            )}
-                        </div>
-                    }
-                >
-                    <div
-                        className="absolute right-1 top-3/4 flex cursor-pointer items-center rounded-full bg-white py-[2px] shadow-sm shadow-zinc-300 dark:bg-zinc-800 dark:shadow-zinc-700"
-                        onClick={() => {
-                            handleOpenReactionModal(message.id)
-                        }}
-                    >
-                        {message?.top_reactions?.map((reaction, index) => {
-                            return (
-                                <span className="text-sm leading-none" key={index}>
-                                    {reaction.react}
-                                </span>
-                            )
-                        })}
-                        {message?.total_reactions !== 0 && (
-                            <span className="mx-1 text-xs leading-none text-gray-500 dark:text-zinc-400">
-                                {message?.total_reactions}
-                            </span>
-                        )}
-                    </div>
                 </Tippy>
             </div>
 
