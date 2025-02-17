@@ -1,7 +1,8 @@
 import Tippy from '@tippyjs/react/headless'
-import { memo } from 'react'
+import { memo, useEffect, useState } from 'react'
 import { useSpring, motion } from 'framer-motion'
 import { sendEvent } from '~/helpers/events'
+
 interface CustomTippyProps {
     children: React.ReactElement
     trigger?: 'click' | 'focus' | 'manual' | 'mouseenter' | 'focusin'
@@ -47,14 +48,19 @@ export default memo(function CustomTippy({
     const initialScale = 0.5
     const opacity = useSpring(0, springConfig)
     const scale = useSpring(initialScale, springConfig)
+    const [appendToElement, setAppendToElement] = useState<HTMLElement | null>(null)
 
-    const render = (attrs: any) => {
-        return (
-            <motion.div style={{ scale, opacity }}>
-                <div {...attrs}>{renderItem()}</div>
-            </motion.div>
-        )
-    }
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            setAppendToElement(document.body)
+        }
+    }, [])
+
+    const render = (attrs: any) => (
+        <motion.div style={{ scale, opacity }}>
+            <div {...attrs}>{renderItem()}</div>
+        </motion.div>
+    )
 
     const onMount = () => {
         scale.set(1)
@@ -77,21 +83,24 @@ export default memo(function CustomTippy({
 
     return (
         <div>
-            <Tippy
-                trigger={trigger}
-                animation={true}
-                interactive
-                delay={[timeDelayOpen, timeDelayClose]}
-                offset={[offsetX, offsetY]}
-                hideOnClick={hideOnClick}
-                placement={placement}
-                render={render}
-                onMount={onMount}
-                onHide={onHide}
-                onShow={onShow}
-            >
-                {children}
-            </Tippy>
+            {appendToElement && (
+                <Tippy
+                    trigger={trigger}
+                    animation={true}
+                    interactive
+                    delay={[timeDelayOpen, timeDelayClose]}
+                    offset={[offsetX, offsetY]}
+                    hideOnClick={hideOnClick}
+                    placement={placement}
+                    render={render}
+                    onMount={onMount}
+                    onHide={onHide}
+                    onShow={onShow}
+                    appendTo={appendToElement}
+                >
+                    {children}
+                </Tippy>
+            )}
         </div>
     )
 })

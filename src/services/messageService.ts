@@ -1,3 +1,4 @@
+import { AxiosResponse } from 'axios'
 import { MessageReactionResponse, MessageResponse } from '~/type/type'
 import * as request from '~/utils/httpRequest'
 
@@ -52,11 +53,7 @@ interface ReactionTypeResponse {
     count: number
 }
 
-export const getReactionTypes = async ({
-    messageId,
-}: {
-    messageId: number
-}): Promise<ReactionTypeResponse[] | undefined> => {
+export const getReactionTypes = async ({ messageId }: { messageId: number }): Promise<ReactionTypeResponse[] | undefined> => {
     try {
         const response = await request.get(`messages/${messageId}/reaction/types`)
 
@@ -89,5 +86,25 @@ export const getReactions = async ({
         return response.data
     } catch (error: any) {
         console.log(error)
+    }
+}
+
+export const revokeMessage = async ({
+    conversationUuid,
+    messageId,
+    type,
+}: {
+    conversationUuid: string
+    messageId: number
+    type: string
+}): Promise<AxiosResponse<{ message: string }>> => {
+    try {
+        return await request.patch('/messages/revoke', {
+            conversation_uuid: conversationUuid,
+            message_id: messageId,
+            revoke_type: type,
+        })
+    } catch (error) {
+        throw error
     }
 }

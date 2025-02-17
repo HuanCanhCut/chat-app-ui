@@ -12,27 +12,20 @@ interface ButtonProps {
     type?: 'button' | 'submit' | 'reset'
 }
 
-const Button = ({
-    children,
-    className,
-    href,
-    buttonType = 'primary',
-    leftIcon,
-    type = 'button',
-    onClick,
-    ...props
-}: ButtonProps) => {
-    const primaryClass =
-        buttonType === 'primary' ? 'bg-primary px-4 py-[6px] rounded-md text-white hover:bg-primary/90' : ''
+const Button = ({ children, className, href, buttonType = 'primary', leftIcon, type = 'button', onClick, ...props }: ButtonProps) => {
+    const primaryClass = buttonType === 'primary' ? 'bg-primary px-4 py-[6px] rounded-md text-white hover:bg-primary/85' : ''
     const outlineClass =
         buttonType === 'outline'
             ? 'border border-gray-300 px-4 py-[6px] rounded-md  dark:hover:bg-[rgba(255,255,255,0.05)] hover:bg-[rgba(0,0,0,0.05)]'
             : ''
     const buttonIconClass =
         buttonType === 'icon'
-            ? 'h-7 w-7 xxs:h-9  xxs:w-9 flex-center rounded-full bg-lightGray dark:bg-[#313233] hover:bg-[#99999936] dark:hover:bg-[#3e4141]'
+            ? 'h-7 w-7 xxs:h-9  xxs:w-9 flex-center rounded-full bg-lightGray dark:bg-[#313233] hover:bg-[#99999936] dark:hover:bg-[#383b3b]'
             : ''
-    const roundedClass = buttonType === 'rounded' ? 'rounded-md px-4 py-[6px] dark:bg-[#313233] bg-gray-200' : ''
+    const roundedClass =
+        buttonType === 'rounded'
+            ? 'rounded-md px-4 py-[6px] dark:bg-[#313233] hover:bg-[#99999936] dark:hover:bg-[#333636] bg-gray-200'
+            : ''
 
     if (href) {
         return (

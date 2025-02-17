@@ -59,7 +59,7 @@ interface ConversationMember extends Timestamp {
 interface MessageModel extends Timestamp {
     id: number
     conversation_id: number
-    content: string
+    content: string | null
     sender_id: number
     sender: UserModel
     message_status: MessageStatus[]
@@ -79,6 +79,8 @@ interface MessageStatus extends Timestamp {
     receiver_id: number
     status: 'sent' | 'delivered' | 'read' | 'sending'
     receiver: UserModel<'last_read_message_id', number> & { last_read_message_id: number }
+    is_revoked: boolean
+    revoke_type: 'for-other' | 'for-me'
     read_at: Date
 }
 

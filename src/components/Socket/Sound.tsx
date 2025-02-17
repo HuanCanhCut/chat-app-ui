@@ -20,10 +20,6 @@ const Sound = ({ children }: { children: React.ReactNode }) => {
                 await audioRef.current?.play()
             } catch (e) {}
         })
-
-        return () => {
-            socket.off(SocketEvent.NEW_NOTIFICATION)
-        }
     }, [])
 
     // listen new message event

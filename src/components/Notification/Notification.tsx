@@ -137,9 +137,7 @@ const Notification = () => {
                 return
             }
 
-            const newNotifications = notifications.data.filter(
-                (notification: NotificationData) => notification.id !== notificationId,
-            )
+            const newNotifications = notifications.data.filter((notification: NotificationData) => notification.id !== notificationId)
 
             mutateNotifications(
                 {
@@ -158,10 +156,6 @@ const Notification = () => {
 
             setReloadNotificationCount(true)
         })
-
-        return () => {
-            socket.off(SocketEvent.REMOVE_NOTIFICATION)
-        }
     }, [mutateNotifications, notifications])
 
     useEffect(() => {
@@ -193,9 +187,7 @@ const Notification = () => {
         const remove = listenEvent({
             eventName: 'notification:delete-notification',
             handler: ({ detail: notificationId }) => {
-                const newNotifications = notifications?.data.filter(
-                    (notification: NotificationData) => notification.id !== notificationId,
-                )
+                const newNotifications = notifications?.data.filter((notification: NotificationData) => notification.id !== notificationId)
 
                 if (notifications) {
                     mutateNotifications(
@@ -295,10 +287,7 @@ const Notification = () => {
                             {notifications.data.map((notification: NotificationData) => {
                                 return (
                                     <React.Fragment key={notification.id}>
-                                        <NotificationItem
-                                            notification={notification}
-                                            notificationIcon={notificationIcon}
-                                        />
+                                        <NotificationItem notification={notification} notificationIcon={notificationIcon} />
                                     </React.Fragment>
                                 )
                             })}

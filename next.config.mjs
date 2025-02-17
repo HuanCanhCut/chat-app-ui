@@ -17,18 +17,6 @@ const nextConfig = {
             },
             {
                 protocol: 'https',
-                hostname: 'hoanghamobile.com',
-                port: '',
-                pathname: '/**',
-            },
-            {
-                protocol: 'https',
-                hostname: 'cellphones.com.vn',
-                port: '',
-                pathname: '/**',
-            },
-            {
-                protocol: 'https',
                 hostname: 'cdn.jsdelivr.net',
                 port: '',
                 pathname: '/**',

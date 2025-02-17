@@ -75,28 +75,28 @@ const Conversations = () => {
             const conversationMutate = {
                 [data.conversation.uuid]: {
                     ...conversationData,
-                    conversation_members: conversationData.conversation_members.map(
-                        (member: ConversationMember, index: number) => {
-                            return {
-                                ...member,
-                                user: {
-                                    ...member.user,
-                                    is_online: conversationData.conversation_members[index].user.is_online,
-                                    last_online_at: conversationData.conversation_members[index].user.last_online_at,
-                                },
-                            }
-                        },
-                    ),
+                    last_message: data.conversation.last_message,
+                    conversation_members: conversationData.conversation_members.map((member: ConversationMember, index: number) => {
+                        return {
+                            ...member,
+                            user: {
+                                ...member.user,
+                                is_online: conversationData.conversation_members[index].user.is_online,
+                                last_online_at: conversationData.conversation_members[index].user.last_online_at,
+                            },
+                        }
+                    }),
                 },
                 ...conversations,
             }
+
+            console.log(conversationMutate)
 
             mutateConversations(conversationMutate, {
                 revalidate: false,
             })
         })
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [mutateConversations])
+    }, [conversations, mutateConversations])
 
     useEffect(() => {
         socket.on(SocketEvent.USER_STATUS, (data: UserStatus) => {
@@ -115,14 +115,14 @@ const Conversations = () => {
                         ...conversations,
                         [conversationUserMap[data.user_id]]: {
                             ...conversations[conversationUserMap[data.user_id]],
-                            conversation_members: conversations[
-                                conversationUserMap[data.user_id]
-                            ].conversation_members.map((member: ConversationMember) => {
-                                if (member.user_id === data.user_id) {
-                                    return { ...member, user: { ...member.user, is_online: data.is_online } }
-                                }
-                                return member
-                            }),
+                            conversation_members: conversations[conversationUserMap[data.user_id]].conversation_members.map(
+                                (member: ConversationMember) => {
+                                    if (member.user_id === data.user_id) {
+                                        return { ...member, user: { ...member.user, is_online: data.is_online } }
+                                    }
+                                    return member
+                                },
+                            ),
                         },
                     },
                     {
@@ -134,9 +134,7 @@ const Conversations = () => {
                     const conversation: ConversationModel = conversations[key]
 
                     if (!conversation.is_group) {
-                        const hasUser = conversation.conversation_members.find(
-                            (member) => member.user_id === data.user_id,
-                        )
+                        const hasUser = conversation.conversation_members.find((member) => member.user_id === data.user_id)
 
                         if (hasUser) {
                             mutateConversations(
@@ -211,11 +209,7 @@ const Conversations = () => {
             ) : (
                 <div className="flex h-full flex-col items-center justify-center">
                     <Image
-                        src={
-                            theme === 'dark'
-                                ? '/static/media/empty-message-light.png'
-                                : '/static/media/empty-message-dark.png'
-                        }
+                        src={theme === 'dark' ? '/static/media/empty-message-light.png' : '/static/media/empty-message-dark.png'}
                         alt="empty-conversation"
                         width={100}
                         height={100}

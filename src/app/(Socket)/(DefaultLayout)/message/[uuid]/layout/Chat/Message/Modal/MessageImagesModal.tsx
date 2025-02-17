@@ -33,7 +33,7 @@ const MessageImagesModel = ({ onClose, imageUrl }: MessageImagesModelProps) => {
 
     const formatImagesResponse = (images: MessageModel[]) => {
         return images.reduce<string[]>((acc, image) => {
-            return acc.concat(JSON.parse(image.content))
+            return acc.concat(JSON.parse(image.content as string))
         }, [])
     }
 
