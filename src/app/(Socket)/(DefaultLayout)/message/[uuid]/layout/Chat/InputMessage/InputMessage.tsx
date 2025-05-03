@@ -154,8 +154,8 @@ const InputMessage: React.FC<InputMessageProps> = () => {
     useEffect(() => {
         const remove = listenEvent({
             eventName: 'message:enter-message',
-            handler: ({ detail: conversationUuid }) => {
-                handleEmitMessage(conversationUuid as string)
+            handler: ({ detail }: { detail: { conversationUuid: string } }) => {
+                handleEmitMessage(detail.conversationUuid)
             },
         })
 

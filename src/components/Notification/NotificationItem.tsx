@@ -181,9 +181,7 @@ const NotificationItem = ({
                             className={`pr-4 text-sm font-normal dark:font-light ${notification.is_read ? 'text-gray-600 dark:text-gray-400' : 'text-gray-800 dark:text-gray-200'}`}
                         ></p>
                         <small
-                            className={`text-xs ${
-                                !notification.is_read ? 'text-primary' : 'text-gray-600 dark:text-gray-400'
-                            } font-normal`}
+                            className={`text-xs ${!notification.is_read ? 'text-primary' : 'text-gray-600 dark:text-gray-400'} font-normal`}
                         >
                             {momentTimezone(notification.created_at)}
                         </small>

@@ -71,7 +71,7 @@ const MessageItem = ({ message, messageIndex, messages, currentUser }: MessageIt
             if (message.id === messages.data[0].id) {
                 for (const status of messages.data[0].message_status) {
                     // If have seen it, then skip it.
-                    if (status.receiver_id === currentUser?.id && status.status === 'read') {
+                    if (status.receiver_id === currentUser?.id && status.receiver.last_read_message_id === message.id) {
                         return
                     }
                 }
@@ -118,7 +118,9 @@ const MessageItem = ({ message, messageIndex, messages, currentUser }: MessageIt
 
     const isOnlyIcon =
         message.type === 'text' &&
-        new RegExp(/^(\p{Emoji_Presentation}|\p{Emoji}\uFE0F|\p{Emoji_Modifier_Base})+$/u).test(message.content?.trim() as string)
+        new RegExp(/^(\p{Emoji_Presentation}|\p{Emoji}\uFE0F|\p{Emoji_Modifier_Base})+$/u).test(
+            message.content?.trim() as string,
+        )
 
     const handleOpenReaction = () => {
         setIsOpenReaction(!isOpenReaction)
@@ -162,11 +164,16 @@ const MessageItem = ({ message, messageIndex, messages, currentUser }: MessageIt
         return (
             <PopperWrapper className="!border-none !p-2">
                 <div className="flex w-32 flex-col text-sm font-medium">
-                    <button className="rounded-md p-2 text-left hover:bg-gray-100 dark:hover:bg-[#353738]" onClick={handleOpenRevokeModal}>
+                    <button
+                        className="rounded-md p-2 text-left hover:bg-gray-100 dark:hover:bg-[#353738]"
+                        onClick={handleOpenRevokeModal}
+                    >
                         {/* if message is not revoked and sender is current user, show "Thu hồi", else show "Gỡ" */}
                         {message.content !== null && message.sender_id === currentUser?.id ? 'Thu hồi' : 'Gỡ'}
                     </button>
-                    <button className="rounded-md p-2 text-left hover:bg-gray-100 dark:hover:bg-[#353738]">Chuyển tiếp</button>
+                    <button className="rounded-md p-2 text-left hover:bg-gray-100 dark:hover:bg-[#353738]">
+                        Chuyển tiếp
+                    </button>
                 </div>
             </PopperWrapper>
         )
@@ -271,7 +278,9 @@ const MessageItem = ({ message, messageIndex, messages, currentUser }: MessageIt
                                             : 'max-w-[60%] sm:max-w-[40%] md:max-w-[35%] lg:max-w-[30%] xl:max-w-[25%]'
                                     }`}
                                 >
-                                    <div className={`flex w-full flex-wrap gap-1 overflow-hidden rounded-3xl [word-break:break-word]`}>
+                                    <div
+                                        className={`flex w-full flex-wrap gap-1 overflow-hidden rounded-3xl [word-break:break-word]`}
+                                    >
                                         {JSON.parse(message.content).map((url: string, index: number) => (
                                             <div className="flex-1" key={index}>
                                                 <CustomImage
@@ -323,9 +332,15 @@ const MessageItem = ({ message, messageIndex, messages, currentUser }: MessageIt
                     ) {
                         return (
                             <React.Fragment key={index}>
-                                <Tippy content={`${status.receiver.full_name} đã xem lúc ${handleFormatTime(status.read_at)}`}>
+                                <Tippy
+                                    content={`${status.receiver.full_name} đã xem lúc ${handleFormatTime(status.read_at)}`}
+                                >
                                     <span>
-                                        <UserAvatar src={status.receiver.avatar} size={14} className="my-1 ml-1 cursor-default" />
+                                        <UserAvatar
+                                            src={status.receiver.avatar}
+                                            size={14}
+                                            className="my-1 ml-1 cursor-default"
+                                        />
                                     </span>
                                 </Tippy>
                             </React.Fragment>
@@ -353,7 +368,9 @@ const MessageItem = ({ message, messageIndex, messages, currentUser }: MessageIt
             </div>
 
             {/* Show time between two message if the time is greater than 7 minutes */}
-            <p className={`my-3 text-center text-xs text-gray-400 ${Number(diffTime) < BETWEEN_TIME_MESSAGE ? 'hidden' : 'block'}`}>
+            <p
+                className={`my-3 text-center text-xs text-gray-400 ${Number(diffTime) < BETWEEN_TIME_MESSAGE ? 'hidden' : 'block'}`}
+            >
                 {messageIndex > 0 && handleFormatTime(messages.data[messageIndex - 1].created_at)}
             </p>
         </div>

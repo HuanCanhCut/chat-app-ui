@@ -191,10 +191,7 @@ const ReactionModal: React.FC<Props> = ({ onClose, messageId }) => {
                         }}
                         className="!overflow-hidden"
                         hasMore={
-                            reactions &&
-                            reactions?.meta.pagination.current_page < reactions?.meta.pagination.total_pages
-                                ? true
-                                : false
+                            reactions && reactions?.meta.pagination.current_page < reactions?.meta.pagination.total_pages ? true : false
                         }
                         scrollThreshold={0.8}
                         loader={
@@ -215,9 +212,7 @@ const ReactionModal: React.FC<Props> = ({ onClose, messageId }) => {
                                     <div className="ml-2 flex-grow">
                                         <p>{reaction.user_reaction.full_name}</p>
                                         <p className="text-xs font-light text-zinc-600 dark:text-zinc-400">
-                                            {reaction.user_id === currentUser?.data.id
-                                                ? 'Nhấp để gỡ bỏ'
-                                                : 'Nhấp để xem trang cá nhân'}
+                                            {reaction.user_id === currentUser?.data.id ? 'Nhấp để gỡ bỏ' : 'Nhấp để xem trang cá nhân'}
                                         </p>
                                     </div>
                                     <p className="text-2xl">{reaction.react}</p>

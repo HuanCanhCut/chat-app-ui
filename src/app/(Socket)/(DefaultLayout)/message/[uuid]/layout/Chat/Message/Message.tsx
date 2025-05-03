@@ -39,7 +39,7 @@ const Message: React.FC = () => {
     useEffect(() => {
         const remove = listenEvent({
             eventName: 'message:emit-message',
-            handler: ({ detail }) => {
+            handler: ({ detail }: { detail: { conversationUuid: string; message: MessageModel } }) => {
                 if (detail.conversationUuid === uuid) {
                     if (!messages?.data) {
                         return
@@ -61,39 +61,41 @@ const Message: React.FC = () => {
         return remove
     }, [messages?.data, messages?.meta, mutateMessages, uuid])
 
-    // useEffect(() => {
-    //     const remove = listenEvent({
-    //         eventName: 'message:revoke',
-    //         handler: ({ detail }) => {
-    //             switch (detail.type) {
-    //                 case 'for-me':
-    //                     const newMessages = messages?.data.filter((message) => {
-    //                         return message.id !== detail.messageId
-    //                     })
+    useEffect(() => {
+        const remove = listenEvent({
+            eventName: 'message:revoke',
+            handler: ({ detail }: { detail: { type: string; messageId: number } }) => {
+                if (!messages?.data) {
+                    return
+                }
 
-    //                     console.log({ newMessages })
+                switch (detail.type) {
+                    case 'for-me':
+                        const newMessages = messages?.data.filter((message) => {
+                            return message.id !== detail.messageId
+                        })
 
-    //                     // mutateMessages(
-    //                     //     {
-    //                     //         data: newMessages,
-    //                     //         meta: messages?.meta,
-    //                     //     },
-    //                     //     {
-    //                     //         revalidate: false,
-    //                     //     },
-    //                     // )
+                        mutateMessages(
+                            {
+                                data: newMessages,
+                                meta: messages?.meta,
+                            },
+                            {
+                                revalidate: false,
+                            },
+                        )
 
-    //                     break
-    //                 case 'for-other':
-    //                     break
-    //                 default:
-    //                     break
-    //             }
-    //         },
-    //     })
+                        break
+                    case 'for-other':
+                        break
+                    default:
+                        break
+                }
+            },
+        })
 
-    //     return remove
-    // }, [messages?.data])
+        return remove
+    }, [messages, mutateMessages])
 
     const handleEnterMessage = (e: React.KeyboardEvent<HTMLDivElement>) => {
         if (e.key === 'Enter') {
@@ -172,51 +174,56 @@ const Message: React.FC = () => {
     }, [messages, mutateMessages, uuid])
 
     useEffect(() => {
-        socket.on(SocketEvent.UPDATE_READ_MESSAGE, ({ message: data, user_read_id }: { message: MessageModel; user_read_id: number }) => {
-            if (!messages?.data) {
-                return
-            }
-
-            let lastReadMessageId = 0
-
-            const newMessages = messages?.data.map((message) => {
-                if (message.id === data.id) {
-                    return data
+        socket.on(
+            SocketEvent.UPDATE_READ_MESSAGE,
+            ({ message: data, user_read_id }: { message: MessageModel; user_read_id: number }) => {
+                if (!messages?.data) {
+                    return
                 }
 
-                if (Number(user_read_id) !== currentUser?.data?.id) {
-                    lastReadMessageId = data.id
-                }
+                let lastReadMessageId = 0
 
-                return {
-                    ...message,
-                    message_status: message.message_status.map((status) => {
-                        if (status?.receiver_id !== currentUser?.data?.id) {
-                            return {
-                                ...status,
-                                receiver: {
-                                    ...status.receiver,
-                                    last_read_message_id: !!lastReadMessageId ? lastReadMessageId : status.receiver.last_read_message_id,
-                                },
-                                status: 'read' as const,
-                                read_at: new Date(),
+                const newMessages = messages?.data.map((message) => {
+                    if (message.id === data.id) {
+                        return data
+                    }
+
+                    if (Number(user_read_id) !== currentUser?.data?.id) {
+                        lastReadMessageId = data.id
+                    }
+
+                    return {
+                        ...message,
+                        message_status: message.message_status.map((status) => {
+                            if (status?.receiver_id !== currentUser?.data?.id) {
+                                return {
+                                    ...status,
+                                    receiver: {
+                                        ...status.receiver,
+                                        last_read_message_id: !!lastReadMessageId
+                                            ? lastReadMessageId
+                                            : status.receiver.last_read_message_id,
+                                    },
+                                    status: 'read' as const,
+                                    read_at: new Date(),
+                                }
                             }
-                        }
-                        return status
-                    }),
-                }
-            })
+                            return status
+                        }),
+                    }
+                })
 
-            mutateMessages(
-                {
-                    data: newMessages,
-                    meta: messages?.meta,
-                },
-                {
-                    revalidate: false,
-                },
-            )
-        })
+                mutateMessages(
+                    {
+                        data: newMessages,
+                        meta: messages?.meta,
+                    },
+                    {
+                        revalidate: false,
+                    },
+                )
+            },
+        )
 
         return () => {
             socket.off(SocketEvent.UPDATE_READ_MESSAGE)
@@ -300,7 +307,11 @@ const Message: React.FC = () => {
                         setPage(page + 1)
                     }}
                     className="flex flex-col-reverse gap-[2.5px] px-2 py-3"
-                    hasMore={messages && messages?.meta.pagination.current_page < messages?.meta.pagination.total_pages ? true : false}
+                    hasMore={
+                        messages && messages?.meta.pagination.current_page < messages?.meta.pagination.total_pages
+                            ? true
+                            : false
+                    }
                     inverse={true}
                     scrollThreshold={0.5}
                     loader={

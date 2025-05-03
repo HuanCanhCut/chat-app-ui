@@ -161,7 +161,7 @@ const Notification = () => {
     useEffect(() => {
         const remove = listenEvent({
             eventName: 'notification:update-read-status',
-            handler: ({ detail: { notificationId, type } }) => {
+            handler: ({ detail: { notificationId, type } }: { detail: { notificationId: number; type: string } }) => {
                 if (!notifications) {
                     return
                 }

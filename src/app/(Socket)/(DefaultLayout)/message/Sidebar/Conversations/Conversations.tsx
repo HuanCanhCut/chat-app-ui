@@ -76,16 +76,18 @@ const Conversations = () => {
                 [data.conversation.uuid]: {
                     ...conversationData,
                     last_message: data.conversation.last_message,
-                    conversation_members: conversationData.conversation_members.map((member: ConversationMember, index: number) => {
-                        return {
-                            ...member,
-                            user: {
-                                ...member.user,
-                                is_online: conversationData.conversation_members[index].user.is_online,
-                                last_online_at: conversationData.conversation_members[index].user.last_online_at,
-                            },
-                        }
-                    }),
+                    conversation_members: conversationData.conversation_members.map(
+                        (member: ConversationMember, index: number) => {
+                            return {
+                                ...member,
+                                user: {
+                                    ...member.user,
+                                    is_online: conversationData.conversation_members[index].user.is_online,
+                                    last_online_at: conversationData.conversation_members[index].user.last_online_at,
+                                },
+                            }
+                        },
+                    ),
                 },
                 ...conversations,
             }
@@ -115,14 +117,14 @@ const Conversations = () => {
                         ...conversations,
                         [conversationUserMap[data.user_id]]: {
                             ...conversations[conversationUserMap[data.user_id]],
-                            conversation_members: conversations[conversationUserMap[data.user_id]].conversation_members.map(
-                                (member: ConversationMember) => {
-                                    if (member.user_id === data.user_id) {
-                                        return { ...member, user: { ...member.user, is_online: data.is_online } }
-                                    }
-                                    return member
-                                },
-                            ),
+                            conversation_members: conversations[
+                                conversationUserMap[data.user_id]
+                            ].conversation_members.map((member: ConversationMember) => {
+                                if (member.user_id === data.user_id) {
+                                    return { ...member, user: { ...member.user, is_online: data.is_online } }
+                                }
+                                return member
+                            }),
                         },
                     },
                     {
@@ -134,7 +136,9 @@ const Conversations = () => {
                     const conversation: ConversationModel = conversations[key]
 
                     if (!conversation.is_group) {
-                        const hasUser = conversation.conversation_members.find((member) => member.user_id === data.user_id)
+                        const hasUser = conversation.conversation_members.find(
+                            (member) => member.user_id === data.user_id,
+                        )
 
                         if (hasUser) {
                             mutateConversations(
@@ -174,17 +178,17 @@ const Conversations = () => {
     useEffect(() => {
         const remove = listenEvent({
             eventName: 'message:read-message',
-            handler: ({ detail: conversationUuid }) => {
-                if (conversations?.[conversationUuid]) {
+            handler: ({ detail }: { detail: { conversationUuid: string } }) => {
+                if (conversations?.[detail.conversationUuid]) {
                     const newData = {
-                        ...conversations[conversationUuid],
+                        ...conversations[detail.conversationUuid],
                         last_message: {
-                            ...conversations[conversationUuid].last_message,
+                            ...conversations[detail.conversationUuid].last_message,
                             is_read: true,
                         },
                     }
 
-                    mutateConversations({ ...conversations, [conversationUuid]: newData }, { revalidate: false })
+                    mutateConversations({ ...conversations, [detail.conversationUuid]: newData }, { revalidate: false })
                 }
             },
         })
@@ -209,7 +213,11 @@ const Conversations = () => {
             ) : (
                 <div className="flex h-full flex-col items-center justify-center">
                     <Image
-                        src={theme === 'dark' ? '/static/media/empty-message-light.png' : '/static/media/empty-message-dark.png'}
+                        src={
+                            theme === 'dark'
+                                ? '/static/media/empty-message-light.png'
+                                : '/static/media/empty-message-dark.png'
+                        }
                         alt="empty-conversation"
                         width={100}
                         height={100}

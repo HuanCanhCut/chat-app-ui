@@ -58,7 +58,7 @@ export default function UserPage() {
     useEffect(() => {
         const remove = listenEvent({
             eventName: 'friend:change-friend-status',
-            handler: ({ detail }) => {
+            handler: ({ detail }: { detail: { send_friend_request: boolean } }) => {
                 if (!user?.data) {
                     return
                 }
@@ -108,11 +108,7 @@ export default function UserPage() {
                 {user && currentUser ? (
                     <div className="w-1100px mx-auto max-w-[1100px]">
                         <CustomImage
-                            src={
-                                currentUser.data.id === user.data.id
-                                    ? currentUser.data.cover_photo
-                                    : user.data.cover_photo
-                            }
+                            src={currentUser.data.id === user.data.id ? currentUser.data.cover_photo : user.data.cover_photo}
                             fallback="/static/media/login-form.jpg"
                             alt="user"
                             className="aspect-[12/5] h-auto w-[1100px] rounded-lg object-cover"
