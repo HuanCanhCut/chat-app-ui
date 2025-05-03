@@ -92,8 +92,6 @@ const Conversations = () => {
                 ...conversations,
             }
 
-            console.log(conversationMutate)
-
             mutateConversations(conversationMutate, {
                 revalidate: false,
             })
@@ -178,17 +176,17 @@ const Conversations = () => {
     useEffect(() => {
         const remove = listenEvent({
             eventName: 'message:read-message',
-            handler: ({ detail }: { detail: { conversationUuid: string } }) => {
-                if (conversations?.[detail.conversationUuid]) {
+            handler: ({ detail: conversationUuid }: { detail: string }) => {
+                if (conversations?.[conversationUuid]) {
                     const newData = {
-                        ...conversations[detail.conversationUuid],
+                        ...conversations[conversationUuid],
                         last_message: {
-                            ...conversations[detail.conversationUuid].last_message,
+                            ...conversations[conversationUuid].last_message,
                             is_read: true,
                         },
                     }
 
-                    mutateConversations({ ...conversations, [detail.conversationUuid]: newData }, { revalidate: false })
+                    mutateConversations({ ...conversations, [conversationUuid]: newData }, { revalidate: false })
                 }
             },
         })
