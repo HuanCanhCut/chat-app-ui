@@ -192,6 +192,10 @@ const Message: React.FC = () => {
                         lastReadMessageId = data.id
                     }
 
+                    if (Number(user_read_id) === currentUser?.data?.id && data.sender_id !== currentUser?.data?.id) {
+                        lastReadMessageId = data.id
+                    }
+
                     return {
                         ...message,
                         message_status: message.message_status.map((status) => {

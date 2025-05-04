@@ -68,21 +68,25 @@ const MessageItem = ({ message, messageIndex, messages, currentUser }: MessageIt
     useEffect(() => {
         if (isFirstMessageVisible) {
             // If haven't seen it, then emit
+            let isRead = false
             if (message.id === messages.data[0].id) {
                 for (const status of messages.data[0].message_status) {
                     // If have seen it, then skip it.
                     if (status.receiver_id === currentUser?.id && status.receiver.last_read_message_id === message.id) {
-                        return
+                        isRead = true
+                        break
                     }
                 }
             }
 
-            socket.emit(SocketEvent.READ_MESSAGE, {
-                conversationUuid: uuid as string,
-                messageId: message.id,
-            })
+            if (!isRead) {
+                socket.emit(SocketEvent.READ_MESSAGE, {
+                    conversationUuid: uuid as string,
+                    messageId: message.id,
+                })
 
-            sendEvent({ eventName: 'message:read-message', detail: uuid as string })
+                sendEvent({ eventName: 'message:read-message', detail: uuid as string })
+            }
         }
     }, [currentUser?.id, isFirstMessageVisible, message.id, messages.data, uuid])
 
