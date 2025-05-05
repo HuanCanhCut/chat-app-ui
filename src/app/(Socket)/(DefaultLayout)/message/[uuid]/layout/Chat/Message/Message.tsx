@@ -21,8 +21,6 @@ const Message: React.FC = () => {
 
     const [page, setPage] = useState(1)
 
-    console.log('re-render')
-
     const { data: messages, mutate: mutateMessages } = useSWR<MessageResponse | undefined>(
         uuid ? [SWRKey.GET_MESSAGES, uuid] : null,
         () => {

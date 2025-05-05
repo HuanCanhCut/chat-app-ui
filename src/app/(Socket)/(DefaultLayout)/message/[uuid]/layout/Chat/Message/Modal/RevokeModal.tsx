@@ -33,8 +33,9 @@ const RevokeModal = ({ message, onClose }: RevokeModalProps) => {
                 messageId: message.id,
                 type: revokeChooseType,
             })
+
             if (response.status === 200) {
-                sendEvent({ eventName: 'message:revoke', detail: { messageId: message.id, type: revokeType } })
+                sendEvent({ eventName: 'message:revoke', detail: { messageId: message.id, type: revokeChooseType } })
                 onClose()
             }
         } catch (error) {
