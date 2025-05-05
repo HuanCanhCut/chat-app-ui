@@ -101,12 +101,7 @@ export default function User({ currentUser, user }: UserProps) {
                 </h1>
                 <p className="text-gr ay-700 text-base dark:text-gray-400">{user?.data.friends_count} người bạn</p>
                 <div className="hidden sm:flex">
-                    {friends?.data?.map((friend: FriendsShip, index) => {
-                        // 7 là số lượng bạn bè tối đa hiển thị
-                        if (index >= 7) {
-                            return
-                        }
-
+                    {friends?.data?.slice(0, 7).map((friend: FriendsShip, index) => {
                         const translateValue = `translateX(-${index * 7}px)`
 
                         return (

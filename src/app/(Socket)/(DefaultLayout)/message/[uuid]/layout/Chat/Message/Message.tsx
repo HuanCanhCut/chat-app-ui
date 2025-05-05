@@ -21,6 +21,8 @@ const Message: React.FC = () => {
 
     const [page, setPage] = useState(1)
 
+    console.log('re-render')
+
     const { data: messages, mutate: mutateMessages } = useSWR<MessageResponse | undefined>(
         uuid ? [SWRKey.GET_MESSAGES, uuid] : null,
         () => {
@@ -179,6 +181,20 @@ const Message: React.FC = () => {
             ({ message: data, user_read_id }: { message: MessageModel; user_read_id: number }) => {
                 if (!messages?.data) {
                     return
+                }
+
+                const userLastReadMessage = data.message_status.find((status) => {
+                    return status.receiver.id === user_read_id
+                })
+
+                // If someone in the group chat revokes a message on their side, the message read status is not processed.
+                if (userLastReadMessage?.receiver.last_read_message_id) {
+                    if (
+                        Number(user_read_id) !== currentUser?.data?.id &&
+                        userLastReadMessage?.receiver.last_read_message_id < messages.data[0].id
+                    ) {
+                        return
+                    }
                 }
 
                 let lastReadMessageId = 0

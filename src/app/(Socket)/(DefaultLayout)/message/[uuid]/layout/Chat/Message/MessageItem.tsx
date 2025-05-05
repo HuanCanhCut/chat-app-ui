@@ -319,12 +319,7 @@ const MessageItem = ({ message, messageIndex, messages, currentUser }: MessageIt
             </div>
 
             <div className={`flex justify-end pr-2`}>
-                {message.message_status.map((status: MessageStatus, index: number) => {
-                    // Only show 6 users who have read the message
-                    if (index > 6) {
-                        return
-                    }
-
+                {message.message_status.slice(0, 6).map((status: MessageStatus, index: number) => {
                     if (status.receiver.last_read_message_id !== message.id && status.status !== 'sending') {
                         return
                     }

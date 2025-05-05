@@ -10,6 +10,7 @@ import { getCurrentUser } from '~/redux/selector'
 import { MessageModel } from '~/type/type'
 import { toast } from '~/utils/toast'
 import { sendEvent } from '~/helpers/events'
+import React, { useState } from 'react'
 interface RevokeModalProps {
     message: MessageModel
     onClose: () => void
@@ -20,16 +21,18 @@ const RevokeModal = ({ message, onClose }: RevokeModalProps) => {
 
     const { uuid } = useParams()
 
-    const revokeType = message.sender_id !== currentUser?.id ? 'for-me' : message.content === null ? 'for-me' : 'for-other'
+    const revokeType =
+        message.sender_id !== currentUser?.id ? 'for-me' : message.content === null ? 'for-me' : 'for-other'
+
+    const [revokeChooseType, setRevokeChooseType] = useState<'for-me' | 'for-other'>(revokeType)
 
     const handleRevoke = async () => {
         try {
             const response = await messageServices.revokeMessage({
                 conversationUuid: uuid as string,
                 messageId: message.id,
-                type: revokeType,
+                type: revokeChooseType,
             })
-
             if (response.status === 200) {
                 sendEvent({ eventName: 'message:revoke', detail: { messageId: message.id, type: revokeType } })
                 onClose()
@@ -40,34 +43,81 @@ const RevokeModal = ({ message, onClose }: RevokeModalProps) => {
     }
 
     return (
-        <PopperWrapper className={`!max-w-[calc(100vw-30px)] !border-none !p-0 ${revokeType === 'for-me' ? '!w-[550px]' : '!w-[700px]'}`}>
+        <PopperWrapper
+            className={`!max-w-[calc(100vw-30px)] !border-none !p-0 ${revokeType === 'for-me' ? '!w-[550px]' : '!w-[700px]'}`}
+        >
             <header className="relative border-b border-gray-200 p-3 text-center dark:border-zinc-700">
                 <span className="text-center text-xl font-medium">
                     {revokeType === 'for-me' ? 'Gỡ đối với bạn?' : 'Bạn muốn tin nhắn này thu hồi ở phía ai?'}
                 </span>
 
-                <Button buttonType="icon" className="absolute right-2 top-1/2 -translate-y-1/2 text-2xl" onClick={onClose}>
+                <Button
+                    buttonType="icon"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-2xl"
+                    onClick={onClose}
+                >
                     <FontAwesomeIcon icon={faXmark} />
                 </Button>
             </header>
-            <main className="p-3">
+            <main className="px-5 py-3">
                 {revokeType === 'for-me' ? (
                     <>
                         <p className="text-[15px] font-light">
-                            Tin nhắn này sẽ bị gỡ khỏi thiết bị của bạn, nhưng vẫn hiển thị với các thành viên khác trong đoạn chat.
+                            Tin nhắn này sẽ bị gỡ khỏi thiết bị của bạn, nhưng vẫn hiển thị với các thành viên khác
+                            trong đoạn chat.
                         </p>
-                        <div className="mt-2 flex items-center justify-end gap-2">
-                            <Button buttonType="rounded" onClick={onClose}>
-                                Hủy
-                            </Button>
-                            <Button buttonType="primary" onClick={handleRevoke}>
-                                Gỡ
-                            </Button>
-                        </div>
                     </>
                 ) : (
-                    <p>Khi bạn thu hồi tin nhắn này, nó sẽ không còn hiển thị trong cuộc trò chuyện của bạn.</p>
+                    <React.Fragment>
+                        <div>
+                            <div className="flex items-center gap-2 py-1">
+                                <input
+                                    className="h-6 w-6 rounded-full"
+                                    type="radio"
+                                    name="revoke-other"
+                                    id="revoke-other"
+                                    checked={revokeChooseType === 'for-other'}
+                                    onChange={() => setRevokeChooseType('for-other')}
+                                />
+                                <label htmlFor="revoke-other" className="cursor-pointer font-medium">
+                                    Thu hồi với mọi người
+                                </label>
+                            </div>
+                            <p className="mx-8 mb-6 text-sm font-light text-zinc-600 dark:text-zinc-400">
+                                Tin nhắn này sẽ bị thu hồi với mọi người trong đoạn chat. Những người khác có thể đã xem
+                                hoặc chuyển tiếp tin nhắn đó. Tin nhắn đã thu hồi vẫn có thể bị báo cáo.
+                            </p>
+                        </div>
+                        <div>
+                            <div className="flex items-center gap-2 py-1">
+                                <input
+                                    className="h-6 w-6 rounded-full border"
+                                    type="radio"
+                                    name="revoke-other"
+                                    id="revoke-forme"
+                                    checked={revokeChooseType === 'for-me'}
+                                    onChange={() => setRevokeChooseType('for-me')}
+                                />
+                                <label htmlFor="revoke-forme" className="cursor-pointer font-medium">
+                                    Thu hồi với bạn
+                                </label>
+                            </div>
+                            <p className="mx-8 mb-6 text-sm font-light text-zinc-600 dark:text-zinc-400">
+                                Chúng tôi sẽ gỡ tin nhắn này ở phía bạn. Những người khác trong đoạn chat vẫn có thể xem
+                                được.
+                            </p>
+                        </div>
+                    </React.Fragment>
                 )}
+
+                <div className="mt-2 flex items-center justify-end gap-2">
+                    <Button buttonType="rounded" onClick={onClose}>
+                        Hủy
+                    </Button>
+                    <Button buttonType="primary" onClick={handleRevoke}>
+                        Gỡ
+                    </Button>
+                </div>
             </main>
         </PopperWrapper>
     )
