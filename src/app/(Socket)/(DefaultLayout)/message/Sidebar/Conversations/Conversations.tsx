@@ -12,13 +12,17 @@ import Image from 'next/image'
 import Skeleton from 'react-loading-skeleton'
 import socket from '~/helpers/socket'
 import { SocketEvent } from '~/enum/SocketEvent'
-import { ConversationMember, ConversationModel, SocketMessage } from '~/type/type'
+import { ConversationMember, ConversationModel, MessageModel, SocketMessage } from '~/type/type'
 import { listenEvent } from '~/helpers/events'
 
 type UserStatus = {
     user_id: number
     is_online: boolean
     last_online_at: string | null
+}
+
+interface Conversation<T> {
+    [key: string]: T
 }
 
 const Conversations = () => {
@@ -32,10 +36,13 @@ const Conversations = () => {
         SWRKey.GET_CONVERSATIONS,
         async () => {
             const response = await conversationService.getConversations({ page: 1 })
-            const groupConversationsByUuid = response?.data?.reduce<Record<string, any>>((acc, conversation) => {
-                acc[conversation.uuid] = conversation
-                return acc
-            }, {})
+            const groupConversationsByUuid = response?.data?.reduce<Conversation<ConversationModel>>(
+                (acc, conversation) => {
+                    acc[conversation.uuid] = conversation
+                    return acc
+                },
+                {},
+            )
             return groupConversationsByUuid
         },
         {
@@ -192,6 +199,29 @@ const Conversations = () => {
         })
 
         return remove
+    }, [conversations, mutateConversations])
+
+    useEffect(() => {
+        interface RevokeMessage {
+            message_id: number
+            conversation_uuid: string
+        }
+
+        socket.on(SocketEvent.MESSAGE_REVOKE, ({ message_id, conversation_uuid }: RevokeMessage) => {
+            if (conversations?.[conversation_uuid]) {
+                if (conversations[conversation_uuid].last_message.id === message_id) {
+                    const newData = {
+                        ...conversations[conversation_uuid],
+                        last_message: {
+                            ...conversations[conversation_uuid].last_message,
+                            content: null,
+                        },
+                    }
+
+                    mutateConversations({ ...conversations, [conversation_uuid]: newData }, { revalidate: false })
+                }
+            }
+        })
     }, [conversations, mutateConversations])
 
     return (

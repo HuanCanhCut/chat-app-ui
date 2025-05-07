@@ -10,7 +10,7 @@ import { SocketEvent } from '~/enum/SocketEvent'
 import SWRKey from '~/enum/SWRKey'
 import { listenEvent, sendEvent } from '~/helpers/events'
 import socket from '~/helpers/socket'
-import { MessageModel, MessageResponse, SocketMessage } from '~/type/type'
+import { MessageModel, MessageResponse, SocketMessage, UserModel } from '~/type/type'
 import MessageItem from './MessageItem'
 import { useAppSelector } from '~/redux'
 import { getCurrentUser } from '~/redux/selector'
@@ -315,6 +315,44 @@ const Message: React.FC = () => {
             socket.off(SocketEvent.REMOVE_REACTION)
         }
     }, [messages?.data, messages?.meta, mutateMessages])
+
+    useEffect(() => {
+        interface RevokeMessage {
+            message_id: number
+            conversation_uuid: string
+        }
+
+        socket.on(SocketEvent.MESSAGE_REVOKE, ({ message_id, conversation_uuid }: RevokeMessage) => {
+            if (messages?.data) {
+                if (conversation_uuid === uuid) {
+                    const newMessages = messages.data.map((message) => {
+                        if (message.id === message_id) {
+                            return {
+                                ...message,
+                                content: null,
+                            }
+                        }
+
+                        return message
+                    })
+
+                    mutateMessages(
+                        {
+                            data: newMessages,
+                            meta: messages.meta,
+                        },
+                        {
+                            revalidate: false,
+                        },
+                    )
+                }
+            }
+        })
+
+        return () => {
+            socket.off(SocketEvent.MESSAGE_REVOKE)
+        }
+    }, [messages?.data, messages?.meta, mutateMessages, uuid])
 
     return (
         <div className="flex-grow overflow-hidden" onKeyDown={handleEnterMessage}>

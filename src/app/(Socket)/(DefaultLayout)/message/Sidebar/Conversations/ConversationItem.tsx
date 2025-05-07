@@ -21,7 +21,8 @@ const ConversationItem: React.FC<Props> = ({ conversation, className = '' }) => 
     // if not group then get user !== current user in conversation_members
     const userMember = conversation.conversation_members.find((member) => member.user_id !== currentUser?.data.id)?.user
 
-    const isRead = conversation.last_message.sender_id !== currentUser?.data.id ? conversation.last_message.is_read : true
+    const isRead =
+        conversation.last_message.sender_id !== currentUser?.data.id ? conversation.last_message.is_read : true
 
     return (
         <>
@@ -46,8 +47,8 @@ const ConversationItem: React.FC<Props> = ({ conversation, className = '' }) => 
                     >
                         <span className="truncate pr-1">
                             {currentUser?.data.id === conversation.last_message?.sender_id
-                                ? `Bạn: ${conversation.last_message?.content}`
-                                : `${!conversation.is_group ? '' : conversation.last_message?.sender.full_name + ': '} ${conversation.last_message?.content}`}
+                                ? `Bạn: ${conversation.last_message?.content === null ? 'Đã thu hồi một tin nhắn' : conversation.last_message?.content}`
+                                : `${!conversation.is_group ? '' : conversation.last_message?.sender.full_name + ': '} ${conversation.last_message?.content === null ? 'Đã thu hồi một tin nhắn' : conversation.last_message?.content}`}
                         </span>
                         <span className="flex-shrink-0">· {momentTimezone(conversation.last_message?.created_at)}</span>
                     </div>
