@@ -1,4 +1,4 @@
-import { faEllipsisVertical, faShare } from '@fortawesome/free-solid-svg-icons'
+import { faEllipsisVertical, faReply, faShare } from '@fortawesome/free-solid-svg-icons'
 import { faSmile } from '@fortawesome/free-regular-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Tippy from '@tippyjs/react'
@@ -13,7 +13,7 @@ import UserAvatar from '~/components/UserAvatar'
 import useVisible from '~/hooks/useVisible'
 import socket from '~/helpers/socket'
 import { SocketEvent } from '~/enum/SocketEvent'
-import { sendEvent } from '~/helpers/events'
+import { listenEvent, sendEvent } from '~/helpers/events'
 import MessageImagesModel from './Modal/MessageImagesModal'
 import { KeyedMutator } from 'swr'
 import ReactionModal from './Modal/ReactionModal'
@@ -41,6 +41,9 @@ const MessageItem = ({ message, messageIndex, messages, currentUser }: MessageIt
     const firstMessageRef = useRef<HTMLDivElement>(null)
     const isFirstMessageVisible: boolean = useVisible(options, firstMessageRef)
     const tippyInstanceRef = useRef<any>(null)
+    const messageRef = useRef<HTMLDivElement>(null)
+    const replyMessageRef = useRef<HTMLDivElement>(null)
+    const groupMessageRef = useRef<HTMLDivElement>(null)
 
     const [openImageModal, setOpenImageModal] = useState({
         isOpen: false,
@@ -56,6 +59,18 @@ const MessageItem = ({ message, messageIndex, messages, currentUser }: MessageIt
 
     // open emoji-picker reaction
     const [isOpenReaction, setIsOpenReaction] = useState(false)
+    const [isOpenMoreAction, setIsOpenMoreAction] = useState(false)
+
+    useEffect(() => {
+        if (message.parent) {
+            if (replyMessageRef.current && (messageRef.current || firstMessageRef) && groupMessageRef.current) {
+                const messageHeight = messageRef.current?.offsetHeight || firstMessageRef.current?.offsetHeight
+                if (messageHeight) {
+                    groupMessageRef.current.style.height = replyMessageRef.current.offsetHeight + messageHeight + 'px'
+                }
+            }
+        }
+    }, [message.parent])
 
     const diffTime =
         messageIndex > 0 &&
@@ -69,7 +84,7 @@ const MessageItem = ({ message, messageIndex, messages, currentUser }: MessageIt
         if (isFirstMessageVisible) {
             // If haven't seen it, then emit
             let isRead = false
-            if (message.id === messages.data[0].id) {
+            if (message.id === messages.data[0].id && !message.is_read) {
                 for (const status of messages.data[0].message_status) {
                     // If have seen it, then skip it.
                     if (status.receiver_id === currentUser?.id && status.receiver.last_read_message_id === message.id) {
@@ -88,7 +103,7 @@ const MessageItem = ({ message, messageIndex, messages, currentUser }: MessageIt
                 sendEvent({ eventName: 'message:read-message', detail: uuid as string })
             }
         }
-    }, [currentUser?.id, isFirstMessageVisible, message.id, messages.data, uuid])
+    }, [currentUser?.id, isFirstMessageVisible, message.id, message.is_read, messages.data, uuid])
 
     const handleFormatTime = (time: Date) => {
         const isSameDay = moment(new Date(time)).isSame(moment(new Date()), 'day')
@@ -185,7 +200,19 @@ const MessageItem = ({ message, messageIndex, messages, currentUser }: MessageIt
 
     const tippyShow = (instance: any) => {
         tippyInstanceRef.current = instance
+        setIsOpenMoreAction(true)
     }
+
+    useEffect(() => {
+        const remove = listenEvent({
+            eventName: 'tippy:tippy-hidden',
+            handler: () => {
+                setIsOpenMoreAction(false)
+            },
+        })
+
+        return remove
+    }, [])
 
     return (
         <div>
@@ -208,114 +235,154 @@ const MessageItem = ({ message, messageIndex, messages, currentUser }: MessageIt
                 <RevokeModal message={message} onClose={handleCloseRevokeModal} />
             </Modal>
 
-            <div
-                className={`group relative flex w-full items-center gap-3 ${message?.top_reactions && 'mb-[10px]'} ${message.sender_id === currentUser?.id ? 'justify-end' : 'justify-start'}`}
-            >
-                <div
-                    className={`flex items-center gap-2 ${!isOpenReaction && 'opacity-0'} transition-opacity duration-100 group-hover:opacity-100 ${message.sender_id === currentUser?.id ? 'order-first' : 'order-last flex-row-reverse'}`}
-                >
-                    <CustomTippy renderItem={renderMoreAction} onShow={tippyShow} placement="top">
-                        <Tippy content="Xem thêm">
-                            <button className="flex-center h-7 w-7 rounded-full text-gray-500 hover:bg-gray-200 dark:text-gray-500 dark:hover:bg-zinc-800">
-                                <FontAwesomeIcon icon={faEllipsisVertical} />
-                            </button>
-                        </Tippy>
-                    </CustomTippy>
-                    <Tippy content="Trả lời">
-                        <button className="flex-center h-7 w-7 rounded-full text-gray-500 hover:bg-gray-200 dark:text-gray-500 dark:hover:bg-zinc-800">
-                            <FontAwesomeIcon icon={faShare} />
-                        </button>
-                    </Tippy>
-                    <Emoji
-                        isOpen={isOpenReaction}
-                        placement="top-start"
-                        setIsOpen={setIsOpenReaction}
-                        onEmojiClick={handleChooseReaction}
-                        isReaction={true}
-                    >
-                        <Tippy content="Bày tỏ cảm xúc">
-                            <button
-                                className="flex-center h-7 w-7 rounded-full text-gray-500 hover:bg-gray-200 dark:text-gray-500 dark:hover:bg-zinc-800"
-                                onClick={handleOpenReaction}
-                            >
-                                <FontAwesomeIcon icon={faSmile} />
-                            </button>
-                        </Tippy>
-                    </Emoji>
-                </div>
+            <div ref={groupMessageRef} className={`group relative flex w-full items-end gap-3`}>
                 {message.sender_id !== currentUser?.id && <UserAvatar src={message.sender.avatar} size={28} />}
-                <Tippy content={handleFormatTime(message.created_at)} placement="left">
-                    <React.Fragment>
-                        {message.content !== null ? (
-                            message.type === 'text' ? (
-                                isOnlyIcon ? (
-                                    <div
-                                        data-message-id={message.id}
-                                        ref={messageIndex === 0 ? firstMessageRef : null}
-                                        className={`relative w-fit max-w-[80%] rounded-3xl font-light [word-break:break-word]`}
-                                    >
-                                        <span className="max-w-fit break-words text-3xl">{message.content}</span>
+                <div
+                    className={`relative flex w-full items-center ${message?.top_reactions ? 'mb-[10px]' : ''} ${message.sender_id === currentUser?.id ? 'justify-end' : 'justify-start'}`}
+                >
+                    {/* Reply message */}
+                    {message.parent && message.type === 'text' ? (
+                        <React.Fragment>
+                            <div
+                                className={`absolute bottom-[calc(100%-14px)] w-fit max-w-[85%] cursor-pointer ${message.sender_id === currentUser?.id ? 'flex flex-col items-end' : 'flex flex-col items-start'}`}
+                                ref={replyMessageRef}
+                            >
+                                <p className="mb-1 flex w-full items-center gap-2 text-right text-xs text-zinc-400 dark:text-zinc-500">
+                                    <FontAwesomeIcon icon={faReply} />
+                                    {'  '}
+                                    {message.sender_id === currentUser?.id
+                                        ? `Bạn đã trả lời ${message.parent.sender_id === currentUser?.id ? 'chính mình' : message.parent.sender.full_name}`
+                                        : `${message.parent.sender.full_name} đã trả lời ${message.parent.sender_id === currentUser?.id ? 'bạn' : message.sender_id === message.parent.sender_id ? 'chính mình' : message.parent.sender.full_name}`}
+                                </p>
+                                <span
+                                    className={`line-clamp-2 max-w-fit overflow-hidden text-ellipsis break-words rounded-2xl ${message.sender_id === currentUser?.id ? 'rounded-br-none' : 'rounded-bl-none'} bg-[#feeace] px-3 py-1.5 pb-4 text-[13px] font-light text-zinc-600 [word-break:break-word] dark:bg-[#a0a0a08d] dark:text-zinc-400`}
+                                >
+                                    {message.parent.content !== null
+                                        ? message.parent.content
+                                        : message.parent.sender_id === currentUser?.id
+                                          ? 'Đã gỡ tin nhắn'
+                                          : 'Tin nhắn đã bị gỡ'}
+                                </span>
+                            </div>
+                        </React.Fragment>
+                    ) : (
+                        <p></p>
+                    )}
 
-                                        <Reaction message={message} handleOpenReactionModal={handleOpenReactionModal} />
-                                    </div>
-                                ) : (
+                    {/* More action */}
+                    <div
+                        className={`mx-3 flex items-center gap-2 ${!isOpenReaction && !isOpenMoreAction ? 'opacity-0' : 'opacity-100'} group-hover:opacity-100 ${message.sender_id === currentUser?.id ? 'order-first' : 'order-last flex-row-reverse'}`}
+                    >
+                        <CustomTippy renderItem={renderMoreAction} onShow={tippyShow} placement="top" offsetY={6}>
+                            <Tippy content="Xem thêm">
+                                <button className="flex-center z-10 h-7 w-7 rounded-full bg-[#feeace] text-black dark:bg-[#6b6b6b] dark:text-white">
+                                    <FontAwesomeIcon icon={faEllipsisVertical} />
+                                </button>
+                            </Tippy>
+                        </CustomTippy>
+                        <Tippy content="Trả lời">
+                            <button className="flex-center z-10 h-7 w-7 rounded-full bg-[#feeace] text-black dark:bg-[#6b6b6b] dark:text-white">
+                                <FontAwesomeIcon icon={faReply} />
+                            </button>
+                        </Tippy>
+                        <Emoji
+                            isOpen={isOpenReaction}
+                            placement="top-start"
+                            setIsOpen={setIsOpenReaction}
+                            onEmojiClick={handleChooseReaction}
+                            isReaction={true}
+                        >
+                            <Tippy content="Bày tỏ cảm xúc">
+                                <button
+                                    className="flex-center z-10 h-7 w-7 rounded-full bg-[#feeace] text-black dark:bg-[#6b6b6b] dark:text-white"
+                                    onClick={handleOpenReaction}
+                                >
+                                    <FontAwesomeIcon icon={faSmile} />
+                                </button>
+                            </Tippy>
+                        </Emoji>
+                    </div>
+
+                    {/* Message content */}
+                    <Tippy content={handleFormatTime(message.created_at)} placement="left">
+                        <>
+                            {message.content !== null ? (
+                                message.type === 'text' ? (
+                                    isOnlyIcon ? (
+                                        <div
+                                            data-message-id={message.id}
+                                            ref={messageIndex === 0 ? firstMessageRef : messageRef}
+                                            className={`relative w-fit max-w-[80%] rounded-3xl font-light [word-break:break-word]`}
+                                        >
+                                            <span className="max-w-fit break-words text-3xl">{message.content}</span>
+
+                                            <Reaction
+                                                message={message}
+                                                handleOpenReactionModal={handleOpenReactionModal}
+                                            />
+                                        </div>
+                                    ) : (
+                                        <div
+                                            data-message-id={message.id}
+                                            ref={messageIndex === 0 ? firstMessageRef : messageRef}
+                                            className={`relative w-fit max-w-[80%] rounded-2xl px-4 py-1.5 font-light [word-break:break-word] ${
+                                                message.sender_id === currentUser?.id
+                                                    ? 'bg-milk-tea text-white'
+                                                    : 'bg-lightGray text-black dark:bg-[#313233] dark:text-dark'
+                                            }`}
+                                        >
+                                            <span className="max-w-fit break-words">{message.content}</span>
+
+                                            <Reaction
+                                                message={message}
+                                                handleOpenReactionModal={handleOpenReactionModal}
+                                            />
+                                        </div>
+                                    )
+                                ) : message.type === 'image' ? (
                                     <div
-                                        data-message-id={message.id}
-                                        ref={messageIndex === 0 ? firstMessageRef : null}
-                                        className={`relative w-fit max-w-[80%] rounded-3xl px-4 py-1.5 font-light [word-break:break-word] ${
-                                            message.sender_id === currentUser?.id
-                                                ? 'bg-milk-tea text-white'
-                                                : 'bg-lightGray text-black dark:bg-[#313233] dark:text-dark'
+                                        ref={messageIndex === 0 ? firstMessageRef : messageRef}
+                                        className={`relative w-full ${
+                                            JSON.parse(message.content).length > 1
+                                                ? 'max-w-[60%] sm:max-w-[55%] md:max-w-[50%] lg:max-w-[45%] xl:max-w-[35%]'
+                                                : 'max-w-[60%] sm:max-w-[40%] md:max-w-[35%] lg:max-w-[30%] xl:max-w-[25%]'
                                         }`}
                                     >
-                                        <span className="max-w-fit break-words">{message.content}</span>
+                                        <div
+                                            className={`flex w-full flex-wrap gap-1 overflow-hidden rounded-2xl [word-break:break-word]`}
+                                        >
+                                            {JSON.parse(message.content).map((url: string, index: number) => (
+                                                <div className="flex-1" key={index}>
+                                                    <CustomImage
+                                                        src={url}
+                                                        alt="message"
+                                                        className={`max-h-[260px] sm:min-w-[150px] ${JSON.parse(message.content as string).length === 1 ? 'min-w-[240px]' : 'aspect-square'} h-full w-full min-w-[180px] cursor-pointer rounded-md object-cover`}
+                                                        priority
+                                                        quality={100}
+                                                        onClick={() => handleOpenImageModal(url, message.id)}
+                                                    />
+                                                </div>
+                                            ))}
+                                        </div>
 
                                         <Reaction message={message} handleOpenReactionModal={handleOpenReactionModal} />
                                     </div>
-                                )
-                            ) : message.type === 'image' ? (
-                                <div
-                                    ref={messageIndex === 0 ? firstMessageRef : null}
-                                    className={`relative w-full ${
-                                        JSON.parse(message.content).length > 1
-                                            ? 'max-w-[60%] sm:max-w-[55%] md:max-w-[50%] lg:max-w-[45%] xl:max-w-[35%]'
-                                            : 'max-w-[60%] sm:max-w-[40%] md:max-w-[35%] lg:max-w-[30%] xl:max-w-[25%]'
+                                ) : null
+                            ) : (
+                                <p
+                                    className={`relative w-fit max-w-[80%] rounded-3xl px-4 py-1.5 font-light italic opacity-85 [word-break:break-word] ${
+                                        message.sender_id === currentUser?.id
+                                            ? 'bg-milk-tea text-zinc-300'
+                                            : 'bg-lightGray text-zinc-600 dark:bg-[#313233] dark:text-zinc-400'
                                     }`}
                                 >
-                                    <div
-                                        className={`flex w-full flex-wrap gap-1 overflow-hidden rounded-3xl [word-break:break-word]`}
-                                    >
-                                        {JSON.parse(message.content).map((url: string, index: number) => (
-                                            <div className="flex-1" key={index}>
-                                                <CustomImage
-                                                    src={url}
-                                                    alt="message"
-                                                    className={`max-h-[260px] sm:min-w-[150px] ${JSON.parse(message.content as string).length === 1 ? 'min-w-[240px]' : 'aspect-square'} h-full w-full min-w-[180px] cursor-pointer rounded-md object-cover`}
-                                                    priority
-                                                    quality={100}
-                                                    onClick={() => handleOpenImageModal(url, message.id)}
-                                                />
-                                            </div>
-                                        ))}
-                                    </div>
-
-                                    <Reaction message={message} handleOpenReactionModal={handleOpenReactionModal} />
-                                </div>
-                            ) : null
-                        ) : (
-                            <p
-                                className={`relative w-fit max-w-[80%] rounded-3xl px-4 py-1.5 font-light italic opacity-85 [word-break:break-word] ${
-                                    message.sender_id === currentUser?.id
-                                        ? 'bg-milk-tea text-zinc-300'
-                                        : 'bg-lightGray text-zinc-600 dark:bg-[#313233] dark:text-zinc-400'
-                                }`}
-                            >
-                                {message.sender.id === currentUser?.id ? 'Bạn ' : `${message.sender.full_name} `}
-                                đã thu hồi một tin nhắn
-                            </p>
-                        )}
-                    </React.Fragment>
-                </Tippy>
+                                    {message.sender.id === currentUser?.id ? 'Bạn ' : `${message.sender.full_name} `}
+                                    đã thu hồi một tin nhắn
+                                </p>
+                            )}
+                        </>
+                    </Tippy>
+                </div>
             </div>
 
             <div className={`flex justify-end pr-2`}>

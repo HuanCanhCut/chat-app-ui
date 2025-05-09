@@ -19,6 +19,8 @@ const Message: React.FC = () => {
     const { uuid } = useParams()
     const currentUser = useAppSelector(getCurrentUser)
 
+    console.log('re-render')
+
     const [page, setPage] = useState(1)
 
     const { data: messages, mutate: mutateMessages } = useSWR<MessageResponse | undefined>(
@@ -71,9 +73,21 @@ const Message: React.FC = () => {
 
                 switch (detail.type) {
                     case 'for-me':
-                        const newMessages = messages?.data.filter((message) => {
-                            return message.id !== detail.messageId
-                        })
+                        // const newMessages = messages?.data.filter((message) => {
+                        //     return message.id !== detail.messageId
+                        // })
+
+                        const newMessages: MessageModel[] = []
+
+                        for (const message of messages.data) {
+                            if (message.id !== detail.messageId) {
+                                if (message.parent?.id === detail.messageId) {
+                                    message.parent = null
+                                }
+
+                                newMessages.push(message)
+                            }
+                        }
 
                         mutateMessages(
                             {
@@ -325,16 +339,29 @@ const Message: React.FC = () => {
         socket.on(SocketEvent.MESSAGE_REVOKE, ({ message_id, conversation_uuid }: RevokeMessage) => {
             if (messages?.data) {
                 if (conversation_uuid === uuid) {
-                    const newMessages = messages.data.map((message) => {
-                        if (message.id === message_id) {
-                            return {
-                                ...message,
-                                content: null,
+                    const newMessages: MessageModel[] = []
+
+                    for (const message of messages.data) {
+                        if (message.parent?.id === message_id) {
+                            message.parent = {
+                                ...message.parent,
+                                content:
+                                    message.parent.sender_id === currentUser?.data?.id
+                                        ? 'Đã gỡ tin nhắn'
+                                        : 'Tin nhắn đã bị gỡ',
                             }
                         }
 
-                        return message
-                    })
+                        if (message.id === message_id) {
+                            newMessages.push({
+                                ...message,
+                                content: null,
+                                parent: null,
+                            })
+                        } else {
+                            newMessages.push(message)
+                        }
+                    }
 
                     mutateMessages(
                         {
@@ -352,7 +379,7 @@ const Message: React.FC = () => {
         return () => {
             socket.off(SocketEvent.MESSAGE_REVOKE)
         }
-    }, [messages?.data, messages?.meta, mutateMessages, uuid])
+    }, [currentUser?.data?.id, messages?.data, messages?.meta, mutateMessages, uuid])
 
     return (
         <div className="flex-grow overflow-hidden" onKeyDown={handleEnterMessage}>

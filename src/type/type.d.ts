@@ -67,6 +67,7 @@ interface MessageModel extends Timestamp {
     type: 'text' | 'image'
     top_reactions?: { react: string; user_reaction: UserModel }[]
     total_reactions: number
+    parent: MessageModel | null
 }
 
 interface MessageResponse extends MetaPagination {
