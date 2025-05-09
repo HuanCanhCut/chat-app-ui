@@ -1,4 +1,4 @@
-import { faEllipsisVertical, faReply, faShare } from '@fortawesome/free-solid-svg-icons'
+import { faEllipsisVertical, faReply } from '@fortawesome/free-solid-svg-icons'
 import { faSmile } from '@fortawesome/free-regular-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Tippy from '@tippyjs/react'
@@ -15,7 +15,6 @@ import socket from '~/helpers/socket'
 import { SocketEvent } from '~/enum/SocketEvent'
 import { listenEvent, sendEvent } from '~/helpers/events'
 import MessageImagesModel from './Modal/MessageImagesModal'
-import { KeyedMutator } from 'swr'
 import ReactionModal from './Modal/ReactionModal'
 import { EmojiClickData } from 'emoji-picker-react'
 import Reaction from './Reaction'
@@ -31,7 +30,6 @@ interface MessageItemProps {
     messageIndex: number
     messages: MessageResponse
     currentUser: UserModel | undefined
-    mutateMessage: KeyedMutator<MessageResponse | undefined>
 }
 
 const MessageItem = ({ message, messageIndex, messages, currentUser }: MessageItemProps) => {
@@ -40,6 +38,7 @@ const MessageItem = ({ message, messageIndex, messages, currentUser }: MessageIt
     const options = { root: null, rootMargin: '0px', threshold: 0.5 }
     const firstMessageRef = useRef<HTMLDivElement>(null)
     const isFirstMessageVisible: boolean = useVisible(options, firstMessageRef)
+
     const tippyInstanceRef = useRef<any>(null)
     const messageRef = useRef<HTMLDivElement>(null)
     const replyMessageRef = useRef<HTMLDivElement>(null)
@@ -66,8 +65,13 @@ const MessageItem = ({ message, messageIndex, messages, currentUser }: MessageIt
             if (replyMessageRef.current && (messageRef.current || firstMessageRef) && groupMessageRef.current) {
                 const messageHeight = messageRef.current?.offsetHeight || firstMessageRef.current?.offsetHeight
                 if (messageHeight) {
-                    groupMessageRef.current.style.height = replyMessageRef.current.offsetHeight + messageHeight + 'px'
+                    groupMessageRef.current.style.marginTop = replyMessageRef.current.offsetHeight + 'px'
                 }
+            }
+        } else {
+            // Đảm bảo reset marginTop khi tin nhắn không có parent
+            if (groupMessageRef.current) {
+                groupMessageRef.current.style.marginTop = '0px'
             }
         }
     }, [message.parent])
@@ -214,6 +218,10 @@ const MessageItem = ({ message, messageIndex, messages, currentUser }: MessageIt
         return remove
     }, [])
 
+    const handleReply = () => {
+        sendEvent({ eventName: 'message:reply', detail: messages.data[messageIndex] })
+    }
+
     return (
         <div>
             {message.type === 'image' && (
@@ -247,7 +255,7 @@ const MessageItem = ({ message, messageIndex, messages, currentUser }: MessageIt
                                 className={`absolute bottom-[calc(100%-14px)] w-fit max-w-[85%] cursor-pointer ${message.sender_id === currentUser?.id ? 'flex flex-col items-end' : 'flex flex-col items-start'}`}
                                 ref={replyMessageRef}
                             >
-                                <p className="mb-1 flex w-full items-center gap-2 text-right text-xs text-zinc-400 dark:text-zinc-500">
+                                <p className="mb-1 flex w-fit items-center gap-2 text-right text-xs text-zinc-400 dark:text-zinc-500">
                                     <FontAwesomeIcon icon={faReply} />
                                     {'  '}
                                     {message.sender_id === currentUser?.id
@@ -281,7 +289,10 @@ const MessageItem = ({ message, messageIndex, messages, currentUser }: MessageIt
                             </Tippy>
                         </CustomTippy>
                         <Tippy content="Trả lời">
-                            <button className="flex-center z-10 h-7 w-7 rounded-full bg-[#feeace] text-black dark:bg-[#6b6b6b] dark:text-white">
+                            <button
+                                onClick={handleReply}
+                                className="flex-center z-10 h-7 w-7 rounded-full bg-[#feeace] text-black dark:bg-[#6b6b6b] dark:text-white"
+                            >
                                 <FontAwesomeIcon icon={faReply} />
                             </button>
                         </Tippy>

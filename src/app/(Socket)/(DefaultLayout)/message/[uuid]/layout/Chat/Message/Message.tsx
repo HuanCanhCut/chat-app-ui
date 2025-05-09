@@ -10,7 +10,7 @@ import { SocketEvent } from '~/enum/SocketEvent'
 import SWRKey from '~/enum/SWRKey'
 import { listenEvent, sendEvent } from '~/helpers/events'
 import socket from '~/helpers/socket'
-import { MessageModel, MessageResponse, SocketMessage, UserModel } from '~/type/type'
+import { MessageModel, MessageResponse, SocketMessage } from '~/type/type'
 import MessageItem from './MessageItem'
 import { useAppSelector } from '~/redux'
 import { getCurrentUser } from '~/redux/selector'
@@ -18,8 +18,6 @@ import { getCurrentUser } from '~/redux/selector'
 const Message: React.FC = () => {
     const { uuid } = useParams()
     const currentUser = useAppSelector(getCurrentUser)
-
-    console.log('re-render')
 
     const [page, setPage] = useState(1)
 
@@ -73,10 +71,6 @@ const Message: React.FC = () => {
 
                 switch (detail.type) {
                     case 'for-me':
-                        // const newMessages = messages?.data.filter((message) => {
-                        //     return message.id !== detail.messageId
-                        // })
-
                         const newMessages: MessageModel[] = []
 
                         for (const message of messages.data) {
@@ -411,7 +405,6 @@ const Message: React.FC = () => {
                                 messageIndex={index}
                                 messages={messages}
                                 currentUser={currentUser?.data}
-                                mutateMessage={mutateMessages}
                             />
                         </React.Fragment>
                     ))}
