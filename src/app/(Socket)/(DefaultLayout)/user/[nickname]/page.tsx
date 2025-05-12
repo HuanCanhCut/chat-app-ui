@@ -103,7 +103,7 @@ export default function UserPage() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-100 pb-4 dark:bg-[#1c1c1d]">
+        <div className="min-h-dvh bg-gray-100 pb-4 dark:bg-[#1c1c1d]">
             <header className="bg-white [box-shadow:1px_2px_4px_rgba(0,0,0,0.1)] dark:bg-dark">
                 {user && currentUser ? (
                     <div className="w-1100px mx-auto max-w-[1100px]">

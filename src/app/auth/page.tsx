@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 const Login: React.FC = () => {
     return (
-        <main className="grid min-h-screen w-full grid-cols-12 dark:bg-dark dark:text-dark">
+        <main className="grid min-h-dvh w-full grid-cols-12 dark:bg-dark dark:text-dark">
             <div className="col-span-12 p-8 sm:col-span-6">
                 <Logo />
                 <h1 className="mt-3 flex flex-col text-center font-bold">
@@ -20,7 +20,7 @@ const Login: React.FC = () => {
 
                 <AuthForm />
             </div>
-            <div className="relative col-span-6 hidden h-screen sm:block">
+            <div className="relative col-span-6 hidden h-dvh sm:block">
                 <Image
                     className="rounded-bl-3xl rounded-tl-3xl"
                     src="/static/media/login-form.jpg"
@@ -28,7 +28,7 @@ const Login: React.FC = () => {
                     fill
                     style={{ objectFit: 'cover' }}
                     quality={100}
-                    sizes="(100%, 100vh)"
+                    sizes="(100%, 100dvh)"
                     priority
                 />
             </div>

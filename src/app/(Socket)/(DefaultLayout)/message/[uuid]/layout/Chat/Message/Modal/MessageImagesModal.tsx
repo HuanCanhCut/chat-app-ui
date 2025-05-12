@@ -225,7 +225,7 @@ const MessageImagesModel = ({ onClose, imageUrl }: MessageImagesModelProps) => {
                     priority
                 />
             )}
-            <div className="fixed bottom-0 left-0 right-0 top-0 z-10 flex max-h-lvh flex-col">
+            <div className="fixed bottom-0 left-0 right-0 top-0 z-10 flex max-h-dvh flex-col">
                 <header className="flex items-center justify-end px-4 py-2">
                     <div className="mt-2 flex items-center gap-3 sm:mr-3">
                         {buttons.map((btn, index) => {

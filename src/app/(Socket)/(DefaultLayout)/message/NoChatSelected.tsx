@@ -7,7 +7,7 @@ import { useAppSelector } from '~/redux'
 const NoChatSelected = () => {
     const theme = useAppSelector(getCurrentTheme)
     return (
-        <div className="[overflow: overlay] h-full max-h-[calc(100vh-var(--header-mobile-height))] sm:max-h-[calc(100vh-var(--header-height))]">
+        <div className="[overflow: overlay] h-full max-h-[calc(100dvh-var(--header-mobile-height))] sm:max-h-[calc(100dvh-var(--header-height))]">
             <div className="flex h-full flex-col items-center justify-center">
                 <Image
                     src={
