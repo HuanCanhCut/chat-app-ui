@@ -72,7 +72,7 @@ const AuthForm = () => {
         const handleRegister = async () => {
             try {
                 if (data.rePassword !== data.password) {
-                    setErrorMessage('Xác nhận mật khẩu không đúng, vui lòng thử laị.')
+                    setErrorMessage('Xác nhận mật khẩu không đúng, vui lòng thử lại.')
                     return
                 }
 
