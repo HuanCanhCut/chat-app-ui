@@ -164,7 +164,11 @@ const AuthForm = () => {
                 </li>
             </ul>
 
-            <span className="text-small mx-auto text-gray-500 dark:text-gray-400">Hoặc đăng nhập bằng email</span>
+            <span className="text-small mx-auto text-gray-500 dark:text-gray-400">
+                {type === 'login' || type === 'register'
+                    ? `Hoặc đăng ${type === 'login' ? 'nhập' : 'kí'} bằng email`
+                    : 'Đổi mật khẩu'}
+            </span>
 
             <div className="flex w-full flex-col gap-3">
                 <Input

@@ -1,10 +1,10 @@
-'use client'
-
-import { useParams } from 'next/navigation'
 import Sidebar from './Sidebar'
+import { headers } from 'next/headers'
 
 export default function MessageLayout({ children }: { children: React.ReactNode }) {
-    const { uuid } = useParams()
+    const headersList = headers()
+    const pathname = headersList.get('x-pathname') || ''
+    const uuid = pathname.split('/').pop()
 
     return (
         <div className="flex h-dvh max-h-[calc(100dvh-var(--header-height-mobile))] w-full dark:bg-dark dark:text-dark sm:max-h-[calc(100dvh-var(--header-height))]">
