@@ -37,6 +37,7 @@ const Message: React.FC = () => {
     }, [uuid])
 
     useEffect(() => {
+        // only listen message type image
         const remove = listenEvent({
             eventName: 'message:emit-message',
             handler: ({ detail }: { detail: { conversationUuid: string; message: MessageModel } }) => {

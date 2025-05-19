@@ -22,6 +22,7 @@ import CustomTippy from '~/components/CustomTippy'
 import PopperWrapper from '~/components/PopperWrapper'
 import RevokeModal from './Modal/RevokeModal'
 import Modal from '~/components/Modal'
+import ReplyMessage from './ReplyMessage'
 
 const BETWEEN_TIME_MESSAGE = 7 // minute
 
@@ -29,7 +30,7 @@ interface MessageItemProps {
     message: MessageModel
     messageIndex: number
     messages: MessageResponse
-    currentUser: UserModel | undefined
+    currentUser: UserModel
 }
 
 const MessageItem = ({ message, messageIndex, messages, currentUser }: MessageItemProps) => {
@@ -60,6 +61,7 @@ const MessageItem = ({ message, messageIndex, messages, currentUser }: MessageIt
     const [isOpenReaction, setIsOpenReaction] = useState(false)
     const [isOpenMoreAction, setIsOpenMoreAction] = useState(false)
 
+    // handle margin top of reply message
     useEffect(() => {
         if (message.parent) {
             if (replyMessageRef.current && (messageRef.current || firstMessageRef) && groupMessageRef.current) {
@@ -69,7 +71,7 @@ const MessageItem = ({ message, messageIndex, messages, currentUser }: MessageIt
                 }
             }
         } else {
-            // Đảm bảo reset marginTop khi tin nhắn không có parent
+            // reset margin top when message has no parent
             if (groupMessageRef.current) {
                 groupMessageRef.current.style.marginTop = '0px'
             }
@@ -138,12 +140,6 @@ const MessageItem = ({ message, messageIndex, messages, currentUser }: MessageIt
             messageId: 0,
         })
     }, [])
-
-    const isOnlyIcon =
-        message.type === 'text' &&
-        new RegExp(/^(\p{Emoji_Presentation}|\p{Emoji}\uFE0F|\p{Emoji_Modifier_Base})+$/u).test(
-            message.content?.trim() as string,
-        )
 
     const handleOpenReaction = () => {
         setIsOpenReaction(!isOpenReaction)
@@ -248,35 +244,7 @@ const MessageItem = ({ message, messageIndex, messages, currentUser }: MessageIt
                 <div
                     className={`relative flex w-full items-center ${message?.top_reactions ? 'mb-[10px]' : ''} ${message.sender_id === currentUser?.id ? 'justify-end' : 'justify-start'}`}
                 >
-                    {/* Reply message */}
-                    {message.parent && message.type === 'text' ? (
-                        <React.Fragment>
-                            <div
-                                className={`absolute bottom-[calc(100%-14px)] w-fit max-w-[85%] cursor-pointer ${message.sender_id === currentUser?.id ? 'flex flex-col items-end' : 'flex flex-col items-start'}`}
-                                ref={replyMessageRef}
-                            >
-                                <p className="mb-1 flex w-fit items-center gap-2 text-right text-xs text-zinc-400 dark:text-zinc-500">
-                                    <FontAwesomeIcon icon={faReply} />
-                                    {'  '}
-                                    {message.sender_id === currentUser?.id
-                                        ? `Bạn đã trả lời ${message.parent.sender_id === currentUser?.id ? 'chính mình' : message.parent.sender.full_name}`
-                                        : `${message.parent.sender.full_name} đã trả lời ${message.parent.sender_id === currentUser?.id ? 'bạn' : message.sender_id === message.parent.sender_id ? 'chính mình' : message.parent.sender.full_name}`}
-                                </p>
-                                <span
-                                    className={`line-clamp-2 max-w-fit overflow-hidden text-ellipsis break-words rounded-2xl ${message.sender_id === currentUser?.id ? 'rounded-br-none' : 'rounded-bl-none'} bg-[#feeace] px-3 py-1.5 pb-4 text-[13px] font-light text-zinc-600 [word-break:break-word] dark:bg-[#a0a0a08d] dark:text-zinc-400`}
-                                >
-                                    {message.parent.content !== null
-                                        ? message.parent.content
-                                        : message.parent.sender_id === currentUser?.id
-                                          ? 'Đã gỡ tin nhắn'
-                                          : 'Tin nhắn đã bị gỡ'}
-                                </span>
-                            </div>
-                        </React.Fragment>
-                    ) : (
-                        <p></p>
-                    )}
-
+                    <ReplyMessage message={message} currentUser={currentUser} ref={replyMessageRef} />
                     {/* More action */}
                     <div
                         className={`mx-3 flex items-center gap-2 ${!isOpenReaction && !isOpenMoreAction ? 'opacity-0' : 'opacity-100'} group-hover:opacity-100 ${message.sender_id === currentUser?.id ? 'order-first' : 'order-last flex-row-reverse'}`}
@@ -317,39 +285,22 @@ const MessageItem = ({ message, messageIndex, messages, currentUser }: MessageIt
                     {/* Message content */}
                     <Tippy content={handleFormatTime(message.created_at)} placement="left">
                         <>
+                            {/* if message is not revoked */}
                             {message.content !== null ? (
                                 message.type === 'text' ? (
-                                    isOnlyIcon ? (
-                                        <div
-                                            data-message-id={message.id}
-                                            ref={messageIndex === 0 ? firstMessageRef : messageRef}
-                                            className={`relative w-fit max-w-[80%] rounded-3xl font-light [word-break:break-word]`}
-                                        >
-                                            <span className="max-w-fit break-words text-3xl">{message.content}</span>
+                                    <div
+                                        data-message-id={message.id}
+                                        ref={messageIndex === 0 ? firstMessageRef : messageRef}
+                                        className={`relative w-fit max-w-[80%] rounded-3xl px-4 py-1.5 font-light [word-break:break-word] ${
+                                            message.sender_id === currentUser?.id
+                                                ? 'bg-milk-tea text-white'
+                                                : 'bg-lightGray text-black dark:bg-[#313233] dark:text-dark'
+                                        }`}
+                                    >
+                                        <span className="max-w-fit break-words">{message.content}</span>
 
-                                            <Reaction
-                                                message={message}
-                                                handleOpenReactionModal={handleOpenReactionModal}
-                                            />
-                                        </div>
-                                    ) : (
-                                        <div
-                                            data-message-id={message.id}
-                                            ref={messageIndex === 0 ? firstMessageRef : messageRef}
-                                            className={`relative w-fit max-w-[80%] rounded-2xl px-4 py-1.5 font-light [word-break:break-word] ${
-                                                message.sender_id === currentUser?.id
-                                                    ? 'bg-milk-tea text-white'
-                                                    : 'bg-lightGray text-black dark:bg-[#313233] dark:text-dark'
-                                            }`}
-                                        >
-                                            <span className="max-w-fit break-words">{message.content}</span>
-
-                                            <Reaction
-                                                message={message}
-                                                handleOpenReactionModal={handleOpenReactionModal}
-                                            />
-                                        </div>
-                                    )
+                                        <Reaction message={message} handleOpenReactionModal={handleOpenReactionModal} />
+                                    </div>
                                 ) : message.type === 'image' ? (
                                     <div
                                         ref={messageIndex === 0 ? firstMessageRef : messageRef}
@@ -378,8 +329,20 @@ const MessageItem = ({ message, messageIndex, messages, currentUser }: MessageIt
 
                                         <Reaction message={message} handleOpenReactionModal={handleOpenReactionModal} />
                                     </div>
-                                ) : null
+                                ) : (
+                                    // if message is icon
+                                    <div
+                                        data-message-id={message.id}
+                                        ref={messageIndex === 0 ? firstMessageRef : messageRef}
+                                        className={`relative w-fit max-w-[80%] rounded-3xl font-light [word-break:break-word]`}
+                                    >
+                                        <span className="max-w-fit break-words text-3xl">{message.content}</span>
+
+                                        <Reaction message={message} handleOpenReactionModal={handleOpenReactionModal} />
+                                    </div>
+                                )
                             ) : (
+                                // if message is revoked
                                 <p
                                     className={`relative w-fit max-w-[80%] rounded-3xl px-4 py-1.5 font-light italic opacity-85 [word-break:break-word] ${
                                         message.sender_id === currentUser?.id

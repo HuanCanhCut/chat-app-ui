@@ -83,10 +83,14 @@ const InputMessage: React.FC<InputMessageProps> = () => {
 
         // handle text message
         if (messageValue.trim().length) {
+            const onlyIcon = new RegExp(/^(\p{Emoji_Presentation}|\p{Emoji}\uFE0F|\p{Emoji_Modifier_Base})+$/u).test(
+                messageValue.trim() as string,
+            )
+
             socket.emit(SocketEvent.NEW_MESSAGE, {
                 conversationUuid,
                 message: messageValue,
-                type: 'text',
+                type: onlyIcon ? 'icon' : 'text',
                 parent_id: replyMessage?.id,
             })
         }
