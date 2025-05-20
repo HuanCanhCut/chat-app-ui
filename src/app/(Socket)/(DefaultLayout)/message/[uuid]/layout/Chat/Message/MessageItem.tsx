@@ -26,14 +26,20 @@ import ReplyMessage from './ReplyMessage'
 
 const BETWEEN_TIME_MESSAGE = 7 // minute
 
+interface MessageRef {
+    [key: string]: HTMLDivElement
+}
+
 interface MessageItemProps {
     message: MessageModel
     messageIndex: number
     messages: MessageResponse
     currentUser: UserModel
+    messageRef: (el: HTMLDivElement) => void
+    messageRefs: MessageRef
 }
 
-const MessageItem = ({ message, messageIndex, messages, currentUser }: MessageItemProps) => {
+const MessageItem = ({ message, messageIndex, messages, currentUser, messageRef, messageRefs }: MessageItemProps) => {
     const { uuid } = useParams()
 
     const options = { root: null, rootMargin: '0px', threshold: 0.5 }
@@ -41,7 +47,6 @@ const MessageItem = ({ message, messageIndex, messages, currentUser }: MessageIt
     const isFirstMessageVisible: boolean = useVisible(options, firstMessageRef)
 
     const tippyInstanceRef = useRef<any>(null)
-    const messageRef = useRef<HTMLDivElement>(null)
     const replyMessageRef = useRef<HTMLDivElement>(null)
     const groupMessageRef = useRef<HTMLDivElement>(null)
 
@@ -64,8 +69,13 @@ const MessageItem = ({ message, messageIndex, messages, currentUser }: MessageIt
     // handle margin top of reply message
     useEffect(() => {
         if (message.parent) {
-            if (replyMessageRef.current && (messageRef.current || firstMessageRef) && groupMessageRef.current) {
-                const messageHeight = messageRef.current?.offsetHeight || firstMessageRef.current?.offsetHeight
+            if (
+                replyMessageRef.current &&
+                (messageRefs[message.parent.id] || firstMessageRef) &&
+                groupMessageRef.current
+            ) {
+                const messageHeight =
+                    messageRefs[message.parent.id]?.offsetHeight || firstMessageRef.current?.offsetHeight
                 if (messageHeight) {
                     groupMessageRef.current.style.marginTop = replyMessageRef.current.offsetHeight + 'px'
                 }
@@ -244,7 +254,12 @@ const MessageItem = ({ message, messageIndex, messages, currentUser }: MessageIt
                 <div
                     className={`relative flex w-full items-center ${message?.top_reactions ? 'mb-[10px]' : ''} ${message.sender_id === currentUser?.id ? 'justify-end' : 'justify-start'}`}
                 >
-                    <ReplyMessage message={message} currentUser={currentUser} ref={replyMessageRef} />
+                    <ReplyMessage
+                        message={message}
+                        currentUser={currentUser}
+                        ref={replyMessageRef}
+                        messageRefs={messageRefs}
+                    />
                     {/* More action */}
                     <div
                         className={`mx-3 flex items-center gap-2 ${!isOpenReaction && !isOpenMoreAction ? 'opacity-0' : 'opacity-100'} group-hover:opacity-100 ${message.sender_id === currentUser?.id ? 'order-first' : 'order-last flex-row-reverse'}`}

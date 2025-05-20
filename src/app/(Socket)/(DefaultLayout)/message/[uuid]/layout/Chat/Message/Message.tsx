@@ -1,5 +1,5 @@
 import { useParams } from 'next/navigation'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import useSWR from 'swr'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -14,6 +14,10 @@ import { MessageModel, MessageResponse, SocketMessage } from '~/type/type'
 import MessageItem from './MessageItem'
 import { useAppSelector } from '~/redux'
 import { getCurrentUser } from '~/redux/selector'
+
+interface MessageRef {
+    [key: string]: HTMLDivElement
+}
 
 const Message: React.FC = () => {
     const { uuid } = useParams()
@@ -30,6 +34,8 @@ const Message: React.FC = () => {
             revalidateOnMount: true,
         },
     )
+
+    const messageRefs = useRef<MessageRef>({})
 
     // Join room when component mount
     useEffect(() => {
@@ -406,6 +412,10 @@ const Message: React.FC = () => {
                                 messageIndex={index}
                                 messages={messages}
                                 currentUser={currentUser?.data}
+                                messageRef={(el) => {
+                                    messageRefs.current[message.id] = el
+                                }}
+                                messageRefs={messageRefs.current}
                             />
                         </React.Fragment>
                     ))}
