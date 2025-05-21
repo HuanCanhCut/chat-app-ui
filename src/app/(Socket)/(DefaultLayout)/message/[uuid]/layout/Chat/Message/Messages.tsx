@@ -390,7 +390,7 @@ const Message: React.FC = () => {
                     next={() => {
                         setPage(page + 1)
                     }}
-                    className="flex flex-col-reverse gap-[2.5px] px-2 py-3"
+                    className="flex flex-col-reverse gap-[2.5px] !overflow-hidden px-2 py-3"
                     hasMore={
                         messages && messages?.meta.pagination.current_page < messages?.meta.pagination.total_pages
                             ? true

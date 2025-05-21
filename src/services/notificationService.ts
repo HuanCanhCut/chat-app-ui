@@ -52,7 +52,7 @@ export const markAsUnread = async (notification_id: number): Promise<AxiosRespon
 
 export const deleteNotification = async (notification_id: number): Promise<AxiosResponse<void>> => {
     try {
-        return await request.deleteMethod(`/notifications/${notification_id}`)
+        return await request.del(`/notifications/${notification_id}`)
     } catch (error: any) {
         throw error
     }

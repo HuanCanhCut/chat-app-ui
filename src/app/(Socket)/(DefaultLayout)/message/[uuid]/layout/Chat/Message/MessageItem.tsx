@@ -69,16 +69,8 @@ const MessageItem = ({ message, messageIndex, messages, currentUser, messageRef,
     // handle margin top of reply message
     useEffect(() => {
         if (message.parent) {
-            if (
-                replyMessageRef.current &&
-                (messageRefs[message.parent.id] || firstMessageRef) &&
-                groupMessageRef.current
-            ) {
-                const messageHeight =
-                    messageRefs[message.parent.id]?.offsetHeight || firstMessageRef.current?.offsetHeight
-                if (messageHeight) {
-                    groupMessageRef.current.style.marginTop = replyMessageRef.current.offsetHeight + 'px'
-                }
+            if (replyMessageRef.current && groupMessageRef.current) {
+                groupMessageRef.current.style.marginTop = replyMessageRef.current.offsetHeight + 'px'
             }
         } else {
             // reset margin top when message has no parent
@@ -304,7 +296,6 @@ const MessageItem = ({ message, messageIndex, messages, currentUser, messageRef,
                             {message.content !== null ? (
                                 message.type === 'text' ? (
                                     <div
-                                        data-message-id={message.id}
                                         ref={messageIndex === 0 ? firstMessageRef : messageRef}
                                         className={`relative w-fit max-w-[80%] rounded-3xl px-4 py-1.5 font-light [word-break:break-word] ${
                                             message.sender_id === currentUser?.id
@@ -319,7 +310,7 @@ const MessageItem = ({ message, messageIndex, messages, currentUser, messageRef,
                                 ) : message.type === 'image' ? (
                                     <div
                                         ref={messageIndex === 0 ? firstMessageRef : messageRef}
-                                        className={`relative w-full ${
+                                        className={`relative w-full rounded-2xl ${
                                             JSON.parse(message.content).length > 1
                                                 ? 'max-w-[60%] sm:max-w-[55%] md:max-w-[50%] lg:max-w-[45%] xl:max-w-[35%]'
                                                 : 'max-w-[60%] sm:max-w-[40%] md:max-w-[35%] lg:max-w-[30%] xl:max-w-[25%]'
@@ -347,7 +338,6 @@ const MessageItem = ({ message, messageIndex, messages, currentUser, messageRef,
                                 ) : (
                                     // if message is icon
                                     <div
-                                        data-message-id={message.id}
                                         ref={messageIndex === 0 ? firstMessageRef : messageRef}
                                         className={`relative w-fit max-w-[80%] rounded-3xl font-light [word-break:break-word]`}
                                     >

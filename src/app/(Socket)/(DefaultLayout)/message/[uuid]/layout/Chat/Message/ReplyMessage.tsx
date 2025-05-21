@@ -58,7 +58,8 @@ const ReplyMessage = ({ message, currentUser, messageRefs }: ReplyMessageProps, 
 
             observer.observe(messageElement)
         } else {
-            //
+            // if reply message is not loaded
+            console.log('reply message is not loaded')
         }
     }
 

@@ -60,7 +60,7 @@ export const patch = async (path: string, data: any = {}, options = {}) => {
     return response
 }
 
-export const deleteMethod = async (path: string, options = {}) => {
+export const del = async (path: string, options = {}) => {
     const response = await request.delete(path, options)
     return response
 }

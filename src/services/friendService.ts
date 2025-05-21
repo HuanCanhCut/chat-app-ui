@@ -30,7 +30,7 @@ export const getFriends = async ({
 
 export const unfriend = async (userId: number): Promise<AxiosResponse<void>> => {
     try {
-        return await request.deleteMethod(`users/${userId}/unfriend`)
+        return await request.del(`users/${userId}/unfriend`)
     } catch (error: any) {
         throw error
     }
