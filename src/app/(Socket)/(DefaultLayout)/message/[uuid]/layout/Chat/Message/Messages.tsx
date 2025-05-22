@@ -19,16 +19,25 @@ interface MessageRef {
     [key: string]: HTMLDivElement
 }
 
+const PER_PAGE = 20
+
 const Message: React.FC = () => {
     const { uuid } = useParams()
     const currentUser = useAppSelector(getCurrentUser)
 
-    const [page, setPage] = useState(1)
+    const [loadedRange, setLoadedRange] = useState({
+        start: 0,
+        end: PER_PAGE,
+    })
 
     const { data: messages, mutate: mutateMessages } = useSWR<MessageResponse | undefined>(
         uuid ? [SWRKey.GET_MESSAGES, uuid] : null,
         () => {
-            return messageServices.getMessages({ conversationUuid: uuid as string, page: page })
+            return messageServices.getMessages({
+                conversationUuid: uuid as string,
+                limit: PER_PAGE,
+                offset: loadedRange.start,
+            })
         },
         {
             revalidateOnMount: true,
@@ -119,14 +128,15 @@ const Message: React.FC = () => {
     }
 
     useEffect(() => {
-        if (page <= 1) {
+        if (loadedRange.start <= 0) {
             return
         }
 
         const getMoreMessages = async () => {
             const response = await messageServices.getMessages({
                 conversationUuid: uuid as string,
-                page: page,
+                limit: PER_PAGE,
+                offset: loadedRange.start,
             })
 
             if (response) {
@@ -147,7 +157,7 @@ const Message: React.FC = () => {
 
         getMoreMessages()
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [page, uuid])
+    }, [loadedRange, uuid])
 
     // Listen new message event
     useEffect(() => {
@@ -382,22 +392,83 @@ const Message: React.FC = () => {
         }
     }, [currentUser?.data?.id, messages?.data, messages?.meta, mutateMessages, uuid])
 
+    useEffect(() => {
+        const remove = listenEvent({
+            eventName: 'message:around-message',
+            handler: async ({ detail: { message_id } }: { detail: { message_id: number } }) => {
+                const aroundMessage = await messageServices.getAroundMessages({
+                    conversationUuid: uuid as string,
+                    messageId: message_id,
+                    limit: PER_PAGE,
+                })
+
+                if (aroundMessage) {
+                    // if around message is the next range of the current range
+                    if (aroundMessage?.meta.pagination.offset <= loadedRange.end) {
+                        const diffOffset = loadedRange.end - aroundMessage?.meta.pagination.offset
+
+                        aroundMessage.data.splice(0, diffOffset)
+
+                        if (!messages?.data) {
+                            return
+                        }
+
+                        const newMessages = [...messages?.data, ...aroundMessage.data]
+
+                        setLoadedRange({
+                            start: loadedRange.end,
+                            end: loadedRange.end + aroundMessage.data.length,
+                        })
+
+                        mutateMessages(
+                            {
+                                data: newMessages,
+                                meta: aroundMessage.meta,
+                            },
+                            {
+                                revalidate: false,
+                            },
+                        )
+                    } else {
+                        setLoadedRange({
+                            start: aroundMessage.meta.pagination.offset + aroundMessage.data.length,
+                            end: aroundMessage.meta.pagination.offset + aroundMessage.data.length + PER_PAGE,
+                        })
+
+                        mutateMessages(
+                            {
+                                data: aroundMessage.data,
+                                meta: aroundMessage.meta,
+                            },
+                            {
+                                revalidate: false,
+                            },
+                        )
+                    }
+                }
+            },
+        })
+
+        return remove
+    }, [uuid, messages, loadedRange])
+
     return (
         <div className="flex-grow overflow-hidden" onKeyDown={handleEnterMessage}>
             <div className="flex h-full max-h-full flex-col-reverse overflow-y-auto" id="message-scrollable">
                 <InfiniteScroll
                     dataLength={messages?.data.length || 0} //This is important field to render the next data
                     next={() => {
-                        setPage(page + 1)
+                        setLoadedRange((prev) => {
+                            return {
+                                start: prev.end,
+                                end: prev.end + PER_PAGE,
+                            }
+                        })
                     }}
                     className="flex flex-col-reverse gap-[2.5px] !overflow-hidden px-2 py-3"
-                    hasMore={
-                        messages && messages?.meta.pagination.current_page < messages?.meta.pagination.total_pages
-                            ? true
-                            : false
-                    }
+                    hasMore={messages ? messages.data.length < messages.meta.pagination.total : false}
+                    scrollThreshold="150px"
                     inverse={true}
-                    scrollThreshold={0.5}
                     loader={
                         <div className="flex justify-center">
                             <FontAwesomeIcon icon={faSpinner} className="animate-spin" />

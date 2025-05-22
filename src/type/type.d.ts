@@ -70,8 +70,16 @@ interface MessageModel extends Timestamp {
     parent: MessageModel | null
 }
 
-interface MessageResponse extends MetaPagination {
+interface MessageResponse {
     data: MessageModel[]
+    meta: {
+        pagination: {
+            total: number
+            count: number
+            limit: number
+            offset: number
+        }
+    }
 }
 
 interface MessageStatus extends Timestamp {

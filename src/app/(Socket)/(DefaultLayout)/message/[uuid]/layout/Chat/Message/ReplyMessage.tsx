@@ -1,8 +1,10 @@
 import { faReply } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import React, { forwardRef, LegacyRef } from 'react'
+
 import Image from '~/components/Image'
 import { MessageModel, UserModel } from '~/type/type'
+import { sendEvent } from '~/helpers/events'
 
 interface MessageRef {
     [key: string]: HTMLDivElement
@@ -15,7 +17,7 @@ interface ReplyMessageProps {
 }
 
 const ReplyMessage = ({ message, currentUser, messageRefs }: ReplyMessageProps, ref: LegacyRef<HTMLDivElement>) => {
-    const handleMoveToReplyMessage = (parentMessage: MessageModel) => {
+    const handleMoveToReplyMessage = async (parentMessage: MessageModel) => {
         const messageElement = messageRefs[parentMessage.id]
 
         // if reply message is loaded
@@ -46,7 +48,7 @@ const ReplyMessage = ({ message, currentUser, messageRefs }: ReplyMessageProps, 
 
                         setTimeout(() => {
                             messageElement.classList.add('animate-scale-up')
-                        }, 150)
+                        }, 250)
 
                         observer.disconnect()
                     }
@@ -58,8 +60,12 @@ const ReplyMessage = ({ message, currentUser, messageRefs }: ReplyMessageProps, 
 
             observer.observe(messageElement)
         } else {
-            // if reply message is not loaded
-            console.log('reply message is not loaded')
+            sendEvent({
+                eventName: 'message:around-message',
+                detail: {
+                    message_id: parentMessage.id,
+                },
+            })
         }
     }
 

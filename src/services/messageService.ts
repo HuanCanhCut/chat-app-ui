@@ -4,18 +4,18 @@ import * as request from '~/utils/httpRequest'
 
 export const getMessages = async ({
     conversationUuid,
-    page,
-    per_page = 20,
+    limit,
+    offset,
 }: {
     conversationUuid: string
-    page: number
-    per_page?: number
+    limit: number
+    offset: number
 }): Promise<MessageResponse | undefined> => {
     try {
         const response = await request.get(`messages/${conversationUuid}`, {
             params: {
-                page,
-                per_page,
+                limit,
+                offset,
             },
         })
 
@@ -53,7 +53,11 @@ interface ReactionTypeResponse {
     count: number
 }
 
-export const getReactionTypes = async ({ messageId }: { messageId: number }): Promise<ReactionTypeResponse[] | undefined> => {
+export const getReactionTypes = async ({
+    messageId,
+}: {
+    messageId: number
+}): Promise<ReactionTypeResponse[] | undefined> => {
     try {
         const response = await request.get(`messages/${messageId}/reaction/types`)
 
@@ -106,5 +110,28 @@ export const revokeMessage = async ({
         })
     } catch (error) {
         throw error
+    }
+}
+
+export const getAroundMessages = async ({
+    conversationUuid,
+    messageId,
+    limit,
+}: {
+    conversationUuid: string
+    messageId: number
+    limit: number
+}): Promise<MessageResponse | undefined> => {
+    try {
+        const response = await request.get(`messages/${messageId}/around`, {
+            params: {
+                limit,
+                conversation_uuid: conversationUuid,
+            },
+        })
+
+        return response.data
+    } catch (error: any) {
+        console.log(error)
     }
 }
