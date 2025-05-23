@@ -91,13 +91,11 @@ const MessageItem = ({ message, messageIndex, messages, currentUser, messageRef,
 
     useEffect(() => {
         if (isFirstMessageVisible) {
-            // If haven't seen it, then emit
-            let isRead = false
+            let isRead = true
             if (message.id === messages.data[0].id && !message.is_read) {
                 for (const status of messages.data[0].message_status) {
-                    // If have seen it, then skip it.
-                    if (status.receiver_id === currentUser?.id && status.receiver.last_read_message_id === message.id) {
-                        isRead = true
+                    if (status.receiver_id === currentUser?.id && status.receiver.last_read_message_id < message.id) {
+                        isRead = false
                         break
                     }
                 }
@@ -108,7 +106,6 @@ const MessageItem = ({ message, messageIndex, messages, currentUser, messageRef,
                     conversationUuid: uuid as string,
                     messageId: message.id,
                 })
-
                 sendEvent({ eventName: 'message:read-message', detail: uuid as string })
             }
         }
