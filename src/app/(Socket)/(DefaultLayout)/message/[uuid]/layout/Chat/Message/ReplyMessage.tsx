@@ -4,71 +4,18 @@ import React, { forwardRef, LegacyRef } from 'react'
 
 import Image from '~/components/Image'
 import { MessageModel, UserModel } from '~/type/type'
-import { sendEvent } from '~/helpers/events'
-
-interface MessageRef {
-    [key: string]: HTMLDivElement
-}
 
 interface ReplyMessageProps {
     message: MessageModel
     currentUser?: UserModel
-    messageRefs: MessageRef
+    // eslint-disable-next-line no-unused-vars
+    handleScrollToMessage: (message: MessageModel) => void
 }
 
-const ReplyMessage = ({ message, currentUser, messageRefs }: ReplyMessageProps, ref: LegacyRef<HTMLDivElement>) => {
-    const handleMoveToReplyMessage = async (parentMessage: MessageModel) => {
-        const messageElement = messageRefs[parentMessage.id]
-
-        // if reply message is loaded
-        if (messageElement) {
-            Object.values(messageRefs).forEach((ref) => {
-                ref.classList.remove(
-                    'border-[2px]',
-                    'border-white',
-                    'dark:border-zinc-800',
-                    'shadow-[0_0_0_1px_#222]',
-                    'dark:shadow-[0_0_0_1px_#fff]',
-                    'animate-scale-up',
-                )
-            })
-
-            messageElement.scrollIntoView({ behavior: 'smooth', block: 'center' })
-
-            const observer = new IntersectionObserver(
-                ([entry]) => {
-                    if (entry.isIntersecting) {
-                        messageElement.classList.add(
-                            'border-[2px]',
-                            'border-white',
-                            'dark:border-zinc-800',
-                            'shadow-[0_0_0_1px_#222]',
-                            'dark:shadow-[0_0_0_1px_#fff]',
-                        )
-
-                        setTimeout(() => {
-                            messageElement.classList.add('animate-scale-up')
-                        }, 250)
-
-                        observer.disconnect()
-                    }
-                },
-                {
-                    threshold: 0.5,
-                },
-            )
-
-            observer.observe(messageElement)
-        } else {
-            sendEvent({
-                eventName: 'message:around-message',
-                detail: {
-                    message_id: parentMessage.id,
-                },
-            })
-        }
-    }
-
+const ReplyMessage = (
+    { message, currentUser, handleScrollToMessage }: ReplyMessageProps,
+    ref: LegacyRef<HTMLDivElement>,
+) => {
     return (
         <>
             {message.parent ? (
@@ -87,7 +34,7 @@ const ReplyMessage = ({ message, currentUser, messageRefs }: ReplyMessageProps, 
                         <span
                             className={`line-clamp-2 max-w-fit overflow-hidden text-ellipsis break-words rounded-2xl ${message.sender_id === currentUser?.id ? 'rounded-br-none' : 'rounded-bl-none'} bg-[#feeace] px-3 py-1.5 pb-6 text-[13px] font-light text-zinc-600 [word-break:break-word] dark:bg-[#a0a0a08d] dark:text-zinc-400`}
                             onClick={() => {
-                                handleMoveToReplyMessage(message.parent as MessageModel)
+                                handleScrollToMessage(message.parent as MessageModel)
                             }}
                         >
                             {message.parent.content !== null
@@ -119,7 +66,7 @@ const ReplyMessage = ({ message, currentUser, messageRefs }: ReplyMessageProps, 
                             alt="reply-message"
                             className="h-24 w-24 rounded-2xl opacity-70"
                             onClick={() => {
-                                handleMoveToReplyMessage(message.parent as MessageModel)
+                                handleScrollToMessage(message.parent as MessageModel)
                             }}
                         />
                     </div>

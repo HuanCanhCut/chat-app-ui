@@ -1,5 +1,5 @@
 import { useParams } from 'next/navigation'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import useSWR from 'swr'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -8,7 +8,7 @@ import * as messageServices from '~/services/messageService'
 
 import { SocketEvent } from '~/enum/SocketEvent'
 import SWRKey from '~/enum/SWRKey'
-import { listenEvent, sendEvent } from '~/helpers/events'
+import { sendEvent } from '~/helpers/events'
 import socket from '~/helpers/socket'
 import { MessageModel, MessageResponse, SocketMessage } from '~/type/type'
 import MessageItem from './MessageItem'
@@ -25,10 +25,7 @@ const Message: React.FC = () => {
     const { uuid } = useParams()
     const currentUser = useAppSelector(getCurrentUser)
 
-    const [loadedRange, setLoadedRange] = useState({
-        start: 0,
-        end: PER_PAGE,
-    })
+    const [offset, setOffset] = useState(PER_PAGE)
 
     const { data: messages, mutate: mutateMessages } = useSWR<MessageResponse | undefined>(
         uuid ? [SWRKey.GET_MESSAGES, uuid] : null,
@@ -36,7 +33,7 @@ const Message: React.FC = () => {
             return messageServices.getMessages({
                 conversationUuid: uuid as string,
                 limit: PER_PAGE,
-                offset: loadedRange.start,
+                offset: 0,
             })
         },
         {
@@ -56,38 +53,6 @@ const Message: React.FC = () => {
             sendEvent({ eventName: 'message:enter-message', detail: { roomUuid: uuid } })
         }
     }
-
-    useEffect(() => {
-        if (loadedRange.start <= 0) {
-            return
-        }
-
-        const getMoreMessages = async () => {
-            const response = await messageServices.getMessages({
-                conversationUuid: uuid as string,
-                limit: PER_PAGE,
-                offset: loadedRange.start,
-            })
-
-            if (response) {
-                if (!messages?.data) {
-                    return
-                }
-
-                const newData: MessageResponse = {
-                    data: [...messages?.data, ...response.data],
-                    meta: response?.meta,
-                }
-
-                mutateMessages(newData, {
-                    revalidate: false,
-                })
-            }
-        }
-
-        getMoreMessages()
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [loadedRange, uuid])
 
     // Listen new message event
     useEffect(() => {
@@ -322,20 +287,68 @@ const Message: React.FC = () => {
         }
     }, [currentUser?.data?.id, messages?.data, messages?.meta, mutateMessages, uuid])
 
-    useEffect(() => {
-        const remove = listenEvent({
-            eventName: 'message:around-message',
-            handler: async ({ detail: { message_id } }: { detail: { message_id: number } }) => {
+    const handleScrollToMessage = useCallback(
+        async (parentMessage: MessageModel) => {
+            const handleAnimate = (messageElement: HTMLDivElement) => {
+                Object.values(messageRefs.current).forEach((ref) => {
+                    if (!ref) {
+                        return
+                    }
+
+                    ref.classList.remove(
+                        'border-[2px]',
+                        'border-white',
+                        'dark:border-zinc-800',
+                        'shadow-[0_0_0_1px_#222]',
+                        'dark:shadow-[0_0_0_1px_#fff]',
+                        'animate-scale-up',
+                    )
+                })
+
+                messageElement.scrollIntoView({ behavior: 'smooth', block: 'start' })
+
+                const observer = new IntersectionObserver(
+                    ([entry]) => {
+                        if (entry.isIntersecting) {
+                            messageElement.classList.add(
+                                'border-[2px]',
+                                'border-white',
+                                'dark:border-zinc-800',
+                                'shadow-[0_0_0_1px_#222]',
+                                'dark:shadow-[0_0_0_1px_#fff]',
+                            )
+
+                            setTimeout(() => {
+                                messageElement.classList.add('animate-scale-up')
+                            }, 250)
+
+                            observer.disconnect()
+                        }
+                    },
+                    {
+                        threshold: 0.5,
+                    },
+                )
+
+                observer.observe(messageElement)
+            }
+
+            const messageElement = messageRefs.current[parentMessage.id]
+
+            // if reply message is loaded
+            if (messageElement) {
+                handleAnimate(messageElement)
+            } else {
                 const aroundMessage = await messageServices.getAroundMessages({
                     conversationUuid: uuid as string,
-                    messageId: message_id,
+                    messageId: parentMessage.id,
                     limit: PER_PAGE,
                 })
 
                 if (aroundMessage) {
                     // if around message is the next range of the current range
-                    if (aroundMessage?.meta.pagination.offset <= loadedRange.end) {
-                        const diffOffset = loadedRange.end - aroundMessage?.meta.pagination.offset
+                    if (aroundMessage?.meta.pagination.offset <= offset) {
+                        const diffOffset = offset - aroundMessage?.meta.pagination.offset
 
                         aroundMessage.data.splice(0, diffOffset)
 
@@ -345,10 +358,7 @@ const Message: React.FC = () => {
 
                         const newMessages = [...messages?.data, ...aroundMessage.data]
 
-                        setLoadedRange({
-                            start: loadedRange.end,
-                            end: loadedRange.end + aroundMessage.data.length,
-                        })
+                        setOffset(newMessages.length)
 
                         mutateMessages(
                             {
@@ -359,11 +369,15 @@ const Message: React.FC = () => {
                                 revalidate: false,
                             },
                         )
+                        const messageItem = newMessages.find((message) => message.id === parentMessage.id)
+
+                        if (messageItem) {
+                            requestIdleCallback(() => {
+                                handleAnimate(messageRefs.current[messageItem.id])
+                            })
+                        }
                     } else {
-                        setLoadedRange({
-                            start: aroundMessage.meta.pagination.offset + aroundMessage.data.length,
-                            end: aroundMessage.meta.pagination.offset + aroundMessage.data.length + PER_PAGE,
-                        })
+                        setOffset(aroundMessage.meta.pagination.offset + aroundMessage.data.length)
 
                         mutateMessages(
                             {
@@ -374,26 +388,49 @@ const Message: React.FC = () => {
                                 revalidate: false,
                             },
                         )
+
+                        const messageItem = aroundMessage.data.find((message) => message.id === parentMessage.id)
+
+                        if (messageItem) {
+                            requestIdleCallback(() => {
+                                handleAnimate(messageRefs.current[messageItem.id])
+                            })
+                        }
                     }
                 }
-            },
-        })
-
-        return remove
-    }, [uuid, messages, loadedRange, mutateMessages])
+            }
+        },
+        [messages?.data, mutateMessages, offset, uuid],
+    )
 
     return (
         <div className="flex-grow overflow-hidden" onKeyDown={handleEnterMessage}>
             <div className="flex h-full max-h-full flex-col-reverse overflow-y-auto" id="message-scrollable">
                 <InfiniteScroll
                     dataLength={messages?.data.length || 0} //This is important field to render the next data
-                    next={() => {
-                        setLoadedRange((prev) => {
-                            return {
-                                start: prev.end,
-                                end: prev.end + PER_PAGE,
-                            }
+                    next={async () => {
+                        const response = await messageServices.getMessages({
+                            conversationUuid: uuid as string,
+                            limit: PER_PAGE,
+                            offset,
                         })
+
+                        if (response) {
+                            if (!messages?.data) {
+                                return
+                            }
+
+                            const newData: MessageResponse = {
+                                data: [...messages?.data, ...response.data],
+                                meta: response?.meta,
+                            }
+
+                            mutateMessages(newData, {
+                                revalidate: false,
+                            })
+
+                            setOffset(newData.data.length)
+                        }
                     }}
                     className="flex flex-col-reverse gap-[2.5px] !overflow-hidden px-2 py-3"
                     hasMore={
@@ -401,7 +438,7 @@ const Message: React.FC = () => {
                             ? messages.meta.pagination.offset / PER_PAGE + 1 < messages.meta.pagination.total / PER_PAGE
                             : false
                     }
-                    scrollThreshold="150px"
+                    scrollThreshold="200px"
                     inverse={true}
                     loader={
                         <div className="flex justify-center">
@@ -420,7 +457,7 @@ const Message: React.FC = () => {
                                 messageRef={(el) => {
                                     messageRefs.current[message.id] = el
                                 }}
-                                messageRefs={messageRefs.current}
+                                handleScrollToMessage={handleScrollToMessage}
                             />
                         </React.Fragment>
                     ))}

@@ -26,10 +26,6 @@ import ReplyMessage from './ReplyMessage'
 
 const BETWEEN_TIME_MESSAGE = 7 // minute
 
-interface MessageRef {
-    [key: string]: HTMLDivElement
-}
-
 interface MessageItemProps {
     message: MessageModel
     messageIndex: number
@@ -37,10 +33,18 @@ interface MessageItemProps {
     currentUser: UserModel
     // eslint-disable-next-line no-unused-vars
     messageRef: (el: HTMLDivElement) => void
-    messageRefs: MessageRef
+    // eslint-disable-next-line no-unused-vars
+    handleScrollToMessage: (message: MessageModel) => void
 }
 
-const MessageItem = ({ message, messageIndex, messages, currentUser, messageRef, messageRefs }: MessageItemProps) => {
+const MessageItem = ({
+    message,
+    messageIndex,
+    messages,
+    currentUser,
+    messageRef,
+    handleScrollToMessage,
+}: MessageItemProps) => {
     const { uuid } = useParams()
 
     const options = { root: null, rootMargin: '0px', threshold: 0.5 }
@@ -248,7 +252,7 @@ const MessageItem = ({ message, messageIndex, messages, currentUser, messageRef,
                         message={message}
                         currentUser={currentUser}
                         ref={replyMessageRef}
-                        messageRefs={messageRefs}
+                        handleScrollToMessage={handleScrollToMessage}
                     />
                     {/* More action */}
                     <div
