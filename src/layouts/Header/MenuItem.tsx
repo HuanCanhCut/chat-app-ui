@@ -10,6 +10,7 @@ import { getCurrentTheme } from '~/redux/selector'
 
 interface MenuItemProps {
     item: MenuItemType
+    // eslint-disable-next-line no-unused-vars
     onChoose: (type: MenuItemType['type']) => void
 }
 

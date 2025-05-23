@@ -35,6 +35,7 @@ interface MessageItemProps {
     messageIndex: number
     messages: MessageResponse
     currentUser: UserModel
+    // eslint-disable-next-line no-unused-vars
     messageRef: (el: HTMLDivElement) => void
     messageRefs: MessageRef
 }

@@ -1,4 +1,4 @@
-interface Timestamp {
+export interface Timestamp {
     created_at: Date
     updated_at: Date
 }
@@ -22,7 +22,7 @@ export interface UserModel<K = any, V = any> extends Timestamp {
     [key: K]: V
 }
 
-interface UserResponse {
+export interface UserResponse {
     data: UserModel
     meta?: {
         pagination: {
@@ -32,7 +32,7 @@ interface UserResponse {
 }
 
 // ========================================== Conversation model ==========================================
-interface ConversationModel extends Timestamp {
+export interface ConversationModel extends Timestamp {
     id: number
     is_group: boolean
     name?: string
@@ -42,11 +42,11 @@ interface ConversationModel extends Timestamp {
     last_message: MessageModel
 }
 
-interface ConversationResponse {
+export interface ConversationResponse {
     data: ConversationModel[]
 }
 
-interface ConversationMember extends Timestamp {
+export interface ConversationMember extends Timestamp {
     id: number
     user_id: number
     conversation_id: number
@@ -56,7 +56,7 @@ interface ConversationMember extends Timestamp {
 
 // ========================================== Message model ==========================================
 
-interface MessageModel extends Timestamp {
+export interface MessageModel extends Timestamp {
     id: number
     conversation_id: number
     content: string | null
@@ -70,7 +70,7 @@ interface MessageModel extends Timestamp {
     parent: MessageModel | null
 }
 
-interface MessageResponse {
+export interface MessageResponse {
     data: MessageModel[]
     meta: {
         pagination: {
@@ -82,7 +82,11 @@ interface MessageResponse {
     }
 }
 
-interface MessageStatus extends Timestamp {
+export interface MessageImagesResponse extends MetaPagination {
+    data: MessageModel[]
+}
+
+export interface MessageStatus extends Timestamp {
     id: number
     message_id: number
     receiver_id: number
@@ -95,7 +99,7 @@ interface MessageStatus extends Timestamp {
 
 // ========================================== Message reaction model ==========================================
 
-interface MessageReactionModel extends Timestamp {
+export interface MessageReactionModel extends Timestamp {
     id: number
     message_id: number
     user_id: number
@@ -103,13 +107,13 @@ interface MessageReactionModel extends Timestamp {
     user_reaction: UserModel
 }
 
-interface MessageReactionResponse extends MetaPagination {
+export interface MessageReactionResponse extends MetaPagination {
     data: MessageReactionModel[]
 }
 
 // ========================================== Friends model ==========================================
 
-interface FriendsShip extends Timestamp {
+export interface FriendsShip extends Timestamp {
     id: number
     user_id: number
     friend_id: number
@@ -117,12 +121,12 @@ interface FriendsShip extends Timestamp {
     user: UserModel
 }
 
-interface FriendsResponse extends MetaPagination {
+export interface FriendsResponse extends MetaPagination {
     data: FriendsShip[]
 }
 
 // ========================================== Meta pagination ==========================================
-interface MetaPagination {
+export interface MetaPagination {
     meta: {
         pagination: {
             total: number
@@ -136,7 +140,7 @@ interface MetaPagination {
 
 // ========================================== Notification model ==========================================
 
-interface NotificationData extends Timestamp {
+export interface NotificationData extends Timestamp {
     id: number
     recipient_id: number
     is_read: boolean
@@ -147,25 +151,25 @@ interface NotificationData extends Timestamp {
     type: 'friend_request' | 'accept_friend_request' | 'message'
 }
 
-interface NotificationResponse extends MetaPagination {
+export interface NotificationResponse extends MetaPagination {
     data: NotificationData[]
 }
 
 // ========================================== Search history model ==========================================
 
-interface SearchHistoryData extends Timestamp {
+export interface SearchHistoryData extends Timestamp {
     id: number
     user_id: number
     user_search_id: number
     user_search: UserModel
 }
 
-interface SearchHistory {
+export interface SearchHistory {
     data: SearchHistoryData[]
 }
 
 // ========================================== Socket model ==========================================
 
-interface SocketMessage {
+export interface SocketMessage {
     conversation: ConversationModel
 }

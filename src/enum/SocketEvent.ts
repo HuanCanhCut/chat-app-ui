@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 export enum SocketEvent {
     // ------------------------------- Chat -------------------------------
     JOIN_ROOM = 'room:join',

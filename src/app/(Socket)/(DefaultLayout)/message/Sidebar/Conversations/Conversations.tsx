@@ -12,7 +12,7 @@ import Image from 'next/image'
 import Skeleton from 'react-loading-skeleton'
 import socket from '~/helpers/socket'
 import { SocketEvent } from '~/enum/SocketEvent'
-import { ConversationMember, ConversationModel, MessageModel, SocketMessage } from '~/type/type'
+import { ConversationMember, ConversationModel, SocketMessage } from '~/type/type'
 import { listenEvent } from '~/helpers/events'
 
 type UserStatus = {

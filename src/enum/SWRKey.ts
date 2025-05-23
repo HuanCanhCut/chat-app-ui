@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 enum SWRKey {
     SEARCH_HISTORY = '/search-history',
 

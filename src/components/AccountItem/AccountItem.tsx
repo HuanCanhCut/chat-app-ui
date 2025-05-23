@@ -7,6 +7,7 @@ import config from '~/config'
 interface AccountItemProps {
     className?: string
     user: UserModel
+    // eslint-disable-next-line no-unused-vars
     onClick?: (user?: UserModel) => void
 }
 

@@ -12,8 +12,18 @@ interface ButtonProps {
     type?: 'button' | 'submit' | 'reset'
 }
 
-const Button = ({ children, className, href, buttonType = 'primary', leftIcon, type = 'button', onClick, ...props }: ButtonProps) => {
-    const primaryClass = buttonType === 'primary' ? 'bg-primary px-4 py-[6px] rounded-md text-white hover:bg-primary/85' : ''
+const Button = ({
+    children,
+    className,
+    href,
+    buttonType = 'primary',
+    leftIcon,
+    type = 'button',
+    onClick,
+    ...props
+}: ButtonProps) => {
+    const primaryClass =
+        buttonType === 'primary' ? 'bg-primary px-4 py-[6px] rounded-md text-white hover:bg-primary/85' : ''
     const outlineClass =
         buttonType === 'outline'
             ? 'border border-gray-300 px-4 py-[6px] rounded-md  dark:hover:bg-[rgba(255,255,255,0.05)] hover:bg-[rgba(0,0,0,0.05)]'
@@ -45,6 +55,7 @@ const Button = ({ children, className, href, buttonType = 'primary', leftIcon, t
             className={`flex-center ${primaryClass} ${outlineClass} ${buttonIconClass} ${roundedClass} ${className}`}
             {...props}
             onClick={onClick}
+            type={type}
         >
             {leftIcon && <span className="mr-2">{leftIcon}</span>}
             {children}

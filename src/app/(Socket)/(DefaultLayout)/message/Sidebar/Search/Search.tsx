@@ -13,6 +13,7 @@ import useDebounce from '~/hooks/useDebounce'
 import UserAvatar from '~/components/UserAvatar'
 
 interface Props {
+    // eslint-disable-next-line no-unused-vars
     setSearchMode: (value: boolean) => void
     searchMode: boolean
 }

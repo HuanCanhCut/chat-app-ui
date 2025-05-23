@@ -4,6 +4,7 @@ import { usePathname } from 'next/navigation'
 interface NavLinkProps {
     children: React.ReactNode
     href: string
+    // eslint-disable-next-line no-unused-vars
     className?: (options: { isActive: boolean }) => string
 }
 

@@ -8,6 +8,7 @@ export const listenEvent = <T>({
     context = document,
 }: {
     eventName: string
+    // eslint-disable-next-line no-unused-vars
     handler: ({ detail }: CustomEvent<T>) => void
     context?: any
 }) => {

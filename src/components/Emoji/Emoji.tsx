@@ -22,8 +22,10 @@ interface EmojiProps {
         | 'left-end'
         | 'right-start'
         | 'right-end'
+    // eslint-disable-next-line no-unused-vars
     setIsOpen: (value: boolean) => void
     placeholder?: string
+    // eslint-disable-next-line no-unused-vars
     onEmojiClick: (emojiData: EmojiClickData, event: MouseEvent) => void
     isReaction?: boolean
 }

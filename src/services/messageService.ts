@@ -1,5 +1,5 @@
 import { AxiosResponse } from 'axios'
-import { MessageReactionResponse, MessageResponse } from '~/type/type'
+import { MessageImagesResponse, MessageReactionResponse, MessageResponse } from '~/type/type'
 import * as request from '~/utils/httpRequest'
 
 export const getMessages = async ({
@@ -33,7 +33,7 @@ export const getMessageImages = async ({
     conversationUuid: string
     page: number
     per_page?: number
-}): Promise<MessageResponse | undefined> => {
+}): Promise<MessageImagesResponse | undefined> => {
     try {
         const response = await request.get(`messages/${conversationUuid}/images`, {
             params: {

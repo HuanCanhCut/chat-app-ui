@@ -3,6 +3,7 @@ import { MessageModel } from '~/type/type'
 
 interface ReactionProps {
     message: MessageModel
+    // eslint-disable-next-line no-unused-vars
     handleOpenReactionModal: (messageId: number) => void
 }
 
