@@ -452,6 +452,10 @@ const Message: React.FC = () => {
         return remove
     }, [uuid, messages, loadedRange, mutateMessages])
 
+    useEffect(() => {
+        console.log(messages)
+    }, [messages])
+
     return (
         <div className="flex-grow overflow-hidden" onKeyDown={handleEnterMessage}>
             <div className="flex h-full max-h-full flex-col-reverse overflow-y-auto" id="message-scrollable">
@@ -466,7 +470,11 @@ const Message: React.FC = () => {
                         })
                     }}
                     className="flex flex-col-reverse gap-[2.5px] !overflow-hidden px-2 py-3"
-                    hasMore={messages ? messages.data.length < messages.meta.pagination.total : false}
+                    hasMore={
+                        messages
+                            ? messages.meta.pagination.offset / PER_PAGE + 1 < messages.meta.pagination.total / PER_PAGE
+                            : false
+                    }
                     scrollThreshold="150px"
                     inverse={true}
                     loader={

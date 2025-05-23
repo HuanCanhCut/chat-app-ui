@@ -13,7 +13,6 @@ const useElementOnScreen = (options: Options, targetRef: RefObject<TargetElement
 
     const callbackFunction = (entries: IntersectionObserverEntry[]) => {
         const [entry] = entries
-        // const entry = entries[0]
         setIsVisible(entry.isIntersecting)
     }
 

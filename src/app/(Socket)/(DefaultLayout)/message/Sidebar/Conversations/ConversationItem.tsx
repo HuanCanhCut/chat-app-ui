@@ -47,7 +47,7 @@ const ConversationItem: React.FC<Props> = ({ conversation, className = '' }) => 
                     >
                         <span className="truncate pr-1">
                             {currentUser?.data.id === conversation.last_message?.sender_id
-                                ? `Bạn: ${conversation.last_message?.content === null ? 'Đã thu hồi một tin nhắn' : conversation.last_message?.content}`
+                                ? `Bạn: ${conversation.last_message?.content === null ? 'Đã thu hồi một tin nhắn' : conversation.last_message?.type === 'image' ? 'Đã gửi một hình ảnh' : conversation.last_message?.content}`
                                 : `${!conversation.is_group ? '' : conversation.last_message?.sender.full_name + ': '} ${conversation.last_message?.content === null ? 'Đã thu hồi một tin nhắn' : conversation.last_message?.content}`}
                         </span>
                         <span className="flex-shrink-0">· {momentTimezone(conversation.last_message?.created_at)}</span>
