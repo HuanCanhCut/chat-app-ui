@@ -450,7 +450,7 @@ const Message: React.FC = () => {
         })
 
         return remove
-    }, [uuid, messages, loadedRange])
+    }, [uuid, messages, loadedRange, mutateMessages])
 
     return (
         <div className="flex-grow overflow-hidden" onKeyDown={handleEnterMessage}>
