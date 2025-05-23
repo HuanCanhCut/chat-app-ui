@@ -4,12 +4,12 @@ import * as request from '~/utils/httpRequest'
 
 export const getMessages = async ({
     conversationUuid,
-    limit,
-    offset,
+    limit = 20,
+    offset = 0,
 }: {
     conversationUuid: string
-    limit: number
-    offset: number
+    limit?: number
+    offset?: number
 }): Promise<MessageResponse | undefined> => {
     try {
         const response = await request.get(`messages/${conversationUuid}`, {

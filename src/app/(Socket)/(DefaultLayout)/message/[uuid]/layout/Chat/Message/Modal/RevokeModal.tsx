@@ -2,15 +2,16 @@ import { faXmark } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { useSelector } from 'react-redux'
 import { useParams } from 'next/navigation'
+import { mutate } from 'swr'
 
 import * as messageServices from '~/services/messageService'
 import Button from '~/components/Button'
 import PopperWrapper from '~/components/PopperWrapper'
 import { getCurrentUser } from '~/redux/selector'
-import { MessageModel } from '~/type/type'
+import { MessageModel, MessageResponse } from '~/type/type'
 import { toast } from '~/utils/toast'
-import { sendEvent } from '~/helpers/events'
 import React, { useState } from 'react'
+import SWRKey from '~/enum/SWRKey'
 interface RevokeModalProps {
     message: MessageModel
     onClose: () => void
@@ -35,7 +36,41 @@ const RevokeModal = ({ message, onClose }: RevokeModalProps) => {
             })
 
             if (response.status === 200) {
-                sendEvent({ eventName: 'message:revoke', detail: { messageId: message.id, type: revokeChooseType } })
+                switch (revokeChooseType) {
+                    case 'for-me':
+                        mutate(
+                            [SWRKey.GET_MESSAGES, uuid],
+                            (prev: MessageResponse | undefined) => {
+                                if (!prev) return prev
+
+                                const newMessages: MessageModel[] = []
+
+                                for (const messageItem of prev.data) {
+                                    if (messageItem.id !== message.id) {
+                                        if (messageItem.parent?.id === message.id) {
+                                            messageItem.parent = null
+                                        }
+
+                                        newMessages.push(messageItem)
+                                    }
+                                }
+
+                                return {
+                                    data: newMessages,
+                                    meta: prev.meta,
+                                }
+                            },
+                            {
+                                revalidate: false,
+                            },
+                        )
+                        break
+                    case 'for-other':
+                        break
+                    default:
+                        break
+                }
+
                 onClose()
             }
         } catch (error) {

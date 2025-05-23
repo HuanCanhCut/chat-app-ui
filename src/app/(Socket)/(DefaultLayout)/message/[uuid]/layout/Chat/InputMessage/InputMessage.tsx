@@ -6,16 +6,16 @@ import Emoji from '~/components/Emoji'
 import { EmojiClickData } from 'emoji-picker-react'
 import Tippy from '@tippyjs/react'
 import { useParams } from 'next/navigation'
+import useSWR, { mutate } from 'swr'
+import { faFolderPlus, faXmark } from '@fortawesome/free-solid-svg-icons'
 
 import * as conversationServices from '~/services/conversationService'
 import { SendHorizontalIcon } from '~/components/Icons'
-import { listenEvent, sendEvent } from '~/helpers/events'
+import { listenEvent } from '~/helpers/events'
 import socket from '~/helpers/socket'
 import { SocketEvent } from '~/enum/SocketEvent'
-import { faFolderPlus, faXmark } from '@fortawesome/free-solid-svg-icons'
 import { useAppSelector } from '~/redux'
 import { getCurrentUser } from '~/redux/selector'
-import useSWR from 'swr'
 import SWRKey from '~/enum/SWRKey'
 import CustomImage from '~/components/Image/Image'
 import { MessageModel } from '~/type/type'
@@ -117,17 +117,28 @@ const InputMessage: React.FC<InputMessageProps> = () => {
                 return await response.json()
             }
 
-            sendEvent({
-                eventName: 'message:emit-message',
-                detail: messageDetails(
-                    'image',
-                    JSON.stringify(
-                        images.map((image) => {
-                            return image.preview
-                        }),
-                    ),
+            const { conversationUuid, message } = messageDetails(
+                'image',
+                JSON.stringify(
+                    images.map((image) => {
+                        return image.preview
+                    }),
                 ),
-            })
+            )
+
+            mutate(
+                [SWRKey.GET_MESSAGES, uuid as string],
+                (prev: any) => {
+                    if (!prev) return prev
+                    return {
+                        data: [message as unknown as MessageModel, ...prev.data],
+                        meta: prev.meta,
+                    }
+                },
+                {
+                    revalidate: false,
+                },
+            )
 
             setImages([])
 

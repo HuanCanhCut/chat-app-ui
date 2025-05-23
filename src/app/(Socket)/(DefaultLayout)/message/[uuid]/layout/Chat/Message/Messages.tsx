@@ -51,76 +51,6 @@ const Message: React.FC = () => {
         socket.emit(SocketEvent.JOIN_ROOM, uuid)
     }, [uuid])
 
-    useEffect(() => {
-        // only listen message type image
-        const remove = listenEvent({
-            eventName: 'message:emit-message',
-            handler: ({ detail }: { detail: { conversationUuid: string; message: MessageModel } }) => {
-                if (detail.conversationUuid === uuid) {
-                    if (!messages?.data) {
-                        return
-                    }
-
-                    mutateMessages(
-                        {
-                            data: [detail.message, ...messages?.data],
-                            meta: messages?.meta,
-                        },
-                        {
-                            revalidate: false,
-                        },
-                    )
-                }
-            },
-        })
-
-        return remove
-    }, [messages?.data, messages?.meta, mutateMessages, uuid])
-
-    useEffect(() => {
-        const remove = listenEvent({
-            eventName: 'message:revoke',
-            handler: ({ detail }: { detail: { type: string; messageId: number } }) => {
-                if (!messages?.data) {
-                    return
-                }
-
-                switch (detail.type) {
-                    case 'for-me':
-                        const newMessages: MessageModel[] = []
-
-                        for (const message of messages.data) {
-                            if (message.id !== detail.messageId) {
-                                if (message.parent?.id === detail.messageId) {
-                                    message.parent = null
-                                }
-
-                                newMessages.push(message)
-                            }
-                        }
-
-                        mutateMessages(
-                            {
-                                data: newMessages,
-                                meta: messages?.meta,
-                            },
-                            {
-                                revalidate: false,
-                            },
-                        )
-
-                        break
-                    case 'for-other':
-                        break
-                    default:
-                        break
-                }
-            },
-        })
-
-        return remove
-    }, [messages, mutateMessages])
-
     const handleEnterMessage = (e: React.KeyboardEvent<HTMLDivElement>) => {
         if (e.key === 'Enter') {
             sendEvent({ eventName: 'message:enter-message', detail: { roomUuid: uuid } })
@@ -451,10 +381,6 @@ const Message: React.FC = () => {
 
         return remove
     }, [uuid, messages, loadedRange, mutateMessages])
-
-    useEffect(() => {
-        console.log(messages)
-    }, [messages])
 
     return (
         <div className="flex-grow overflow-hidden" onKeyDown={handleEnterMessage}>
