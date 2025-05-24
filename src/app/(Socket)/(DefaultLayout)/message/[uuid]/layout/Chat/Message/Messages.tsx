@@ -25,7 +25,10 @@ const Message: React.FC = () => {
     const { uuid } = useParams()
     const currentUser = useAppSelector(getCurrentUser)
 
-    const [offset, setOffset] = useState(PER_PAGE)
+    const [offsetRange, setOffsetRange] = useState({
+        start: 0,
+        end: PER_PAGE,
+    })
 
     const { data: messages, mutate: mutateMessages } = useSWR<MessageResponse | undefined>(
         uuid ? [SWRKey.GET_MESSAGES, uuid] : null,
@@ -347,8 +350,8 @@ const Message: React.FC = () => {
 
                 if (aroundMessage) {
                     // if around message is the next range of the current range
-                    if (aroundMessage?.meta.pagination.offset <= offset) {
-                        const diffOffset = offset - aroundMessage?.meta.pagination.offset
+                    if (aroundMessage?.meta.pagination.offset <= offsetRange.end) {
+                        const diffOffset = offsetRange.end - aroundMessage?.meta.pagination.offset
 
                         aroundMessage.data.splice(0, diffOffset)
 
@@ -358,7 +361,12 @@ const Message: React.FC = () => {
 
                         const newMessages = [...messages?.data, ...aroundMessage.data]
 
-                        setOffset(newMessages.length)
+                        setOffsetRange((prev) => {
+                            return {
+                                ...prev,
+                                end: prev.end + aroundMessage.meta.pagination.offset,
+                            }
+                        })
 
                         mutateMessages(
                             {
@@ -377,7 +385,10 @@ const Message: React.FC = () => {
                             })
                         }
                     } else {
-                        setOffset(aroundMessage.meta.pagination.offset + aroundMessage.data.length)
+                        setOffsetRange({
+                            start: aroundMessage.meta.pagination.offset,
+                            end: aroundMessage.meta.pagination.offset + aroundMessage.data.length,
+                        })
 
                         mutateMessages(
                             {
@@ -400,7 +411,7 @@ const Message: React.FC = () => {
                 }
             }
         },
-        [messages?.data, mutateMessages, offset, uuid],
+        [messages?.data, mutateMessages, offsetRange.end, uuid],
     )
 
     return (
@@ -412,7 +423,7 @@ const Message: React.FC = () => {
                         const response = await messageServices.getMessages({
                             conversationUuid: uuid as string,
                             limit: PER_PAGE,
-                            offset,
+                            offset: offsetRange.end,
                         })
 
                         if (response) {
@@ -429,7 +440,12 @@ const Message: React.FC = () => {
                                 revalidate: false,
                             })
 
-                            setOffset(newData.data.length)
+                            setOffsetRange((prev) => {
+                                return {
+                                    ...prev,
+                                    end: response.meta.pagination.offset + response.data.length,
+                                }
+                            })
                         }
                     }}
                     className="flex flex-col-reverse gap-[2.5px] !overflow-hidden px-2 py-3"

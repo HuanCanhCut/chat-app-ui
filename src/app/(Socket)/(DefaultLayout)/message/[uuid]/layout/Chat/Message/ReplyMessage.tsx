@@ -1,6 +1,6 @@
 import { faReply } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import React, { forwardRef, LegacyRef } from 'react'
+import React, { forwardRef, LegacyRef, memo } from 'react'
 
 import Image from '~/components/Image'
 import { MessageModel, UserModel } from '~/type/type'
@@ -76,4 +76,4 @@ const ReplyMessage = (
     )
 }
 
-export default forwardRef(ReplyMessage)
+export default memo(forwardRef(ReplyMessage))

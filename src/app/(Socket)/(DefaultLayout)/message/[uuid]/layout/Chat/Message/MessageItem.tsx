@@ -5,7 +5,7 @@ import Tippy from '@tippyjs/react'
 import moment from 'moment-timezone'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useParams } from 'next/navigation'
-
+import { memo } from 'react'
 import CustomImage from '~/components/Image/Image'
 import Emoji from '~/components/Emoji'
 import { MessageModel, MessageResponse, MessageStatus, UserModel } from '~/type/type'
@@ -424,4 +424,4 @@ const MessageItem = ({
     )
 }
 
-export default MessageItem
+export default memo(MessageItem)
