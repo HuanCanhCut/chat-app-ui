@@ -25,10 +25,14 @@ const Message: React.FC = () => {
     const { uuid } = useParams()
     const currentUser = useAppSelector(getCurrentUser)
 
+    // save offset range for scroll down and scroll up
     const [offsetRange, setOffsetRange] = useState({
-        start: 0,
-        end: PER_PAGE,
+        start: 0, // for scroll down
+        end: PER_PAGE, // for scroll up
     })
+
+    const prevScrollY = useRef(0)
+    const isScrollLoading = useRef(false)
 
     const { data: messages, mutate: mutateMessages } = useSWR<MessageResponse | undefined>(
         uuid ? [SWRKey.GET_MESSAGES, uuid] : null,
@@ -414,9 +418,70 @@ const Message: React.FC = () => {
         [messages?.data, mutateMessages, offsetRange.end, uuid],
     )
 
+    const handleScrollDown = async (e: React.UIEvent<HTMLDivElement>) => {
+        const target = e.target as HTMLDivElement
+
+        const scrollTop = target.scrollTop // scroll top return negative number
+
+        // if scroll down then handle
+        if (scrollTop >= prevScrollY.current) {
+            // check if scroll to the bottom with 100px
+            if (scrollTop >= -100 && !isScrollLoading.current) {
+                if (!messages?.data) {
+                    return
+                }
+
+                const hasMore = messages.meta.pagination.offset !== 0
+
+                if (!hasMore) {
+                    return
+                }
+
+                isScrollLoading.current = true
+
+                const offset = offsetRange.start - PER_PAGE >= 0 ? offsetRange.start - PER_PAGE : 0
+
+                const response = await messageServices.getMessages({
+                    conversationUuid: uuid as string,
+                    limit: PER_PAGE,
+                    offset,
+                })
+
+                console.log(messageRefs)
+
+                if (response) {
+                    const newData: MessageResponse = {
+                        data: [...response?.data, ...messages?.data],
+                        meta: response?.meta,
+                    }
+
+                    mutateMessages(newData, {
+                        revalidate: false,
+                    })
+
+                    setOffsetRange((prev) => {
+                        return {
+                            ...prev,
+                            start: prev.start - response.data.length,
+                        }
+                    })
+                }
+                setTimeout(() => {
+                    isScrollLoading.current = false
+                }, 500)
+            }
+        }
+
+        prevScrollY.current = target.scrollTop
+    }
+
     return (
         <div className="flex-grow overflow-hidden" onKeyDown={handleEnterMessage}>
-            <div className="flex h-full max-h-full flex-col-reverse overflow-y-auto" id="message-scrollable">
+            <div
+                className="flex h-full max-h-full flex-col-reverse overflow-y-auto"
+                id="message-scrollable"
+                onScroll={handleScrollDown}
+            >
                 <InfiniteScroll
                     dataLength={messages?.data.length || 0} //This is important field to render the next data
                     next={async () => {
