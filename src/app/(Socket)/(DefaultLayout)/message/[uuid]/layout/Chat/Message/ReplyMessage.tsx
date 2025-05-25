@@ -64,6 +64,17 @@ const ReplyMessage = (
                         setTimeout(() => {
                             messageElement.classList.add('animate-scale-up')
                         }, 250)
+
+                        setTimeout(() => {
+                            messageElement.classList.remove(
+                                'border-[2px]',
+                                'border-white',
+                                'dark:border-zinc-800',
+                                'shadow-[0_0_0_1px_#222]',
+                                'dark:shadow-[0_0_0_1px_#fff]',
+                            )
+                        }, 3000)
+
                         observer.disconnect()
                     }
                 },

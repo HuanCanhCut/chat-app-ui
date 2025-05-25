@@ -302,7 +302,7 @@ const Message: React.FC = () => {
         // if scroll down then handle
         if (scrollTop >= prevScrollY.current) {
             // check if scroll to the bottom with 100px
-            if (scrollTop >= -100 && !isScrollLoading.current) {
+            if (scrollTop >= -150 && !isScrollLoading.current) {
                 if (!messages?.data) {
                     return
                 }
@@ -352,7 +352,7 @@ const Message: React.FC = () => {
     return (
         <div className="flex-grow !overflow-hidden" onKeyDown={handleEnterMessage}>
             <div
-                className="flex h-full max-h-full flex-col-reverse scroll-smooth"
+                className="flex h-full max-h-full flex-col-reverse overflow-y-auto scroll-smooth"
                 id="message-scrollable"
                 onScroll={handleScrollDown}
             >
@@ -404,7 +404,7 @@ const Message: React.FC = () => {
                         </div>
                     }
                     scrollableTarget="message-scrollable"
-                    // scrollThreshold="200px"
+                    scrollThreshold="150px"
                 >
                     {messages?.data.map((message, index) => (
                         <React.Fragment key={index}>
