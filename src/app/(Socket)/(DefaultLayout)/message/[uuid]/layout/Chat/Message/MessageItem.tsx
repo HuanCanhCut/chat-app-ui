@@ -119,11 +119,14 @@ const MessageItem = ({
             }
 
             if (!isRead) {
-                socket.emit(SocketEvent.READ_MESSAGE, {
-                    conversationUuid: uuid as string,
-                    messageId: message.id,
-                })
-                sendEvent({ eventName: 'message:read-message', detail: uuid as string })
+                // if user is not in another tab, then send event to server
+                if (document.visibilityState === 'visible') {
+                    socket.emit(SocketEvent.READ_MESSAGE, {
+                        conversationUuid: uuid as string,
+                        messageId: message.id,
+                    })
+                    sendEvent({ eventName: 'message:read-message', detail: uuid as string })
+                }
             }
         }
     }, [currentUser?.id, isFirstMessageVisible, message.id, message.is_read, messages.data, uuid])
