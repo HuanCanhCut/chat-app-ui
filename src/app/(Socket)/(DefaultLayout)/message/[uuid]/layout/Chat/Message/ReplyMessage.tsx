@@ -1,21 +1,153 @@
 import { faReply } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import React, { forwardRef, LegacyRef, memo } from 'react'
+import { mutate } from 'swr'
 
 import Image from '~/components/Image'
-import { MessageModel, UserModel } from '~/type/type'
+import { MessageModel, MessageResponse, UserModel } from '~/type/type'
+import * as messageServices from '~/services/messageService'
+import { useParams } from 'next/navigation'
+import SWRKey from '~/enum/SWRKey'
+
+interface MessageRef {
+    [key: string]: HTMLDivElement
+}
 
 interface ReplyMessageProps {
     message: MessageModel
     currentUser?: UserModel
+    messageRefs: MessageRef
+    offsetRange: { start: number; end: number }
     // eslint-disable-next-line no-unused-vars
-    handleScrollToMessage: (message: MessageModel) => void
+    setOffsetRange: React.Dispatch<
+        React.SetStateAction<{
+            start: number
+            end: number
+        }>
+    >
 }
 
+const PER_PAGE = 20
+
 const ReplyMessage = (
-    { message, currentUser, handleScrollToMessage }: ReplyMessageProps,
+    { message, currentUser, messageRefs, offsetRange, setOffsetRange }: ReplyMessageProps,
     ref: LegacyRef<HTMLDivElement>,
 ) => {
+    const { uuid } = useParams()
+
+    const handleScrollToMessage = async (parentMessage: MessageModel) => {
+        const handleAnimate = (messageElement: HTMLDivElement) => {
+            Object.values(messageRefs).forEach((ref) => {
+                if (!ref) {
+                    return
+                }
+                ref.classList.remove(
+                    'border-[2px]',
+                    'border-white',
+                    'dark:border-zinc-800',
+                    'shadow-[0_0_0_1px_#222]',
+                    'dark:shadow-[0_0_0_1px_#fff]',
+                    'animate-scale-up',
+                )
+            })
+            messageElement.scrollIntoView({ behavior: 'smooth', block: 'start' })
+            const observer = new IntersectionObserver(
+                ([entry]) => {
+                    if (entry.isIntersecting) {
+                        messageElement.classList.add(
+                            'border-[2px]',
+                            'border-white',
+                            'dark:border-zinc-800',
+                            'shadow-[0_0_0_1px_#222]',
+                            'dark:shadow-[0_0_0_1px_#fff]',
+                        )
+                        setTimeout(() => {
+                            messageElement.classList.add('animate-scale-up')
+                        }, 250)
+                        observer.disconnect()
+                    }
+                },
+                {
+                    threshold: 0.5,
+                },
+            )
+            observer.observe(messageElement)
+        }
+        const messageElement = messageRefs[parentMessage.id]
+        // if reply message is loaded
+        if (messageElement) {
+            handleAnimate(messageElement)
+        } else {
+            const aroundMessage = await messageServices.getAroundMessages({
+                conversationUuid: uuid as string,
+                messageId: parentMessage.id,
+                limit: PER_PAGE,
+            })
+            if (aroundMessage) {
+                // if around message is the next range of the current range
+                if (aroundMessage?.meta.pagination.offset <= offsetRange.end) {
+                    const diffOffset = offsetRange.end - aroundMessage?.meta.pagination.offset
+                    aroundMessage.data.splice(0, diffOffset)
+                    mutate(
+                        [SWRKey.GET_MESSAGES, uuid],
+                        (prev: MessageResponse | undefined) => {
+                            if (!prev) {
+                                return prev
+                            }
+                            const newMessages = [...prev.data, ...aroundMessage.data]
+                            const messageItem = newMessages.find((message) => message.id === parentMessage.id)
+                            if (messageItem) {
+                                requestIdleCallback(() => {
+                                    handleAnimate(messageRefs[messageItem.id])
+                                })
+                            }
+                            return {
+                                ...prev,
+                                data: newMessages,
+                                meta: aroundMessage.meta,
+                            }
+                        },
+                        {
+                            revalidate: false,
+                        },
+                    )
+                    setOffsetRange((prev) => {
+                        return {
+                            ...prev,
+                            end: prev.end + aroundMessage.meta.pagination.offset,
+                        }
+                    })
+                } else {
+                    setOffsetRange({
+                        start: aroundMessage.meta.pagination.offset,
+                        end: aroundMessage.meta.pagination.offset + aroundMessage.data.length,
+                    })
+                    mutate(
+                        [SWRKey.GET_MESSAGES, uuid],
+                        (prev: MessageResponse | undefined) => {
+                            if (!prev) {
+                                return prev
+                            }
+                            return {
+                                data: aroundMessage.data,
+                                meta: aroundMessage.meta,
+                            }
+                        },
+                        {
+                            revalidate: false,
+                        },
+                    )
+                    const messageItem = aroundMessage.data.find((message) => message.id === parentMessage.id)
+                    if (messageItem) {
+                        requestIdleCallback(() => {
+                            handleAnimate(messageRefs[messageItem.id])
+                        })
+                    }
+                }
+            }
+        }
+    }
+
     return (
         <>
             {message.parent ? (

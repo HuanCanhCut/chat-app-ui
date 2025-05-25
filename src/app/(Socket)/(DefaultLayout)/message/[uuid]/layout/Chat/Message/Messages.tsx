@@ -1,5 +1,5 @@
 import { useParams } from 'next/navigation'
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import useSWR from 'swr'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -14,6 +14,7 @@ import { MessageModel, MessageResponse, SocketMessage } from '~/type/type'
 import MessageItem from './MessageItem'
 import { useAppSelector } from '~/redux'
 import { getCurrentUser } from '~/redux/selector'
+import { toast } from '~/utils/toast'
 
 interface MessageRef {
     [key: string]: HTMLDivElement
@@ -33,7 +34,6 @@ const Message: React.FC = () => {
 
     const prevScrollY = useRef(0)
     const isScrollLoading = useRef(false)
-
     const { data: messages, mutate: mutateMessages } = useSWR<MessageResponse | undefined>(
         uuid ? [SWRKey.GET_MESSAGES, uuid] : null,
         () => {
@@ -294,130 +294,6 @@ const Message: React.FC = () => {
         }
     }, [currentUser?.data?.id, messages?.data, messages?.meta, mutateMessages, uuid])
 
-    const handleScrollToMessage = useCallback(
-        async (parentMessage: MessageModel) => {
-            const handleAnimate = (messageElement: HTMLDivElement) => {
-                Object.values(messageRefs.current).forEach((ref) => {
-                    if (!ref) {
-                        return
-                    }
-
-                    ref.classList.remove(
-                        'border-[2px]',
-                        'border-white',
-                        'dark:border-zinc-800',
-                        'shadow-[0_0_0_1px_#222]',
-                        'dark:shadow-[0_0_0_1px_#fff]',
-                        'animate-scale-up',
-                    )
-                })
-
-                messageElement.scrollIntoView({ behavior: 'smooth', block: 'start' })
-
-                const observer = new IntersectionObserver(
-                    ([entry]) => {
-                        if (entry.isIntersecting) {
-                            messageElement.classList.add(
-                                'border-[2px]',
-                                'border-white',
-                                'dark:border-zinc-800',
-                                'shadow-[0_0_0_1px_#222]',
-                                'dark:shadow-[0_0_0_1px_#fff]',
-                            )
-
-                            setTimeout(() => {
-                                messageElement.classList.add('animate-scale-up')
-                            }, 250)
-
-                            observer.disconnect()
-                        }
-                    },
-                    {
-                        threshold: 0.5,
-                    },
-                )
-
-                observer.observe(messageElement)
-            }
-
-            const messageElement = messageRefs.current[parentMessage.id]
-
-            // if reply message is loaded
-            if (messageElement) {
-                handleAnimate(messageElement)
-            } else {
-                const aroundMessage = await messageServices.getAroundMessages({
-                    conversationUuid: uuid as string,
-                    messageId: parentMessage.id,
-                    limit: PER_PAGE,
-                })
-
-                if (aroundMessage) {
-                    // if around message is the next range of the current range
-                    if (aroundMessage?.meta.pagination.offset <= offsetRange.end) {
-                        const diffOffset = offsetRange.end - aroundMessage?.meta.pagination.offset
-
-                        aroundMessage.data.splice(0, diffOffset)
-
-                        if (!messages?.data) {
-                            return
-                        }
-
-                        const newMessages = [...messages?.data, ...aroundMessage.data]
-
-                        setOffsetRange((prev) => {
-                            return {
-                                ...prev,
-                                end: prev.end + aroundMessage.meta.pagination.offset,
-                            }
-                        })
-
-                        mutateMessages(
-                            {
-                                data: newMessages,
-                                meta: aroundMessage.meta,
-                            },
-                            {
-                                revalidate: false,
-                            },
-                        )
-                        const messageItem = newMessages.find((message) => message.id === parentMessage.id)
-
-                        if (messageItem) {
-                            requestIdleCallback(() => {
-                                handleAnimate(messageRefs.current[messageItem.id])
-                            })
-                        }
-                    } else {
-                        setOffsetRange({
-                            start: aroundMessage.meta.pagination.offset,
-                            end: aroundMessage.meta.pagination.offset + aroundMessage.data.length,
-                        })
-
-                        mutateMessages(
-                            {
-                                data: aroundMessage.data,
-                                meta: aroundMessage.meta,
-                            },
-                            {
-                                revalidate: false,
-                            },
-                        )
-
-                        const messageItem = aroundMessage.data.find((message) => message.id === parentMessage.id)
-
-                        if (messageItem) {
-                            requestIdleCallback(() => {
-                                handleAnimate(messageRefs.current[messageItem.id])
-                            })
-                        }
-                    }
-                }
-            }
-        },
-        [messages?.data, mutateMessages, offsetRange.end, uuid],
-    )
-
     const handleScrollDown = async (e: React.UIEvent<HTMLDivElement>) => {
         const target = e.target as HTMLDivElement
 
@@ -447,8 +323,6 @@ const Message: React.FC = () => {
                     offset,
                 })
 
-                console.log(messageRefs)
-
                 if (response) {
                     const newData: MessageResponse = {
                         data: [...response?.data, ...messages?.data],
@@ -476,41 +350,45 @@ const Message: React.FC = () => {
     }
 
     return (
-        <div className="flex-grow overflow-hidden" onKeyDown={handleEnterMessage}>
+        <div className="flex-grow !overflow-hidden" onKeyDown={handleEnterMessage}>
             <div
-                className="flex h-full max-h-full flex-col-reverse overflow-y-auto"
+                className="flex h-full max-h-full flex-col-reverse scroll-smooth"
                 id="message-scrollable"
                 onScroll={handleScrollDown}
             >
                 <InfiniteScroll
-                    dataLength={messages?.data.length || 0} //This is important field to render the next data
+                    dataLength={messages?.data.length || 0}
                     next={async () => {
-                        const response = await messageServices.getMessages({
-                            conversationUuid: uuid as string,
-                            limit: PER_PAGE,
-                            offset: offsetRange.end,
-                        })
-
-                        if (response) {
-                            if (!messages?.data) {
-                                return
-                            }
-
-                            const newData: MessageResponse = {
-                                data: [...messages?.data, ...response.data],
-                                meta: response?.meta,
-                            }
-
-                            mutateMessages(newData, {
-                                revalidate: false,
+                        try {
+                            const response = await messageServices.getMessages({
+                                conversationUuid: uuid as string,
+                                limit: PER_PAGE,
+                                offset: offsetRange.end,
                             })
 
-                            setOffsetRange((prev) => {
-                                return {
-                                    ...prev,
-                                    end: response.meta.pagination.offset + response.data.length,
+                            if (response) {
+                                if (!messages?.data) {
+                                    return
                                 }
-                            })
+
+                                const newData: MessageResponse = {
+                                    data: [...messages?.data, ...response.data],
+                                    meta: response?.meta,
+                                }
+
+                                mutateMessages(newData, {
+                                    revalidate: false,
+                                })
+
+                                setOffsetRange((prev) => {
+                                    return {
+                                        ...prev,
+                                        end: response.meta.pagination.offset + response.data.length,
+                                    }
+                                })
+                            }
+                        } catch (error) {
+                            toast('Có lỗi khi tải tin nhắn, vui lòng thử lại sau', 'error')
                         }
                     }}
                     className="flex flex-col-reverse gap-[2.5px] !overflow-hidden px-2 py-3"
@@ -519,7 +397,6 @@ const Message: React.FC = () => {
                             ? messages.meta.pagination.offset / PER_PAGE + 1 < messages.meta.pagination.total / PER_PAGE
                             : false
                     }
-                    scrollThreshold="200px"
                     inverse={true}
                     loader={
                         <div className="flex justify-center">
@@ -527,6 +404,7 @@ const Message: React.FC = () => {
                         </div>
                     }
                     scrollableTarget="message-scrollable"
+                    // scrollThreshold="200px"
                 >
                     {messages?.data.map((message, index) => (
                         <React.Fragment key={index}>
@@ -535,10 +413,12 @@ const Message: React.FC = () => {
                                 messageIndex={index}
                                 messages={messages}
                                 currentUser={currentUser?.data}
+                                messageRefs={messageRefs.current}
                                 messageRef={(el) => {
                                     messageRefs.current[message.id] = el
                                 }}
-                                handleScrollToMessage={handleScrollToMessage}
+                                offsetRange={offsetRange}
+                                setOffsetRange={setOffsetRange}
                             />
                         </React.Fragment>
                     ))}

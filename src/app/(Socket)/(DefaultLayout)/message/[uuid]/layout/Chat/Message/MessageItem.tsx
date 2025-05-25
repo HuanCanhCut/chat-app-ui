@@ -26,15 +26,26 @@ import ReplyMessage from './ReplyMessage'
 
 const BETWEEN_TIME_MESSAGE = 7 // minute
 
+interface MessageRef {
+    [key: string]: HTMLDivElement
+}
+
 interface MessageItemProps {
     message: MessageModel
     messageIndex: number
     messages: MessageResponse
     currentUser: UserModel
+    messageRefs: MessageRef
     // eslint-disable-next-line no-unused-vars
     messageRef: (el: HTMLDivElement) => void
+    offsetRange: { start: number; end: number }
     // eslint-disable-next-line no-unused-vars
-    handleScrollToMessage: (message: MessageModel) => void
+    setOffsetRange: React.Dispatch<
+        React.SetStateAction<{
+            start: number
+            end: number
+        }>
+    >
 }
 
 const MessageItem = ({
@@ -42,8 +53,10 @@ const MessageItem = ({
     messageIndex,
     messages,
     currentUser,
+    messageRefs,
     messageRef,
-    handleScrollToMessage,
+    offsetRange,
+    setOffsetRange,
 }: MessageItemProps) => {
     const { uuid } = useParams()
 
@@ -252,7 +265,9 @@ const MessageItem = ({
                         message={message}
                         currentUser={currentUser}
                         ref={replyMessageRef}
-                        handleScrollToMessage={handleScrollToMessage}
+                        messageRefs={messageRefs}
+                        offsetRange={offsetRange}
+                        setOffsetRange={setOffsetRange}
                     />
                     {/* More action */}
                     <div
