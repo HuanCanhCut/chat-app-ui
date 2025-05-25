@@ -307,7 +307,7 @@ const Message: React.FC = () => {
                     return
                 }
 
-                const hasMore = messages.meta.pagination.offset !== 0
+                const hasMore = offsetRange.start !== 0
 
                 if (!hasMore) {
                     return
@@ -324,6 +324,11 @@ const Message: React.FC = () => {
                 })
 
                 if (response) {
+                    if (messages.meta.pagination.offset - response.meta.pagination.offset < PER_PAGE) {
+                        const diffOffset = messages.meta.pagination.offset - response.meta.pagination.offset
+
+                        response.data.splice(diffOffset)
+                    }
                     const newData: MessageResponse = {
                         data: [...response?.data, ...messages?.data],
                         meta: response?.meta,
@@ -336,7 +341,7 @@ const Message: React.FC = () => {
                     setOffsetRange((prev) => {
                         return {
                             ...prev,
-                            start: prev.start - response.data.length,
+                            start: prev.start - response.data.length <= 0 ? 0 : prev.start - response.data.length,
                         }
                     })
                 }
@@ -407,7 +412,7 @@ const Message: React.FC = () => {
                     scrollThreshold="150px"
                 >
                     {messages?.data.map((message, index) => (
-                        <React.Fragment key={index}>
+                        <React.Fragment key={message.id}>
                             <MessageItem
                                 message={message}
                                 messageIndex={index}
