@@ -1,6 +1,6 @@
 import { faReply } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import React, { forwardRef, LegacyRef, memo } from 'react'
+import React, { forwardRef, LegacyRef } from 'react'
 import { mutate } from 'swr'
 
 import Image from '~/components/Image'
@@ -151,8 +151,8 @@ const ReplyMessage = (
 
     return (
         <>
-            {message.parent ? (
-                message.parent.type === 'text' || message.parent.type === 'icon' ? (
+            {message.parent &&
+                (message.parent.type === 'text' || message.parent.type === 'icon' ? (
                     <div
                         className={`absolute bottom-[calc(100%-20px)] w-fit max-w-[85%] cursor-pointer ${message.sender_id === currentUser?.id ? 'flex flex-col items-end' : 'flex flex-col items-start'}`}
                         ref={ref}
@@ -203,10 +203,9 @@ const ReplyMessage = (
                             }}
                         />
                     </div>
-                )
-            ) : null}
+                ))}
         </>
     )
 }
 
-export default memo(forwardRef(ReplyMessage))
+export default forwardRef(ReplyMessage)
