@@ -45,12 +45,32 @@ const RevokeModal = ({ message, onClose }: RevokeModalProps) => {
 
                                 const newMessages: MessageModel[] = []
 
-                                for (const messageItem of prev.data) {
-                                    if (messageItem.id !== message.id) {
+                                for (let i = 0; i < prev.data.length; i++) {
+                                    const messageItem = prev.data[i]
+
+                                    if (messageItem.id === message.id) {
+                                        let beforeMessage = null
+
+                                        for (let i = 0; i < prev.data.length; i++) {
+                                            if (
+                                                prev.data[i].id !== message.id &&
+                                                !prev.data[i].type.startsWith('system') &&
+                                                prev.data[i].id < message.id
+                                            ) {
+                                                beforeMessage = prev.data[i]
+                                                break
+                                            }
+                                        }
+
+                                        if (beforeMessage) {
+                                            beforeMessage.message_status.forEach((status) => {
+                                                status.receiver.last_read_message_id = beforeMessage.id || 0
+                                            })
+                                        }
+                                    } else {
                                         if (messageItem.parent?.id === message.id) {
                                             messageItem.parent = null
                                         }
-
                                         newMessages.push(messageItem)
                                     }
                                 }

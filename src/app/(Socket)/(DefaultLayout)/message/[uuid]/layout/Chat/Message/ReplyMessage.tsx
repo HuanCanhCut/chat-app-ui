@@ -50,7 +50,9 @@ const ReplyMessage = (
                     'animate-scale-up',
                 )
             })
+
             messageElement.scrollIntoView({ behavior: 'smooth', block: 'start' })
+
             const observer = new IntersectionObserver(
                 ([entry]) => {
                     if (entry.isIntersecting) {
@@ -74,11 +76,15 @@ const ReplyMessage = (
             )
             observer.observe(messageElement)
         }
+
         const messageElement = messageRefs[parentMessage.id]
         // if reply message is loaded
         if (messageElement) {
             handleAnimate(messageElement)
         } else {
+            if (parentMessage.id >= Number(Object.keys(messageRefs)[0])) {
+                return
+            }
             const aroundMessage = await messageServices.getAroundMessages({
                 conversationUuid: uuid as string,
                 messageId: parentMessage.id,
