@@ -23,6 +23,7 @@ import PopperWrapper from '~/components/PopperWrapper'
 import RevokeModal from './Modal/RevokeModal'
 import Modal from '~/components/Modal'
 import ReplyMessage from './ReplyMessage'
+import SystemMessage from './SystemMessage'
 
 const BETWEEN_TIME_MESSAGE = 7 // minute
 
@@ -99,19 +100,27 @@ const MessageItem = ({
     }, [message.parent])
 
     const diffTime =
-        messageIndex > 0 &&
-        Math.abs(
-            moment
-                .tz(messages.data[messageIndex].created_at, 'UTC')
-                .diff(moment.tz(messages.data[messageIndex - 1].created_at, 'UTC'), 'minutes'),
-        )
+        messageIndex > 0 && !messages.data[messageIndex - 1].type.startsWith('system')
+            ? Math.abs(
+                  moment
+                      .tz(messages.data[messageIndex].created_at, 'UTC')
+                      .diff(moment.tz(messages.data[messageIndex - 1].created_at, 'UTC'), 'minutes'),
+              )
+            : 0
 
     useEffect(() => {
         if (isFirstMessageVisible) {
             let isRead = true
-            if (message.id === messages.data[0].id && !message.is_read) {
-                for (const status of messages.data[0].message_status) {
-                    if (status.receiver_id === currentUser?.id && status.receiver.last_read_message_id < message.id) {
+
+            const firstMessage = messages.data[0]
+
+            if (message.id === firstMessage.id && offsetRange.start === 0) {
+                if (firstMessage.type.startsWith('system') && firstMessage.is_read) {
+                    return
+                }
+
+                for (const status of firstMessage.message_status) {
+                    if (status.receiver_id === currentUser?.id && status.receiver.last_read_message_id !== message.id) {
                         isRead = false
                         break
                     }
@@ -129,7 +138,7 @@ const MessageItem = ({
                 }
             }
         }
-    }, [currentUser?.id, isFirstMessageVisible, message.id, message.is_read, messages.data, uuid])
+    }, [currentUser?.id, isFirstMessageVisible, message.id, messages.data, offsetRange.start, uuid])
 
     const handleFormatTime = (time: Date) => {
         const isSameDay = moment(new Date(time)).isSame(moment(new Date()), 'day')
@@ -236,6 +245,10 @@ const MessageItem = ({
 
     const handleReply = () => {
         sendEvent({ eventName: 'message:reply', detail: messages.data[messageIndex] })
+    }
+
+    if (message.type.startsWith('system')) {
+        return <SystemMessage message={message} messageIndex={messageIndex} ref={firstMessageRef} />
     }
 
     return (
