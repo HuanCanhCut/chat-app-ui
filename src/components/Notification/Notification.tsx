@@ -21,7 +21,6 @@ const PER_PAGE = 6
 const Notification = () => {
     const [currentTab, setCurrentTab] = useState<'all' | 'unread'>('all')
     const [notificationUnSeenCount, setNotificationUnSeenCount] = useState(0)
-    const [reloadNotificationCount, setReloadNotificationCount] = useState(true)
 
     const [page, setPage] = useState(1)
 
@@ -41,10 +40,6 @@ const Notification = () => {
 
     // Count notification
     useMemo(() => {
-        if (!reloadNotificationCount) {
-            return
-        }
-
         const count = notifications?.data.reduce((acc: number, curr: NotificationData) => {
             return acc + (curr.is_seen ? 0 : 1)
         }, 0)
@@ -52,9 +47,7 @@ const Notification = () => {
         if (count) {
             setNotificationUnSeenCount(count)
         }
-
-        setReloadNotificationCount(false)
-    }, [notifications?.data, reloadNotificationCount])
+    }, [notifications])
 
     const tippyInstanceRef = useRef<InstanceType<any>>(null)
 
@@ -96,6 +89,22 @@ const Notification = () => {
     const handleOpenNotification = () => {
         if (notificationUnSeenCount) {
             notificationServices.seen()
+
+            const newData = notifications?.data.map((notification: NotificationData) => ({
+                ...notification,
+                is_seen: true,
+            }))
+
+            if (newData) {
+                mutateNotifications(
+                    {
+                        data: newData,
+                        meta: notifications?.meta!,
+                    },
+                    { revalidate: false },
+                )
+            }
+
             setNotificationUnSeenCount(0)
         }
     }
@@ -123,8 +132,6 @@ const Notification = () => {
                     revalidate: false,
                 },
             )
-
-            setReloadNotificationCount(true)
         }
 
         socket.on(SocketEvent.NEW_NOTIFICATION, socketHandler)
@@ -158,8 +165,6 @@ const Notification = () => {
                 },
                 { revalidate: false },
             )
-
-            setReloadNotificationCount(true)
         }
 
         socket.on(SocketEvent.REMOVE_NOTIFICATION, socketHandler)
