@@ -19,7 +19,7 @@ const ConversationItem: React.FC<Props> = ({ conversation, className = '' }) => 
     const isActive = uuid === conversation.uuid
 
     // if not group then get user !== current user in conversation_members
-    const userMember = conversation.conversation_members.find((member) => member.user_id !== currentUser?.data.id)?.user
+    const userMember = conversation.conversation_members.find((member) => member.user_id !== currentUser?.data.id)
 
     const isRead =
         conversation.last_message.sender_id !== currentUser?.data.id ? conversation.last_message.is_read : true
@@ -32,16 +32,18 @@ const ConversationItem: React.FC<Props> = ({ conversation, className = '' }) => 
             >
                 <div className="relative flex-shrink-0">
                     <UserAvatar
-                        src={conversation?.avatar || userMember?.avatar}
+                        src={conversation?.avatar || userMember?.user.avatar}
                         size={56}
                         className="h-[48px] w-[48px] lg:h-[56px] lg:w-[56px]"
                     />
-                    {!conversation.is_group && userMember?.is_online && (
+                    {!conversation.is_group && userMember?.user.is_online && (
                         <div className="absolute bottom-0 right-0 h-4 w-4 rounded-full border-2 border-white bg-green-500 dark:border-dark"></div>
                     )}
                 </div>
                 <div className="ml-3 overflow-hidden">
-                    <p className="truncate font-medium">{conversation.name || userMember?.full_name}</p>
+                    <p className="truncate font-medium">
+                        {conversation.name || userMember?.nickname || userMember?.user.full_name}
+                    </p>
                     <div
                         className={`flex items-center text-xs font-normal ${isRead ? 'text-gray-600 dark:text-gray-400' : 'font-medium text-black dark:text-gray-200'} `}
                     >

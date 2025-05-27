@@ -28,15 +28,9 @@ const Notification = () => {
         data: notifications,
         mutate: mutateNotifications,
         isLoading,
-    } = useSWR<NotificationResponse | undefined>(
-        currentTab ? [SWRKey.GET_NOTIFICATIONS, currentTab] : null,
-        () => {
-            return notificationServices.getNotifications({ page, per_page: PER_PAGE, type: currentTab })
-        },
-        {
-            revalidateIfStale: true,
-        },
-    )
+    } = useSWR<NotificationResponse | undefined>(currentTab ? [SWRKey.GET_NOTIFICATIONS, currentTab] : null, () => {
+        return notificationServices.getNotifications({ page, per_page: PER_PAGE, type: currentTab })
+    })
 
     // Count notification
     useMemo(() => {

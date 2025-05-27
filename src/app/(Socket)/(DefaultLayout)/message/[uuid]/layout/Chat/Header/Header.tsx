@@ -33,7 +33,7 @@ const Header: React.FC<HeaderProps> = ({ className = '', toggleInfo, conversatio
 
     const conversationMember = conversation?.conversation_members.find(
         (member) => member.user_id !== currentUser?.data.id,
-    )?.user
+    )
 
     const dateDiff = (date: Date) => {
         return moment.tz(new Date(Date.now()).toISOString(), 'Asia/Ho_Chi_Minh').diff(date, 'minutes')
@@ -50,8 +50,8 @@ const Header: React.FC<HeaderProps> = ({ className = '', toggleInfo, conversatio
     }
 
     useEffect(() => {
-        if (conversationMember && conversationMember.last_online_at) {
-            setLastOnlineTime(dateDiff(conversationMember.last_online_at))
+        if (conversationMember && conversationMember.user.last_online_at) {
+            setLastOnlineTime(dateDiff(conversationMember.user.last_online_at))
         }
     }, [conversationMember])
 
@@ -91,20 +91,22 @@ const Header: React.FC<HeaderProps> = ({ className = '', toggleInfo, conversatio
                 >
                     <div className="relative flex-shrink-0">
                         <UserAvatar
-                            src={conversation?.is_group ? conversation?.avatar : conversationMember?.avatar}
+                            src={conversation?.is_group ? conversation?.avatar : conversationMember?.user?.avatar}
                             size={40}
                         />
-                        {!conversation?.is_group && conversationMember?.is_online && (
+                        {!conversation?.is_group && conversationMember?.user?.is_online && (
                             <div className="absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-white bg-green-500 dark:border-dark"></div>
                         )}
                     </div>
                     <div className="flex flex-col">
                         <h4 className="max-w-[150px] truncate whitespace-nowrap font-semibold xs:max-w-[200px] sm:max-w-[250px] md:max-w-[350px]">
-                            {conversation?.is_group ? conversation?.name : conversationMember?.full_name}
+                            {conversation?.is_group
+                                ? conversation?.name
+                                : conversationMember?.nickname || conversationMember?.user?.full_name}
                         </h4>
                         {!conversation?.is_group && (
                             <span className="text-xs font-normal text-zinc-700 dark:text-gray-400">
-                                {conversationMember?.is_online
+                                {conversationMember?.user?.is_online
                                     ? 'Đang hoạt động'
                                     : lastOnlineTime && `Hoạt động ${handleFormatTime(lastOnlineTime)}`}
                             </span>
