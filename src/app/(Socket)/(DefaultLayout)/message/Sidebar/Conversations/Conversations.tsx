@@ -12,14 +12,8 @@ import Image from 'next/image'
 import Skeleton from 'react-loading-skeleton'
 import socket from '~/helpers/socket'
 import { SocketEvent } from '~/enum/SocketEvent'
-import { ConversationMember, ConversationModel, SocketMessage } from '~/type/type'
+import { ConversationMember, ConversationModel, SocketMessage, UserStatus } from '~/type/type'
 import { listenEvent } from '~/helpers/events'
-
-type UserStatus = {
-    user_id: number
-    is_online: boolean
-    last_online_at: string | null
-}
 
 interface Conversation<T> {
     [key: string]: T
@@ -67,7 +61,7 @@ const Conversations = () => {
     }
 
     useEffect(() => {
-        socket.on(SocketEvent.NEW_MESSAGE, (data: SocketMessage) => {
+        const socketHandler = (data: SocketMessage) => {
             let conversationData
 
             if (conversations?.[data.conversation.uuid]) {
@@ -102,11 +96,17 @@ const Conversations = () => {
             mutateConversations(conversationMutate, {
                 revalidate: false,
             })
-        })
+        }
+
+        socket.on(SocketEvent.NEW_MESSAGE, socketHandler)
+
+        return () => {
+            socket.off(SocketEvent.NEW_MESSAGE, socketHandler)
+        }
     }, [conversations, mutateConversations])
 
     useEffect(() => {
-        socket.on(SocketEvent.USER_STATUS, (data: UserStatus) => {
+        const socketHandler = (data: UserStatus) => {
             if (conversationUserMap[data.user_id]) {
                 if (!conversations) {
                     return
@@ -176,7 +176,13 @@ const Conversations = () => {
                     }
                 }
             }
-        })
+        }
+
+        socket.on(SocketEvent.USER_STATUS, socketHandler)
+
+        return () => {
+            socket.off(SocketEvent.USER_STATUS, socketHandler)
+        }
     }, [conversationUserMap, conversations, mutateConversations])
 
     // update last message is read
@@ -207,7 +213,7 @@ const Conversations = () => {
             conversation_uuid: string
         }
 
-        socket.on(SocketEvent.MESSAGE_REVOKE, ({ message_id, conversation_uuid }: RevokeMessage) => {
+        const socketHandler = ({ message_id, conversation_uuid }: RevokeMessage) => {
             if (conversations?.[conversation_uuid]) {
                 if (conversations[conversation_uuid].last_message.id === message_id) {
                     const newData = {
@@ -221,7 +227,13 @@ const Conversations = () => {
                     mutateConversations({ ...conversations, [conversation_uuid]: newData }, { revalidate: false })
                 }
             }
-        })
+        }
+
+        socket.on(SocketEvent.MESSAGE_REVOKE, socketHandler)
+
+        return () => {
+            socket.off(SocketEvent.MESSAGE_REVOKE, socketHandler)
+        }
     }, [conversations, mutateConversations])
 
     return (

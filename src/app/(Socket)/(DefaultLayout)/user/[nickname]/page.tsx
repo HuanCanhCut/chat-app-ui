@@ -6,7 +6,7 @@ import { useEffect } from 'react'
 import { useParams } from 'next/navigation'
 
 import CustomImage from '~/components/Image'
-import { UserResponse } from '~/type/type'
+import { UserResponse, UserStatus } from '~/type/type'
 import * as userService from '~/services/userService'
 import User from './components/User'
 import FriendList from './components/FriendList'
@@ -38,7 +38,7 @@ export default function UserPage() {
     )
 
     useEffect(() => {
-        socket.on(SocketEvent.USER_STATUS, (data) => {
+        const socketHandler = (data: UserStatus) => {
             if (!user) {
                 return
             }
@@ -52,7 +52,13 @@ export default function UserPage() {
                     },
                 })
             }
-        })
+        }
+
+        socket.on(SocketEvent.USER_STATUS, socketHandler)
+
+        return () => {
+            socket.off(SocketEvent.USER_STATUS, socketHandler)
+        }
     }, [mutate, user])
 
     useEffect(() => {

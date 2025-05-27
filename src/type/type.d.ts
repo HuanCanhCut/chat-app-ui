@@ -31,6 +31,12 @@ export interface UserResponse {
     }
 }
 
+export interface UserStatus {
+    user_id: number
+    is_online: boolean
+    last_online_at: Date
+}
+
 // ========================================== Conversation model ==========================================
 export interface ConversationModel extends Timestamp {
     id: number
@@ -56,6 +62,11 @@ export interface ConversationMember extends Timestamp {
 
 // ========================================== Message model ==========================================
 
+export interface TopReaction {
+    react: string
+    user_reaction: UserModel
+}
+
 export interface MessageModel extends Timestamp {
     id: number
     conversation_id: number
@@ -73,7 +84,7 @@ export interface MessageModel extends Timestamp {
         | 'system_change_theme'
         | 'system_add_user'
         | 'system_remove_user'
-    top_reactions?: { react: string; user_reaction: UserModel }[]
+    top_reactions?: TopReaction[]
     total_reactions: number
     parent_id: number | null
     parent: MessageModel | null

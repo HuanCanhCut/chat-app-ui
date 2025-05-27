@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation'
 import UserAvatar from '~/components/UserAvatar'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronLeft, faCircleInfo } from '@fortawesome/free-solid-svg-icons'
-import { ConversationModel } from '~/type/type'
+import { ConversationModel, UserStatus } from '~/type/type'
 import { useAppSelector } from '~/redux'
 import { getCurrentUser } from '~/redux/selector'
 import { useEffect, useState } from 'react'
@@ -56,11 +56,17 @@ const Header: React.FC<HeaderProps> = ({ className = '', toggleInfo, conversatio
     }, [conversationMember])
 
     useEffect(() => {
-        socket.on(SocketEvent.USER_OFFLINE_TIMER, (data) => {
+        const socketHandler = (data: UserStatus) => {
             if (data.user_id === conversationMember?.id) {
                 setLastOnlineTime(dateDiff(data.last_online_at))
             }
-        })
+        }
+
+        socket.on(SocketEvent.USER_OFFLINE_TIMER, socketHandler)
+
+        return () => {
+            socket.off(SocketEvent.USER_OFFLINE_TIMER, socketHandler)
+        }
     }, [conversationMember?.id])
 
     return (

@@ -10,7 +10,7 @@ import { SocketEvent } from '~/enum/SocketEvent'
 import SWRKey from '~/enum/SWRKey'
 import { sendEvent } from '~/helpers/events'
 import socket from '~/helpers/socket'
-import { MessageModel, MessageResponse, SocketMessage } from '~/type/type'
+import { MessageModel, MessageReactionModel, MessageResponse, SocketMessage, TopReaction } from '~/type/type'
 import MessageItem from './MessageItem'
 import { useAppSelector } from '~/redux'
 import { getCurrentUser } from '~/redux/selector'
@@ -63,7 +63,7 @@ const Message: React.FC = () => {
 
     // Listen new message event
     useEffect(() => {
-        socket.on(SocketEvent.NEW_MESSAGE, (data: SocketMessage) => {
+        const socketHandler = (data: SocketMessage) => {
             if (data.conversation.uuid === uuid) {
                 if (!messages?.data) {
                     return
@@ -97,86 +97,96 @@ const Message: React.FC = () => {
                     },
                 )
             }
-        })
+        }
+
+        socket.on(SocketEvent.NEW_MESSAGE, socketHandler)
+
+        return () => {
+            socket.off(SocketEvent.NEW_MESSAGE, socketHandler)
+        }
     }, [messages, mutateMessages, uuid])
 
     useEffect(() => {
-        socket.on(
-            SocketEvent.UPDATE_READ_MESSAGE,
-            ({ message: data, user_read_id }: { message: MessageModel; user_read_id: number }) => {
-                if (!messages?.data) {
+        const socketHandler = ({ message: data, user_read_id }: { message: MessageModel; user_read_id: number }) => {
+            if (!messages?.data) {
+                return
+            }
+
+            const userLastReadMessage = data.message_status.find((status) => {
+                return status.receiver.id === user_read_id
+            })
+
+            // If someone in the group chat revokes a message on their side, the message read status is not processed.
+            if (userLastReadMessage?.receiver.last_read_message_id) {
+                if (
+                    Number(user_read_id) !== currentUser?.data?.id &&
+                    userLastReadMessage?.receiver.last_read_message_id < messages.data[0].id
+                ) {
                     return
                 }
+            }
 
-                const userLastReadMessage = data.message_status.find((status) => {
-                    return status.receiver.id === user_read_id
-                })
+            let lastReadMessageId = 0
 
-                // If someone in the group chat revokes a message on their side, the message read status is not processed.
-                if (userLastReadMessage?.receiver.last_read_message_id) {
-                    if (
-                        Number(user_read_id) !== currentUser?.data?.id &&
-                        userLastReadMessage?.receiver.last_read_message_id < messages.data[0].id
-                    ) {
-                        return
-                    }
+            const newMessages = messages?.data.map((message) => {
+                if (message.id === data.id) {
+                    return data
                 }
 
-                let lastReadMessageId = 0
+                if (Number(user_read_id) !== currentUser?.data?.id) {
+                    lastReadMessageId = data.id
+                }
 
-                const newMessages = messages?.data.map((message) => {
-                    if (message.id === data.id) {
-                        return data
-                    }
+                if (Number(user_read_id) === currentUser?.data?.id && data.sender_id !== currentUser?.data?.id) {
+                    lastReadMessageId = data.id
+                }
 
-                    if (Number(user_read_id) !== currentUser?.data?.id) {
-                        lastReadMessageId = data.id
-                    }
-
-                    if (Number(user_read_id) === currentUser?.data?.id && data.sender_id !== currentUser?.data?.id) {
-                        lastReadMessageId = data.id
-                    }
-
-                    return {
-                        ...message,
-                        message_status: message.message_status.map((status) => {
-                            if (status?.receiver_id !== currentUser?.data?.id) {
-                                return {
-                                    ...status,
-                                    receiver: {
-                                        ...status.receiver,
-                                        last_read_message_id: !!lastReadMessageId
-                                            ? lastReadMessageId
-                                            : status.receiver.last_read_message_id,
-                                    },
-                                    status: 'read' as const,
-                                    read_at: new Date(),
-                                }
+                return {
+                    ...message,
+                    message_status: message.message_status.map((status) => {
+                        if (status?.receiver_id !== currentUser?.data?.id) {
+                            return {
+                                ...status,
+                                receiver: {
+                                    ...status.receiver,
+                                    last_read_message_id: !!lastReadMessageId
+                                        ? lastReadMessageId
+                                        : status.receiver.last_read_message_id,
+                                },
+                                status: 'read' as const,
+                                read_at: new Date(),
                             }
-                            return status
-                        }),
-                    }
-                })
+                        }
+                        return status
+                    }),
+                }
+            })
 
-                mutateMessages(
-                    {
-                        data: newMessages,
-                        meta: messages?.meta,
-                    },
-                    {
-                        revalidate: false,
-                    },
-                )
-            },
-        )
+            mutateMessages(
+                {
+                    data: newMessages,
+                    meta: messages?.meta,
+                },
+                {
+                    revalidate: false,
+                },
+            )
+        }
+
+        socket.on(SocketEvent.UPDATE_READ_MESSAGE, socketHandler)
 
         return () => {
-            socket.off(SocketEvent.UPDATE_READ_MESSAGE)
+            socket.off(SocketEvent.UPDATE_READ_MESSAGE, socketHandler)
         }
     }, [currentUser?.data?.id, messages?.data, messages?.meta, mutateMessages])
 
     useEffect(() => {
-        socket.on(SocketEvent.REACT_MESSAGE, (data) => {
+        interface ReactionMessage {
+            reaction: MessageReactionModel
+            total_reactions: number
+            top_reactions: TopReaction[]
+        }
+        const socketHandler = (data: ReactionMessage) => {
             if (!messages?.data) {
                 return
             }
@@ -202,15 +212,23 @@ const Message: React.FC = () => {
                     revalidate: false,
                 },
             )
-        })
+        }
+
+        socket.on(SocketEvent.REACT_MESSAGE, socketHandler)
 
         return () => {
-            socket.off(SocketEvent.REACT_MESSAGE)
+            socket.off(SocketEvent.REACT_MESSAGE, socketHandler)
         }
     }, [messages?.data, messages?.meta, mutateMessages])
 
     useEffect(() => {
-        socket.on(SocketEvent.REMOVE_REACTION, (data) => {
+        interface RemoveReactionMessage {
+            message_id: number
+            total_reactions: number
+            top_reactions: TopReaction[]
+        }
+
+        const socketHandler = (data: RemoveReactionMessage) => {
             if (!messages?.data) {
                 return
             }
@@ -236,10 +254,12 @@ const Message: React.FC = () => {
                     revalidate: false,
                 },
             )
-        })
+        }
+
+        socket.on(SocketEvent.REMOVE_REACTION, socketHandler)
 
         return () => {
-            socket.off(SocketEvent.REMOVE_REACTION)
+            socket.off(SocketEvent.REMOVE_REACTION, socketHandler)
         }
     }, [messages?.data, messages?.meta, mutateMessages])
 
@@ -249,7 +269,7 @@ const Message: React.FC = () => {
             conversation_uuid: string
         }
 
-        socket.on(SocketEvent.MESSAGE_REVOKE, ({ message_id, conversation_uuid }: RevokeMessage) => {
+        const socketHandler = ({ message_id, conversation_uuid }: RevokeMessage) => {
             if (messages?.data) {
                 if (conversation_uuid === uuid) {
                     const newMessages: MessageModel[] = []
@@ -287,10 +307,12 @@ const Message: React.FC = () => {
                     )
                 }
             }
-        })
+        }
+
+        socket.on(SocketEvent.MESSAGE_REVOKE, socketHandler)
 
         return () => {
-            socket.off(SocketEvent.MESSAGE_REVOKE)
+            socket.off(SocketEvent.MESSAGE_REVOKE, socketHandler)
         }
     }, [currentUser?.data?.id, messages?.data, messages?.meta, mutateMessages, uuid])
 

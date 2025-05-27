@@ -13,19 +13,21 @@ const Sound = ({ children }: { children: React.ReactNode }) => {
     const audioRef = useRef<HTMLAudioElement>(null)
 
     useEffect(() => {
-        socket.on(SocketEvent.NEW_NOTIFICATION, async () => {
+        const socketHandler = async () => {
             try {
                 if (!audioRef.current) return
                 audioRef.current.src = '/static/audio/notify.mp3'
                 await audioRef.current?.play()
-            } catch (e) {}
-        })
+            } catch (error) {}
+        }
+
+        socket.on(SocketEvent.NEW_NOTIFICATION, socketHandler)
     }, [])
 
     // listen new message event
     useEffect(() => {
         if (!currentUser) return
-        socket.on(SocketEvent.NEW_MESSAGE, async (data: SocketMessage) => {
+        const socketHandler = async (data: SocketMessage) => {
             try {
                 if (!audioRef.current) return
 
@@ -34,7 +36,13 @@ const Sound = ({ children }: { children: React.ReactNode }) => {
                 audioRef.current.src = '/static/audio/new-message.mp3'
                 await audioRef.current?.play()
             } catch (error) {}
-        })
+        }
+
+        socket.on(SocketEvent.NEW_MESSAGE, socketHandler)
+
+        return () => {
+            socket.off(SocketEvent.NEW_MESSAGE, socketHandler)
+        }
     }, [currentUser])
 
     return (

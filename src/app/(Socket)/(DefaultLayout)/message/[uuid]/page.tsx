@@ -12,6 +12,7 @@ import Info from './layout/Info/Info'
 import SWRKey from '~/enum/SWRKey'
 import socket from '~/helpers/socket'
 import { SocketEvent } from '~/enum/SocketEvent'
+import { UserStatus } from '~/type/type'
 
 const MessagePage = () => {
     const { uuid } = useParams()
@@ -26,7 +27,7 @@ const MessagePage = () => {
     )
 
     useEffect(() => {
-        socket.on(SocketEvent.USER_STATUS, (data) => {
+        const socketHandler = (data: UserStatus) => {
             if (!conversation?.data) {
                 return
             }
@@ -52,7 +53,13 @@ const MessagePage = () => {
                     })
                 }
             })
-        })
+        }
+
+        socket.on(SocketEvent.USER_STATUS, socketHandler)
+
+        return () => {
+            socket.off(SocketEvent.USER_STATUS, socketHandler)
+        }
     }, [conversation, conversation?.data, mutateConversation])
 
     const toggleInfo = () => {

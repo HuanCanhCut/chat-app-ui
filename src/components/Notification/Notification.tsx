@@ -102,7 +102,7 @@ const Notification = () => {
 
     // Listen event new notification
     useEffect(() => {
-        socket.on(SocketEvent.NEW_NOTIFICATION, (newNotification: { notification: NotificationData }) => {
+        const socketHandler = (newNotification: { notification: NotificationData }) => {
             if (!notifications) {
                 return
             }
@@ -125,19 +125,24 @@ const Notification = () => {
             )
 
             setReloadNotificationCount(true)
-        })
-        // không off socket vì trong file layout có xử lí rồi
+        }
+
+        socket.on(SocketEvent.NEW_NOTIFICATION, socketHandler)
+
+        return () => {
+            socket.off(SocketEvent.NEW_NOTIFICATION, socketHandler)
+        }
     }, [mutateNotifications, notifications])
 
-    // Listen event when remove a notification
-
     useEffect(() => {
-        socket.on(SocketEvent.REMOVE_NOTIFICATION, ({ notificationId }: { notificationId: number }) => {
+        const socketHandler = ({ notificationId }: { notificationId: number }) => {
             if (!notifications) {
                 return
             }
 
-            const newNotifications = notifications.data.filter((notification: NotificationData) => notification.id !== notificationId)
+            const newNotifications = notifications.data.filter(
+                (notification: NotificationData) => notification.id !== notificationId,
+            )
 
             mutateNotifications(
                 {
@@ -155,7 +160,13 @@ const Notification = () => {
             )
 
             setReloadNotificationCount(true)
-        })
+        }
+
+        socket.on(SocketEvent.REMOVE_NOTIFICATION, socketHandler)
+
+        return () => {
+            socket.off(SocketEvent.REMOVE_NOTIFICATION, socketHandler)
+        }
     }, [mutateNotifications, notifications])
 
     useEffect(() => {
@@ -187,7 +198,9 @@ const Notification = () => {
         const remove = listenEvent({
             eventName: 'notification:delete-notification',
             handler: ({ detail: notificationId }) => {
-                const newNotifications = notifications?.data.filter((notification: NotificationData) => notification.id !== notificationId)
+                const newNotifications = notifications?.data.filter(
+                    (notification: NotificationData) => notification.id !== notificationId,
+                )
 
                 if (notifications) {
                     mutateNotifications(
@@ -287,7 +300,10 @@ const Notification = () => {
                             {notifications.data.map((notification: NotificationData) => {
                                 return (
                                     <React.Fragment key={notification.id}>
-                                        <NotificationItem notification={notification} notificationIcon={notificationIcon} />
+                                        <NotificationItem
+                                            notification={notification}
+                                            notificationIcon={notificationIcon}
+                                        />
                                     </React.Fragment>
                                 )
                             })}

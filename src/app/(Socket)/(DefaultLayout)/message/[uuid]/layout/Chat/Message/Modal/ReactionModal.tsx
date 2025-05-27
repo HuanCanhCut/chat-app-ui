@@ -11,7 +11,7 @@ import config from '~/config'
 import UserAvatar from '~/components/UserAvatar'
 import { useAppSelector } from '~/redux'
 import { getCurrentUser } from '~/redux/selector'
-import { MessageReactionModel } from '~/type/type'
+import { MessageReactionModel, TopReaction } from '~/type/type'
 import { useParams, useRouter } from 'next/navigation'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import socket from '~/helpers/socket'
@@ -122,7 +122,14 @@ const ReactionModal: React.FC<Props> = ({ onClose, messageId }) => {
     }, [messageId, mutateReactions, page])
 
     useEffect(() => {
-        socket.on(SocketEvent.REMOVE_REACTION, (data) => {
+        interface RemoveReaction {
+            message_id: number
+            react: string
+            top_reactions: TopReaction[]
+            total_reactions: number
+        }
+
+        const socketHandler = (data: RemoveReaction) => {
             if (!reactions?.data) {
                 return
             }
@@ -155,7 +162,13 @@ const ReactionModal: React.FC<Props> = ({ onClose, messageId }) => {
                     },
                 )
             }
-        })
+        }
+
+        socket.on(SocketEvent.REMOVE_REACTION, socketHandler)
+
+        return () => {
+            socket.off(SocketEvent.REMOVE_REACTION, socketHandler)
+        }
     }, [currentUser.data.id, messageId, mutateReactionTypes, mutateReactions, reactionTypes, reactions])
 
     return (
@@ -191,7 +204,10 @@ const ReactionModal: React.FC<Props> = ({ onClose, messageId }) => {
                         }}
                         className="!overflow-hidden"
                         hasMore={
-                            reactions && reactions?.meta.pagination.current_page < reactions?.meta.pagination.total_pages ? true : false
+                            reactions &&
+                            reactions?.meta.pagination.current_page < reactions?.meta.pagination.total_pages
+                                ? true
+                                : false
                         }
                         scrollThreshold={0.8}
                         loader={
@@ -212,7 +228,9 @@ const ReactionModal: React.FC<Props> = ({ onClose, messageId }) => {
                                     <div className="ml-2 flex-grow">
                                         <p>{reaction.user_reaction.full_name}</p>
                                         <p className="text-xs font-light text-zinc-600 dark:text-zinc-400">
-                                            {reaction.user_id === currentUser?.data.id ? 'Nhấp để gỡ bỏ' : 'Nhấp để xem trang cá nhân'}
+                                            {reaction.user_id === currentUser?.data.id
+                                                ? 'Nhấp để gỡ bỏ'
+                                                : 'Nhấp để xem trang cá nhân'}
                                         </p>
                                     </div>
                                     <p className="text-2xl">{reaction.react}</p>
