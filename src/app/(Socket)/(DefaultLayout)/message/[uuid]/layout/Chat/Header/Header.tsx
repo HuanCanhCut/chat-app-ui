@@ -7,12 +7,11 @@ import { faChevronLeft, faCircleInfo } from '@fortawesome/free-solid-svg-icons'
 import { ConversationModel, UserStatus } from '~/type/type'
 import { useAppSelector } from '~/redux'
 import { getCurrentUser } from '~/redux/selector'
-import { useEffect, useState } from 'react'
-import socket from '~/helpers/socket'
-import { SocketEvent } from '~/enum/SocketEvent'
+import { useEffect, useRef, useState } from 'react'
 import moment from 'moment-timezone'
 import config from '~/config'
-
+import socket from '~/helpers/socket'
+import { SocketEvent } from '~/enum/SocketEvent'
 interface HeaderProps {
     className?: string
     toggleInfo: () => void
@@ -22,6 +21,9 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ className = '', toggleInfo, conversation }) => {
     const currentUser = useAppSelector(getCurrentUser)
     const router = useRouter()
+
+    const offlineTimerSocket = useRef<NodeJS.Timeout | null>(null)
+    const offlineTimer = useRef<NodeJS.Timeout | null>(null)
 
     const handleNavigate = () => {
         if (!conversation?.is_group) {
@@ -57,17 +59,43 @@ const Header: React.FC<HeaderProps> = ({ className = '', toggleInfo, conversatio
 
     useEffect(() => {
         const socketHandler = (data: UserStatus) => {
-            if (data.user_id === conversationMember?.id) {
-                setLastOnlineTime(dateDiff(data.last_online_at))
+            if (offlineTimer.current) {
+                clearTimeout(offlineTimer.current)
+            }
+
+            if (data.user_id === conversationMember?.user.id && !data.is_online) {
+                offlineTimerSocket.current = setInterval(() => {
+                    setLastOnlineTime(dateDiff(new Date(data.last_online_at)))
+                }, 1000 * 30) // 30 seconds
             }
         }
 
-        socket.on(SocketEvent.USER_OFFLINE_TIMER, socketHandler)
+        socket.on(SocketEvent.USER_STATUS, socketHandler)
 
         return () => {
-            socket.off(SocketEvent.USER_OFFLINE_TIMER, socketHandler)
+            socket.off(SocketEvent.USER_STATUS, socketHandler)
+
+            if (offlineTimerSocket.current) {
+                clearTimeout(offlineTimerSocket.current)
+            }
         }
-    }, [conversationMember?.id])
+    }, [conversationMember?.user.id])
+
+    useEffect(() => {
+        if (!conversationMember?.user.is_online) {
+            if (conversationMember?.user.last_online_at) {
+                offlineTimer.current = setInterval(() => {
+                    setLastOnlineTime(dateDiff(new Date(conversationMember?.user.last_online_at)))
+                }, 1000 * 30) // 30 seconds
+            }
+        }
+
+        return () => {
+            if (offlineTimer.current) {
+                clearTimeout(offlineTimer.current)
+            }
+        }
+    }, [conversationMember?.user.is_online, conversationMember?.user.last_online_at])
 
     return (
         <div

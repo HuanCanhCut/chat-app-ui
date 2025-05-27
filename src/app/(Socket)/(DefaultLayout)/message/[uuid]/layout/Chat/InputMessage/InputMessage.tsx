@@ -349,7 +349,7 @@ const InputMessage: React.FC<InputMessageProps> = () => {
                         />
                     </div>
                     {/* show placeholder if messageValue is empty */}
-                    {messageValue.trim() === '' && textareaRows() === 1 && (
+                    {messageValue === '' && textareaRows() === 1 && (
                         <span className="absolute bottom-[10px] left-4 bg-transparent leading-none text-gray-400">
                             Aa
                         </span>

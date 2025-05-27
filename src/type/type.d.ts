@@ -34,7 +34,7 @@ export interface UserResponse {
 export interface UserStatus {
     user_id: number
     is_online: boolean
-    last_online_at: Date
+    last_online_at: string
 }
 
 // ========================================== Conversation model ==========================================
