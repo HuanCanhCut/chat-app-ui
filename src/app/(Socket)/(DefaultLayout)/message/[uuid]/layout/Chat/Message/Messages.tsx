@@ -93,7 +93,13 @@ const Message: React.FC = () => {
                 mutateMessages(
                     {
                         data: [data.conversation.last_message, ...messages?.data],
-                        meta: messages?.meta,
+                        meta: {
+                            ...messages?.meta,
+                            pagination: {
+                                ...messages?.meta.pagination,
+                                total: messages?.meta.pagination.total + 1,
+                            },
+                        },
                     },
                     {
                         revalidate: false,

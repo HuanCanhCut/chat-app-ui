@@ -77,7 +77,13 @@ const RevokeModal = ({ message, onClose }: RevokeModalProps) => {
 
                                 return {
                                     data: newMessages,
-                                    meta: prev.meta,
+                                    meta: {
+                                        ...prev.meta,
+                                        pagination: {
+                                            ...prev.meta.pagination,
+                                            total: prev.meta.pagination.total - 1,
+                                        },
+                                    },
                                 }
                             },
                             {
