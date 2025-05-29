@@ -36,6 +36,8 @@ const ReplyMessage = (
     const { uuid } = useParams()
 
     const handleScrollToMessage = async (parentMessage: MessageModel) => {
+        console.log(parentMessage)
+
         const handleAnimate = (messageElement: HTMLDivElement) => {
             Object.values(messageRefs).forEach((ref) => {
                 if (!ref) {
@@ -82,14 +84,12 @@ const ReplyMessage = (
         if (messageElement) {
             handleAnimate(messageElement)
         } else {
-            if (parentMessage.id >= Number(Object.keys(messageRefs)[0])) {
-                return
-            }
             const aroundMessage = await messageServices.getAroundMessages({
                 conversationUuid: uuid as string,
                 messageId: parentMessage.id,
                 limit: PER_PAGE,
             })
+
             if (aroundMessage) {
                 // if around message is the next range of the current range
                 if (aroundMessage?.meta.pagination.offset <= offsetRange.end) {

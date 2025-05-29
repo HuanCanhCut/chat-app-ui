@@ -11,10 +11,11 @@ import SWRKey from '~/enum/SWRKey'
 import { sendEvent } from '~/helpers/events'
 import socket from '~/helpers/socket'
 import { MessageModel, MessageReactionModel, MessageResponse, SocketMessage, TopReaction } from '~/type/type'
-import MessageItem from './MessageItem'
+import MessageItem from './components/MessageItem'
 import { useAppSelector } from '~/redux'
 import { getCurrentUser } from '~/redux/selector'
 import { toast } from '~/utils/toast'
+import ScrollToBottom from './components/ScrollToBottom'
 
 interface MessageRef {
     [key: string]: HTMLDivElement
@@ -24,6 +25,7 @@ const PER_PAGE = 20
 
 const Message: React.FC = () => {
     const { uuid } = useParams()
+
     const currentUser = useAppSelector(getCurrentUser)
 
     // save offset range for scroll down and scroll up
@@ -34,6 +36,9 @@ const Message: React.FC = () => {
 
     const prevScrollY = useRef(0)
     const isScrollLoading = useRef(false)
+    const messageRefs = useRef<MessageRef>({})
+    const scrollableRef = useRef<HTMLDivElement>(null)
+
     const { data: messages, mutate: mutateMessages } = useSWR<MessageResponse | undefined>(
         uuid ? [SWRKey.GET_MESSAGES, uuid] : null,
         () => {
@@ -47,8 +52,6 @@ const Message: React.FC = () => {
             revalidateOnMount: true,
         },
     )
-
-    const messageRefs = useRef<MessageRef>({})
 
     // Join room when component mount
     useEffect(() => {
@@ -377,11 +380,12 @@ const Message: React.FC = () => {
     }
 
     return (
-        <div className="flex-grow !overflow-hidden" onKeyDown={handleEnterMessage}>
+        <div className="relative flex-grow !overflow-hidden" onKeyDown={handleEnterMessage}>
             <div
                 className="flex h-full max-h-full flex-col-reverse overflow-y-auto scroll-smooth"
                 id="message-scrollable"
                 onScroll={handleScrollDown}
+                ref={scrollableRef}
             >
                 <InfiniteScroll
                     dataLength={messages?.data.length || 0}
@@ -450,6 +454,14 @@ const Message: React.FC = () => {
                         </React.Fragment>
                     ))}
                 </InfiniteScroll>
+
+                <ScrollToBottom
+                    offsetRange={offsetRange}
+                    scrollableRef={scrollableRef}
+                    messageRefs={messageRefs}
+                    PER_PAGE={PER_PAGE}
+                    setOffsetRange={setOffsetRange}
+                />
             </div>
         </div>
     )

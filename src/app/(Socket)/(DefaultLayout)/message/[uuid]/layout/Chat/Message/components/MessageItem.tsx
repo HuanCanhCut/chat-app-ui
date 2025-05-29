@@ -14,13 +14,13 @@ import useVisible from '~/hooks/useVisible'
 import socket from '~/helpers/socket'
 import { SocketEvent } from '~/enum/SocketEvent'
 import { listenEvent, sendEvent } from '~/helpers/events'
-import MessageImagesModel from './Modal/MessageImagesModal'
-import ReactionModal from './Modal/ReactionModal'
+import MessageImagesModel from '../Modal/MessageImagesModal'
+import ReactionModal from '../Modal/ReactionModal'
 import { EmojiClickData } from 'emoji-picker-react'
 import Reaction from './Reaction'
 import CustomTippy from '~/components/CustomTippy'
 import PopperWrapper from '~/components/PopperWrapper'
-import RevokeModal from './Modal/RevokeModal'
+import RevokeModal from '../Modal/RevokeModal'
 import Modal from '~/components/Modal'
 import ReplyMessage from './ReplyMessage'
 import SystemMessage from './SystemMessage'
@@ -114,7 +114,7 @@ const MessageItem = ({
 
             const firstMessage = messages.data[0]
 
-            if (message.id === firstMessage.id && offsetRange.start === 0) {
+            if (message.id === firstMessage.id && messages.meta.pagination.offset === 0) {
                 if (firstMessage.type.startsWith('system') && firstMessage.is_read) {
                     return
                 }
@@ -138,7 +138,7 @@ const MessageItem = ({
                 }
             }
         }
-    }, [currentUser?.id, isFirstMessageVisible, message.id, messages.data, offsetRange.start, uuid])
+    }, [currentUser?.id, isFirstMessageVisible, message.id, messages.data, messages.meta.pagination.offset, uuid])
 
     const handleFormatTime = (time: Date) => {
         const isSameDay = moment(new Date(time)).isSame(moment(new Date()), 'day')
