@@ -63,8 +63,15 @@ const RevokeModal = ({ message, onClose }: RevokeModalProps) => {
                                         }
 
                                         if (beforeMessage) {
-                                            beforeMessage.message_status.forEach((status) => {
-                                                status.receiver.last_read_message_id = beforeMessage.id || 0
+                                            messageItem.message_status.forEach((status) => {
+                                                if (
+                                                    status.receiver.id !== currentUser.id &&
+                                                    status.receiver.last_read_message_id === message.id
+                                                ) {
+                                                    beforeMessage.message_status.forEach((status) => {
+                                                        status.receiver.last_read_message_id = beforeMessage.id || 0
+                                                    })
+                                                }
                                             })
                                         }
                                     } else {
