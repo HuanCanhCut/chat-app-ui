@@ -72,6 +72,34 @@ const Message: React.FC = () => {
                     return
                 }
 
+                // Do not mutate new messages if the latest messages have not been downloaded.
+                if (offsetRange.start !== 0) {
+                    mutateMessages(
+                        {
+                            ...messages,
+                            meta: {
+                                ...messages?.meta,
+                                pagination: {
+                                    ...messages?.meta.pagination,
+                                    total: messages?.meta.pagination.total + 1,
+                                    offset: messages?.meta.pagination.offset + 1,
+                                },
+                            },
+                        },
+                        {
+                            revalidate: false,
+                        },
+                    )
+                    setOffsetRange((prev) => {
+                        return {
+                            ...prev,
+                            start: prev.start + 1,
+                            end: prev.end + 1,
+                        }
+                    })
+                    return
+                }
+
                 // revoke object url of image
                 for (const message of messages.data) {
                     if (message.type === 'image' && message.content) {
@@ -113,7 +141,7 @@ const Message: React.FC = () => {
         return () => {
             socket.off(SocketEvent.NEW_MESSAGE, socketHandler)
         }
-    }, [messages, mutateMessages, uuid])
+    }, [messages, mutateMessages, offsetRange.start, uuid])
 
     useEffect(() => {
         const socketHandler = ({ message: data, user_read_id }: { message: MessageModel; user_read_id: number }) => {
