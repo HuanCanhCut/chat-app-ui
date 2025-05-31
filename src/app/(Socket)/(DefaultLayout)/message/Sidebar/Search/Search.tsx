@@ -1,16 +1,18 @@
 import { faArrowLeft, faSearch } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import useSWR from 'swr'
 import { useEffect, useState } from 'react'
 import Tippy from '@tippyjs/react/headless'
+import config from '~/config'
 
-import * as friendService from '~/services/friendService'
-import SWRKey from '~/enum/SWRKey'
-import { FriendsResponse, UserModel } from '~/type/type'
+import * as conversationService from '~/services/conversationService'
+import { ConversationModel } from '~/type/type'
+import useDebounce from '~/hooks/useDebounce'
+import { AxiosError } from 'axios'
+import { toast } from 'react-toastify'
+import UserAvatar from '~/components/UserAvatar'
 import { useAppSelector } from '~/redux'
 import { getCurrentUser } from '~/redux/selector'
-import useDebounce from '~/hooks/useDebounce'
-import UserAvatar from '~/components/UserAvatar'
+import Link from 'next/link'
 
 interface Props {
     // eslint-disable-next-line no-unused-vars
@@ -21,46 +23,62 @@ interface Props {
 const Search: React.FC<Props> = ({ setSearchMode, searchMode }) => {
     const currentUser = useAppSelector(getCurrentUser)
 
-    const [searchResult, setSearchResult] = useState<UserModel[]>([])
+    const [searchResult, setSearchResult] = useState<ConversationModel[]>([])
     const [searchValue, setSearchValue] = useState('')
     const debounceValue = useDebounce(searchValue, 250)
 
-    const { data: friends } = useSWR<FriendsResponse | undefined>(
-        currentUser?.data.nickname ? [SWRKey.GET_ALL_FRIENDS, currentUser.data.nickname] : null,
-        () => {
-            if (currentUser) {
-                return friendService.getFriends({ user_id: currentUser.data.id })
-            }
-        },
-    )
-
     useEffect(() => {
-        if (debounceValue && friends) {
-            const result = friends.data.filter((friend) => {
-                return friend.user.full_name.toLowerCase().includes(debounceValue.toLowerCase())
-            })
-
-            const userResult = result.map((friend) => {
-                return friend.user
-            })
-
-            setSearchResult(userResult)
+        if (debounceValue) {
+            // search conversation
+            ;(async () => {
+                try {
+                    const response = await conversationService.searchConversation({ q: debounceValue })
+                    if (response) {
+                        setSearchResult(response.data)
+                    }
+                } catch (error) {
+                    if (error instanceof AxiosError) {
+                        if (error.response?.status === 422) {
+                            toast.error(error.response?.data.message)
+                        }
+                    }
+                }
+            })()
         }
-    }, [debounceValue, friends])
+    }, [debounceValue])
 
     const renderResult = () => {
         return (
             // 20px: padding left and right
             <div className="h-[calc(100dvh-210px)] w-[calc(100vw-20px)] [overflow:overlay] dark:bg-dark sm:h-[calc(100dvh-180px)] md:w-[calc(var(--sidebar-width-tablet)-20px)] lg:w-[calc(var(--sidebar-width)-20px)]">
-                {searchResult.map((user) => (
-                    <div
-                        key={user.id}
-                        className="flex cursor-pointer items-center gap-2 rounded-md p-2 hover:bg-darkGray"
-                    >
-                        <UserAvatar src={user.avatar} />
-                        <p>{user.full_name}</p>
-                    </div>
-                ))}
+                {searchResult.map((conversation) => {
+                    let conversationMember = conversation.conversation_members.find(
+                        (member) => member.user_id !== currentUser?.data.id,
+                    )
+                    if (!conversation.is_group) {
+                        conversationMember = conversation.conversation_members[0]
+                    }
+
+                    return (
+                        <Link
+                            href={`${config.routes.message}/${conversation.uuid}`}
+                            key={conversation.id}
+                            className="mt-4 flex items-center gap-2"
+                        >
+                            <UserAvatar
+                                src={conversation.is_group ? conversation.avatar : conversationMember?.user.avatar}
+                                size={40}
+                            />
+                            <div>
+                                <p>
+                                    {conversation.is_group
+                                        ? conversation.name
+                                        : conversationMember?.nickname || conversationMember?.user.full_name}
+                                </p>
+                            </div>
+                        </Link>
+                    )
+                })}
             </div>
         )
     }
@@ -83,15 +101,17 @@ const Search: React.FC<Props> = ({ setSearchMode, searchMode }) => {
                         <FontAwesomeIcon icon={faSearch} width={16} height={16} />
                         <input
                             type="text"
-                            placeholder="Tìm kiếm trên Huancanhcut"
+                            placeholder="Tìm kiếm đoạn chat"
                             className="w-full bg-transparent px-3 py-2 outline-none"
                             value={searchValue}
                             onChange={(e) => setSearchValue(e.target.value)}
                             onFocus={() => setSearchMode(true)}
                             onBlur={() => {
-                                setSearchMode(false)
-                                setSearchValue('')
-                                setSearchResult([])
+                                setTimeout(() => {
+                                    setSearchMode(false)
+                                    setSearchValue('')
+                                    setSearchResult([])
+                                }, 100)
                             }}
                         />
                     </div>

@@ -68,13 +68,13 @@ const MessagePage = () => {
 
     return (
         <div className="flex h-full max-w-full">
-            <div className="flex max-w-full flex-grow flex-col">
+            <div className={`flex max-w-full flex-grow flex-col ${infoOpen ? 'hidden sm:flex' : 'flex'}`}>
                 <Header toggleInfo={toggleInfo} conversation={conversation?.data} />
                 <Message />
                 <InputMessage />
             </div>
             {infoOpen && (
-                <Info className={`${infoOpen ? 'block' : 'hidden'} min-w-[280px] md:block lg:min-w-[320px]`} />
+                <Info className={`${infoOpen ? 'block' : 'hidden'} min-w-[300px] md:block lg:min-w-[320px]`} />
             )}
         </div>
     )

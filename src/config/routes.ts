@@ -1,8 +1,11 @@
-interface Routes<T> {
-    [key: string]: T
+interface Routes {
+    home: string
+    user: string
+    auth: string
+    message: string
 }
 
-export const routes: Routes<string> = {
+export const routes: Routes = {
     home: '/',
     user: '/user',
     auth: '/auth',

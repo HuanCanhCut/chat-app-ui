@@ -33,3 +33,12 @@ export const getConversationByUuid = async ({
         console.log(error)
     }
 }
+
+export const searchConversation = async ({ q }: { q: string }): Promise<ConversationResponse | undefined> => {
+    try {
+        const response = await request.get(`/conversations/search`, { params: { q } })
+        return response.data
+    } catch (error: any) {
+        console.log(error)
+    }
+}

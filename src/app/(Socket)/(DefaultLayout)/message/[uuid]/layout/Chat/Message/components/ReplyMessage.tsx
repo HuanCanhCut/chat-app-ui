@@ -36,8 +36,6 @@ const ReplyMessage = (
     const { uuid } = useParams()
 
     const handleScrollToMessage = async (parentMessage: MessageModel) => {
-        console.log(parentMessage)
-
         const handleAnimate = (messageElement: HTMLDivElement) => {
             Object.values(messageRefs).forEach((ref) => {
                 if (!ref) {

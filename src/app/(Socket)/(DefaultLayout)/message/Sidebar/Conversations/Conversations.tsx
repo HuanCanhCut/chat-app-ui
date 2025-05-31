@@ -5,7 +5,7 @@ import useSWR from 'swr'
 
 import SWRKey from '~/enum/SWRKey'
 import * as conversationService from '~/services/conversationService'
-import ConversationItem from './ConversationItem'
+import ConversationItem from '~/components/ConversationItem'
 import { useAppSelector } from '~/redux'
 import { getCurrentTheme } from '~/redux/selector'
 import Image from 'next/image'

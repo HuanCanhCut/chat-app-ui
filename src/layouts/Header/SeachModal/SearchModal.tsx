@@ -30,7 +30,6 @@ const SearchModal: React.FC<Props> = ({ isOpen, closeModal }) => {
 
                     <Search placeholder="Tìm kiếm" className="flex-1" />
                 </header>
-                <main></main>
             </div>
         </ReactModal>
     )

@@ -25,7 +25,7 @@ const Header: React.FC = () => {
             <div className="flex w-full items-center justify-between">
                 <>
                     <UserAvatar src={currentUser?.data?.avatar} onClick={handleNavigateToProfile} />
-                    <h3 className="text- text-xl font-semibold dark:text-dark">Huấn cánh cụt</h3>
+                    <h3 className="text-xl font-semibold dark:text-dark">Huấn cánh cụt</h3>
 
                     <Tippy content="Hiện để cho đẹp :))))" hideOnClick={false} placement="bottom-start">
                         <button className="flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-darkGray dark:text-dark dark:hover:opacity-90">

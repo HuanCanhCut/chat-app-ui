@@ -17,7 +17,7 @@ const nextConfig = {
             },
             {
                 protocol: 'https',
-                hostname: 'cdn.jsdelivr.net',
+                hostname: 'cellphones.com.vn',
                 port: '',
                 pathname: '/**',
             },

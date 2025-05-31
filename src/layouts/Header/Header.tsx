@@ -38,6 +38,7 @@ export default function Header() {
 
     return (
         <>
+            {/* Mobile Header */}
             <header id="header" className={`${headerStyle} hidden h-[var(--header-height)] sm:flex sm:items-center`}>
                 <div className="flex items-center gap-4">
                     <Logo className="col-span-1" />
@@ -47,6 +48,7 @@ export default function Header() {
                 <Interaction />
             </header>
 
+            {/* Desktop Header */}
             <header className={`${headerStyle} flex h-[var(--header-height-mobile)] flex-col sm:hidden`}>
                 <SearchModal isOpen={isOpen} closeModal={closeModal} />
                 <div className="flex items-center justify-between">
