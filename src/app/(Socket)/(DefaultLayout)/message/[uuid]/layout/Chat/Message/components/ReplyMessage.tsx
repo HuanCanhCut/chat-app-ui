@@ -1,10 +1,11 @@
 import { faReply } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import React, { forwardRef, LegacyRef } from 'react'
+import React, { forwardRef, LegacyRef, useMemo } from 'react'
 import { mutate } from 'swr'
+import { useSWRConfig } from 'swr'
 
 import Image from '~/components/Image'
-import { MessageModel, MessageResponse, UserModel } from '~/type/type'
+import { ConversationMember, ConversationModel, MessageModel, MessageResponse, UserModel } from '~/type/type'
 import * as messageServices from '~/services/messageService'
 import { useParams } from 'next/navigation'
 import SWRKey from '~/enum/SWRKey'
@@ -34,6 +35,22 @@ const ReplyMessage = (
     ref: LegacyRef<HTMLDivElement>,
 ) => {
     const { uuid } = useParams()
+
+    const { cache: swrCache } = useSWRConfig()
+
+    const memberMap = useMemo(() => {
+        const conversation: ConversationModel = swrCache.get(SWRKey.GET_CONVERSATIONS)?.data[uuid as string]
+
+        const member: ConversationMember[] = conversation.conversation_members
+
+        return member.reduce(
+            (mem, cur) => {
+                mem[cur.user_id] = cur
+                return mem
+            },
+            {} as Record<number, ConversationMember>,
+        )
+    }, [swrCache, uuid])
 
     const handleScrollToMessage = async (parentMessage: MessageModel) => {
         const handleAnimate = (messageElement: HTMLDivElement) => {
@@ -165,8 +182,8 @@ const ReplyMessage = (
                             <FontAwesomeIcon icon={faReply} />
                             {'  '}
                             {message.sender_id === currentUser?.id
-                                ? `Bạn đã trả lời ${message.parent.sender_id === currentUser?.id ? 'chính mình' : message.parent.sender.full_name}`
-                                : `${message.parent.sender.full_name} đã trả lời ${message.parent.sender_id === currentUser?.id ? 'bạn' : message.sender_id === message.parent.sender_id ? 'chính mình' : message.parent.sender.full_name}`}
+                                ? `Bạn đã trả lời ${message.parent.sender_id === currentUser?.id ? 'chính mình' : memberMap[message.parent.sender_id]?.nickname || memberMap[message.parent.sender_id]?.user.full_name}`
+                                : `${memberMap[message.sender_id]?.nickname || memberMap[message.sender_id]?.user.full_name} đã trả lời ${message.parent.sender_id === currentUser?.id ? 'bạn' : message.sender_id === message.parent.sender_id ? 'chính mình' : memberMap[message.parent.sender_id]?.nickname || memberMap[message.parent.sender_id]?.user.full_name}`}
                         </p>
                         <span
                             className={`line-clamp-2 max-w-fit overflow-hidden text-ellipsis break-words rounded-2xl ${message.sender_id === currentUser?.id ? 'rounded-br-none' : 'rounded-bl-none'} bg-[#feeace] px-3 py-1.5 pb-6 text-[13px] font-light text-zinc-600 [word-break:break-word] dark:bg-[#a0a0a08d] dark:text-zinc-400`}

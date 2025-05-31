@@ -277,14 +277,16 @@ const MessageItem = ({
                 <div
                     className={`relative flex w-full items-center ${message?.top_reactions ? 'mb-[10px]' : ''} ${message.sender_id === currentUser?.id ? 'justify-end' : 'justify-start'}`}
                 >
-                    <ReplyMessage
-                        message={message}
-                        currentUser={currentUser}
-                        ref={replyMessageRef}
-                        messageRefs={messageRefs}
-                        offsetRange={offsetRange}
-                        setOffsetRange={setOffsetRange}
-                    />
+                    {message.parent && (
+                        <ReplyMessage
+                            message={message}
+                            currentUser={currentUser}
+                            ref={replyMessageRef}
+                            messageRefs={messageRefs}
+                            offsetRange={offsetRange}
+                            setOffsetRange={setOffsetRange}
+                        />
+                    )}
                     {/* More action */}
                     <div
                         className={`mx-3 flex items-center gap-2 ${!isOpenReaction && !isOpenMoreAction ? 'opacity-0' : 'opacity-100'} group-hover:opacity-100 ${message.sender_id === currentUser?.id ? 'order-first' : 'order-last flex-row-reverse'}`}
@@ -421,7 +423,7 @@ const MessageItem = ({
                         )
                     }
 
-                    if (status.receiver_id !== currentUser?.id) {
+                    if (status.receiver_id !== currentUser?.id && messageIndex === 0) {
                         const statusMessages = {
                             sent: 'Đã gửi',
                             delivered: 'Đã nhận',
