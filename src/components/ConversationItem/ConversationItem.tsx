@@ -40,7 +40,7 @@ const ConversationItem: React.FC<Props> = ({ conversation, className = '' }) => 
                         <div className="absolute bottom-0 right-0 h-4 w-4 rounded-full border-2 border-white bg-green-500 dark:border-dark"></div>
                     )}
                 </div>
-                <div className="ml-3 overflow-hidden">
+                <div className="ml-3 flex-1 overflow-hidden">
                     <p className="truncate font-medium">
                         {conversation.name || userMember?.nickname || userMember?.user.full_name}
                     </p>
@@ -55,6 +55,35 @@ const ConversationItem: React.FC<Props> = ({ conversation, className = '' }) => 
                         <span className="flex-shrink-0">· {momentTimezone(conversation.last_message?.created_at)}</span>
                     </div>
                 </div>
+                {
+                    <div className="relative h-5 w-10">
+                        {(() => {
+                            if (conversation.last_message.sender_id !== currentUser?.data.id) {
+                                return null
+                            }
+
+                            // only show two user read message status
+                            let readStatus = conversation.last_message.message_status.filter(
+                                (status) => status.receiver_id !== currentUser?.data.id && status.status === 'read',
+                            )
+
+                            if (readStatus && Array.isArray(readStatus)) {
+                                return readStatus.map((status, index) => {
+                                    return (
+                                        <UserAvatar
+                                            key={index}
+                                            src={status.receiver.avatar}
+                                            size={16}
+                                            className={`absolute h-5 w-5 rounded-full right-${index * 3} border-2 border-white dark:border-dark`}
+                                        />
+                                    )
+                                })
+                            }
+
+                            return null
+                        })()}
+                    </div>
+                }
             </Link>
         </>
     )

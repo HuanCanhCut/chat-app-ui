@@ -423,24 +423,34 @@ const MessageItem = ({
                         )
                     }
 
-                    if (status.receiver_id !== currentUser?.id && messageIndex === 0) {
-                        const statusMessages = {
-                            sent: 'Đã gửi',
-                            delivered: 'Đã nhận',
-                            sending: 'Đang gửi',
-                        }
-
-                        const message = statusMessages[status.status as keyof typeof statusMessages]
-
-                        if (message) {
-                            return (
-                                <p key={index} className="mt-[2px] text-xs font-light text-zinc-400">
-                                    {message}
-                                </p>
-                            )
-                        }
-                    }
+                    return null
                 })}
+                {messageIndex === 0 && message.sender_id === currentUser?.id && (
+                    <>
+                        {(() => {
+                            // find latest status of message that is not current user
+                            const latestStatus = message.message_status.find(
+                                (status) => status.receiver_id !== currentUser?.id,
+                            )
+
+                            if (latestStatus) {
+                                const statusMessages = {
+                                    sent: 'Đã gửi',
+                                    delivered: 'Đã nhận',
+                                    sending: 'Đang gửi',
+                                }
+
+                                const statusText = statusMessages[latestStatus.status as keyof typeof statusMessages]
+
+                                if (statusText) {
+                                    return <p className="mt-[2px] text-xs font-light text-zinc-400">{statusText}</p>
+                                }
+                            }
+
+                            return null
+                        })()}
+                    </>
+                )}
             </div>
 
             {/* Show time between two message if the time is greater than 7 minutes */}

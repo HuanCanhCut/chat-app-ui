@@ -1,12 +1,12 @@
 import { faSmile } from '@fortawesome/free-regular-svg-icons'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { faImage } from '@fortawesome/free-regular-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Emoji from '~/components/Emoji'
 import { EmojiClickData } from 'emoji-picker-react'
 import Tippy from '@tippyjs/react'
 import { useParams } from 'next/navigation'
-import useSWR, { mutate } from 'swr'
+import useSWR, { mutate, useSWRConfig } from 'swr'
 import { faFolderPlus, faXmark } from '@fortawesome/free-solid-svg-icons'
 
 import * as conversationServices from '~/services/conversationService'
@@ -18,7 +18,7 @@ import { useAppSelector } from '~/redux'
 import { getCurrentUser } from '~/redux/selector'
 import SWRKey from '~/enum/SWRKey'
 import CustomImage from '~/components/Image/Image'
-import { MessageModel } from '~/type/type'
+import { ConversationMember, ConversationModel, MessageModel } from '~/type/type'
 
 interface InputMessageProps {
     className?: string
@@ -44,6 +44,23 @@ const InputMessage: React.FC<InputMessageProps> = () => {
     const [isOpenEmoji, setIsOpenEmoji] = useState(false)
     const [images, setImages] = useState<IFile[]>([])
     const [replyMessage, setReplyMessage] = useState<MessageModel | null>(null)
+
+    const { cache: swrCache } = useSWRConfig()
+
+    const memberMap = useMemo(() => {
+        if (!replyMessage) return
+        const conversation: ConversationModel = swrCache.get(SWRKey.GET_CONVERSATIONS)?.data[uuid as string]
+
+        const member: ConversationMember[] = conversation.conversation_members
+
+        return member.reduce(
+            (mem, cur) => {
+                mem[cur.user_id] = cur
+                return mem
+            },
+            {} as Record<number, ConversationMember>,
+        )
+    }, [replyMessage, swrCache, uuid])
 
     const handleEnterMessage = (e: React.KeyboardEvent<HTMLDivElement>) => {
         if (e.key === 'Enter') {
@@ -261,7 +278,8 @@ const InputMessage: React.FC<InputMessageProps> = () => {
                             Đang trả lời{' '}
                             {replyMessage.sender_id === currentUser.data.id
                                 ? 'chính mình'
-                                : replyMessage.sender.full_name}
+                                : (memberMap && memberMap[replyMessage.sender_id]?.nickname) ||
+                                  (memberMap && memberMap[replyMessage.sender_id]?.user.full_name)}
                         </span>
                         <p className="mt-1 line-clamp-2 w-[80%] overflow-hidden text-ellipsis text-xs text-zinc-600 dark:text-zinc-400 sm:line-clamp-1">
                             {replyMessage.type === 'text' ? replyMessage.content : 'Hình ảnh'}
