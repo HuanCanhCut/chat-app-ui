@@ -12,7 +12,7 @@ import Image from 'next/image'
 import Skeleton from 'react-loading-skeleton'
 import socket from '~/helpers/socket'
 import { SocketEvent } from '~/enum/SocketEvent'
-import { ConversationMember, ConversationModel, SocketMessage, UserStatus } from '~/type/type'
+import { ConversationMember, ConversationModel, MessageModel, SocketMessage, UserStatus } from '~/type/type'
 import { listenEvent } from '~/helpers/events'
 
 interface Conversation<T> {
@@ -233,6 +233,45 @@ const Conversations = () => {
 
         return () => {
             socket.off(SocketEvent.MESSAGE_REVOKE, socketHandler)
+        }
+    }, [conversations, mutateConversations])
+
+    useEffect(() => {
+        const socketHandler = ({ message: data }: { message: MessageModel }) => {
+            if (!data) {
+                return
+            }
+
+            if (!conversations) {
+                return
+            }
+
+            let conversation: ConversationModel | null = null
+
+            for (const key in conversations) {
+                if (conversations[key].id === data.conversation_id) {
+                    conversation = conversations[key]
+                }
+            }
+
+            if (!conversation) {
+                return
+            }
+
+            if (conversation.last_message.id === data.id) {
+                const newData = {
+                    ...conversation,
+                    last_message: data,
+                }
+
+                mutateConversations({ ...conversations, [conversation.uuid]: newData }, { revalidate: false })
+            }
+        }
+
+        socket.on(SocketEvent.UPDATE_READ_MESSAGE, socketHandler)
+
+        return () => {
+            socket.off(SocketEvent.UPDATE_READ_MESSAGE, socketHandler)
         }
     }, [conversations, mutateConversations])
 
