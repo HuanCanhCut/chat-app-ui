@@ -55,9 +55,6 @@ const Search: React.FC<Props> = ({ setSearchMode, searchMode }) => {
                     let conversationMember = conversation.conversation_members.find(
                         (member) => member.user_id !== currentUser?.data.id,
                     )
-                    if (!conversation.is_group) {
-                        conversationMember = conversation.conversation_members[0]
-                    }
 
                     return (
                         <Link
