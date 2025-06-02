@@ -384,6 +384,7 @@ const MessageItem = ({
                             ) : (
                                 // if message is revoked
                                 <p
+                                    ref={messageIndex === 0 ? firstMessageRef : messageRef}
                                     className={`relative w-fit max-w-[80%] rounded-3xl px-4 py-1.5 font-light italic opacity-85 [word-break:break-word] ${
                                         message.sender_id === currentUser?.id
                                             ? 'bg-milk-tea text-zinc-300'
