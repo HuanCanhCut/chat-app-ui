@@ -261,7 +261,10 @@ const Conversations = () => {
             if (conversation.last_message.id === data.id) {
                 const newData = {
                     ...conversation,
-                    last_message: data,
+                    last_message: {
+                        ...conversation.last_message,
+                        message_status: data.message_status,
+                    },
                 }
 
                 mutateConversations({ ...conversations, [conversation.uuid]: newData }, { revalidate: false })

@@ -22,7 +22,7 @@ const ConversationItem: React.FC<Props> = ({ conversation, className = '' }) => 
     const userMember = conversation.conversation_members.find((member) => member.user_id !== currentUser?.data.id)
 
     const isRead =
-        conversation.last_message.sender_id !== currentUser?.data.id ? conversation.last_message.is_read : true
+        conversation.last_message.sender_id !== currentUser?.data.id ? !!conversation.last_message.is_read : true
 
     return (
         <>
