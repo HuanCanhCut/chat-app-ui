@@ -426,6 +426,7 @@ const MessageItem = ({
 
                     return null
                 })}
+
                 {messageIndex === 0 && message.sender_id === currentUser?.id && (
                     <>
                         {(() => {
@@ -434,7 +435,12 @@ const MessageItem = ({
                                 (status) => status.receiver_id !== currentUser?.id,
                             )
 
-                            if (latestStatus) {
+                            // someone has read the message
+                            const readStatus = message.message_status.some((status) => {
+                                return status.receiver_id !== currentUser?.id && status.status === 'read'
+                            })
+
+                            if (latestStatus && !readStatus) {
                                 const statusMessages = {
                                     sent: 'Đã gửi',
                                     delivered: 'Đã nhận',

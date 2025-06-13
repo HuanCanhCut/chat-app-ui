@@ -136,13 +136,13 @@ const Notification = () => {
     }, [mutateNotifications, notifications])
 
     useEffect(() => {
-        const socketHandler = ({ notificationId }: { notificationId: number }) => {
+        const socketHandler = ({ notification_id }: { notification_id: number }) => {
             if (!notifications) {
                 return
             }
 
             const newNotifications = notifications.data.filter(
-                (notification: NotificationData) => notification.id !== notificationId,
+                (notification: NotificationData) => notification.id !== notification_id,
             )
 
             mutateNotifications(
