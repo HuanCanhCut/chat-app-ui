@@ -32,7 +32,7 @@ interface MessageRef {
 }
 
 interface MessageItemProps {
-    message: MessageModel
+    message: MessageModel & { is_preview: boolean }
     messageIndex: number
     messages: MessageResponse
     currentUser: UserModel
@@ -130,6 +130,10 @@ const MessageItem = ({
             if (!isRead) {
                 // if user is not in another tab, then send event to server
                 if (document.visibilityState === 'visible') {
+                    if (message.is_preview) {
+                        return
+                    }
+
                     socket.emit(SocketEvent.READ_MESSAGE, {
                         conversationUuid: uuid as string,
                         messageId: message.id,
@@ -138,7 +142,7 @@ const MessageItem = ({
                 }
             }
         }
-    }, [currentUser?.id, isFirstMessageVisible, message.id, messages.data, messages.meta.pagination.offset, uuid])
+    }, [currentUser?.id, isFirstMessageVisible, message, messages.data, messages.meta.pagination.offset, uuid])
 
     const handleFormatTime = (time: Date) => {
         const isSameDay = moment(new Date(time)).isSame(moment(new Date()), 'day')

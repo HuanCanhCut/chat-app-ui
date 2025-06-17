@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { useParams } from 'next/navigation'
 
 import UserAvatar from '~/components/UserAvatar'
-import { ConversationModel } from '~/type/type'
+import { ConversationModel, MessageModel } from '~/type/type'
 import { momentTimezone } from '~/utils/moment'
 import { useAppSelector } from '~/redux'
 import { getCurrentUser } from '~/redux/selector'
@@ -23,6 +23,27 @@ const ConversationItem: React.FC<Props> = ({ conversation, className = '' }) => 
 
     const isRead =
         conversation.last_message.sender_id !== currentUser?.data.id ? !!conversation.last_message.is_read : true
+
+    const content = (message: MessageModel) => {
+        let content = ''
+
+        const messageType = new Map<string | null, string>([
+            [null, 'Đã thu hồi một tin nhắn'],
+            ['image', 'Đã gửi một ảnh'],
+        ])
+
+        if (currentUser?.data.id === message.sender_id) {
+            content += 'Bạn: '
+        } else {
+            if (conversation.is_group) {
+                content += `${message.sender.full_name}: `
+            }
+        }
+
+        const type = message.content !== null ? message.type : null
+
+        return (content += messageType.has(type) ? messageType.get(type) : message?.content)
+    }
 
     return (
         <>
@@ -47,11 +68,7 @@ const ConversationItem: React.FC<Props> = ({ conversation, className = '' }) => 
                     <div
                         className={`flex items-center text-xs font-normal ${isRead ? 'text-gray-600 dark:text-gray-400' : 'font-medium text-black dark:text-gray-200'} `}
                     >
-                        <span className="truncate pr-1">
-                            {currentUser?.data.id === conversation.last_message?.sender_id
-                                ? `Bạn: ${conversation.last_message?.content === null ? 'Đã thu hồi một tin nhắn' : conversation.last_message?.type === 'image' ? 'Đã gửi một hình ảnh' : conversation.last_message?.content}`
-                                : `${!conversation.is_group ? '' : conversation.last_message?.sender.full_name + ': '} ${conversation.last_message?.content === null ? 'Đã thu hồi một tin nhắn' : conversation.last_message?.content}`}
-                        </span>
+                        <span className="truncate pr-1">{content(conversation.last_message)}</span>
                         <span className="flex-shrink-0">· {momentTimezone(conversation.last_message?.created_at)}</span>
                     </div>
                 </div>

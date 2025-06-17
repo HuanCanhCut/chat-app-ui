@@ -69,7 +69,7 @@ export interface TopReaction {
     user_reaction: UserModel
 }
 
-export interface MessageModel extends Timestamp {
+export interface MessageModel<K = any, V = any> extends Timestamp {
     id: number
     conversation_id: number
     content: string | null
@@ -90,6 +90,7 @@ export interface MessageModel extends Timestamp {
     total_reactions: number
     parent_id: number | null
     parent: MessageModel | null
+    [key: K]: V
 }
 
 export interface MessageResponse {

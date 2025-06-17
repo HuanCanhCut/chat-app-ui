@@ -73,6 +73,7 @@ const InputMessage: React.FC<InputMessageProps> = () => {
             return {
                 conversationUuid,
                 message: {
+                    id: Math.random(),
                     content: content,
                     sender_id: currentUser.data.id,
                     type,
