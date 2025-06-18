@@ -69,7 +69,7 @@ export interface TopReaction {
     user_reaction: UserModel
 }
 
-export interface MessageModel<K = any, V = any> extends Timestamp {
+export interface MessageModel extends Timestamp {
     id: number
     conversation_id: number
     content: string | null
@@ -90,7 +90,6 @@ export interface MessageModel<K = any, V = any> extends Timestamp {
     total_reactions: number
     parent_id: number | null
     parent: MessageModel | null
-    [key: K]: V
 }
 
 export interface MessageResponse {
@@ -114,7 +113,7 @@ export interface MessageStatus extends Timestamp {
     message_id: number
     receiver_id: number
     status: 'sent' | 'delivered' | 'read' | 'sending'
-    receiver: UserModel<'last_read_message_id', number> & { last_read_message_id: number }
+    receiver: UserModel & { last_read_message_id: number }
     is_revoked: boolean
     revoke_type: 'for-other' | 'for-me'
     read_at: Date

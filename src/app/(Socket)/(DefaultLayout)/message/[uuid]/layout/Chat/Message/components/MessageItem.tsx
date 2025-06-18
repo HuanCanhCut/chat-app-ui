@@ -99,14 +99,19 @@ const MessageItem = ({
         }
     }, [message.parent])
 
-    const diffTime =
-        messageIndex > 0 && !messages.data[messageIndex - 1].type.startsWith('system')
-            ? Math.abs(
-                  moment
-                      .tz(messages.data[messageIndex].created_at, 'UTC')
-                      .diff(moment.tz(messages.data[messageIndex - 1].created_at, 'UTC'), 'minutes'),
-              )
-            : 0
+    const diffTime = (message: MessageModel, targetMessage: MessageModel) => {
+        if (messageIndex > 0) {
+            if (!targetMessage.type.startsWith('system')) {
+                return Math.abs(
+                    moment.tz(message.created_at, 'UTC').diff(moment.tz(targetMessage.created_at, 'UTC'), 'minutes'),
+                )
+            }
+
+            return 0
+        }
+
+        return 0
+    }
 
     useEffect(() => {
         if (isFirstMessageVisible) {
@@ -255,6 +260,89 @@ const MessageItem = ({
         return <SystemMessage message={message} messageIndex={messageIndex} ref={firstMessageRef} />
     }
 
+    const consecutiveMessageStyle = () => {
+        let style = ''
+
+        // Nếu là tin nhắn đầu tiên, cuối cùng, system hoặc có parent thì không cần style
+        if (message.type.startsWith('system')) {
+            return ''
+        }
+
+        const isCurrentUser = message.sender_id === currentUser?.id
+
+        if (messageIndex >= messages.data.length - 1) {
+            if (
+                messages.data[messageIndex - 1].sender_id === message.sender_id &&
+                diffTime(message, messages.data[messageIndex - 1]) < BETWEEN_TIME_MESSAGE
+            ) {
+                style += isCurrentUser ? ' rounded-br-[6px]' : ' rounded-bl-[6px]'
+            }
+
+            return style
+        }
+
+        const nextMessage = messages.data[messageIndex + 1]
+        const isConsecutiveWithNext =
+            nextMessage.sender_id === message.sender_id && diffTime(message, nextMessage) < BETWEEN_TIME_MESSAGE
+
+        if (messageIndex === 0) {
+            if (isConsecutiveWithNext) {
+                style += isCurrentUser ? ' rounded-tr-[6px]' : ' rounded-tl-[6px]'
+            }
+
+            return style
+        }
+
+        const prevMessage = messages.data[messageIndex - 1]
+
+        const isConsecutiveWithPrev =
+            prevMessage.sender_id === message.sender_id && diffTime(message, prevMessage) < BETWEEN_TIME_MESSAGE
+
+        if (message.parent) {
+            if (prevMessage.parent) {
+                return
+            }
+        }
+
+        // Style for consecutive message with previous message
+        if (isConsecutiveWithPrev) {
+            style += isCurrentUser ? ' rounded-br-[6px]' : ' rounded-bl-[6px]'
+        }
+
+        // Style for consecutive message with next message
+        if (isConsecutiveWithNext) {
+            style += isCurrentUser ? ' rounded-tr-[6px]' : ' rounded-tl-[6px]'
+        }
+
+        // Style for first message in a group
+        if (!isConsecutiveWithPrev && isConsecutiveWithNext) {
+            style += isCurrentUser ? ' rounded-tr-[6px]' : ' rounded-tl-[6px]'
+        }
+
+        return style
+    }
+
+    const isLastMessageInConsecutiveGroup = () => {
+        if (message.type.startsWith('system')) {
+            return true
+        }
+
+        if (messageIndex >= messages.data.length - 1) {
+            return true
+        }
+
+        const prevMessage = messages.data[messageIndex - 1]
+
+        if (prevMessage) {
+            const isConsecutiveWithPrev =
+                prevMessage.sender_id === message.sender_id && diffTime(message, prevMessage) < BETWEEN_TIME_MESSAGE
+
+            return !isConsecutiveWithPrev
+        }
+
+        return true
+    }
+
     return (
         <div>
             {message.type === 'image' && (
@@ -277,7 +365,13 @@ const MessageItem = ({
             </Modal>
 
             <div ref={groupMessageRef} className={`group relative flex w-full items-end gap-3`}>
-                {message.sender_id !== currentUser?.id && <UserAvatar src={message.sender.avatar} size={28} />}
+                {message.sender_id !== currentUser?.id && (
+                    <UserAvatar
+                        className={`${!isLastMessageInConsecutiveGroup() ? 'invisible' : 'visible'}`}
+                        src={message.sender.avatar}
+                        size={28}
+                    />
+                )}
                 <div
                     className={`relative flex w-full items-center ${message?.top_reactions ? 'mb-[10px]' : ''} ${message.sender_id === currentUser?.id ? 'justify-end' : 'justify-start'}`}
                 >
@@ -340,7 +434,7 @@ const MessageItem = ({
                                             message.sender_id === currentUser?.id
                                                 ? 'bg-milk-tea text-white'
                                                 : 'bg-lightGray text-black dark:bg-[#313233] dark:text-dark'
-                                        }`}
+                                        } ${consecutiveMessageStyle()}`}
                                     >
                                         <span className="max-w-fit break-words">{message.content}</span>
 
@@ -356,7 +450,7 @@ const MessageItem = ({
                                         }`}
                                     >
                                         <div
-                                            className={`flex w-full flex-wrap gap-1 overflow-hidden rounded-2xl [word-break:break-word]`}
+                                            className={`flex w-full flex-wrap gap-1 overflow-hidden rounded-2xl [word-break:break-word] ${consecutiveMessageStyle()}`}
                                         >
                                             {JSON.parse(message.content).map((url: string, index: number) => (
                                                 <div className="flex-1" key={index}>
@@ -393,7 +487,7 @@ const MessageItem = ({
                                         message.sender_id === currentUser?.id
                                             ? 'bg-milk-tea text-zinc-300'
                                             : 'bg-lightGray text-zinc-600 dark:bg-[#313233] dark:text-zinc-400'
-                                    }`}
+                                    } ${consecutiveMessageStyle()}`}
                                 >
                                     {message.sender.id === currentUser?.id ? 'Bạn ' : `${message.sender.full_name} `}
                                     đã thu hồi một tin nhắn
@@ -466,7 +560,7 @@ const MessageItem = ({
 
             {/* Show time between two message if the time is greater than 7 minutes */}
             <p
-                className={`my-3 text-center text-xs text-gray-400 ${Number(diffTime) < BETWEEN_TIME_MESSAGE ? 'hidden' : 'block'}`}
+                className={`my-3 text-center text-xs text-gray-400 ${diffTime(message, messages.data[messageIndex - 1]) < BETWEEN_TIME_MESSAGE ? 'hidden' : 'block'}`}
             >
                 {messageIndex > 0 && handleFormatTime(messages.data[messageIndex - 1].created_at)}
             </p>
