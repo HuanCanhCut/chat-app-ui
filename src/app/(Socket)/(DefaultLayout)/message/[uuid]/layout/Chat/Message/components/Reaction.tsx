@@ -1,5 +1,6 @@
 import Tippy from '@tippyjs/react'
 import { MessageModel } from '~/type/type'
+import { Emoji, EmojiStyle } from 'emoji-picker-react'
 
 interface ReactionProps {
     message: MessageModel
@@ -35,7 +36,7 @@ const Reaction = ({ message, handleOpenReactionModal }: ReactionProps) => {
                 {message?.top_reactions?.map((reaction, index) => {
                     return (
                         <span className="text-sm leading-none" key={index}>
-                            {reaction.react}
+                            <Emoji unified={reaction.react} size={14} emojiStyle={EmojiStyle.NATIVE} />
                         </span>
                     )
                 })}

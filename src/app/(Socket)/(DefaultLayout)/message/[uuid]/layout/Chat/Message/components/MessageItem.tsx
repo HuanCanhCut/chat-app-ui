@@ -32,7 +32,7 @@ interface MessageRef {
 }
 
 interface MessageItemProps {
-    message: MessageModel & { is_preview: boolean }
+    message: MessageModel & { is_preview?: boolean }
     messageIndex: number
     messages: MessageResponse
     currentUser: UserModel
@@ -189,7 +189,7 @@ const MessageItem = ({
         socket.emit(SocketEvent.REACT_MESSAGE, {
             conversation_uuid: uuid as string,
             message_id: message.id,
-            react: EmojiClickData.emoji,
+            react: EmojiClickData.unified,
             user_react_id: currentUser?.id,
         })
     }

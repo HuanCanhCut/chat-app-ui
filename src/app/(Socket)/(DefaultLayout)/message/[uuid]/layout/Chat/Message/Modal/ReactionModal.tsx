@@ -16,6 +16,7 @@ import { useParams, useRouter } from 'next/navigation'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import socket from '~/helpers/socket'
 import { SocketEvent } from '~/enum/SocketEvent'
+import { Emoji, EmojiStyle } from 'emoji-picker-react'
 
 interface Props {
     onClose: () => void
@@ -191,7 +192,11 @@ const ReactionModal: React.FC<Props> = ({ onClose, messageId }) => {
                             }`}
                             onClick={() => handleChangeReaction(tab.type)}
                         >
-                            {tab.label}
+                            {tab.type === 'all' ? (
+                                'Tất cả'
+                            ) : (
+                                <Emoji unified={tab.type} size={18} emojiStyle={EmojiStyle.NATIVE} />
+                            )}
                             {!!tab.count && <span className={`ml-1 text-sm`}>{tab.count}</span>}
                         </button>
                     ))}
@@ -233,7 +238,9 @@ const ReactionModal: React.FC<Props> = ({ onClose, messageId }) => {
                                                 : 'Nhấp để xem trang cá nhân'}
                                         </p>
                                     </div>
-                                    <p className="text-2xl">{reaction.react}</p>
+                                    <p className="text-2xl">
+                                        <Emoji unified={reaction.react} size={24} emojiStyle={EmojiStyle.NATIVE} />
+                                    </p>
                                 </div>
                             )
                         })}
