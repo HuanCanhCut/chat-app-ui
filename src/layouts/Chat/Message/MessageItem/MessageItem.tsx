@@ -1,31 +1,25 @@
-import { faEllipsisVertical, faReply } from '@fortawesome/free-solid-svg-icons'
-import { faSmile } from '@fortawesome/free-regular-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Tippy from '@tippyjs/react'
 import moment from 'moment-timezone'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useParams } from 'next/navigation'
 import { memo } from 'react'
-import CustomImage from '~/components/Image/Image'
-import Emoji from '~/components/Emoji'
-import HeadlessTippy from '@tippyjs/react/headless'
 
-import { MessageModel, MessageResponse, MessageStatus, UserModel } from '~/type/type'
+import CustomImage from '~/components/Image/Image'
+import { MessageModel, MessageResponse, UserModel } from '~/type/type'
 import UserAvatar from '~/components/UserAvatar'
 import useVisible from '~/hooks/useVisible'
 import socket from '~/helpers/socket'
 import { SocketEvent } from '~/enum/SocketEvent'
-import { listenEvent, sendEvent } from '~/helpers/events'
-import MessageImagesModel from '../Modal/MessageImagesModal'
-import ReactionModal from '../Modal/ReactionModal'
-import { EmojiClickData } from 'emoji-picker-react'
-import Reaction from './Reaction'
-import CustomTippy from '~/components/CustomTippy'
-import PopperWrapper from '~/components/PopperWrapper'
-import RevokeModal from '../Modal/RevokeModal'
+import { sendEvent } from '~/helpers/events'
+import MessageImagesModel from '~/layouts/Chat/Message/Modal/MessageImagesModal'
+import ReactionModal from '~/layouts/Chat/Message/Modal/ReactionModal'
+import Reaction from './components/Reaction'
+import RevokeModal from '~/layouts/Chat/Message/Modal/RevokeModal'
 import Modal from '~/components/Modal'
-import ReplyMessage from './ReplyMessage'
-import SystemMessage from './SystemMessage'
+import ReplyMessage from './components/ReplyMessage'
+import SystemMessage from '../SystemMessage'
+import Viewed from './components/UserViewed'
+import MessageAction from './components/MessageAction'
 
 const BETWEEN_TIME_MESSAGE = 7 // minute
 
@@ -67,7 +61,6 @@ const MessageItem = ({
     const firstMessageRef = useRef<HTMLDivElement>(null)
     const isFirstMessageVisible: boolean = useVisible(options, firstMessageRef)
 
-    const tippyInstanceRef = useRef<any>(null)
     const replyMessageRef = useRef<HTMLDivElement>(null)
     const groupMessageRef = useRef<HTMLDivElement>(null)
 
@@ -82,13 +75,6 @@ const MessageItem = ({
     })
 
     const [openRevokeModal, setOpenRevokeModal] = useState(false)
-
-    // open emoji-picker reaction
-    const [isOpenReaction, setIsOpenReaction] = useState({
-        reactionOpen: false,
-        reactionWrapperOpen: false,
-    })
-    const [isOpenMoreAction, setIsOpenMoreAction] = useState(false)
 
     // handle margin top of reply message
     useEffect(() => {
@@ -154,7 +140,7 @@ const MessageItem = ({
         }
     }, [currentUser?.id, isFirstMessageVisible, message, messages.data, messages.meta.pagination.offset, uuid])
 
-    const handleFormatTime = (time: Date) => {
+    const handleFormatTime = useCallback((time: Date) => {
         const isSameDay = moment(new Date(time)).isSame(moment(new Date()), 'day')
         const isSameWeek = moment(new Date(time)).isSame(moment(new Date()), 'week')
 
@@ -162,7 +148,7 @@ const MessageItem = ({
         if (isSameWeek) return moment(new Date(time)).locale('vi').format('HH:mm ddd')
 
         return moment(new Date(time)).locale('vi').format('DD [Tháng] MM, YYYY')
-    }
+    }, [])
 
     const handleOpenImageModal = (url: string, messageId: number) => {
         if (url.startsWith('blob:http')) {
@@ -184,29 +170,6 @@ const MessageItem = ({
         })
     }, [])
 
-    const handleOpenReaction = () => {
-        setIsOpenReaction((prev) => ({
-            ...prev,
-            reactionOpen: true,
-            reactionWrapperOpen: !prev.reactionWrapperOpen,
-        }))
-    }
-
-    const handleChooseReaction = (EmojiClickData: EmojiClickData) => {
-        setIsOpenReaction((prev) => ({
-            ...prev,
-            reactionOpen: true,
-            reactionWrapperOpen: false,
-        }))
-
-        socket.emit(SocketEvent.REACT_MESSAGE, {
-            conversation_uuid: uuid as string,
-            message_id: message.id,
-            react: EmojiClickData.unified,
-            user_react_id: currentUser?.id,
-        })
-    }
-
     const handleCloseReactionModal = useCallback(() => {
         setOpenReactionModal({
             isOpen: false,
@@ -221,53 +184,9 @@ const MessageItem = ({
         })
     }
 
-    const handleOpenRevokeModal = () => {
-        setOpenRevokeModal(true)
-        tippyInstanceRef.current?.hide()
-    }
-
     const handleCloseRevokeModal = useCallback(() => {
         setOpenRevokeModal(false)
     }, [])
-
-    const renderMoreAction = () => {
-        return (
-            <PopperWrapper className="!border-none !p-2">
-                <div className="flex w-32 flex-col text-sm font-medium">
-                    <button
-                        className="rounded-md p-2 text-left hover:bg-gray-100 dark:hover:bg-[#353738]"
-                        onClick={handleOpenRevokeModal}
-                    >
-                        {/* if message is not revoked and sender is current user, show "Thu hồi", else show "Gỡ" */}
-                        {message.content !== null && message.sender_id === currentUser?.id ? 'Thu hồi' : 'Gỡ'}
-                    </button>
-                    <button className="rounded-md p-2 text-left hover:bg-gray-100 dark:hover:bg-[#353738]">
-                        Chuyển tiếp
-                    </button>
-                </div>
-            </PopperWrapper>
-        )
-    }
-
-    const tippyShow = (instance: any) => {
-        tippyInstanceRef.current = instance
-        setIsOpenMoreAction(true)
-    }
-
-    useEffect(() => {
-        const remove = listenEvent({
-            eventName: 'tippy:tippy-hidden',
-            handler: () => {
-                setIsOpenMoreAction(false)
-            },
-        })
-
-        return remove
-    }, [])
-
-    const handleReply = () => {
-        sendEvent({ eventName: 'message:reply', detail: messages.data[messageIndex] })
-    }
 
     if (message.type.startsWith('system')) {
         return <SystemMessage message={message} messageIndex={messageIndex} ref={firstMessageRef} />
@@ -399,59 +318,13 @@ const MessageItem = ({
                         />
                     )}
                     {/* More action */}
-                    <div
-                        className={`mx-3 flex items-center gap-2 ${!isOpenReaction.reactionWrapperOpen && !isOpenMoreAction ? 'opacity-0' : 'opacity-100'} group-hover:opacity-100 ${message.sender_id === currentUser?.id ? 'order-first' : 'order-last flex-row-reverse'}`}
-                    >
-                        <CustomTippy renderItem={renderMoreAction} onShow={tippyShow} placement="top" offsetY={6}>
-                            <Tippy content="Xem thêm">
-                                <button className="flex-center z-10 h-7 w-7 rounded-full bg-[#feeace] text-black dark:bg-[#6b6b6b] dark:text-white">
-                                    <FontAwesomeIcon icon={faEllipsisVertical} />
-                                </button>
-                            </Tippy>
-                        </CustomTippy>
-                        <Tippy content="Trả lời">
-                            <button
-                                onClick={handleReply}
-                                className="flex-center z-10 h-7 w-7 rounded-full bg-[#feeace] text-black dark:bg-[#6b6b6b] dark:text-white"
-                            >
-                                <FontAwesomeIcon icon={faReply} />
-                            </button>
-                        </Tippy>
-
-                        <HeadlessTippy
-                            render={(...attrs) => {
-                                return (
-                                    <Emoji
-                                        {...attrs}
-                                        onEmojiClick={handleChooseReaction}
-                                        isOpen={isOpenReaction.reactionOpen}
-                                        isReaction={true}
-                                    />
-                                )
-                            }}
-                            onClickOutside={() =>
-                                setIsOpenReaction((prev) => ({
-                                    ...prev,
-                                    reactionOpen: true,
-                                    reactionWrapperOpen: false,
-                                }))
-                            }
-                            placement="top-start"
-                            offset={[0, 15]}
-                            interactive
-                            visible={isOpenReaction.reactionWrapperOpen}
-                        >
-                            <Tippy content="Bày tỏ cảm xúc">
-                                <button
-                                    className="flex-center z-10 h-7 w-7 rounded-full bg-[#feeace] text-black dark:bg-[#6b6b6b] dark:text-white"
-                                    onClick={handleOpenReaction}
-                                >
-                                    <FontAwesomeIcon icon={faSmile} />
-                                </button>
-                            </Tippy>
-                        </HeadlessTippy>
-                    </div>
-
+                    <MessageAction
+                        message={message}
+                        currentUser={currentUser}
+                        messageIndex={messageIndex}
+                        messages={messages}
+                        setOpenRevokeModal={setOpenRevokeModal}
+                    />
                     {/* Message content */}
                     <Tippy content={handleFormatTime(message.created_at)} placement="left">
                         <>
@@ -528,65 +401,12 @@ const MessageItem = ({
                 </div>
             </div>
 
-            <div className={`flex justify-end pr-2`}>
-                {message.message_status.slice(0, 6).map((status: MessageStatus, index: number) => {
-                    if (
-                        status.receiver.last_read_message_id === message.id &&
-                        status.receiver_id !== currentUser?.id &&
-                        status.status === 'read'
-                    ) {
-                        return (
-                            <React.Fragment key={index}>
-                                <Tippy
-                                    content={`${status.receiver.full_name} đã xem lúc ${handleFormatTime(status.read_at)}`}
-                                >
-                                    <span>
-                                        <UserAvatar
-                                            src={status.receiver.avatar}
-                                            size={14}
-                                            className="my-1 ml-1 cursor-default"
-                                        />
-                                    </span>
-                                </Tippy>
-                            </React.Fragment>
-                        )
-                    }
-
-                    return null
-                })}
-
-                {messageIndex === 0 && message.sender_id === currentUser?.id && (
-                    <>
-                        {(() => {
-                            // find latest status of message that is not current user
-                            const latestStatus = message.message_status.find(
-                                (status) => status.receiver_id !== currentUser?.id,
-                            )
-
-                            // someone has read the message
-                            const readStatus = message.message_status.some((status) => {
-                                return status.receiver_id !== currentUser?.id && status.status === 'read'
-                            })
-
-                            if (latestStatus && !readStatus) {
-                                const statusMessages = {
-                                    sent: 'Đã gửi',
-                                    delivered: 'Đã nhận',
-                                    sending: 'Đang gửi',
-                                }
-
-                                const statusText = statusMessages[latestStatus.status as keyof typeof statusMessages]
-
-                                if (statusText) {
-                                    return <p className="mt-[2px] text-xs font-light text-zinc-400">{statusText}</p>
-                                }
-                            }
-
-                            return null
-                        })()}
-                    </>
-                )}
-            </div>
+            <Viewed
+                message={message}
+                currentUser={currentUser}
+                messageIndex={messageIndex}
+                handleFormatTime={handleFormatTime}
+            />
 
             {/* Show time between two message if the time is greater than 7 minutes */}
             <p

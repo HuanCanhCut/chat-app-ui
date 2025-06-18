@@ -10,12 +10,12 @@ import { SocketEvent } from '~/enum/SocketEvent'
 import SWRKey from '~/enum/SWRKey'
 import { sendEvent } from '~/helpers/events'
 import socket from '~/helpers/socket'
-import { MessageModel, MessageReactionModel, MessageResponse, SocketMessage, TopReaction } from '~/type/type'
-import MessageItem from './components/MessageItem'
+import { MessageModel, MessageResponse, SocketMessage } from '~/type/type'
+import MessageItem from './MessageItem'
 import { useAppSelector } from '~/redux'
 import { getCurrentUser } from '~/redux/selector'
 import { toast } from '~/utils/toast'
-import ScrollToBottom from './components/ScrollToBottom'
+import ScrollToBottom from './ScrollToBottom'
 
 interface MessageRef {
     [key: string]: HTMLDivElement
@@ -216,89 +216,6 @@ const Message: React.FC = () => {
             socket.off(SocketEvent.UPDATE_READ_MESSAGE, socketHandler)
         }
     }, [currentUser?.data?.id, messages?.data, messages?.meta, mutateMessages])
-
-    useEffect(() => {
-        interface ReactionMessage {
-            reaction: MessageReactionModel
-            total_reactions: number
-            top_reactions: TopReaction[]
-        }
-        const socketHandler = (data: ReactionMessage) => {
-            if (!messages?.data) {
-                return
-            }
-
-            const newMessages = messages.data.map((message) => {
-                if (message.id === data.reaction.message_id) {
-                    return {
-                        ...message,
-                        top_reactions: data.top_reactions,
-                        total_reactions: data.total_reactions,
-                    }
-                }
-
-                return message
-            })
-
-            mutateMessages(
-                {
-                    data: newMessages,
-                    meta: messages.meta,
-                },
-                {
-                    revalidate: false,
-                },
-            )
-        }
-
-        socket.on(SocketEvent.REACT_MESSAGE, socketHandler)
-
-        return () => {
-            socket.off(SocketEvent.REACT_MESSAGE, socketHandler)
-        }
-    }, [messages?.data, messages?.meta, mutateMessages])
-
-    useEffect(() => {
-        interface RemoveReactionMessage {
-            message_id: number
-            total_reactions: number
-            top_reactions: TopReaction[]
-        }
-
-        const socketHandler = (data: RemoveReactionMessage) => {
-            if (!messages?.data) {
-                return
-            }
-
-            const newMessages = messages.data.map((message) => {
-                if (message.id === data.message_id) {
-                    return {
-                        ...message,
-                        top_reactions: data.top_reactions,
-                        total_reactions: data.total_reactions,
-                    }
-                }
-
-                return message
-            })
-
-            mutateMessages(
-                {
-                    data: newMessages,
-                    meta: messages.meta,
-                },
-                {
-                    revalidate: false,
-                },
-            )
-        }
-
-        socket.on(SocketEvent.REMOVE_REACTION, socketHandler)
-
-        return () => {
-            socket.off(SocketEvent.REMOVE_REACTION, socketHandler)
-        }
-    }, [messages?.data, messages?.meta, mutateMessages])
 
     useEffect(() => {
         interface RevokeMessage {
