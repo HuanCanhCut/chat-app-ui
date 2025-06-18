@@ -8,6 +8,8 @@ import { useParams } from 'next/navigation'
 import { memo } from 'react'
 import CustomImage from '~/components/Image/Image'
 import Emoji from '~/components/Emoji'
+import HeadlessTippy from '@tippyjs/react/headless'
+
 import { MessageModel, MessageResponse, MessageStatus, UserModel } from '~/type/type'
 import UserAvatar from '~/components/UserAvatar'
 import useVisible from '~/hooks/useVisible'
@@ -82,7 +84,10 @@ const MessageItem = ({
     const [openRevokeModal, setOpenRevokeModal] = useState(false)
 
     // open emoji-picker reaction
-    const [isOpenReaction, setIsOpenReaction] = useState(false)
+    const [isOpenReaction, setIsOpenReaction] = useState({
+        reactionOpen: false,
+        reactionWrapperOpen: false,
+    })
     const [isOpenMoreAction, setIsOpenMoreAction] = useState(false)
 
     // handle margin top of reply message
@@ -180,11 +185,19 @@ const MessageItem = ({
     }, [])
 
     const handleOpenReaction = () => {
-        setIsOpenReaction(!isOpenReaction)
+        setIsOpenReaction((prev) => ({
+            ...prev,
+            reactionOpen: true,
+            reactionWrapperOpen: !prev.reactionWrapperOpen,
+        }))
     }
 
     const handleChooseReaction = (EmojiClickData: EmojiClickData) => {
-        setIsOpenReaction(false)
+        setIsOpenReaction((prev) => ({
+            ...prev,
+            reactionOpen: true,
+            reactionWrapperOpen: false,
+        }))
 
         socket.emit(SocketEvent.REACT_MESSAGE, {
             conversation_uuid: uuid as string,
@@ -373,7 +386,7 @@ const MessageItem = ({
                     />
                 )}
                 <div
-                    className={`relative flex w-full items-center ${message?.top_reactions ? 'mb-[10px]' : ''} ${message.sender_id === currentUser?.id ? 'justify-end' : 'justify-start'}`}
+                    className={`relative flex w-full items-center ${message?.top_reactions?.length ? 'mb-[10px]' : ''} ${message.sender_id === currentUser?.id ? 'justify-end' : 'justify-start'}`}
                 >
                     {message.parent && (
                         <ReplyMessage
@@ -387,7 +400,7 @@ const MessageItem = ({
                     )}
                     {/* More action */}
                     <div
-                        className={`mx-3 flex items-center gap-2 ${!isOpenReaction && !isOpenMoreAction ? 'opacity-0' : 'opacity-100'} group-hover:opacity-100 ${message.sender_id === currentUser?.id ? 'order-first' : 'order-last flex-row-reverse'}`}
+                        className={`mx-3 flex items-center gap-2 ${!isOpenReaction.reactionWrapperOpen && !isOpenMoreAction ? 'opacity-0' : 'opacity-100'} group-hover:opacity-100 ${message.sender_id === currentUser?.id ? 'order-first' : 'order-last flex-row-reverse'}`}
                     >
                         <CustomTippy renderItem={renderMoreAction} onShow={tippyShow} placement="top" offsetY={6}>
                             <Tippy content="Xem thêm">
@@ -404,12 +417,29 @@ const MessageItem = ({
                                 <FontAwesomeIcon icon={faReply} />
                             </button>
                         </Tippy>
-                        <Emoji
-                            isOpen={isOpenReaction}
+
+                        <HeadlessTippy
+                            render={(...attrs) => {
+                                return (
+                                    <Emoji
+                                        {...attrs}
+                                        onEmojiClick={handleChooseReaction}
+                                        isOpen={isOpenReaction.reactionOpen}
+                                        isReaction={true}
+                                    />
+                                )
+                            }}
+                            onClickOutside={() =>
+                                setIsOpenReaction((prev) => ({
+                                    ...prev,
+                                    reactionOpen: true,
+                                    reactionWrapperOpen: false,
+                                }))
+                            }
                             placement="top-start"
-                            setIsOpen={setIsOpenReaction}
-                            onEmojiClick={handleChooseReaction}
-                            isReaction={true}
+                            offset={[0, 15]}
+                            interactive
+                            visible={isOpenReaction.reactionWrapperOpen}
                         >
                             <Tippy content="Bày tỏ cảm xúc">
                                 <button
@@ -419,7 +449,7 @@ const MessageItem = ({
                                     <FontAwesomeIcon icon={faSmile} />
                                 </button>
                             </Tippy>
-                        </Emoji>
+                        </HeadlessTippy>
                     </div>
 
                     {/* Message content */}

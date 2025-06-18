@@ -8,6 +8,7 @@ import Tippy from '@tippyjs/react'
 import { useParams } from 'next/navigation'
 import useSWR, { mutate, useSWRConfig } from 'swr'
 import { faFolderPlus, faXmark } from '@fortawesome/free-solid-svg-icons'
+import HeadlessTippy from '@tippyjs/react/headless'
 
 import * as conversationServices from '~/services/conversationService'
 import { SendHorizontalIcon } from '~/components/Icons'
@@ -41,7 +42,10 @@ const InputMessage: React.FC<InputMessageProps> = () => {
     const textareaRef = useRef<HTMLTextAreaElement>(null)
 
     const [messageValue, setMessageValue] = useState('')
-    const [isOpenEmoji, setIsOpenEmoji] = useState(false)
+    const [isOpenEmoji, setIsOpenEmoji] = useState({
+        emojiOpen: false,
+        emojiWrapperOpen: false,
+    })
     const [images, setImages] = useState<IFile[]>([])
     const [replyMessage, setReplyMessage] = useState<MessageModel | null>(null)
 
@@ -182,7 +186,11 @@ const InputMessage: React.FC<InputMessageProps> = () => {
     }
 
     const handleToggleEmoji = () => {
-        setIsOpenEmoji(!isOpenEmoji)
+        setIsOpenEmoji((prev) => ({
+            ...prev,
+            emojiOpen: true,
+            emojiWrapperOpen: !prev.emojiWrapperOpen,
+        }))
     }
 
     const handleEmojiClick = (emojiData: EmojiClickData) => {
@@ -373,7 +381,18 @@ const InputMessage: React.FC<InputMessageProps> = () => {
                             Aa
                         </span>
                     )}
-                    <Emoji isOpen={isOpenEmoji} setIsOpen={setIsOpenEmoji} onEmojiClick={handleEmojiClick}>
+                    <HeadlessTippy
+                        render={(...attrs) => {
+                            return <Emoji {...attrs} onEmojiClick={handleEmojiClick} isOpen={isOpenEmoji.emojiOpen} />
+                        }}
+                        onClickOutside={() =>
+                            setIsOpenEmoji((prev) => ({ ...prev, emojiOpen: true, emojiWrapperOpen: false }))
+                        }
+                        placement="top-start"
+                        offset={[0, 15]}
+                        interactive
+                        visible={isOpenEmoji.emojiWrapperOpen}
+                    >
                         <Tippy content="Chọn biểu tượng cảm xúc">
                             <button
                                 className="absolute bottom-1 right-1 rounded-full p-1 leading-[1px] hover:bg-gray-300 dark:hover:bg-darkGray"
@@ -382,7 +401,7 @@ const InputMessage: React.FC<InputMessageProps> = () => {
                                 <FontAwesomeIcon icon={faSmile} className="text-xl" />
                             </button>
                         </Tippy>
-                    </Emoji>
+                    </HeadlessTippy>
                 </div>
                 <div
                     // prettier-ignore
