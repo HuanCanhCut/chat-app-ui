@@ -142,8 +142,8 @@ const Reaction = ({ message, handleOpenReactionModal }: ReactionProps) => {
             >
                 {message?.top_reactions?.map((reaction, index) => {
                     return (
-                        <span className="text-sm leading-none" key={index}>
-                            <Emoji unified={reaction.react} size={14} emojiStyle={EmojiStyle.NATIVE} />
+                        <span className="ml-[2px] text-sm leading-none" key={index}>
+                            <Emoji unified={reaction.react} size={14} emojiStyle={EmojiStyle.FACEBOOK} />
                         </span>
                     )
                 })}

@@ -3,6 +3,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { faImage } from '@fortawesome/free-regular-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Emoji from '~/components/Emoji'
+import { Emoji as EmojiPicker, EmojiStyle } from 'emoji-picker-react'
 import { EmojiClickData } from 'emoji-picker-react'
 import Tippy from '@tippyjs/react'
 import { useParams } from 'next/navigation'
@@ -415,7 +416,9 @@ const InputMessage: React.FC<InputMessageProps> = () => {
                             <SendHorizontalIcon />
                         </button>
                     ) : (
-                        <button className="text-xl">🤣</button>
+                        <button className="flex-shrink-0 overflow-hidden text-xl">
+                            <EmojiPicker unified="1f923" size={24} emojiStyle={EmojiStyle.FACEBOOK} />
+                        </button>
                     )}
                 </div>
             </div>

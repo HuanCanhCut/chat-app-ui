@@ -65,8 +65,8 @@ const Emoji: React.FC<EmojiProps> = ({
             <Picker
                 open={isOpen}
                 theme={theme === 'light' ? Theme.LIGHT : Theme.DARK}
-                emojiStyle={EmojiStyle.NATIVE}
                 onEmojiClick={onEmojiClick}
+                emojiStyle={EmojiStyle.FACEBOOK}
                 searchPlaceHolder={placeholder}
                 skinTonesDisabled
                 previewConfig={{ showPreview: false }} // hide footer preview

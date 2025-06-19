@@ -185,7 +185,7 @@ const ReactionModal: React.FC<Props> = ({ onClose, messageId }) => {
                     {tabs.map((tab) => (
                         <button
                             key={tab.type}
-                            className={`h-[60px] px-4 font-medium ${tab.type !== 'all' ? 'text-xl' : ''} ${
+                            className={`h-[60px] px-4 font-medium [&>img]:inline-flex ${tab.type !== 'all' ? 'text-xl' : ''} ${
                                 currentTab === tab.type
                                     ? 'border-b-[3px] border-primary text-primary'
                                     : 'rounded-lg border-b-[3px] border-transparent text-zinc-800 hover:bg-[#99999936] dark:text-zinc-400 dark:hover:bg-[#3e4141]'
@@ -195,9 +195,9 @@ const ReactionModal: React.FC<Props> = ({ onClose, messageId }) => {
                             {tab.type === 'all' ? (
                                 'Tất cả'
                             ) : (
-                                <Emoji unified={tab.type} size={18} emojiStyle={EmojiStyle.NATIVE} />
+                                <Emoji unified={tab.type} size={18} emojiStyle={EmojiStyle.FACEBOOK} />
                             )}
-                            {!!tab.count && <span className={`ml-1 text-sm`}>{tab.count}</span>}
+                            {!!tab.count && <span className={`ml-2 text-sm`}>{tab.count}</span>}
                         </button>
                     ))}
                 </div>
@@ -239,7 +239,7 @@ const ReactionModal: React.FC<Props> = ({ onClose, messageId }) => {
                                         </p>
                                     </div>
                                     <p className="text-2xl">
-                                        <Emoji unified={reaction.react} size={24} emojiStyle={EmojiStyle.NATIVE} />
+                                        <Emoji unified={reaction.react} size={24} emojiStyle={EmojiStyle.FACEBOOK} />
                                     </p>
                                 </div>
                             )
