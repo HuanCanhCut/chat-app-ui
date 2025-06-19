@@ -76,7 +76,7 @@ const InputMessage: React.FC<InputMessageProps> = () => {
     const handleEmitMessage = async (conversationUuid: string) => {
         const messageDetails = (type: string, content: string) => {
             return {
-                conversationUuid,
+                conversation_uuid: conversationUuid,
                 message: {
                     id: Math.random(),
                     content: content,
@@ -111,7 +111,7 @@ const InputMessage: React.FC<InputMessageProps> = () => {
             )
 
             socket.emit(SocketEvent.NEW_MESSAGE, {
-                conversationUuid,
+                conversation_uuid: conversationUuid,
                 message: messageValue,
                 type: onlyIcon ? 'icon' : 'text',
                 parent_id: replyMessage?.id,
@@ -140,7 +140,7 @@ const InputMessage: React.FC<InputMessageProps> = () => {
                 return await response.json()
             }
 
-            const { conversationUuid, message } = messageDetails(
+            const { conversation_uuid, message } = messageDetails(
                 'image',
                 JSON.stringify(
                     images.map((image) => {
@@ -176,7 +176,7 @@ const InputMessage: React.FC<InputMessageProps> = () => {
             )
 
             socket.emit(SocketEvent.NEW_MESSAGE, {
-                conversationUuid,
+                conversation_uuid,
                 message: JSON.stringify(payload.map((item) => item.secure_url)),
                 type: 'image',
             })
@@ -237,6 +237,7 @@ const InputMessage: React.FC<InputMessageProps> = () => {
         // change height of textarea
         e.target.style.height = 'auto'
         e.target.style.height = e.target.scrollHeight + 'px'
+
         setMessageValue(e.target.value)
     }
 

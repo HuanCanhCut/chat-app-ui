@@ -1,13 +1,13 @@
 /* eslint-disable no-unused-vars */
 export enum SocketEvent {
-    // ------------------------------- Chat -------------------------------
+    // ------------------------------- MESSAGE -------------------------------
     JOIN_ROOM = 'room:join',
     NEW_MESSAGE = 'message:new',
     READ_MESSAGE = 'message:read',
     UPDATE_READ_MESSAGE = 'message:update_read',
     USER_STATUS = 'user:status',
     MESSAGE_REVOKE = 'message:revoke',
-
+    MESSAGE_TYPING = 'message:typing',
     // ------------------------------- Notification -------------------------------
     NEW_NOTIFICATION = 'notification:new',
     REMOVE_NOTIFICATION = 'notification:remove',

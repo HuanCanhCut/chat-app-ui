@@ -131,8 +131,8 @@ const MessageItem = ({
                     }
 
                     socket.emit(SocketEvent.READ_MESSAGE, {
-                        conversationUuid: uuid as string,
-                        messageId: message.id,
+                        conversation_uuid: uuid as string,
+                        message_id: message.id,
                     })
                     sendEvent({ eventName: 'message:read-message', detail: uuid as string })
                 }
