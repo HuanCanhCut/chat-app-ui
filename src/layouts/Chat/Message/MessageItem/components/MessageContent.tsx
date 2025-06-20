@@ -55,7 +55,8 @@ const MessageContent = (
         }
 
         const nextMessage = messages.data[messageIndex + 1]
-        const isConsecutiveWithNext = nextMessage.sender_id === message.sender_id && diffTime(message, nextMessage) < BETWEEN_TIME_MESSAGE
+        const isConsecutiveWithNext =
+            nextMessage.sender_id === message.sender_id && diffTime(message, nextMessage) < BETWEEN_TIME_MESSAGE
 
         if (messageIndex === 0) {
             if (isConsecutiveWithNext) {
@@ -67,7 +68,8 @@ const MessageContent = (
 
         const prevMessage = messages.data[messageIndex - 1]
 
-        const isConsecutiveWithPrev = prevMessage.sender_id === message.sender_id && diffTime(message, prevMessage) < BETWEEN_TIME_MESSAGE
+        const isConsecutiveWithPrev =
+            prevMessage.sender_id === message.sender_id && diffTime(message, prevMessage) < BETWEEN_TIME_MESSAGE
 
         if (message.parent) {
             if (prevMessage.parent) {
@@ -115,7 +117,7 @@ const MessageContent = (
             return (
                 <div
                     ref={messageIndex === 0 ? ref : messageRef}
-                    className={`relative w-fit max-w-[80%] rounded-3xl px-4 py-1.5 font-light [word-break:break-word] ${
+                    className={`relative w-fit max-w-[80%] whitespace-pre-wrap rounded-3xl px-4 py-1.5 font-light [word-break:break-word] ${
                         message.sender_id === currentUser?.id
                             ? 'bg-milk-tea text-white'
                             : 'bg-lightGray text-black dark:bg-[#313233] dark:text-dark'
@@ -160,7 +162,7 @@ const MessageContent = (
             return (
                 <div
                     ref={messageIndex === 0 ? ref : messageRef}
-                    className={`relative w-fit max-w-[80%] rounded-3xl font-light [word-break:break-word]`}
+                    className={`relative w-fit max-w-[80%] whitespace-pre-wrap rounded-3xl font-light [word-break:break-word]`}
                 >
                     <span className="max-w-fit break-words text-3xl">{message.content}</span>
 
