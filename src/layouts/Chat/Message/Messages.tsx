@@ -16,6 +16,7 @@ import { useAppSelector } from '~/redux'
 import { getCurrentUser } from '~/redux/selector'
 import { toast } from '~/utils/toast'
 import ScrollToBottom from './ScrollToBottom'
+import Typing from '../../../components/Typing'
 
 interface MessageRef {
     [key: string]: HTMLDivElement
@@ -55,7 +56,13 @@ const Message: React.FC = () => {
 
     // Join room when component mount
     useEffect(() => {
-        socket.emit(SocketEvent.JOIN_ROOM, uuid)
+        if (!socket.connected) {
+            setTimeout(() => {
+                socket.emit(SocketEvent.JOIN_ROOM, uuid)
+            }, 1000)
+        } else {
+            socket.emit(SocketEvent.JOIN_ROOM, uuid)
+        }
     }, [uuid])
 
     const handleEnterMessage = (e: React.KeyboardEvent<HTMLDivElement>) => {
@@ -381,6 +388,8 @@ const Message: React.FC = () => {
                 >
                     {messages?.data.map((message, index) => (
                         <React.Fragment key={message.id}>
+                            {index === 0 && <Typing />}
+
                             <MessageItem
                                 message={message}
                                 messageIndex={index}

@@ -86,6 +86,7 @@ export interface MessageModel extends Timestamp {
         | 'system_change_theme'
         | 'system_add_user'
         | 'system_remove_user'
+        | 'typing'
     top_reactions?: TopReaction[]
     total_reactions: number
     parent_id: number | null

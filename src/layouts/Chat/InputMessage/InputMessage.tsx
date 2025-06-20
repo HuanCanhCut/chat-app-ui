@@ -129,13 +129,10 @@ const InputMessage: React.FC<InputMessageProps> = () => {
                 formData.append('folder', folder)
                 formData.append('public_id', publicId)
 
-                const response = await fetch(
-                    `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_NAME}/image/upload`,
-                    {
-                        method: 'POST',
-                        body: formData,
-                    },
-                )
+                const response = await fetch(`https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_NAME}/image/upload`, {
+                    method: 'POST',
+                    body: formData,
+                })
 
                 return await response.json()
             }
@@ -167,11 +164,7 @@ const InputMessage: React.FC<InputMessageProps> = () => {
 
             const payload = await Promise.all(
                 images.map((image) =>
-                    uploadToCloudinary(
-                        image,
-                        'chat-app/message',
-                        `${uuid}-${image.name}-${Math.random().toString().substring(2, 15)}`,
-                    ),
+                    uploadToCloudinary(image, 'chat-app/message', `${uuid}-${image.name}-${Math.random().toString().substring(2, 15)}`),
                 ),
             )
 
@@ -323,15 +316,7 @@ const InputMessage: React.FC<InputMessageProps> = () => {
                 </div>
             )}
             <div className="flex w-full items-center justify-between gap-2 px-2 py-4 pt-0">
-                <input
-                    ref={inputFileRef}
-                    id="image-input"
-                    type="file"
-                    accept="image/*"
-                    hidden
-                    multiple
-                    onChange={handleUploadImage}
-                />
+                <input ref={inputFileRef} id="image-input" type="file" accept="image/*" hidden multiple onChange={handleUploadImage} />
                 <div
                     className={`flex cursor-pointer items-center p-2 ${images.length > 0 || textareaRows() > 1 ? 'self-end' : 'self-center'}`}
                 >
@@ -352,11 +337,7 @@ const InputMessage: React.FC<InputMessageProps> = () => {
                                         className="flex-center aspect-square h-12 w-12 cursor-pointer rounded-lg bg-zinc-300 hover:bg-transparent dark:bg-darkGray dark:hover:bg-transparent"
                                         onClick={handleOpenUploadImage}
                                     >
-                                        <FontAwesomeIcon
-                                            icon={faFolderPlus}
-                                            fontSize={24}
-                                            className="text-zinc-800 dark:text-white"
-                                        />
+                                        <FontAwesomeIcon icon={faFolderPlus} fontSize={24} className="text-zinc-800 dark:text-white" />
                                     </button>
                                 </Tippy>
                                 {images.map((image, index) => {
@@ -397,17 +378,13 @@ const InputMessage: React.FC<InputMessageProps> = () => {
                     </div>
                     {/* show placeholder if messageValue is empty */}
                     {messageValue === '' && textareaRows() === 1 && (
-                        <span className="absolute bottom-[10px] left-4 bg-transparent leading-none text-gray-400">
-                            Aa
-                        </span>
+                        <span className="absolute bottom-[10px] left-4 bg-transparent leading-none text-gray-400">Aa</span>
                     )}
                     <HeadlessTippy
                         render={(...attrs) => {
                             return <Emoji {...attrs} onEmojiClick={handleEmojiClick} isOpen={isOpenEmoji.emojiOpen} />
                         }}
-                        onClickOutside={() =>
-                            setIsOpenEmoji((prev) => ({ ...prev, emojiOpen: true, emojiWrapperOpen: false }))
-                        }
+                        onClickOutside={() => setIsOpenEmoji((prev) => ({ ...prev, emojiOpen: true, emojiWrapperOpen: false }))}
                         placement="top-start"
                         offset={[0, 15]}
                         interactive

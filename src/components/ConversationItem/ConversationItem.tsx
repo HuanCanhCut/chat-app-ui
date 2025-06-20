@@ -6,6 +6,7 @@ import { ConversationModel, MessageModel } from '~/type/type'
 import { momentTimezone } from '~/utils/moment'
 import { useAppSelector } from '~/redux'
 import { getCurrentUser } from '~/redux/selector'
+import AvatarGroup from '../AvatarGroup'
 
 interface Props {
     conversation: ConversationModel
@@ -73,7 +74,7 @@ const ConversationItem: React.FC<Props> = ({ conversation, className = '' }) => 
                     </div>
                 </div>
                 {
-                    <div className="relative h-5 w-10">
+                    <div>
                         {(() => {
                             if (conversation.last_message.sender_id !== currentUser?.data.id) {
                                 return null
@@ -85,16 +86,16 @@ const ConversationItem: React.FC<Props> = ({ conversation, className = '' }) => 
                             )
 
                             if (readStatus && Array.isArray(readStatus)) {
-                                return readStatus.map((status, index) => {
-                                    return (
-                                        <UserAvatar
-                                            key={index}
-                                            src={status.receiver.avatar}
-                                            size={16}
-                                            className={`absolute h-5 w-5 rounded-full right-${index * 3} border-2 border-white dark:border-dark`}
-                                        />
-                                    )
-                                })
+                                const avatars: string[] = readStatus.map((status) => status.receiver.avatar)
+
+                                return (
+                                    <AvatarGroup
+                                        avatars={avatars}
+                                        size={16}
+                                        translate={3}
+                                        className="flex h-5 w-5 items-center gap-2 border-2 border-white dark:border-dark [&>img]:h-5 [&>img]:w-5"
+                                    />
+                                )
                             }
 
                             return null

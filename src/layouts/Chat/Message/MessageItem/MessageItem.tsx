@@ -91,8 +91,10 @@ const MessageItem = ({
 
     const diffTime = (message: MessageModel, targetMessage: MessageModel) => {
         if (messageIndex > 0) {
-            if (!targetMessage.type.startsWith('system')) {
-                return Math.abs(moment.tz(message.created_at, 'UTC').diff(moment.tz(targetMessage.created_at, 'UTC'), 'minutes'))
+            if (!targetMessage.type.startsWith('system') || targetMessage.type !== 'typing') {
+                return Math.abs(
+                    moment.tz(message.created_at, 'UTC').diff(moment.tz(targetMessage.created_at, 'UTC'), 'minutes'),
+                )
             }
 
             return 0
@@ -277,7 +279,12 @@ const MessageItem = ({
                 </div>
             </div>
 
-            <Viewed message={message} currentUser={currentUser} messageIndex={messageIndex} handleFormatTime={handleFormatTime} />
+            <Viewed
+                message={message}
+                currentUser={currentUser}
+                messageIndex={messageIndex}
+                handleFormatTime={handleFormatTime}
+            />
 
             {/* Show time between two message if the time is greater than 7 minutes */}
             <p
