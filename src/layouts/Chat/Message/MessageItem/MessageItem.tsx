@@ -4,7 +4,6 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useParams } from 'next/navigation'
 import { memo } from 'react'
 
-import CustomImage from '~/components/Image/Image'
 import { MessageModel, MessageResponse, UserModel } from '~/type/type'
 import UserAvatar from '~/components/UserAvatar'
 import useVisible from '~/hooks/useVisible'
@@ -13,13 +12,13 @@ import { SocketEvent } from '~/enum/SocketEvent'
 import { sendEvent } from '~/helpers/events'
 import MessageImagesModel from '~/layouts/Chat/Message/Modal/MessageImagesModal'
 import ReactionModal from '~/layouts/Chat/Message/Modal/ReactionModal'
-import Reaction from './components/Reaction'
 import RevokeModal from '~/layouts/Chat/Message/Modal/RevokeModal'
 import Modal from '~/components/Modal'
 import ReplyMessage from './components/ReplyMessage'
 import SystemMessage from '../SystemMessage'
 import Viewed from './components/UserViewed'
 import MessageAction from './components/MessageAction'
+import MessageContent from './components/MessageContent'
 
 const BETWEEN_TIME_MESSAGE = 7 // minute
 
@@ -93,9 +92,7 @@ const MessageItem = ({
     const diffTime = (message: MessageModel, targetMessage: MessageModel) => {
         if (messageIndex > 0) {
             if (!targetMessage.type.startsWith('system')) {
-                return Math.abs(
-                    moment.tz(message.created_at, 'UTC').diff(moment.tz(targetMessage.created_at, 'UTC'), 'minutes'),
-                )
+                return Math.abs(moment.tz(message.created_at, 'UTC').diff(moment.tz(targetMessage.created_at, 'UTC'), 'minutes'))
             }
 
             return 0
@@ -192,68 +189,6 @@ const MessageItem = ({
         return <SystemMessage message={message} messageIndex={messageIndex} ref={firstMessageRef} />
     }
 
-    const consecutiveMessageStyle = () => {
-        let style = ''
-
-        // Nếu là tin nhắn đầu tiên, cuối cùng, system hoặc có parent thì không cần style
-        if (message.type.startsWith('system')) {
-            return ''
-        }
-
-        const isCurrentUser = message.sender_id === currentUser?.id
-
-        if (messageIndex >= messages.data.length - 1) {
-            if (
-                messages.data[messageIndex - 1].sender_id === message.sender_id &&
-                diffTime(message, messages.data[messageIndex - 1]) < BETWEEN_TIME_MESSAGE
-            ) {
-                style += isCurrentUser ? ' rounded-br-[6px]' : ' rounded-bl-[6px]'
-            }
-
-            return style
-        }
-
-        const nextMessage = messages.data[messageIndex + 1]
-        const isConsecutiveWithNext =
-            nextMessage.sender_id === message.sender_id && diffTime(message, nextMessage) < BETWEEN_TIME_MESSAGE
-
-        if (messageIndex === 0) {
-            if (isConsecutiveWithNext) {
-                style += isCurrentUser ? ' rounded-tr-[6px]' : ' rounded-tl-[6px]'
-            }
-
-            return style
-        }
-
-        const prevMessage = messages.data[messageIndex - 1]
-
-        const isConsecutiveWithPrev =
-            prevMessage.sender_id === message.sender_id && diffTime(message, prevMessage) < BETWEEN_TIME_MESSAGE
-
-        if (message.parent) {
-            if (prevMessage.parent) {
-                return
-            }
-        }
-
-        // Style for consecutive message with previous message
-        if (isConsecutiveWithPrev) {
-            style += isCurrentUser ? ' rounded-br-[6px]' : ' rounded-bl-[6px]'
-        }
-
-        // Style for consecutive message with next message
-        if (isConsecutiveWithNext) {
-            style += isCurrentUser ? ' rounded-tr-[6px]' : ' rounded-tl-[6px]'
-        }
-
-        // Style for first message in a group
-        if (!isConsecutiveWithPrev && isConsecutiveWithNext) {
-            style += isCurrentUser ? ' rounded-tr-[6px]' : ' rounded-tl-[6px]'
-        }
-
-        return style
-    }
-
     const isLastMessageInConsecutiveGroup = () => {
         if (message.type.startsWith('system')) {
             return true
@@ -327,86 +262,22 @@ const MessageItem = ({
                     />
                     {/* Message content */}
                     <Tippy content={handleFormatTime(message.created_at)} placement="left">
-                        <>
-                            {/* if message is not revoked */}
-                            {message.content !== null ? (
-                                message.type === 'text' ? (
-                                    <div
-                                        ref={messageIndex === 0 ? firstMessageRef : messageRef}
-                                        className={`relative w-fit max-w-[80%] rounded-3xl px-4 py-1.5 font-light [word-break:break-word] ${
-                                            message.sender_id === currentUser?.id
-                                                ? 'bg-milk-tea text-white'
-                                                : 'bg-lightGray text-black dark:bg-[#313233] dark:text-dark'
-                                        } ${consecutiveMessageStyle()}`}
-                                    >
-                                        <span className="max-w-fit break-words">{message.content}</span>
-
-                                        <Reaction message={message} handleOpenReactionModal={handleOpenReactionModal} />
-                                    </div>
-                                ) : message.type === 'image' ? (
-                                    <div
-                                        ref={messageIndex === 0 ? firstMessageRef : messageRef}
-                                        className={`relative w-full rounded-2xl ${
-                                            JSON.parse(message.content).length > 1
-                                                ? 'max-w-[60%] sm:max-w-[55%] md:max-w-[50%] lg:max-w-[45%] xl:max-w-[35%]'
-                                                : 'max-w-[60%] sm:max-w-[40%] md:max-w-[35%] lg:max-w-[30%] xl:max-w-[25%]'
-                                        }`}
-                                    >
-                                        <div
-                                            className={`flex w-full flex-wrap gap-1 overflow-hidden rounded-2xl [word-break:break-word] ${consecutiveMessageStyle()}`}
-                                        >
-                                            {JSON.parse(message.content).map((url: string, index: number) => (
-                                                <div className="flex-1" key={index}>
-                                                    <CustomImage
-                                                        src={url}
-                                                        alt="message"
-                                                        className={`max-h-[260px] sm:min-w-[150px] ${JSON.parse(message.content as string).length === 1 ? 'min-w-[240px]' : 'aspect-square'} h-full w-full min-w-[180px] cursor-pointer rounded-md object-cover`}
-                                                        priority
-                                                        quality={100}
-                                                        onClick={() => handleOpenImageModal(url, message.id)}
-                                                    />
-                                                </div>
-                                            ))}
-                                        </div>
-
-                                        <Reaction message={message} handleOpenReactionModal={handleOpenReactionModal} />
-                                    </div>
-                                ) : (
-                                    // if message is icon
-                                    <div
-                                        ref={messageIndex === 0 ? firstMessageRef : messageRef}
-                                        className={`relative w-fit max-w-[80%] rounded-3xl font-light [word-break:break-word]`}
-                                    >
-                                        <span className="max-w-fit break-words text-3xl">{message.content}</span>
-
-                                        <Reaction message={message} handleOpenReactionModal={handleOpenReactionModal} />
-                                    </div>
-                                )
-                            ) : (
-                                // if message is revoked
-                                <p
-                                    ref={messageIndex === 0 ? firstMessageRef : messageRef}
-                                    className={`relative w-fit max-w-[80%] rounded-3xl px-4 py-1.5 font-light italic opacity-85 [word-break:break-word] ${
-                                        message.sender_id === currentUser?.id
-                                            ? 'bg-milk-tea text-zinc-300'
-                                            : 'bg-lightGray text-zinc-600 dark:bg-[#313233] dark:text-zinc-400'
-                                    } ${consecutiveMessageStyle()}`}
-                                >
-                                    {message.sender.id === currentUser?.id ? 'Bạn ' : `${message.sender.full_name} `}
-                                    đã thu hồi một tin nhắn
-                                </p>
-                            )}
-                        </>
+                        <MessageContent
+                            message={message}
+                            messageIndex={messageIndex}
+                            ref={firstMessageRef}
+                            messageRef={messageRef}
+                            currentUser={currentUser}
+                            handleOpenImageModal={handleOpenImageModal}
+                            handleOpenReactionModal={handleOpenReactionModal}
+                            messages={messages}
+                            diffTime={diffTime}
+                        />
                     </Tippy>
                 </div>
             </div>
 
-            <Viewed
-                message={message}
-                currentUser={currentUser}
-                messageIndex={messageIndex}
-                handleFormatTime={handleFormatTime}
-            />
+            <Viewed message={message} currentUser={currentUser} messageIndex={messageIndex} handleFormatTime={handleFormatTime} />
 
             {/* Show time between two message if the time is greater than 7 minutes */}
             <p

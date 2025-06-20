@@ -186,9 +186,7 @@ const Message: React.FC = () => {
                                 ...status,
                                 receiver: {
                                     ...status.receiver,
-                                    last_read_message_id: !!lastReadMessageId
-                                        ? lastReadMessageId
-                                        : status.receiver.last_read_message_id,
+                                    last_read_message_id: !!lastReadMessageId ? lastReadMessageId : status.receiver.last_read_message_id,
                                 },
                                 status: 'read' as const,
                                 read_at: new Date(),
@@ -232,10 +230,7 @@ const Message: React.FC = () => {
                         if (message.parent?.id === message_id) {
                             message.parent = {
                                 ...message.parent,
-                                content:
-                                    message.parent.sender_id === currentUser?.data?.id
-                                        ? 'Đã gỡ tin nhắn'
-                                        : 'Tin nhắn đã bị gỡ',
+                                content: message.parent.sender_id === currentUser?.data?.id ? 'Đã gỡ tin nhắn' : 'Tin nhắn đã bị gỡ',
                             }
                         }
 
@@ -374,11 +369,7 @@ const Message: React.FC = () => {
                         }
                     }}
                     className="flex flex-col-reverse gap-[2.5px] !overflow-hidden px-2 py-3"
-                    hasMore={
-                        messages
-                            ? messages.meta.pagination.offset / PER_PAGE + 1 < messages.meta.pagination.total / PER_PAGE
-                            : false
-                    }
+                    hasMore={messages ? messages.meta.pagination.offset / PER_PAGE + 1 < messages.meta.pagination.total / PER_PAGE : false}
                     inverse={true}
                     loader={
                         <div className="flex justify-center">

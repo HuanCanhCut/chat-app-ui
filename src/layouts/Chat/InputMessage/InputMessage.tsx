@@ -238,6 +238,24 @@ const InputMessage: React.FC<InputMessageProps> = () => {
         e.target.style.height = 'auto'
         e.target.style.height = e.target.scrollHeight + 'px'
 
+        // Only send when user enters the first letter, the following letters will not be sent.
+        if (messageValue.trim().length === 0 && e.target.value.trim().length > 0) {
+            socket.emit(SocketEvent.MESSAGE_TYPING, {
+                conversation_uuid: uuid as string,
+                user_id: currentUser.data.id,
+                is_typing: true,
+            })
+        }
+
+        // Only send when user deletes all letters
+        if (e.target.value.trim().length === 0) {
+            socket.emit(SocketEvent.MESSAGE_TYPING, {
+                conversation_uuid: uuid as string,
+                user_id: currentUser.data.id,
+                is_typing: false,
+            })
+        }
+
         setMessageValue(e.target.value)
     }
 
