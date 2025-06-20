@@ -25,17 +25,20 @@ const EmojiMessageStyle: React.FC<EmojiMessageStyleProps> = ({
             const emoji = match[0]
             const matchIndex = match.index || 0
 
-            jsx.push(<span key={Math.random()}>{text.slice(lastIndex, matchIndex)}</span>)
+            jsx.push(<span key={`text-${matchIndex}`}>{text.slice(lastIndex, matchIndex)}</span>)
 
             const codePoint = emoji.codePointAt(0)
             const unified = codePoint?.toString(16).toUpperCase()
 
             if (unified) {
-                console.log(unified)
-
                 jsx.push(
-                    <span className={className}>
-                        <Emoji key={Math.random()} unified={`${unified.toLowerCase()}`} size={size} emojiStyle={type} />
+                    <span key={`emoji-container-${matchIndex}`} className={className}>
+                        <Emoji
+                            key={`emoji-${matchIndex}`}
+                            unified={`${unified.toLowerCase()}`}
+                            size={size}
+                            emojiStyle={type}
+                        />
                     </span>,
                 )
             }
@@ -44,16 +47,12 @@ const EmojiMessageStyle: React.FC<EmojiMessageStyleProps> = ({
         }
 
         // Thêm phần văn bản còn lại
-        jsx.push(text.slice(lastIndex))
+        jsx.push(<span key={`text-end`}>{text.slice(lastIndex)}</span>)
 
         return jsx
     }
 
-    return (
-        <p key={Math.random()} className="flex w-fit items-center">
-            {highlight(text)}
-        </p>
-    )
+    return <p className="flex w-fit items-center">{highlight(text)}</p>
 }
 
 export default EmojiMessageStyle

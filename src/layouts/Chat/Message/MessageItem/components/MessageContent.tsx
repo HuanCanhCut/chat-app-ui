@@ -165,7 +165,7 @@ const MessageContent = (
             return (
                 <div
                     ref={messageIndex === 0 ? ref : messageRef}
-                    className={`relative w-fit max-w-[80%] whitespace-pre-wrap rounded-3xl font-light [word-break:break-word]`}
+                    className={`relative w-fit max-w-[80%] whitespace-pre-wrap rounded-3xl py-[2px] font-light [word-break:break-word]`}
                 >
                     <span className="max-w-fit break-words text-3xl">
                         <EmojiMessageStyle text={message.content} size={32} />

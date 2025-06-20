@@ -441,7 +441,20 @@ const InputMessage: React.FC<InputMessageProps> = () => {
                             <SendHorizontalIcon />
                         </button>
                     ) : (
-                        <button className="flex-shrink-0 overflow-hidden text-xl">
+                        <button
+                            className="flex-shrink-0 overflow-hidden text-xl"
+                            onClick={() => {
+                                const unified = '1f923' // Unicode hex string
+                                const emoji = String.fromCodePoint(parseInt(unified, 16))
+
+                                socket.emit(SocketEvent.NEW_MESSAGE, {
+                                    conversation_uuid: uuid,
+                                    message: emoji,
+                                    type: 'icon',
+                                    parent_id: replyMessage?.id,
+                                })
+                            }}
+                        >
                             <EmojiPicker unified="1f923" size={24} emojiStyle={EmojiStyle.FACEBOOK} />
                         </button>
                     )}
