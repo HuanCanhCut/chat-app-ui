@@ -7,6 +7,7 @@ import { momentTimezone } from '~/utils/moment'
 import { useAppSelector } from '~/redux'
 import { getCurrentUser } from '~/redux/selector'
 import AvatarGroup from '../AvatarGroup'
+import EmojiMessageStyle from '../EmojiMessageStyle'
 
 interface Props {
     conversation: ConversationModel
@@ -69,7 +70,9 @@ const ConversationItem: React.FC<Props> = ({ conversation, className = '' }) => 
                     <div
                         className={`flex items-center text-xs font-normal ${isRead ? 'text-gray-600 dark:text-gray-400' : 'font-medium text-black dark:text-gray-200'} `}
                     >
-                        <span className="truncate pr-1">{content(conversation.last_message)}</span>
+                        <span className="truncate pr-1">
+                            <EmojiMessageStyle text={content(conversation.last_message)} className="ml-1" />
+                        </span>
                         <span className="flex-shrink-0">· {momentTimezone(conversation.last_message?.created_at)}</span>
                     </div>
                 </div>
@@ -93,7 +96,7 @@ const ConversationItem: React.FC<Props> = ({ conversation, className = '' }) => 
                                         avatars={avatars}
                                         size={16}
                                         translate={3}
-                                        className="flex h-5 w-5 items-center gap-2 border-2 border-white dark:border-dark [&>img]:h-5 [&>img]:w-5"
+                                        className="flex h-5 w-5 items-center gap-2 [&>img]:h-5 [&>img]:w-5 [&>img]:border-2 [&>img]:border-white [&>img]:dark:border-dark"
                                     />
                                 )
                             }

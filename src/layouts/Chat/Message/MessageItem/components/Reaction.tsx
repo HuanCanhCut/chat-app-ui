@@ -135,7 +135,7 @@ const Reaction = ({ message, handleOpenReactionModal }: ReactionProps) => {
             }
         >
             <div
-                className="absolute bottom-[-10px] right-1 flex cursor-pointer items-center rounded-full bg-white py-[2px] shadow-sm shadow-zinc-300 dark:bg-zinc-800 dark:shadow-zinc-700"
+                className="absolute bottom-[-11px] right-1 flex cursor-pointer items-center rounded-full bg-white py-[2px] shadow-sm shadow-zinc-300 dark:bg-zinc-800 dark:shadow-zinc-700"
                 onClick={() => {
                     handleOpenReactionModal(message.id)
                 }}

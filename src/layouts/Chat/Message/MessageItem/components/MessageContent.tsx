@@ -2,6 +2,7 @@ import { forwardRef, LegacyRef } from 'react'
 import { MessageModel, MessageResponse, UserModel } from '~/type/type'
 import Reaction from './Reaction'
 import CustomImage from '~/components/Image/Image'
+import EmojiMessageStyle from '~/components/EmojiMessageStyle'
 
 interface MessageContentProps {
     message: MessageModel
@@ -123,7 +124,9 @@ const MessageContent = (
                             : 'bg-lightGray text-black dark:bg-[#313233] dark:text-dark'
                     } ${consecutiveMessageStyle()}`}
                 >
-                    <span className="max-w-fit break-words">{message.content}</span>
+                    <span className="max-w-fit break-words">
+                        <EmojiMessageStyle text={message.content} />
+                    </span>
 
                     <Reaction message={message} handleOpenReactionModal={handleOpenReactionModal} />
                 </div>
@@ -164,7 +167,9 @@ const MessageContent = (
                     ref={messageIndex === 0 ? ref : messageRef}
                     className={`relative w-fit max-w-[80%] whitespace-pre-wrap rounded-3xl font-light [word-break:break-word]`}
                 >
-                    <span className="max-w-fit break-words text-3xl">{message.content}</span>
+                    <span className="max-w-fit break-words text-3xl">
+                        <EmojiMessageStyle text={message.content} size={32} />
+                    </span>
 
                     <Reaction message={message} handleOpenReactionModal={handleOpenReactionModal} />
                 </div>
