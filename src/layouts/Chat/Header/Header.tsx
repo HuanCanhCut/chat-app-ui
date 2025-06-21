@@ -12,13 +12,14 @@ import moment from 'moment-timezone'
 import config from '~/config'
 import socket from '~/helpers/socket'
 import { SocketEvent } from '~/enum/SocketEvent'
+import { sendEvent } from '~/helpers/events'
 interface HeaderProps {
     className?: string
-    toggleInfo: () => void
+    isInfoOpen: boolean
     conversation: ConversationModel | undefined
 }
 
-const Header: React.FC<HeaderProps> = ({ className = '', toggleInfo, conversation }) => {
+const Header: React.FC<HeaderProps> = ({ className = '', isInfoOpen, conversation }) => {
     const currentUser = useAppSelector(getCurrentUser)
     const router = useRouter()
 
@@ -97,6 +98,15 @@ const Header: React.FC<HeaderProps> = ({ className = '', toggleInfo, conversatio
         }
     }, [conversationMember?.user.is_online, conversationMember?.user.last_online_at])
 
+    const handleToggleInfo = () => {
+        sendEvent({
+            eventName: 'info:toggle',
+            detail: {
+                isOpen: !isInfoOpen,
+            },
+        })
+    }
+
     return (
         <div
             className={`${className} flex items-center justify-between px-2 py-1 shadow-sm shadow-gray-200 dark:[box-shadow:1px_2px_4px_rgba(0,0,0,0.1)]`}
@@ -145,10 +155,10 @@ const Header: React.FC<HeaderProps> = ({ className = '', toggleInfo, conversatio
             <div className="flex items-center">
                 <FontAwesomeIcon
                     icon={faCircleInfo}
-                    width={24}
-                    height={24}
+                    width={20}
+                    height={20}
                     className="cursor-pointer text-xl dark:text-gray-500"
-                    onClick={toggleInfo}
+                    onClick={handleToggleInfo}
                 />
             </div>
         </div>

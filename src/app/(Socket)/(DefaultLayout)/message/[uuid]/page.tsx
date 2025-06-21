@@ -5,14 +5,15 @@ import useSWR from 'swr'
 import { useParams } from 'next/navigation'
 
 import * as conversationServices from '~/services/conversationService'
-import Header from '../../../../../layouts/Chat/Header'
-import Message from '../../../../../layouts/Chat/Message'
-import InputMessage from '../../../../../layouts/Chat/InputMessage'
-import Info from '../../../../../layouts/Chat/Info/Info'
+import Header from '~/layouts/Chat/Header'
+import Message from '~/layouts/Chat/Message'
+import InputMessage from '~/layouts/Chat/InputMessage'
+import Info from '~/layouts/Chat/Info/Info'
 import SWRKey from '~/enum/SWRKey'
 import socket from '~/helpers/socket'
 import { SocketEvent } from '~/enum/SocketEvent'
 import { UserStatus } from '~/type/type'
+import { listenEvent } from '~/helpers/events'
 
 const MessagePage = () => {
     const { uuid } = useParams()
@@ -62,20 +63,27 @@ const MessagePage = () => {
         }
     }, [conversation, conversation?.data, mutateConversation])
 
-    const toggleInfo = () => {
-        setInfoOpen(!infoOpen)
-    }
+    useEffect(() => {
+        const remove = listenEvent({
+            eventName: 'info:toggle',
+            handler: ({ detail: { isOpen } }: { detail: { isOpen: boolean } }) => {
+                setInfoOpen(isOpen)
+            },
+        })
+
+        return remove
+    }, [])
 
     return (
         <div className="flex h-full max-w-full">
-            <div className={`flex max-w-full flex-grow flex-col ${infoOpen ? 'hidden sm:flex' : 'flex'}`}>
-                <Header toggleInfo={toggleInfo} conversation={conversation?.data} />
+            <div className={`flex max-w-full flex-grow flex-col ${infoOpen ? 'invisible w-0 sm:flex' : 'flex'}`}>
+                <Header isInfoOpen={infoOpen} conversation={conversation?.data} />
                 <Message />
                 <InputMessage />
             </div>
-            {infoOpen && (
-                <Info className={`${infoOpen ? 'block' : 'hidden'} min-w-[300px] md:block lg:min-w-[320px]`} />
-            )}
+            <Info
+                className={`${infoOpen ? 'block' : 'hidden'} w-full sm:w-auto sm:min-w-[300px] md:block lg:min-w-[320px]`}
+            />
         </div>
     )
 }
