@@ -46,6 +46,7 @@ export interface ConversationModel extends Timestamp {
     uuid: string
     conversation_members: ConversationMember[]
     last_message: MessageModel
+    emoji: string
 }
 
 export interface ConversationResponse {
@@ -77,6 +78,7 @@ export interface MessageModel extends Timestamp {
     sender: UserModel
     message_status: MessageStatus[]
     is_read: boolean
+
     type:
         | 'text'
         | 'image'
