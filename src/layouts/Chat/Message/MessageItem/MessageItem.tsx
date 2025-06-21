@@ -90,7 +90,7 @@ const MessageItem = ({
     }, [message.parent])
 
     const diffTime = (message: MessageModel, targetMessage: MessageModel) => {
-        if (messageIndex > 0) {
+        if (targetMessage && message) {
             if (!targetMessage.type.startsWith('system') || targetMessage.type !== 'typing') {
                 return Math.abs(
                     moment.tz(message.created_at, 'UTC').diff(moment.tz(targetMessage.created_at, 'UTC'), 'minutes'),
