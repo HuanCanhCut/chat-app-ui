@@ -11,7 +11,9 @@ const AvatarGroup: React.FC<AvatarGroupProps> = ({ avatars, size = 36, translate
     return (
         <div className={`relative ${className}`}>
             {avatars.map((avatar, index) => (
-                <UserAvatar key={avatar} src={avatar} size={size} className={`absolute right-${index * translate}`} />
+                <div key={avatar} className={`absolute right-${index * translate}`}>
+                    <UserAvatar src={avatar} size={size} />
+                </div>
             ))}
         </div>
     )

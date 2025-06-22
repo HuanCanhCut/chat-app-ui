@@ -76,14 +76,19 @@ const MessagePage = () => {
 
     return (
         <div className="flex h-full max-w-full">
-            <div className={`flex max-w-full flex-grow flex-col ${infoOpen ? 'invisible w-0 sm:flex' : 'flex'}`}>
+            {/* Don't change the invisible below to hidden to avoid uncontrolled scrolling in the message component */}
+            <div
+                className={`flex max-w-full flex-grow flex-col ${infoOpen ? 'invisible w-0 sm:visible sm:flex sm:w-auto' : 'flex'}`}
+            >
                 <Header isInfoOpen={infoOpen} conversation={conversation?.data} />
                 <Message />
                 <InputMessage />
             </div>
-            <Info
-                className={`${infoOpen ? 'block' : 'hidden'} w-full sm:w-auto sm:min-w-[300px] md:block lg:min-w-[320px]`}
-            />
+            {infoOpen && (
+                <Info
+                    className={`${infoOpen ? 'block' : 'hidden'} w-full sm:w-auto sm:min-w-[300px] md:block lg:min-w-[320px]`}
+                />
+            )}
         </div>
     )
 }

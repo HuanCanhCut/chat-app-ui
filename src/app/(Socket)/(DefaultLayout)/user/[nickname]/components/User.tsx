@@ -90,10 +90,9 @@ export default function User({ currentUser, user }: UserProps) {
                 <UserAvatar
                     src={currentUser.data.id === user.data.id ? currentUser.data.avatar : user.data.avatar}
                     size={168}
+                    isOnline={user.data.is_online}
+                    onlineClassName="w-7 h-7 right-1 sm:right-2 sm:bottom-2 border-4"
                 />
-                {user.data.is_online && (
-                    <div className="absolute bottom-0 right-0 rounded-full border-4 border-white bg-green-500 p-3 dark:border-dark sm:bottom-2 sm:right-1"></div>
-                )}
             </div>
             <div className="mt-4 flex flex-col gap-2 overflow-hidden pr-4 sm:ml-[180px] sm:mt-0 sm:flex-1">
                 <h1 className="m-0 mt-2 line-clamp-2 overflow-hidden text-ellipsis font-semibold">

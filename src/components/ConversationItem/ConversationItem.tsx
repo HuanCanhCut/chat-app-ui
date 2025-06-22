@@ -58,10 +58,9 @@ const ConversationItem: React.FC<Props> = ({ conversation, className = '' }) => 
                         src={conversation?.avatar || userMember?.user.avatar}
                         size={56}
                         className="h-[48px] w-[48px] lg:h-[56px] lg:w-[56px]"
+                        isOnline={!conversation.is_group && userMember?.user.is_online}
+                        onlineClassName="h-4 w-4"
                     />
-                    {!conversation.is_group && userMember?.user.is_online && (
-                        <div className="absolute bottom-0 right-0 h-4 w-4 rounded-full border-2 border-white bg-green-500 dark:border-dark"></div>
-                    )}
                 </div>
                 <div className="ml-3 flex-1 overflow-hidden">
                     <p className="truncate font-medium">
@@ -93,10 +92,10 @@ const ConversationItem: React.FC<Props> = ({ conversation, className = '' }) => 
 
                                 return (
                                     <AvatarGroup
-                                        avatars={avatars}
+                                        avatars={avatars.slice(0, 2)}
                                         size={16}
                                         translate={3}
-                                        className="flex h-5 w-5 items-center gap-2 [&>img]:h-5 [&>img]:w-5 [&>img]:border-2 [&>img]:border-white [&>img]:dark:border-dark"
+                                        className="flex h-5 w-7 items-center gap-2 [&>img]:h-5 [&>img]:w-5 [&>img]:border-2 [&>img]:border-white [&>img]:dark:border-dark"
                                     />
                                 )
                             }

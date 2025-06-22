@@ -8,11 +8,11 @@ import { ConversationModel, UserStatus } from '~/type/type'
 import { useAppSelector } from '~/redux'
 import { getCurrentUser } from '~/redux/selector'
 import { useEffect, useRef, useState } from 'react'
-import moment from 'moment-timezone'
 import config from '~/config'
 import socket from '~/helpers/socket'
 import { SocketEvent } from '~/enum/SocketEvent'
 import { sendEvent } from '~/helpers/events'
+import { momentTimezone } from '~/utils/moment'
 interface HeaderProps {
     className?: string
     isInfoOpen: boolean
@@ -38,23 +38,11 @@ const Header: React.FC<HeaderProps> = ({ className = '', isInfoOpen, conversatio
         (member) => member.user_id !== currentUser?.data.id,
     )
 
-    const dateDiff = (date: Date) => {
-        return moment.tz(new Date(Date.now()).toISOString(), 'Asia/Ho_Chi_Minh').diff(date, 'minutes')
-    }
-
-    const [lastOnlineTime, setLastOnlineTime] = useState<number | null>(null)
-
-    const handleFormatTime = (time: number) => {
-        if (time < 60) {
-            return `${time} phút trước`
-        }
-
-        return `${Math.floor(time / 60)} giờ trước`
-    }
+    const [lastOnlineTime, setLastOnlineTime] = useState<Date | null>(null)
 
     useEffect(() => {
         if (conversationMember && conversationMember.user.last_online_at) {
-            setLastOnlineTime(dateDiff(conversationMember.user.last_online_at))
+            setLastOnlineTime(conversationMember.user.last_online_at)
         }
     }, [conversationMember])
 
@@ -65,8 +53,16 @@ const Header: React.FC<HeaderProps> = ({ className = '', isInfoOpen, conversatio
             }
 
             if (data.user_id === conversationMember?.user.id && !data.is_online) {
+                sendEvent({
+                    eventName: 'user:status',
+                    detail: {
+                        user_id: conversationMember?.user.id,
+                        is_online: false,
+                        last_online_at: new Date(conversationMember?.user.last_online_at),
+                    },
+                })
                 offlineTimerSocket.current = setInterval(() => {
-                    setLastOnlineTime(dateDiff(new Date(data.last_online_at)))
+                    setLastOnlineTime(new Date(data.last_online_at))
                 }, 1000 * 30) // 30 seconds
             }
         }
@@ -80,13 +76,22 @@ const Header: React.FC<HeaderProps> = ({ className = '', isInfoOpen, conversatio
                 clearTimeout(offlineTimerSocket.current)
             }
         }
-    }, [conversationMember?.user.id])
+    }, [conversationMember?.user.id, conversationMember?.user.last_online_at])
 
     useEffect(() => {
         if (!conversationMember?.user.is_online) {
             if (conversationMember?.user.last_online_at) {
+                sendEvent({
+                    eventName: 'user:status',
+                    detail: {
+                        user_id: conversationMember?.user.id,
+                        is_online: false,
+                        last_online_at: new Date(conversationMember?.user.last_online_at),
+                    },
+                })
+
                 offlineTimer.current = setInterval(() => {
-                    setLastOnlineTime(dateDiff(new Date(conversationMember?.user.last_online_at)))
+                    setLastOnlineTime(new Date(conversationMember?.user.last_online_at))
                 }, 1000 * 30) // 30 seconds
             }
         }
@@ -96,7 +101,7 @@ const Header: React.FC<HeaderProps> = ({ className = '', isInfoOpen, conversatio
                 clearTimeout(offlineTimer.current)
             }
         }
-    }, [conversationMember?.user.is_online, conversationMember?.user.last_online_at])
+    }, [conversationMember?.user.id, conversationMember?.user.is_online, conversationMember?.user.last_online_at])
 
     const handleToggleInfo = () => {
         sendEvent({
@@ -131,10 +136,8 @@ const Header: React.FC<HeaderProps> = ({ className = '', isInfoOpen, conversatio
                         <UserAvatar
                             src={conversation?.is_group ? conversation?.avatar : conversationMember?.user?.avatar}
                             size={40}
+                            isOnline={conversationMember?.user?.is_online}
                         />
-                        {!conversation?.is_group && conversationMember?.user?.is_online && (
-                            <div className="absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-white bg-green-500 dark:border-dark"></div>
-                        )}
                     </div>
                     <div className="flex flex-col">
                         <h4 className="max-w-[150px] truncate whitespace-nowrap font-semibold xs:max-w-[200px] sm:max-w-[250px] md:max-w-[350px]">
@@ -146,7 +149,7 @@ const Header: React.FC<HeaderProps> = ({ className = '', isInfoOpen, conversatio
                             <span className="text-xs font-normal text-zinc-700 dark:text-gray-400">
                                 {conversationMember?.user?.is_online
                                     ? 'Đang hoạt động'
-                                    : lastOnlineTime && `Hoạt động ${handleFormatTime(lastOnlineTime)}`}
+                                    : lastOnlineTime && `Hoạt động ${momentTimezone(lastOnlineTime)} trước`}
                             </span>
                         )}
                     </div>

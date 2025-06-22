@@ -1,10 +1,4 @@
-import { Dispatch, SetStateAction } from 'react'
-
-interface SearchMessageProps {
-    setSearchMode: Dispatch<SetStateAction<boolean>>
-}
-
-const SearchMessage: React.FC<SearchMessageProps> = ({ setSearchMode }) => {
+const SearchMessage: React.FC = () => {
     return <div>SearchMessage</div>
 }
 
