@@ -34,7 +34,7 @@ const config: Config = {
             backgroundColor: {
                 dark: '#212223',
                 lightGray: '#f0f2f5',
-                darkGray: '#252728',
+                darkGray: '#313233',
                 'milk-tea': '#ab885d',
             },
             textColor: {

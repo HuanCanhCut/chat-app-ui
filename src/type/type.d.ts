@@ -78,7 +78,6 @@ export interface MessageModel extends Timestamp {
     sender: UserModel
     message_status: MessageStatus[]
     is_read: boolean
-
     type:
         | 'text'
         | 'image'
@@ -120,6 +119,15 @@ export interface MessageStatus extends Timestamp {
     is_revoked: boolean
     revoke_type: 'for-other' | 'for-me'
     read_at: Date
+}
+
+export interface SearchMessageModel extends MessageModel {
+    top_reactions?: never
+    parent?: never
+}
+
+export interface SearchMessageResponse extends MetaPagination {
+    data: SearchMessageModel[]
 }
 
 // ========================================== Message reaction model ==========================================

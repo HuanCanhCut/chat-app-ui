@@ -1,4 +1,4 @@
-import { SearchHistory } from '~/type/type'
+import { SearchHistory, SearchMessageResponse } from '~/type/type'
 import * as request from '~/utils/httpRequest'
 
 export const searchUser = async (value: string) => {
@@ -31,5 +31,33 @@ export const setSearchHistory = async (user_search_id: number) => {
         await request.post('users/search-history', { user_search_id })
     } catch (error) {
         console.log(error)
+    }
+}
+
+export const searchMessage = async ({
+    q,
+    page,
+    per_page,
+    conversation_uuid,
+}: {
+    q: string
+    page: number
+    per_page: number
+    conversation_uuid: string
+}): Promise<SearchMessageResponse> => {
+    try {
+        const response = await request.get('messages/search', {
+            params: {
+                q,
+                page,
+                per_page,
+                conversation_uuid,
+            },
+        })
+
+        return response.data
+    } catch (error) {
+        console.log(error)
+        throw error
     }
 }

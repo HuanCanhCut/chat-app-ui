@@ -10,7 +10,8 @@ const Info: React.FC<InfoProps> = ({ className = '' }) => {
 
     return (
         <div
-            className={`${className} min-h-[calc(100dvh-var(--header-mobile-height))] border-l border-gray-200 px-2 py-3 [overflow:overlay] dark:border-gray-800 sm:min-h-[calc(100dvh-var(--header-height))]`}
+            id="info-container"
+            className={`${className} min-h-[calc(100dvh-var(--header-mobile-height))] border-l border-gray-200 px-2 py-3 [overflow:overlay] dark:border-zinc-700 sm:min-h-[calc(100dvh-var(--header-height))]`}
         >
             {searchMode ? <SearchMessage /> : <ControlPanel setSearchMode={setSearchMode} />}
         </div>

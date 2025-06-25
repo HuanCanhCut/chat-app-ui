@@ -1,6 +1,11 @@
 import { toast } from '../utils/toast'
 
-const handleApiError = (error: any) => {
+const handleApiError = (error: any, message?: string) => {
+    if (message) {
+        toast(message, 'error')
+        return
+    }
+
     if (error?.response?.data?.message) {
         toast(error.response.data.message, 'error')
     } else {

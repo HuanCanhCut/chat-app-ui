@@ -25,7 +25,7 @@ const Search: React.FC<Props> = ({ setSearchMode, searchMode }) => {
 
     const [searchResult, setSearchResult] = useState<ConversationModel[]>([])
     const [searchValue, setSearchValue] = useState('')
-    const debounceValue = useDebounce(searchValue, 250)
+    const debounceValue = useDebounce(searchValue)
 
     useEffect(() => {
         if (debounceValue) {
