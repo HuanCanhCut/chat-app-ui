@@ -34,6 +34,21 @@ const MessageContent = (
     }: MessageContentProps,
     ref: LegacyRef<HTMLDivElement>,
 ) => {
+    const combinedRef = (el: HTMLDivElement) => {
+        if (messageIndex === 0) {
+            if (ref) {
+                if (typeof ref === 'function') {
+                    ref(el)
+                } else if (ref && typeof ref === 'object' && 'current' in ref) {
+                    ;(ref as React.MutableRefObject<HTMLDivElement | null>).current = el
+                }
+            }
+            messageRef(el)
+        } else {
+            messageRef(el)
+        }
+    }
+
     const consecutiveMessageStyle = () => {
         let style = ''
 
@@ -100,7 +115,7 @@ const MessageContent = (
     if (message.content === null) {
         return (
             <p
-                ref={messageIndex === 0 ? ref : messageRef}
+                ref={combinedRef}
                 className={`relative w-fit max-w-[80%] rounded-3xl px-4 py-1.5 font-light italic opacity-85 [word-break:break-word] ${
                     message.sender_id === currentUser?.id
                         ? 'bg-milk-tea text-zinc-300'
@@ -117,7 +132,7 @@ const MessageContent = (
         case 'text':
             return (
                 <div
-                    ref={messageIndex === 0 ? ref : messageRef}
+                    ref={combinedRef}
                     className={`relative w-fit max-w-[80%] whitespace-pre-wrap rounded-3xl px-4 py-1.5 font-light [word-break:break-word] ${
                         message.sender_id === currentUser?.id
                             ? 'bg-milk-tea text-white'
@@ -134,7 +149,7 @@ const MessageContent = (
         case 'image':
             return (
                 <div
-                    ref={messageIndex === 0 ? ref : messageRef}
+                    ref={combinedRef}
                     className={`relative w-full rounded-2xl ${
                         JSON.parse(message.content as string).length > 1
                             ? 'max-w-[60%] sm:max-w-[55%] md:max-w-[50%] lg:max-w-[45%] xl:max-w-[35%]'
@@ -164,7 +179,7 @@ const MessageContent = (
         case 'icon':
             return (
                 <div
-                    ref={messageIndex === 0 ? ref : messageRef}
+                    ref={combinedRef}
                     className={`relative w-fit max-w-[80%] whitespace-pre-wrap rounded-3xl py-[2px] font-light [word-break:break-word]`}
                 >
                     <span className="max-w-fit break-words text-3xl">

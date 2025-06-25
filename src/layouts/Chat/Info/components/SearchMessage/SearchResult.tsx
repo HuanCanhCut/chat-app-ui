@@ -1,6 +1,7 @@
 import UserAvatar from '~/components/UserAvatar'
 import { SearchMessageModel } from '~/type/type'
 import Highlighter from 'react-highlight-words'
+import { sendEvent } from '~/helpers/events'
 
 interface SearchResultProps {
     message: SearchMessageModel
@@ -8,8 +9,21 @@ interface SearchResultProps {
 }
 
 const SearchResult: React.FC<SearchResultProps> = ({ message, searchWords }) => {
+    const handleScrollToMessage = () => {
+        sendEvent({
+            eventName: 'message:scroll-to-message',
+            detail: {
+                parentMessage: message,
+                type: 'search',
+            },
+        })
+    }
+
     return (
-        <div className="flex cursor-pointer items-center gap-2 rounded-md px-1 py-3 hover:bg-gray-100 dark:hover:bg-darkGray">
+        <div
+            className="flex cursor-pointer items-center gap-2 rounded-md px-1 py-3 hover:bg-gray-100 dark:hover:bg-darkGray"
+            onClick={handleScrollToMessage}
+        >
             <UserAvatar src={message.sender.avatar} size={32} />
             <div className="flex flex-col gap-1">
                 <p className="text-sm">{message.sender.full_name}</p>

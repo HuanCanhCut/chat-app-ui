@@ -8,7 +8,7 @@ import * as messageServices from '~/services/messageService'
 
 import { SocketEvent } from '~/enum/SocketEvent'
 import SWRKey from '~/enum/SWRKey'
-import { sendEvent } from '~/helpers/events'
+import { listenEvent, sendEvent } from '~/helpers/events'
 import socket from '~/helpers/socket'
 import { MessageModel, MessageResponse, SocketMessage } from '~/type/type'
 import MessageItem from './MessageItem'
@@ -39,6 +39,7 @@ const Message: React.FC = () => {
     const isScrollLoading = useRef(false)
     const messageRefs = useRef<MessageRef>({})
     const scrollableRef = useRef<HTMLDivElement>(null)
+    const isJumpingToMessage = useRef(false)
 
     const { data: messages, mutate: mutateMessages } = useSWR<MessageResponse | undefined>(
         uuid ? [SWRKey.GET_MESSAGES, uuid] : null,
@@ -278,6 +279,10 @@ const Message: React.FC = () => {
     }, [currentUser?.data?.id, messages?.data, messages?.meta, mutateMessages, uuid])
 
     const handleScrollDown = async (e: React.UIEvent<HTMLDivElement>) => {
+        if (isJumpingToMessage.current) {
+            return
+        }
+
         const target = e.target as HTMLDivElement
 
         const scrollTop = target.scrollTop // scroll top return negative number
@@ -336,6 +341,144 @@ const Message: React.FC = () => {
 
         prevScrollY.current = target.scrollTop
     }
+
+    useEffect(() => {
+        interface Detail {
+            parentMessage: MessageModel
+            type: string
+        }
+
+        const remove = listenEvent({
+            eventName: 'message:scroll-to-message',
+            handler: async ({ detail: { parentMessage, type } }: { detail: Detail }) => {
+                const handleAnimate = (messageElement: HTMLDivElement) => {
+                    Object.values(messageRefs.current).forEach((ref) => {
+                        if (!ref) {
+                            return
+                        }
+
+                        ref.classList.remove(
+                            'border-[2px]',
+                            'border-white',
+                            'dark:border-zinc-800',
+                            'shadow-[0_0_0_1px_#222]',
+                            'dark:shadow-[0_0_0_1px_#fff]',
+                            'animate-scale-up',
+                        )
+                    })
+
+                    if (messageElement) {
+                        messageElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+
+                        isJumpingToMessage.current = true
+
+                        setTimeout(() => {
+                            isJumpingToMessage.current = false
+                        }, 1000)
+
+                        const observer = new IntersectionObserver(
+                            ([entry]) => {
+                                if (entry.isIntersecting) {
+                                    messageElement.classList.add(
+                                        'border-[2px]',
+                                        'border-white',
+                                        'dark:border-zinc-800',
+                                        'shadow-[0_0_0_1px_#222]',
+                                        'dark:shadow-[0_0_0_1px_#fff]',
+                                    )
+                                    setTimeout(() => {
+                                        messageElement.classList.add('animate-scale-up')
+                                    }, 250)
+
+                                    observer.disconnect()
+                                }
+                            },
+                            {
+                                threshold: 0.5,
+                            },
+                        )
+                        observer.observe(messageElement)
+                    }
+                }
+
+                const messageElement = messageRefs.current[parentMessage.id]
+                // if reply message is loaded
+                if (messageElement) {
+                    handleAnimate(messageElement)
+                } else {
+                    const aroundMessage = await messageServices.getAroundMessages({
+                        conversationUuid: uuid as string,
+                        messageId: parentMessage.id,
+                        limit: PER_PAGE,
+                    })
+
+                    if (aroundMessage) {
+                        // if around message is the next range of the current range
+                        if (aroundMessage?.meta.pagination.offset <= offsetRange.end && type === 'reply') {
+                            const diffOffset = offsetRange.end - aroundMessage?.meta.pagination.offset
+                            aroundMessage.data.splice(0, diffOffset)
+
+                            if (!messages?.data) {
+                                return
+                            }
+
+                            const newMessages = [...messages.data, ...aroundMessage.data]
+                            const messageItem = newMessages.find((message) => message.id === parentMessage.id)
+
+                            if (messageItem) {
+                                requestIdleCallback(() => {
+                                    handleAnimate(messageRefs.current[messageItem.id])
+                                })
+                            }
+
+                            mutateMessages(
+                                {
+                                    data: newMessages,
+                                    meta: aroundMessage.meta,
+                                },
+                                {
+                                    revalidate: false,
+                                },
+                            )
+
+                            setOffsetRange((prev) => {
+                                return {
+                                    ...prev,
+                                    end: prev.end + aroundMessage.meta.pagination.offset,
+                                }
+                            })
+                        } else {
+                            setOffsetRange({
+                                start: aroundMessage.meta.pagination.offset,
+                                end: aroundMessage.meta.pagination.offset + aroundMessage.data.length,
+                            })
+
+                            mutateMessages(
+                                {
+                                    data: aroundMessage.data,
+                                    meta: aroundMessage.meta,
+                                },
+                                { revalidate: false },
+                            )
+
+                            const messageItem = aroundMessage.data.find((message) => message.id === parentMessage.id)
+                            if (messageItem) {
+                                requestIdleCallback(() => {
+                                    const messageElement = messageRefs.current[messageItem.id]
+
+                                    if (messageElement) {
+                                        handleAnimate(messageElement)
+                                    }
+                                })
+                            }
+                        }
+                    }
+                }
+            },
+        })
+
+        return remove
+    }, [messages?.data, mutateMessages, offsetRange.end, uuid])
 
     return (
         <div className="relative flex-grow !overflow-hidden" onKeyDown={handleEnterMessage}>
@@ -404,12 +547,9 @@ const Message: React.FC = () => {
                                 messageIndex={index}
                                 messages={messages}
                                 currentUser={currentUser?.data}
-                                messageRefs={messageRefs.current}
                                 messageRef={(el) => {
                                     messageRefs.current[message.id] = el
                                 }}
-                                offsetRange={offsetRange}
-                                setOffsetRange={setOffsetRange}
                             />
                         </React.Fragment>
                     ))}

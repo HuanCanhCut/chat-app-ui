@@ -69,8 +69,12 @@ const ConversationItem: React.FC<Props> = ({ conversation, className = '' }) => 
                     <div
                         className={`flex items-center text-xs font-normal ${isRead ? 'text-gray-600 dark:text-gray-400' : 'font-medium text-black dark:text-gray-200'} `}
                     >
-                        <span className="truncate pr-1">
-                            <EmojiMessageStyle text={content(conversation.last_message)} className="ml-1" />
+                        <span className="truncate pr-1 [&>p]:w-auto">
+                            <EmojiMessageStyle
+                                text={content(conversation.last_message)}
+                                className="ml-1"
+                                textClassName="truncate line-clamp-1 text-ellipsis flex-1 w-full"
+                            />
                         </span>
                         <span className="flex-shrink-0">· {momentTimezone(conversation.last_message?.created_at)}</span>
                     </div>

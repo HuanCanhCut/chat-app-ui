@@ -7,6 +7,7 @@ interface EmojiMessageStyleProps {
     type?: EmojiStyle
     size?: number
     className?: string
+    textClassName?: string
 }
 
 const EmojiMessageStyle: React.FC<EmojiMessageStyleProps> = ({
@@ -14,6 +15,7 @@ const EmojiMessageStyle: React.FC<EmojiMessageStyleProps> = ({
     type = EmojiStyle.FACEBOOK,
     size = 16,
     className = '',
+    textClassName = '',
 }) => {
     const highlight = (text: string) => {
         const jsx: (string | JSX.Element)[] = []
@@ -47,7 +49,11 @@ const EmojiMessageStyle: React.FC<EmojiMessageStyleProps> = ({
         }
 
         // Thêm phần văn bản còn lại
-        jsx.push(<span key={`text-end`}>{text.slice(lastIndex)}</span>)
+        jsx.push(
+            <span key={`text-end`} className={textClassName}>
+                {text.slice(lastIndex)}
+            </span>,
+        )
 
         return jsx
     }

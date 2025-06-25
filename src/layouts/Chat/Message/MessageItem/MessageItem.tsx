@@ -22,38 +22,16 @@ import MessageContent from './components/MessageContent'
 
 const BETWEEN_TIME_MESSAGE = 7 // minute
 
-interface MessageRef {
-    [key: string]: HTMLDivElement
-}
-
 interface MessageItemProps {
     message: MessageModel & { is_preview?: boolean }
     messageIndex: number
     messages: MessageResponse
     currentUser: UserModel
-    messageRefs: MessageRef
     // eslint-disable-next-line no-unused-vars
     messageRef: (el: HTMLDivElement) => void
-    offsetRange: { start: number; end: number }
-    // eslint-disable-next-line no-unused-vars
-    setOffsetRange: React.Dispatch<
-        React.SetStateAction<{
-            start: number
-            end: number
-        }>
-    >
 }
 
-const MessageItem = ({
-    message,
-    messageIndex,
-    messages,
-    currentUser,
-    messageRefs,
-    messageRef,
-    offsetRange,
-    setOffsetRange,
-}: MessageItemProps) => {
+const MessageItem = ({ message, messageIndex, messages, currentUser, messageRef }: MessageItemProps) => {
     const { uuid } = useParams()
 
     const options = { root: null, rootMargin: '0px', threshold: 0.5 }
@@ -244,16 +222,7 @@ const MessageItem = ({
                 <div
                     className={`relative flex w-full items-center ${message?.top_reactions?.length ? 'mb-[10px]' : ''} ${message.sender_id === currentUser?.id ? 'justify-end' : 'justify-start'}`}
                 >
-                    {message.parent && (
-                        <ReplyMessage
-                            message={message}
-                            currentUser={currentUser}
-                            ref={replyMessageRef}
-                            messageRefs={messageRefs}
-                            offsetRange={offsetRange}
-                            setOffsetRange={setOffsetRange}
-                        />
-                    )}
+                    <ReplyMessage message={message} currentUser={currentUser} ref={replyMessageRef} />
                     {/* More action */}
                     <MessageAction
                         message={message}
