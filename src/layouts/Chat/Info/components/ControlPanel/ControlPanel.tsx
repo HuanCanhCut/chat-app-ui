@@ -1,9 +1,19 @@
-import { Dispatch, SetStateAction, useCallback, useEffect, useState } from 'react'
-import { faArrowLeft, faMagnifyingGlass, faUser } from '@fortawesome/free-solid-svg-icons'
+import { Dispatch, SetStateAction, useCallback, useEffect, useMemo, useState } from 'react'
+import {
+    faArrowLeft,
+    faArrowRightFromBracket,
+    faCircleMinus,
+    faEllipsis,
+    faLink,
+    faMagnifyingGlass,
+    faPen,
+    faUser,
+} from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { useParams } from 'next/navigation'
 import useSWR from 'swr'
 import config from '~/config'
+import Image from 'next/image'
 
 import * as conversationServices from '~/services/conversationService'
 import Button from '~/components/Button'
@@ -15,9 +25,24 @@ import { getCurrentUser } from '~/redux/selector'
 import { ConversationMember } from '~/type/type'
 import Link from 'next/link'
 import { momentTimezone } from '~/utils/moment'
+import { FontIcon, GalleryImageIcon } from '~/components/Icons'
+import Accordion from '~/components/Accordion'
+import CustomTippy from '~/components/CustomTippy'
+import Tippy from '@tippyjs/react'
+import AccountOptions from './AccountOptions'
 
 interface ControlPanelProps {
     setSearchMode: Dispatch<SetStateAction<boolean>>
+}
+
+interface AccordionItem {
+    title: string
+    leftIcon?: React.ReactNode
+    rightIcon?: React.ReactNode
+    description?: string
+    type: string
+    href?: string
+    children?: AccordionItem[]
 }
 
 const ControlPanel: React.FC<ControlPanelProps> = ({ setSearchMode }) => {
@@ -34,6 +59,18 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ setSearchMode }) => {
 
     const [lastOnlineTime, setLastOnlineTime] = useState<Date | null>(member.user.last_online_at)
 
+    const memberMap = useMemo(() => {
+        const member: ConversationMember[] = conversation?.data.conversation_members || []
+
+        return member.reduce(
+            (mem, cur) => {
+                mem[cur.user_id] = cur
+                return mem
+            },
+            {} as Record<number, ConversationMember>,
+        )
+    }, [conversation])
+
     const handleToggleInfo = useCallback(() => {
         sendEvent({
             eventName: 'info:toggle',
@@ -41,6 +78,153 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ setSearchMode }) => {
                 isOpen: false,
             },
         })
+    }, [])
+
+    const ACCORDION_DATA: AccordionItem[] = [
+        {
+            title: 'Tùy chỉnh đoạn chat',
+            type: 'custom_conversation',
+            children: [
+                conversation?.data.is_group
+                    ? {
+                          title: 'Đổi tên đoạn chat',
+                          leftIcon: <FontAwesomeIcon icon={faPen} width={20} height={20} />,
+                          type: 'rename_conversation',
+                      }
+                    : null,
+                conversation?.data.is_group
+                    ? {
+                          title: 'Thay đổi ảnh',
+                          leftIcon: <GalleryImageIcon />,
+                          type: 'change_avatar',
+                      }
+                    : null,
+                {
+                    title: 'Đổi chủ đề',
+                    leftIcon: (
+                        <Image
+                            src="https://res.cloudinary.com/dkmwrkngj/image/upload/v1750481947/chat-app/avatar/1-chat-app/avatar.webp"
+                            alt="edit"
+                            width={16}
+                            height={16}
+                        />
+                    ),
+                    type: 'change_topic',
+                },
+                {
+                    title: 'Thay đổi biểu tượng cảm xúc',
+                    leftIcon: (
+                        <Image
+                            src="https://res.cloudinary.com/dkmwrkngj/image/upload/v1750481947/chat-app/avatar/1-chat-app/avatar.webp"
+                            alt="edit"
+                            width={16}
+                            height={16}
+                        />
+                    ),
+                    type: 'change_emoji',
+                },
+                {
+                    title: 'Chỉnh sửa biệt danh',
+                    leftIcon: <FontIcon />,
+                    type: 'change_nickname',
+                },
+            ].filter(Boolean) as AccordionItem[],
+        },
+        conversation?.data.is_group
+            ? {
+                  title: 'Thành viên trong đoạn chat',
+                  type: 'member_in_conversation',
+                  children: conversation.data.conversation_members.map((member, index) => {
+                      const addedBy = () => {
+                          if (member.added_by_id === currentUser.data.id) {
+                              return 'bạn'
+                          }
+
+                          if (member.added_by_id) {
+                              return (
+                                  memberMap[member.added_by_id].nickname || memberMap[member.added_by_id].user.full_name
+                              )
+                          }
+
+                          return ''
+                      }
+
+                      const descriptionMap = {
+                          admin: 'Người tạo nhóm',
+                          leader: `Quản trị viên · Do ${addedBy()} thêm`,
+                          member: `Do ${addedBy()} thêm`,
+                      }
+
+                      return {
+                          title: member.nickname || member.user.full_name,
+                          leftIcon: <UserAvatar src={member.user.avatar} size={36} />,
+                          description: descriptionMap[member.role],
+                          type: 'member',
+                          href: `${config.routes.user}/@${member.user.nickname}`,
+                          className: 'hover:bg-transparent dark:hover:bg-transparent [&>*[data-right-icon]]:ml-auto',
+                          rightIcon: (
+                              <CustomTippy
+                                  renderItem={() => {
+                                      return <AccountOptions member={member} />
+                                  }}
+                              >
+                                  <Tippy content="Lựa chọn của thành viên" delay={[350, 0]}>
+                                      <div
+                                          className="flex-center h-9 w-9 rounded-full hover:bg-[#99999936] dark:hover:bg-[#333636]"
+                                          onClick={(e) => {
+                                              e.stopPropagation()
+                                              e.preventDefault()
+                                          }}
+                                      >
+                                          <FontAwesomeIcon icon={faEllipsis} />
+                                      </div>
+                                  </Tippy>
+                              </CustomTippy>
+                          ),
+                      }
+                  }),
+              }
+            : null,
+        {
+            title: 'File phương tiện, liên kết',
+            type: 'media_and_link',
+            children: [
+                {
+                    title: 'File phương tiện',
+                    leftIcon: <GalleryImageIcon />,
+                    type: 'media',
+                },
+                {
+                    title: 'Liên kết',
+                    leftIcon: <FontAwesomeIcon icon={faLink} width={20} height={20} />,
+                    type: 'link',
+                },
+            ],
+        },
+        {
+            title: 'Quyền riêng tư và hỗ trợ',
+            type: 'privacy_and_support',
+            children: [
+                !conversation?.data.is_group
+                    ? {
+                          title: 'Chặn',
+                          leftIcon: <FontAwesomeIcon icon={faCircleMinus} width={20} height={20} />,
+                          type: 'block',
+                      }
+                    : null,
+                conversation?.data.is_group
+                    ? {
+                          title: 'Rời nhóm',
+                          leftIcon: <FontAwesomeIcon icon={faArrowRightFromBracket} width={20} height={20} />,
+                          type: 'leave_group',
+                      }
+                    : null,
+            ].filter(Boolean),
+        },
+    ].filter(Boolean) as AccordionItem[]
+
+    const handleChose = useCallback((type: string) => {
+        console.log(type)
     }, [])
 
     useEffect(() => {
@@ -112,6 +296,12 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ setSearchMode }) => {
                         <p className="mt-2 text-xs text-zinc-600 dark:text-zinc-300">Tìm kiếm</p>
                     </div>
                 </div>
+            </div>
+
+            <div className="mt-6">
+                {ACCORDION_DATA.map((item) => {
+                    return <Accordion key={item.title} data={item} onChose={handleChose} />
+                })}
             </div>
         </>
     )

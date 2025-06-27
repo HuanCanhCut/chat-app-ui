@@ -18,6 +18,7 @@ const Button = ({
     href,
     buttonType = 'primary',
     leftIcon,
+    rightIcon,
     type = 'button',
     onClick,
     ...props
@@ -44,8 +45,17 @@ const Button = ({
                 className={`flex-center ${primaryClass} ${outlineClass} ${buttonIconClass} ${roundedClass} ${className}`}
                 {...props}
             >
-                {leftIcon && <span className="mr-2">{leftIcon}</span>}
+                {leftIcon && (
+                    <span data-left-icon className="mr-2">
+                        {leftIcon}
+                    </span>
+                )}
                 {children}
+                {rightIcon && (
+                    <span data-right-icon className="ml-2">
+                        {rightIcon}
+                    </span>
+                )}
             </Link>
         )
     }
@@ -57,8 +67,17 @@ const Button = ({
             onClick={onClick}
             type={type}
         >
-            {leftIcon && <span className="mr-2">{leftIcon}</span>}
+            {leftIcon && (
+                <span data-left-icon className="mr-2">
+                    {leftIcon}
+                </span>
+            )}
             {children}
+            {rightIcon && (
+                <span data-right-icon className="ml-2">
+                    {rightIcon}
+                </span>
+            )}
         </button>
     )
 }

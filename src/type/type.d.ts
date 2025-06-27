@@ -61,6 +61,8 @@ export interface ConversationMember extends Timestamp {
     role: 'admin' | 'leader' | 'member'
     user: UserModel
     joined_at: Date
+    added_by?: UserModel
+    added_by_id?: number
 }
 
 // ========================================== Message model ==========================================
