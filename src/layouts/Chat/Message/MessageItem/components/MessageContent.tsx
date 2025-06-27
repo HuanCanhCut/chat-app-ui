@@ -117,7 +117,7 @@ const MessageContent = (
         return (
             <p
                 ref={combinedRef}
-                className={`relative w-fit max-w-[80%] rounded-3xl px-4 py-1.5 font-light italic opacity-85 [word-break:break-word] ${
+                className={`relative w-fit max-w-[80%] rounded-3xl px-4 py-1.5 italic opacity-85 [word-break:break-word] ${
                     message.sender_id === currentUser?.id
                         ? 'bg-milk-tea text-zinc-300'
                         : 'bg-lightGray text-zinc-600 dark:bg-[#313233] dark:text-zinc-400'
@@ -134,7 +134,7 @@ const MessageContent = (
             return (
                 <div
                     ref={combinedRef}
-                    className={`relative w-fit max-w-[80%] whitespace-pre-wrap rounded-3xl px-4 py-1.5 font-light [word-break:break-word] ${
+                    className={`relative w-fit max-w-[80%] whitespace-pre-wrap rounded-3xl px-4 py-1.5 font-normal [word-break:break-word] ${
                         message.sender_id === currentUser?.id
                             ? 'bg-milk-tea text-white'
                             : 'bg-lightGray text-black dark:bg-[#313233] dark:text-dark'
@@ -181,7 +181,7 @@ const MessageContent = (
             return (
                 <div
                     ref={combinedRef}
-                    className={`relative w-fit max-w-[80%] whitespace-pre-wrap rounded-3xl py-[2px] font-light [word-break:break-word]`}
+                    className={`relative w-fit max-w-[80%] whitespace-pre-wrap rounded-3xl py-[2px] font-normal [word-break:break-word]`}
                 >
                     <span className="max-w-fit break-words text-3xl">
                         <EmojiMessageStyle text={message.content} size={32} />

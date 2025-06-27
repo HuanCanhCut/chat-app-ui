@@ -22,7 +22,7 @@ const AccountItem: React.FC<AccountItemProps> = ({ className = '', user, onClick
             <UserAvatar size={50} src={user.avatar} />
             <div className="ml-3 max-w-full overflow-hidden">
                 <h4 className="truncate text-base font-medium">{user.full_name}</h4>
-                <p className="truncate text-xs text-gray-500">{user.nickname}</p>
+                <p className="truncate text-xs text-gray-500 dark:text-gray-400">{user.nickname}</p>
             </div>
         </Link>
     )

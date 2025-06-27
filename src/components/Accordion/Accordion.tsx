@@ -54,7 +54,7 @@ const Accordion = ({ data, onChose, level = 0 }: AccordionProps) => {
                 }}
             >
                 <div>
-                    <p>{data.title}</p>
+                    <p className="font-semibold">{data.title}</p>
                     {data.description && <p className="text-xs text-gray-500 dark:text-zinc-400">{data.description}</p>}
                 </div>
             </Button>

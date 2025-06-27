@@ -84,7 +84,7 @@ const SearchMessage: React.FC = () => {
                 <input
                     ref={inputRef}
                     type="text"
-                    className="w-full select-none overflow-hidden truncate text-ellipsis bg-transparent px-3 py-[6px] pl-6 text-sm font-light outline-none"
+                    className="w-full select-none overflow-hidden truncate text-ellipsis bg-transparent px-3 py-[6px] pl-6 text-sm font-normal outline-none"
                     placeholder="Tìm kiếm trong cuộc trò chuyện"
                     value={searchValue}
                     onChange={(e) => setSearchValue(e.target.value)}

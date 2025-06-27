@@ -64,7 +64,7 @@ const UserViewed: React.FC<UserViewedProp> = ({ message, currentUser, messageInd
                             const statusText = statusMessages[latestStatus.status as keyof typeof statusMessages]
 
                             if (statusText) {
-                                return <p className="mt-[2px] text-xs font-light text-zinc-400">{statusText}</p>
+                                return <p className="mt-[2px] text-xs font-normal text-zinc-400">{statusText}</p>
                             }
                         }
 

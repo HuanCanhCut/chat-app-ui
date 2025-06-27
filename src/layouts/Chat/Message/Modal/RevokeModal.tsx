@@ -131,7 +131,7 @@ const RevokeModal = ({ message, onClose }: RevokeModalProps) => {
             <main className="px-5 py-3">
                 {revokeType === 'for-me' ? (
                     <>
-                        <p className="text-[15px] font-light">
+                        <p className="text-[15px] font-normal">
                             Tin nhắn này sẽ bị gỡ khỏi thiết bị của bạn, nhưng vẫn hiển thị với các thành viên khác
                             trong đoạn chat.
                         </p>
@@ -152,7 +152,7 @@ const RevokeModal = ({ message, onClose }: RevokeModalProps) => {
                                     Thu hồi với mọi người
                                 </label>
                             </div>
-                            <p className="mx-8 mb-6 text-sm font-light text-zinc-600 dark:text-zinc-400">
+                            <p className="mx-8 mb-6 text-sm font-normal text-zinc-600 dark:text-zinc-400">
                                 Tin nhắn này sẽ bị thu hồi với mọi người trong đoạn chat. Những người khác có thể đã xem
                                 hoặc chuyển tiếp tin nhắn đó. Tin nhắn đã thu hồi vẫn có thể bị báo cáo.
                             </p>
@@ -171,7 +171,7 @@ const RevokeModal = ({ message, onClose }: RevokeModalProps) => {
                                     Thu hồi với bạn
                                 </label>
                             </div>
-                            <p className="mx-8 mb-6 text-sm font-light text-zinc-600 dark:text-zinc-400">
+                            <p className="mx-8 mb-6 text-sm font-normal text-zinc-600 dark:text-zinc-400">
                                 Chúng tôi sẽ gỡ tin nhắn này ở phía bạn. Những người khác trong đoạn chat vẫn có thể xem
                                 được.
                             </p>

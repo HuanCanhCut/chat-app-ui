@@ -1,4 +1,4 @@
-import React, { useEffect,useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { mutate } from 'swr'
 
@@ -152,7 +152,7 @@ const EditProfile = ({ closeModal }: EditProfileProps) => {
     return (
         <PopperWrapper className="w-[700px] max-w-[90vw] overflow-y-auto">
             <header className="relative border-b border-gray-200 p-4 pb-4 dark:border-gray-800">
-                <h2 className="text-center font-semibold">Chỉnh sửa hồ sơ</h2>
+                <h2 className="text-center font-bold">Chỉnh sửa hồ sơ</h2>
                 <Button buttonType="icon" onClick={closeModal} className="absolute right-4 top-1/2 -translate-y-1/2">
                     <FontAwesomeIcon icon={faXmark} />
                 </Button>

@@ -7,7 +7,7 @@ import Tippy from '@tippyjs/react'
 import { SocketEvent } from '~/enum/SocketEvent'
 import SWRKey from '~/enum/SWRKey'
 import socket from '~/helpers/socket'
-import { MessageModel, MessageReactionModel, MessageResponse,TopReaction } from '~/type/type'
+import { MessageModel, MessageReactionModel, MessageResponse, TopReaction } from '~/type/type'
 interface ReactionProps {
     message: MessageModel
     // eslint-disable-next-line no-unused-vars
@@ -123,14 +123,14 @@ const Reaction = ({ message, handleOpenReactionModal }: ReactionProps) => {
                 <div>
                     {message?.top_reactions?.map((reaction, index) => {
                         return (
-                            <p className="font-light leading-5" key={index}>
+                            <p className="font-normal leading-5" key={index}>
                                 {reaction.user_reaction.full_name}
                             </p>
                         )
                     })}
 
                     {message?.total_reactions > 2 && (
-                        <p className="font-light leading-5">và {message?.total_reactions - 2} người khác...</p>
+                        <p className="font-normal leading-5">và {message?.total_reactions - 2} người khác...</p>
                     )}
                 </div>
             }

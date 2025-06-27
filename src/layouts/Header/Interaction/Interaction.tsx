@@ -2,7 +2,7 @@ import React from 'react'
 import { useRouter } from 'next/navigation'
 
 import MenuItem from '../MenuItem'
-import { faCircleDot, faPen,faSignOut } from '@fortawesome/free-solid-svg-icons'
+import { faCircleDot, faPen, faSignOut } from '@fortawesome/free-solid-svg-icons'
 import { faMoon, IconDefinition } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Tippy from '@tippyjs/react'
@@ -71,7 +71,7 @@ const Interaction = () => {
                 </header>
                 <section>
                     <div className="border-b border-t border-gray-300 px-5 py-2 dark:border-zinc-700">
-                        <label className="font-semibold">Tài khoản</label>
+                        <label className="text-base font-semibold">Tài khoản</label>
                         <div className="flex max-w-full items-center justify-between overflow-hidden">
                             {currentUser && <AccountItem user={currentUser?.data} className="mt-2" />}
                             <Button

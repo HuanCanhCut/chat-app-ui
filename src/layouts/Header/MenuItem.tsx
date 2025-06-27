@@ -38,7 +38,7 @@ export default function MenuItem({ item, onChoose }: MenuItemProps) {
                 <Button buttonType="icon">
                     <FontAwesomeIcon icon={item.icon} className="text-xl" />
                 </Button>
-                <span className="font-medium">{item.label}</span>
+                <span className="text-base font-medium">{item.label}</span>
             </div>
 
             {item.switchButton && <SwitchButton onClick={handleSwitch} isOn={isOn} />}

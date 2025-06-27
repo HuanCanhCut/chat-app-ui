@@ -59,7 +59,7 @@ const ReplyMessage = ({ message, currentUser }: ReplyMessageProps, ref: LegacyRe
                                 : `${memberMap[message.sender_id]?.nickname || memberMap[message.sender_id]?.user.full_name} đã trả lời ${message.parent.sender_id === currentUser?.id ? 'bạn' : message.sender_id === message.parent.sender_id ? 'chính mình' : memberMap[message.parent.sender_id]?.nickname || memberMap[message.parent.sender_id]?.user.full_name}`}
                         </p>
                         <span
-                            className={`line-clamp-2 max-w-fit overflow-hidden text-ellipsis break-words rounded-2xl ${message.sender_id === currentUser?.id ? 'rounded-br-none' : 'rounded-bl-none'} bg-[#feeace] px-3 py-1.5 pb-6 text-[13px] font-light text-zinc-600 [word-break:break-word] dark:bg-[#a0a0a08d] dark:text-zinc-400`}
+                            className={`line-clamp-2 max-w-fit overflow-hidden text-ellipsis break-words rounded-2xl ${message.sender_id === currentUser?.id ? 'rounded-br-none' : 'rounded-bl-none'} bg-[#feeace] px-3 py-1.5 pb-6 text-[13px] font-normal text-zinc-600 [word-break:break-word] dark:bg-[#a0a0a08d] dark:text-zinc-400`}
                             onClick={() => {
                                 handleScrollToMessage(message.parent as MessageModel)
                             }}

@@ -17,7 +17,7 @@ const AccountPreview = ({ user, currentUser }: AccountPreviewProps) => {
                 <div className="flex items-start gap-4">
                     <UserAvatar src={user.avatar} size={96} />
                     <main className="mt-2 flex flex-col gap-1">
-                        <h2 className="font-semibold">{user.full_name}</h2>
+                        <h2 className="font-bold">{user.full_name}</h2>
                         <h4 className="text-sm">{user.nickname}</h4>
                     </main>
                 </div>

@@ -231,8 +231,8 @@ const ReactionModal: React.FC<Props> = ({ onClose, messageId }) => {
                                 >
                                     <UserAvatar size={40} src={reaction.user_reaction.avatar} />
                                     <div className="ml-2 flex-grow">
-                                        <p>{reaction.user_reaction.full_name}</p>
-                                        <p className="text-xs font-light text-zinc-600 dark:text-zinc-400">
+                                        <p className="font-medium">{reaction.user_reaction.full_name}</p>
+                                        <p className="text-xs font-normal text-zinc-600 dark:text-zinc-400">
                                             {reaction.user_id === currentUser?.data.id
                                                 ? 'Nhấp để gỡ bỏ'
                                                 : 'Nhấp để xem trang cá nhân'}

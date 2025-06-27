@@ -178,7 +178,7 @@ const NotificationItem = ({
                                     `<span class="font-semibold">${notification.sender_user.full_name.trim()}</span>`,
                                 )}`,
                             }}
-                            className={`pr-4 text-sm font-normal dark:font-light ${notification.is_read ? 'text-gray-600 dark:text-gray-400' : 'text-gray-800 dark:text-gray-200'}`}
+                            className={`pr-4 text-sm font-normal ${notification.is_read ? 'text-gray-600 dark:text-gray-400' : 'text-gray-800 dark:text-gray-200'}`}
                         ></p>
                         <small
                             className={`text-xs ${!notification.is_read ? 'text-primary' : 'text-gray-600 dark:text-gray-400'} font-normal`}
@@ -207,7 +207,7 @@ const NotificationItem = ({
                 </div>
             )}
             {isAccept && (
-                <p className="mt-4 text-sm font-normal text-gray-800 dark:font-light dark:text-gray-200">
+                <p className="mt-4 text-sm font-normal text-gray-800 dark:text-gray-200">
                     Đã chấp nhận lời mời kết bạn
                 </p>
             )}

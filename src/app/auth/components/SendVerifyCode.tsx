@@ -71,9 +71,7 @@ const SendVerifyCode: React.FC<Props> = ({ emailRef }) => {
             onClick={handleSendCode}
         >
             {sendSuccess ? (
-                <span className="flex h-full items-center justify-center text-lg font-semibold leading-[0px]">
-                    {counter}
-                </span>
+                <span className="flex h-full items-center justify-center text-lg leading-[0px]">{counter}</span>
             ) : (
                 'Gửi mã'
             )}
