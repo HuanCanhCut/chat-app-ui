@@ -1,6 +1,7 @@
 import { useState } from 'react'
-import SearchMessage from './components/SearchMessage'
+
 import ControlPanel from './components/ControlPanel'
+import SearchMessage from './components/SearchMessage'
 interface InfoProps {
     className?: string
 }

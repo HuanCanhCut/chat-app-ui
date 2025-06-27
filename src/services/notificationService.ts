@@ -1,4 +1,5 @@
 import { AxiosResponse } from 'axios'
+
 import { NotificationResponse } from '~/type/type'
 import * as request from '~/utils/httpRequest'
 

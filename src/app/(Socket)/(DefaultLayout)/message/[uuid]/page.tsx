@@ -1,19 +1,19 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import useSWR from 'swr'
 import { useParams } from 'next/navigation'
+import useSWR from 'swr'
 
-import * as conversationServices from '~/services/conversationService'
-import Header from '~/layouts/Chat/Header'
-import Message from '~/layouts/Chat/Message'
-import InputMessage from '~/layouts/Chat/InputMessage'
-import Info from '~/layouts/Chat/Info/Info'
-import SWRKey from '~/enum/SWRKey'
-import socket from '~/helpers/socket'
 import { SocketEvent } from '~/enum/SocketEvent'
-import { UserStatus } from '~/type/type'
+import SWRKey from '~/enum/SWRKey'
 import { listenEvent } from '~/helpers/events'
+import socket from '~/helpers/socket'
+import Header from '~/layouts/Chat/Header'
+import Info from '~/layouts/Chat/Info/Info'
+import InputMessage from '~/layouts/Chat/InputMessage'
+import Message from '~/layouts/Chat/Message'
+import * as conversationServices from '~/services/conversationService'
+import { UserStatus } from '~/type/type'
 
 const MessagePage = () => {
     const { uuid } = useParams()

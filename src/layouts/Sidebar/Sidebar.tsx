@@ -1,8 +1,9 @@
 'use client'
 
-import Header from './Header'
-import Conversations from './Conversations'
 import { useState } from 'react'
+
+import Conversations from './Conversations'
+import Header from './Header'
 import Search from './Search'
 
 const Sidebar = () => {

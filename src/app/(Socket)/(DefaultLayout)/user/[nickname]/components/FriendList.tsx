@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react'
+import Link from 'next/link'
 import useSWR from 'swr'
 
-import * as friendService from '~/services/friendService'
 import UserAvatar from '~/components/UserAvatar/UserAvatar'
-import { FriendsResponse, FriendsShip, UserResponse } from '~/type/type'
-import Link from 'next/link'
-import SWRKey from '~/enum/SWRKey'
 import config from '~/config'
+import SWRKey from '~/enum/SWRKey'
+import * as friendService from '~/services/friendService'
+import { FriendsResponse, FriendsShip, UserResponse } from '~/type/type'
 
 interface FriendListProps {
     user: UserResponse

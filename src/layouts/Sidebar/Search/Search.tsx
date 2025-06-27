@@ -1,18 +1,18 @@
+import { useEffect, useState } from 'react'
+import { toast } from 'react-toastify'
+import Link from 'next/link'
+import { AxiosError } from 'axios'
+
 import { faArrowLeft, faSearch } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { useEffect, useState } from 'react'
 import Tippy from '@tippyjs/react/headless'
-import config from '~/config'
-
-import * as conversationService from '~/services/conversationService'
-import { ConversationModel } from '~/type/type'
-import useDebounce from '~/hooks/useDebounce'
-import { AxiosError } from 'axios'
-import { toast } from 'react-toastify'
 import UserAvatar from '~/components/UserAvatar'
+import config from '~/config'
+import useDebounce from '~/hooks/useDebounce'
 import { useAppSelector } from '~/redux'
 import { getCurrentUser } from '~/redux/selector'
-import Link from 'next/link'
+import * as conversationService from '~/services/conversationService'
+import { ConversationModel } from '~/type/type'
 
 interface Props {
     // eslint-disable-next-line no-unused-vars

@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
+
 import socket from '~/helpers/socket'
 
 const Socket = ({ children }: { children: React.ReactNode }) => {

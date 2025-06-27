@@ -1,19 +1,19 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
+import Skeleton from 'react-loading-skeleton'
+import Image from 'next/image'
 import useSWR from 'swr'
 
-import SWRKey from '~/enum/SWRKey'
-import * as conversationService from '~/services/conversationService'
 import ConversationItem from '~/components/ConversationItem'
+import { SocketEvent } from '~/enum/SocketEvent'
+import SWRKey from '~/enum/SWRKey'
+import { listenEvent } from '~/helpers/events'
+import socket from '~/helpers/socket'
 import { useAppSelector } from '~/redux'
 import { getCurrentTheme } from '~/redux/selector'
-import Image from 'next/image'
-import Skeleton from 'react-loading-skeleton'
-import socket from '~/helpers/socket'
-import { SocketEvent } from '~/enum/SocketEvent'
+import * as conversationService from '~/services/conversationService'
 import { ConversationMember, ConversationModel, MessageModel, SocketMessage, UserStatus } from '~/type/type'
-import { listenEvent } from '~/helpers/events'
 
 interface Conversation<T> {
     [key: string]: T

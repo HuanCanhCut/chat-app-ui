@@ -1,12 +1,12 @@
 import { useMemo } from 'react'
-import Tippy from '@tippyjs/react'
 import { usePathname } from 'next/navigation'
 
+import Tippy from '@tippyjs/react'
 import { HomeIcon, UserGroupIcon } from '~/components/Icons'
-import config from '~/config'
 import NavLink from '~/components/NavLink'
-import { getCurrentUser } from '~/redux/selector'
+import config from '~/config'
 import { useAppSelector } from '~/redux'
+import { getCurrentUser } from '~/redux/selector'
 
 const NavBar = () => {
     const pathname = usePathname()

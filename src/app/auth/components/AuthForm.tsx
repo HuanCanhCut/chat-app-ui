@@ -1,17 +1,17 @@
 'use client'
 import React, { useEffect, useRef, useState } from 'react'
+import { SubmitHandler, useForm } from 'react-hook-form'
 import Image from 'next/image'
-import { useForm, SubmitHandler } from 'react-hook-form'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons'
 import { signInWithPopup } from 'firebase/auth'
 
+import SendVerifyCode from './SendVerifyCode'
+import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import Input from '~/components/Input/Input'
 import config from '~/config'
 import * as authServices from '~/services/authService'
 import { UserModel } from '~/type/type'
 import { toast } from '~/utils/toast'
-import SendVerifyCode from './SendVerifyCode'
-import Input from '~/components/Input/Input'
 
 export interface FieldValue {
     email: string

@@ -1,5 +1,6 @@
-import Tippy from '@tippyjs/react'
 import React from 'react'
+
+import Tippy from '@tippyjs/react'
 import UserAvatar from '~/components/UserAvatar'
 import { MessageModel, MessageStatus, UserModel } from '~/type/type'
 

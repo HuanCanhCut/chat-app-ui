@@ -1,11 +1,13 @@
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faArrowDown } from '@fortawesome/free-solid-svg-icons'
 import { useEffect, useRef } from 'react'
-import * as messageServices from '~/services/messageService'
 import { useParams } from 'next/navigation'
-import { MessageResponse } from '~/type/type'
 import { mutate } from 'swr'
+
+import { faArrowDown } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import SWRKey from '~/enum/SWRKey'
+import * as messageServices from '~/services/messageService'
+import { MessageResponse } from '~/type/type'
+
 interface MessageRef {
     [key: string]: HTMLDivElement
 }

@@ -2,12 +2,13 @@
 
 import { useEffect, useRef } from 'react'
 import { Provider } from 'react-redux'
-import { makeStore, AppStore } from '../../redux/store'
-import useSWR from 'swr'
-import SWRKey from '~/enum/SWRKey'
-import * as meServices from '~/services/meService'
-import { actions } from '~/redux'
 import { useRouter } from 'next/navigation'
+import useSWR from 'swr'
+
+import { AppStore,makeStore } from '../../redux/store'
+import SWRKey from '~/enum/SWRKey'
+import { actions } from '~/redux'
+import * as meServices from '~/services/meService'
 
 export default function ReduxProvider({ children }: { children: React.ReactNode }) {
     const router = useRouter()

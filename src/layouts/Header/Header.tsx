@@ -1,14 +1,15 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
-import Logo from '~/components/Logo/Logo'
-import Nav from './Nav'
+
 import Interaction from './Interaction'
-import Search from '~/components/Search'
+import Nav from './Nav'
+import SearchModal from './SeachModal/SearchModal'
+import { faSearch } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Button from '~/components/Button'
-import { faSearch } from '@fortawesome/free-solid-svg-icons'
-import SearchModal from './SeachModal/SearchModal'
+import Logo from '~/components/Logo/Logo'
+import Search from '~/components/Search'
 import { listenEvent } from '~/helpers/events'
 
 export default function Header() {

@@ -3,11 +3,10 @@
 import { Categories, EmojiClickData, EmojiStyle } from 'emoji-picker-react'
 import { Theme } from 'emoji-picker-react'
 
-import Picker from '~/helpers/picker'
-
 import './Emoji.css'
-import { getCurrentTheme } from '~/redux/selector'
+import Picker from '~/helpers/picker'
 import { useAppSelector } from '~/redux'
+import { getCurrentTheme } from '~/redux/selector'
 
 interface EmojiProps {
     placeholder?: string

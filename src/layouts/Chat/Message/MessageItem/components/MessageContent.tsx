@@ -1,8 +1,9 @@
 import { forwardRef, LegacyRef } from 'react'
-import { MessageModel, MessageResponse, UserModel } from '~/type/type'
+
 import Reaction from './Reaction'
-import CustomImage from '~/components/Image/Image'
 import EmojiMessageStyle from '~/components/EmojiMessageStyle'
+import CustomImage from '~/components/Image/Image'
+import { MessageModel, MessageResponse, UserModel } from '~/type/type'
 
 interface MessageContentProps {
     message: MessageModel

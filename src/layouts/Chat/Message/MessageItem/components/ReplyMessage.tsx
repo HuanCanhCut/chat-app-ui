@@ -1,13 +1,13 @@
-import { faReply } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import React, { forwardRef, LegacyRef, useMemo } from 'react'
+import { useParams } from 'next/navigation'
 import { useSWRConfig } from 'swr'
 
+import { faReply } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Image from '~/components/Image'
-import { ConversationMember, ConversationModel, MessageModel, UserModel } from '~/type/type'
-import { useParams } from 'next/navigation'
 import SWRKey from '~/enum/SWRKey'
 import { sendEvent } from '~/helpers/events'
+import { ConversationMember, ConversationModel, MessageModel, UserModel } from '~/type/type'
 
 interface ReplyMessageProps {
     message: MessageModel

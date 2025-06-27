@@ -1,16 +1,16 @@
-import { faSearch, faSpinner, faXmark } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { useParams } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import InfiniteScroll from 'react-infinite-scroll-component'
+import { useParams } from 'next/navigation'
 
+import SearchResult from './SearchResult'
+import { faSearch, faSpinner, faXmark } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Button from '~/components/Button'
 import { sendEvent } from '~/helpers/events'
 import handleApiError from '~/helpers/handleApiError'
 import useDebounce from '~/hooks/useDebounce'
 import * as searchServices from '~/services/searchService'
 import { SearchMessageResponse } from '~/type/type'
-import SearchResult from './SearchResult'
 
 const PER_PAGE = 20
 

@@ -1,20 +1,20 @@
-import { faEllipsisVertical, faReply } from '@fortawesome/free-solid-svg-icons'
+import React, { useEffect, useRef, useState } from 'react'
+import { useParams } from 'next/navigation'
+import { EmojiClickData } from 'emoji-picker-react'
+
 import { faSmile } from '@fortawesome/free-regular-svg-icons'
+import { faEllipsisVertical, faReply } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Tippy from '@tippyjs/react'
-import React, { useEffect, useRef, useState } from 'react'
 import HeadlessTippy from '@tippyjs/react/headless'
-
-import Emoji from '~/components/Emoji'
 import CustomTippy from '~/components/CustomTippy'
-import { MessageModel, MessageResponse, UserModel } from '~/type/type'
+import Emoji from '~/components/Emoji'
 import PopperWrapper from '~/components/PopperWrapper'
+import { SocketEvent } from '~/enum/SocketEvent'
 import { listenEvent } from '~/helpers/events'
 import { sendEvent } from '~/helpers/events'
-import { EmojiClickData } from 'emoji-picker-react'
-import { SocketEvent } from '~/enum/SocketEvent'
 import socket from '~/helpers/socket'
-import { useParams } from 'next/navigation'
+import { MessageModel, MessageResponse, UserModel } from '~/type/type'
 
 interface MessageActionProps {
     message: MessageModel

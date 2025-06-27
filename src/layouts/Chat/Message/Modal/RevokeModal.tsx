@@ -1,17 +1,17 @@
-import { faXmark } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import React, { useState } from 'react'
 import { useSelector } from 'react-redux'
 import { useParams } from 'next/navigation'
 import { mutate } from 'swr'
 
-import * as messageServices from '~/services/messageService'
+import { faXmark } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Button from '~/components/Button'
 import PopperWrapper from '~/components/PopperWrapper'
+import SWRKey from '~/enum/SWRKey'
 import { getCurrentUser } from '~/redux/selector'
+import * as messageServices from '~/services/messageService'
 import { MessageModel, MessageResponse } from '~/type/type'
 import { toast } from '~/utils/toast'
-import React, { useState } from 'react'
-import SWRKey from '~/enum/SWRKey'
 interface RevokeModalProps {
     message: MessageModel
     onClose: () => void

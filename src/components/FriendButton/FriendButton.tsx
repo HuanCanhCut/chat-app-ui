@@ -1,17 +1,17 @@
 'use client'
 
 import { useCallback, useState } from 'react'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faUserFriends, faUserPlus, faXmark } from '@fortawesome/free-solid-svg-icons'
 import ReactModal from 'react-modal'
 
-import * as friendService from '~/services/friendService'
-import PopperWrapper from '~/components/PopperWrapper/PopperWrapper'
-import { UserModel } from '~/type/type'
+import { faUserFriends, faUserPlus, faXmark } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Button from '~/components/Button/Button'
-import { handleAcceptFriend, handleRejectFriendRequest } from '~/utils/friendEvent'
+import PopperWrapper from '~/components/PopperWrapper/PopperWrapper'
 import { sendEvent } from '~/helpers/events'
 import handleApiError from '~/helpers/handleApiError'
+import * as friendService from '~/services/friendService'
+import { UserModel } from '~/type/type'
+import { handleAcceptFriend, handleRejectFriendRequest } from '~/utils/friendEvent'
 
 interface FriendButtonProps {
     user: UserModel

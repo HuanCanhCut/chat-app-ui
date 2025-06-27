@@ -1,5 +1,5 @@
-import { UserResponse } from '~/type/type'
 import { RootState } from './store'
+import { UserResponse } from '~/type/type'
 
 export const getCurrentTheme = (state: RootState) => {
     return state.theme.theme

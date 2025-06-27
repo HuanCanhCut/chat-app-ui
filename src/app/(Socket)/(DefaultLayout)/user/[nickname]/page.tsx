@@ -1,22 +1,22 @@
 'use client'
 
-import useSWR from 'swr'
-import Skeleton from 'react-loading-skeleton'
 import { useEffect } from 'react'
+import Skeleton from 'react-loading-skeleton'
 import { useParams } from 'next/navigation'
+import useSWR from 'swr'
 
-import CustomImage from '~/components/Image'
-import { UserResponse, UserStatus } from '~/type/type'
-import * as userService from '~/services/userService'
-import User from './components/User'
 import FriendList from './components/FriendList'
+import User from './components/User'
 import NotFound from '~/app/not-found'
-import { listenEvent } from '~/helpers/events'
+import CustomImage from '~/components/Image'
+import { SocketEvent } from '~/enum/SocketEvent'
 import SWRKey from '~/enum/SWRKey'
+import { listenEvent } from '~/helpers/events'
+import socket from '~/helpers/socket'
 import { useAppSelector } from '~/redux'
 import { getCurrentUser } from '~/redux/selector'
-import socket from '~/helpers/socket'
-import { SocketEvent } from '~/enum/SocketEvent'
+import * as userService from '~/services/userService'
+import { UserResponse, UserStatus } from '~/type/type'
 
 export default function UserPage() {
     const { nickname } = useParams()

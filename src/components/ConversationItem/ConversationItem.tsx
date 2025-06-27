@@ -1,13 +1,13 @@
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 
-import UserAvatar from '~/components/UserAvatar'
-import { ConversationModel, MessageModel } from '~/type/type'
-import { momentTimezone } from '~/utils/moment'
-import { useAppSelector } from '~/redux'
-import { getCurrentUser } from '~/redux/selector'
 import AvatarGroup from '../AvatarGroup'
 import EmojiMessageStyle from '../EmojiMessageStyle'
+import UserAvatar from '~/components/UserAvatar'
+import { useAppSelector } from '~/redux'
+import { getCurrentUser } from '~/redux/selector'
+import { ConversationModel, MessageModel } from '~/type/type'
+import { momentTimezone } from '~/utils/moment'
 
 interface Props {
     conversation: ConversationModel

@@ -1,8 +1,9 @@
 'use client'
 
 import Image from 'next/image'
-import { getCurrentTheme } from '~/redux/selector'
+
 import { useAppSelector } from '~/redux'
+import { getCurrentTheme } from '~/redux/selector'
 
 const NoChatSelected = () => {
     const theme = useAppSelector(getCurrentTheme)

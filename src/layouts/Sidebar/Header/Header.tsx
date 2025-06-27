@@ -1,15 +1,15 @@
 'use client'
 
 import React, { memo, useCallback } from 'react'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faEllipsis } from '@fortawesome/free-solid-svg-icons'
-import Tippy from '@tippyjs/react'
 import { useRouter } from 'next/navigation'
 
+import { faEllipsis } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import Tippy from '@tippyjs/react'
 import UserAvatar from '~/components/UserAvatar/UserAvatar'
+import config from '~/config'
 import { useAppSelector } from '~/redux'
 import { getCurrentUser } from '~/redux/selector'
-import config from '~/config'
 
 const Header: React.FC = () => {
     const router = useRouter()

@@ -1,13 +1,13 @@
-import React, { useEffect, useRef, useState, memo, useCallback } from 'react'
+import React, { memo, useCallback,useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
+import { useParams } from 'next/navigation'
+import useSWR from 'swr'
+
 import { faChevronLeft, faChevronRight, faDownload, faXmark } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Tippy from '@tippyjs/react'
-import useSWR from 'swr'
-
-import * as messageServices from '~/services/messageService'
 import SWRKey from '~/enum/SWRKey'
-import { useParams } from 'next/navigation'
+import * as messageServices from '~/services/messageService'
 import { MessageModel, MetaPagination } from '~/type/type'
 
 interface MessageImagesModelProps {

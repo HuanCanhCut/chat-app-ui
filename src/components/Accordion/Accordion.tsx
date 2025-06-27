@@ -1,8 +1,9 @@
 import { memo, useState } from 'react'
+
 import Button from '../Button/Button'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronUp } from '@fortawesome/free-solid-svg-icons'
 import { faChevronDown } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 interface AccordionItem {
     title: string

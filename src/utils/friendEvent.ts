@@ -1,6 +1,6 @@
 import { sendEvent } from '../helpers/events'
-import * as friendService from '~/services/friendService'
 import handleApiError from '../helpers/handleApiError'
+import * as friendService from '~/services/friendService'
 
 export const handleAcceptFriend = async (userID: number) => {
     try {

@@ -1,16 +1,16 @@
-import { faSearch, faXmark } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { memo, useCallback, useEffect, useState } from 'react'
 import useSWR from 'swr'
 
-import * as searchService from '~/services/searchService'
-import { SearchHistory, SearchHistoryData, UserModel } from '~/type/type'
-import useDebounce from '~/hooks/useDebounce'
-import Tippy from '@tippyjs/react/headless'
-import PopperWrapper from '../PopperWrapper'
 import AccountItem from '../AccountItem'
+import PopperWrapper from '../PopperWrapper'
+import { faSearch, faXmark } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import Tippy from '@tippyjs/react/headless'
 import SWRKey from '~/enum/SWRKey'
 import { sendEvent } from '~/helpers/events'
+import useDebounce from '~/hooks/useDebounce'
+import * as searchService from '~/services/searchService'
+import { SearchHistory, SearchHistoryData, UserModel } from '~/type/type'
 
 interface SearchProps {
     placeholder?: string

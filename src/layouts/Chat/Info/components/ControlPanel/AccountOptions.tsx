@@ -1,6 +1,7 @@
+import React from 'react'
+
 import { faUserCircle, faUserXmark } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import React from 'react'
 import { StarShieldIcon } from '~/components/Icons'
 import PopperWrapper from '~/components/PopperWrapper'
 import { ConversationMember } from '~/type/type'

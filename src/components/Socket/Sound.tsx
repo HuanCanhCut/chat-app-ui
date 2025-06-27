@@ -1,10 +1,11 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
-import socket from '~/helpers/socket'
+
 import { SocketEvent } from '~/enum/SocketEvent'
-import { getCurrentUser } from '~/redux/selector'
+import socket from '~/helpers/socket'
 import { useAppSelector } from '~/redux'
+import { getCurrentUser } from '~/redux/selector'
 import { SocketMessage } from '~/type/type'
 
 const Sound = ({ children }: { children: React.ReactNode }) => {

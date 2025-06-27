@@ -1,7 +1,8 @@
 'use client'
 
-import Sidebar from '~/layouts/Sidebar'
 import { useParams } from 'next/navigation'
+
+import Sidebar from '~/layouts/Sidebar'
 
 export default function MessageLayout({ children }: { children: React.ReactNode }) {
     const { uuid } = useParams()

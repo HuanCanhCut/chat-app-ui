@@ -1,8 +1,9 @@
 import { memo } from 'react'
-import { UserModel } from '~/type/type'
-import UserAvatar from '~/components/UserAvatar/UserAvatar'
 import Link from 'next/link'
+
+import UserAvatar from '~/components/UserAvatar/UserAvatar'
 import config from '~/config'
+import { UserModel } from '~/type/type'
 
 interface AccountItemProps {
     className?: string

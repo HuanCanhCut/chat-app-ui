@@ -1,21 +1,21 @@
+import React, { useEffect,useRef, useState } from 'react'
+import { SubmitHandler, useForm } from 'react-hook-form'
+import { mutate } from 'swr'
+
 import { faCamera, faXmark } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import React, { useState, useRef, useEffect } from 'react'
-import { mutate } from 'swr'
-import { SubmitHandler, useForm } from 'react-hook-form'
-
-import * as meService from '~/services/meService'
 import Button from '~/components/Button/Button'
-import PopperWrapper from '~/components/PopperWrapper/PopperWrapper'
 import CustomImage from '~/components/Image/Image'
 import Input from '~/components/Input/Input'
-import { toast } from '~/utils/toast'
+import PopperWrapper from '~/components/PopperWrapper/PopperWrapper'
 import UserAvatar from '~/components/UserAvatar/UserAvatar'
-import handleApiError from '~/helpers/handleApiError'
+import config from '~/config'
 import SWRKey from '~/enum/SWRKey'
+import handleApiError from '~/helpers/handleApiError'
 import { useAppSelector } from '~/redux'
 import { getCurrentUser } from '~/redux/selector'
-import config from '~/config'
+import * as meService from '~/services/meService'
+import { toast } from '~/utils/toast'
 
 interface IFile extends File {
     preview: string

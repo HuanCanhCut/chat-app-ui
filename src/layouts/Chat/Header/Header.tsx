@@ -1,17 +1,18 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
-import UserAvatar from '~/components/UserAvatar'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faChevronLeft, faCircleInfo } from '@fortawesome/free-solid-svg-icons'
-import { ConversationModel, UserStatus } from '~/type/type'
-import { useAppSelector } from '~/redux'
-import { getCurrentUser } from '~/redux/selector'
 import { useEffect, useRef, useState } from 'react'
+import { useRouter } from 'next/navigation'
+
+import { faChevronLeft, faCircleInfo } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import UserAvatar from '~/components/UserAvatar'
 import config from '~/config'
-import socket from '~/helpers/socket'
 import { SocketEvent } from '~/enum/SocketEvent'
 import { sendEvent } from '~/helpers/events'
+import socket from '~/helpers/socket'
+import { useAppSelector } from '~/redux'
+import { getCurrentUser } from '~/redux/selector'
+import { ConversationModel, UserStatus } from '~/type/type'
 import { momentTimezone } from '~/utils/moment'
 interface HeaderProps {
     className?: string

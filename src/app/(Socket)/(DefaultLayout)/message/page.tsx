@@ -1,5 +1,6 @@
-import NoChatSelected from './NoChatSelected'
 import { Metadata } from 'next'
+
+import NoChatSelected from './NoChatSelected'
 
 export const metadata: Metadata = {
     title: 'Message | Huấn Cánh Cụt',

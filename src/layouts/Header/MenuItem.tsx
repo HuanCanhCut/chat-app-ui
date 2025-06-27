@@ -1,10 +1,9 @@
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-
-import SwitchButton from '~/components/SwitchButton/SwitchButton'
 import { useState } from 'react'
-import Button from '~/components/Button/Button'
 
 import { MenuItemType } from './Interaction/Interaction'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import Button from '~/components/Button/Button'
+import SwitchButton from '~/components/SwitchButton/SwitchButton'
 import { actions, useAppDispatch, useAppSelector } from '~/redux'
 import { getCurrentTheme } from '~/redux/selector'
 

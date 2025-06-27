@@ -1,3 +1,4 @@
+import { ToastContainer } from 'react-toastify'
 import { Inter } from 'next/font/google'
 
 import './globals.css'
@@ -6,7 +7,6 @@ import 'tippy.js/dist/tippy.css'
 import 'react-toastify/dist/ReactToastify.css'
 import GlobalSWRConfig from '~/components/GlobalWrapper/GlobalSWRConfig'
 import ReduxProvider from '~/components/GlobalWrapper/ReduxProvider'
-import { ToastContainer } from 'react-toastify'
 
 const inter = Inter({ subsets: ['latin'] })
 

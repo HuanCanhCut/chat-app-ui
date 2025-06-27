@@ -2,12 +2,12 @@ import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import useSWR from 'swr'
 
-import * as conversationServices from '~/services/conversationService'
-import { SocketEvent } from '~/enum/SocketEvent'
-import socket from '~/helpers/socket'
-import SWRKey from '~/enum/SWRKey'
-import { ConversationMember } from '~/type/type'
 import AvatarGroup from '~/components/AvatarGroup'
+import { SocketEvent } from '~/enum/SocketEvent'
+import SWRKey from '~/enum/SWRKey'
+import socket from '~/helpers/socket'
+import * as conversationServices from '~/services/conversationService'
+import { ConversationMember } from '~/type/type'
 
 const Typing = () => {
     const { uuid } = useParams()

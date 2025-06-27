@@ -1,6 +1,6 @@
-import { configureStore } from '@reduxjs/toolkit'
-import themeReducer from './reducers/theme'
 import authReducer from './reducers/auth'
+import themeReducer from './reducers/theme'
+import { configureStore } from '@reduxjs/toolkit'
 
 export const makeStore = () => {
     return configureStore({

@@ -1,6 +1,7 @@
-import Tippy from '@tippyjs/react/headless'
 import { memo, useEffect, useState } from 'react'
-import { useSpring, motion } from 'framer-motion'
+import { motion,useSpring } from 'framer-motion'
+
+import Tippy from '@tippyjs/react/headless'
 import { sendEvent } from '~/helpers/events'
 
 interface CustomTippyProps {

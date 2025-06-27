@@ -1,7 +1,7 @@
 'use client'
 
-import Image from 'next/image'
 import { memo, useState } from 'react'
+import Image from 'next/image'
 
 interface Props {
     src?: string

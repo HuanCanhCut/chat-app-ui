@@ -1,7 +1,8 @@
-import UserAvatar from '~/components/UserAvatar'
-import { SearchMessageModel } from '~/type/type'
 import Highlighter from 'react-highlight-words'
+
+import UserAvatar from '~/components/UserAvatar'
 import { sendEvent } from '~/helpers/events'
+import { SearchMessageModel } from '~/type/type'
 
 interface SearchResultProps {
     message: SearchMessageModel

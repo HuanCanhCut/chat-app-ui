@@ -1,9 +1,10 @@
 'use client'
 
-import { useEffect, useRef, useState, memo, MutableRefObject } from 'react'
+import { memo, MutableRefObject, useEffect, useRef, useState } from 'react'
+
 import handleApiError from '~/helpers/handleApiError'
-import { toast } from '~/utils/toast'
 import * as authService from '~/services/authService'
+import { toast } from '~/utils/toast'
 
 interface Props {
     emailRef: MutableRefObject<HTMLInputElement | null>

@@ -2,6 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
+
 import config from '~/config'
 import { useAppSelector } from '~/redux'
 import { getCurrentTheme } from '~/redux/selector'

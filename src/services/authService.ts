@@ -1,6 +1,7 @@
+import { AxiosResponse } from 'axios'
+
 import { UserModel } from '~/type/type'
 import * as request from '~/utils/httpRequest'
-import { AxiosResponse } from 'axios'
 
 interface RegisterProps {
     email: string
