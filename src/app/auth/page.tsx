@@ -15,7 +15,7 @@ const Login: React.FC = () => {
             <div className="col-span-12 p-8 sm:col-span-6">
                 <Logo />
                 <h1 className="mt-3 flex flex-col text-center font-bold">
-                    Đăng nhập vào <span className="text-cyan-800 dark:text-cyan-500">Huấn Cánh Cụt</span>
+                    Đăng nhập vào <span className="mt-2 text-3xl text-cyan-800 dark:text-cyan-500">Huấn Cánh Cụt</span>
                 </h1>
 
                 <AuthForm />

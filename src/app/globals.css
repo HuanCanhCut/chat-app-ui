@@ -39,12 +39,9 @@
     animation: scale-up 0.6s ease-in-out;
 }
 
-* {
-    font-size: 16px;
-}
-
 html {
     scroll-behavior: smooth;
+    font-size: 16px;
 }
 
 html *::-webkit-scrollbar {

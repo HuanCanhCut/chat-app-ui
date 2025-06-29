@@ -286,7 +286,7 @@ const AuthForm = () => {
                 </span>
             </span>
 
-            <footer className="text-center text-sm text-gray-500 dark:text-gray-400">
+            <footer className="text-center text-[13px] text-gray-500 dark:text-gray-400">
                 Việc bạn tiếp tục sử dụng trang web này có nghĩa bạn đồng ý với{' '}
                 <span className="text-error">điều khoản</span> sử dụng của chúng tôi
             </footer>
