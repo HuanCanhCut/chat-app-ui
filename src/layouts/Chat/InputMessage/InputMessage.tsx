@@ -56,7 +56,7 @@ const InputMessage: React.FC<InputMessageProps> = () => {
         if (!replyMessage) return
         const conversation: ConversationModel = swrCache.get(SWRKey.GET_CONVERSATIONS)?.data[uuid as string]
 
-        const member: ConversationMember[] = conversation.conversation_members
+        const member: ConversationMember[] = conversation.members
 
         return member.reduce(
             (mem, cur) => {
@@ -86,7 +86,7 @@ const InputMessage: React.FC<InputMessageProps> = () => {
                     created_at: new Date().toISOString(),
                     updated_at: new Date().toISOString(),
                     sender: currentUser.data,
-                    message_status: conversation?.data.conversation_members.map((conversation) => {
+                    message_status: conversation?.data.members.map((conversation) => {
                         return {
                             receiver_id: conversation.user_id,
                             status: 'sending',

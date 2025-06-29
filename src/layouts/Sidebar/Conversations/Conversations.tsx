@@ -77,18 +77,16 @@ const Conversations = () => {
                 [data.conversation.uuid]: {
                     ...conversationData,
                     last_message: data.conversation.last_message,
-                    conversation_members: conversationData.conversation_members.map(
-                        (member: ConversationMember, index: number) => {
-                            return {
-                                ...member,
-                                user: {
-                                    ...member.user,
-                                    is_online: conversationData.conversation_members[index].user.is_online,
-                                    last_online_at: conversationData.conversation_members[index].user.last_online_at,
-                                },
-                            }
-                        },
-                    ),
+                    members: conversationData.members.map((member: ConversationMember, index: number) => {
+                        return {
+                            ...member,
+                            user: {
+                                ...member.user,
+                                is_online: conversationData.members[index].user.is_online,
+                                last_online_at: conversationData.members[index].user.last_online_at,
+                            },
+                        }
+                    }),
                 },
                 ...conversations,
             }
@@ -122,14 +120,14 @@ const Conversations = () => {
                         ...conversations,
                         [conversationUserMap[data.user_id]]: {
                             ...conversations[conversationUserMap[data.user_id]],
-                            conversation_members: conversations[
-                                conversationUserMap[data.user_id]
-                            ].conversation_members.map((member: ConversationMember) => {
-                                if (member.user_id === data.user_id) {
-                                    return { ...member, user: { ...member.user, is_online: data.is_online } }
-                                }
-                                return member
-                            }),
+                            members: conversations[conversationUserMap[data.user_id]].members.map(
+                                (member: ConversationMember) => {
+                                    if (member.user_id === data.user_id) {
+                                        return { ...member, user: { ...member.user, is_online: data.is_online } }
+                                    }
+                                    return member
+                                },
+                            ),
                         },
                     },
                     {
@@ -141,9 +139,7 @@ const Conversations = () => {
                     const conversation: ConversationModel = conversations[key]
 
                     if (!conversation.is_group) {
-                        const hasUser = conversation.conversation_members.find(
-                            (member) => member.user_id === data.user_id,
-                        )
+                        const hasUser = conversation.members.find((member) => member.user_id === data.user_id)
 
                         if (hasUser) {
                             mutateConversations(
@@ -151,7 +147,7 @@ const Conversations = () => {
                                     ...conversations,
                                     [key]: {
                                         ...conversation,
-                                        conversation_members: conversation.conversation_members.map((member) => {
+                                        members: conversation.members.map((member) => {
                                             if (member.user_id === data.user_id) {
                                                 return {
                                                     ...member,

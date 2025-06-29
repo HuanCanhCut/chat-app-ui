@@ -53,14 +53,14 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ setSearchMode }) => {
         return conversationServices.getConversationByUuid({ uuid: uuid as string })
     })
 
-    const member = conversation?.data.conversation_members.find((member) => {
+    const member = conversation?.data.members.find((member) => {
         return member.user_id !== currentUser?.data.id
     }) as ConversationMember
 
     const [lastOnlineTime, setLastOnlineTime] = useState<Date | null>(member.user.last_online_at)
 
     const memberMap = useMemo(() => {
-        const member: ConversationMember[] = conversation?.data.conversation_members || []
+        const member: ConversationMember[] = conversation?.data.members || []
 
         return member.reduce(
             (mem, cur) => {
@@ -134,7 +134,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ setSearchMode }) => {
             ? {
                   title: 'Thành viên trong đoạn chat',
                   type: 'member_in_conversation',
-                  children: conversation.data.conversation_members.map((member, index) => {
+                  children: conversation.data.members.map((member, index) => {
                       const addedBy = () => {
                           if (member.added_by_id === currentUser.data.id) {
                               return 'bạn'

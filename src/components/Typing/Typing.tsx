@@ -28,7 +28,7 @@ const Typing = () => {
         const socketHandler = ({ conversation_uuid, user_id, is_typing }: Typing) => {
             if (conversation_uuid === uuid) {
                 if (is_typing) {
-                    const member = conversation?.data.conversation_members.find((member) => member.user_id === user_id)
+                    const member = conversation?.data.members.find((member) => member.user_id === user_id)
 
                     if (!member) {
                         return
@@ -55,7 +55,7 @@ const Typing = () => {
         return () => {
             socket.off(SocketEvent.MESSAGE_TYPING)
         }
-    }, [conversation?.data.conversation_members, uuid])
+    }, [conversation?.data.members, uuid])
 
     return memberTyping.length > 0 ? (
         <div className="flex items-center gap-3">

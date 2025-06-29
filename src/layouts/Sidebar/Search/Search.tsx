@@ -52,7 +52,7 @@ const Search: React.FC<Props> = ({ setSearchMode, searchMode }) => {
             // 20px: padding left and right
             <div className="h-[calc(100dvh-210px)] w-[calc(100vw-20px)] [overflow:overlay] dark:bg-dark sm:h-[calc(100dvh-180px)] md:w-[calc(var(--sidebar-width-tablet)-20px)] lg:w-[calc(var(--sidebar-width)-20px)]">
                 {searchResult.map((conversation) => {
-                    let conversationMember = conversation.conversation_members.find(
+                    let conversationMember = conversation.members.find(
                         (member) => member.user_id !== currentUser?.data.id,
                     )
 

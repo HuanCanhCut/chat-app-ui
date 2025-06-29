@@ -22,7 +22,7 @@ const ReplyMessage = ({ message, currentUser }: ReplyMessageProps, ref: LegacyRe
     const memberMap = useMemo(() => {
         const conversation: ConversationModel = swrCache.get(SWRKey.GET_CONVERSATIONS)?.data[uuid as string]
 
-        const member: ConversationMember[] = conversation.conversation_members
+        const member: ConversationMember[] = conversation.members
 
         return member.reduce(
             (mem, cur) => {

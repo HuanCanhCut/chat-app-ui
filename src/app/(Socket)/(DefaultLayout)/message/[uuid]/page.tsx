@@ -37,13 +37,13 @@ const MessagePage = () => {
                 return
             }
 
-            conversation.data.conversation_members.find((member) => {
+            conversation.data.members.find((member) => {
                 if (member.id === data.user_id) {
                     mutateConversation({
                         ...conversation,
                         data: {
                             ...conversation.data,
-                            conversation_members: conversation.data.conversation_members.map((member) => ({
+                            members: conversation.data.members.map((member) => ({
                                 ...member,
                                 user: {
                                     ...member.user,

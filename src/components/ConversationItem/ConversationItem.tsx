@@ -21,7 +21,7 @@ const ConversationItem: React.FC<Props> = ({ conversation, className = '' }) => 
     const isActive = uuid === conversation.uuid
 
     // if not group then get user !== current user in conversation_members
-    const userMember = conversation.conversation_members.find((member) => member.user_id !== currentUser?.data.id)
+    const userMember = conversation.members.find((member) => member.user_id !== currentUser?.data.id)
 
     const isRead =
         conversation.last_message.sender_id !== currentUser?.data.id ? !!conversation.last_message.is_read : true

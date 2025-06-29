@@ -44,7 +44,7 @@ export interface ConversationModel extends Timestamp {
     name?: string
     avatar?: string
     uuid: string
-    conversation_members: ConversationMember[]
+    members: ConversationMember[]
     last_message: MessageModel
     emoji: string
 }

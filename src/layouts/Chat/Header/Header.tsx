@@ -29,15 +29,13 @@ const Header: React.FC<HeaderProps> = ({ className = '', isInfoOpen, conversatio
 
     const handleNavigate = () => {
         if (!conversation?.is_group) {
-            const member = conversation?.conversation_members.find((member) => member.user_id !== currentUser?.data.id)
+            const member = conversation?.members.find((member) => member.user_id !== currentUser?.data.id)
 
             router.push(`${config.routes.user}/@${member?.user.nickname}`)
         }
     }
 
-    const conversationMember = conversation?.conversation_members.find(
-        (member) => member.user_id !== currentUser?.data.id,
-    )
+    const conversationMember = conversation?.members.find((member) => member.user_id !== currentUser?.data.id)
 
     const [lastOnlineTime, setLastOnlineTime] = useState<Date | null>(null)
 
