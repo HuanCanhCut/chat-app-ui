@@ -2,7 +2,7 @@
 
 import { memo, useState } from 'react'
 import Image from 'next/image'
-
+import { useRouter } from 'next/navigation'
 interface Props {
     src?: string
     alt?: string
@@ -12,6 +12,7 @@ interface Props {
     onClick?: () => void
     isOnline?: boolean
     onlineClassName?: string
+    href?: string
 }
 
 const defaultAvatar = '/static/media/default-avatar.jpg'
@@ -25,7 +26,9 @@ const UserAvatar = ({
     onClick = () => {},
     isOnline = false,
     onlineClassName = '',
+    href,
 }: Props) => {
+    const router = useRouter()
     const [fallback, setFallback] = useState<string>()
 
     const handleError = () => {
@@ -36,8 +39,14 @@ const UserAvatar = ({
         src = defaultAvatar
     }
 
+    const handleRedirect = (href: string | undefined) => {
+        if (href) {
+            router.push(href)
+        }
+    }
+
     return (
-        <div className="relative">
+        <div className="relative" onClick={() => handleRedirect(href)}>
             <Image
                 src={fallback || src}
                 onError={handleError}

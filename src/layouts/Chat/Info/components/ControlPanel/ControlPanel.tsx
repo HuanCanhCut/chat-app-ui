@@ -157,11 +157,18 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ setSearchMode }) => {
 
                       return {
                           title: member.nickname || member.user.full_name,
-                          leftIcon: <UserAvatar src={member.user.avatar} size={36} />,
+                          leftIcon: (
+                              <UserAvatar
+                                  src={member.user.avatar}
+                                  size={36}
+                                  href={`${config.routes.user}/@${member.user.nickname}`}
+                              />
+                          ),
                           description: descriptionMap[member.role],
                           type: 'member',
                           href: `${config.routes.user}/@${member.user.nickname}`,
-                          className: 'hover:bg-transparent dark:hover:bg-transparent [&>*[data-right-icon]]:ml-auto',
+                          className:
+                              'hover:bg-transparent dark:hover:bg-transparent [&>*[data-right-icon]]:ml-auto cursor-default [&_#accordion-title]:cursor-pointer',
                           rightIcon: (
                               <CustomTippy
                                   renderItem={() => {
@@ -170,7 +177,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ setSearchMode }) => {
                               >
                                   <Tippy content="Lựa chọn của thành viên" delay={[350, 0]}>
                                       <div
-                                          className="flex-center h-9 w-9 rounded-full hover:bg-[#99999936] dark:hover:bg-[#333636]"
+                                          className="flex-center h-9 w-9 cursor-pointer rounded-full hover:bg-[#99999936] dark:hover:bg-[#333636]"
                                           onClick={(e) => {
                                               e.stopPropagation()
                                               e.preventDefault()
