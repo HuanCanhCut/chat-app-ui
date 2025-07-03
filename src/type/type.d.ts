@@ -1,10 +1,10 @@
-export interface Timestamp {
+export interface BaseModel {
+    id: number
     created_at: Date
     updated_at: Date
 }
 // ========================================== User model ==========================================
-export interface UserModel<K = any, V = any> extends Timestamp {
-    id: number
+export interface UserModel<K = any, V = any> extends BaseModel {
     first_name: string
     last_name: string
     full_name: string
@@ -37,9 +37,48 @@ export interface UserStatus {
     last_online_at: string
 }
 
+export interface ConversationThemeModel extends BaseModel {
+    name: string
+    logo: string
+    description: string | null
+    emoji: string
+    theme_config: {
+        sender: {
+            light: {
+                text_color: string
+                background_color: string
+            }
+            dark: {
+                text_color: string
+                background_color: string
+            }
+        }
+        receiver: {
+            light: {
+                text_color: string
+                background_color: string
+            }
+            dark: {
+                text_color: string
+                background_color: string
+            }
+        }
+        background_theme: {
+            light: {
+                background_image: string | null
+                background_color: string
+            }
+            dark: {
+                background_image: string | null
+                background_color: string
+            }
+        }
+        emoji: string
+    }
+}
+
 // ========================================== Conversation model ==========================================
-export interface ConversationModel extends Timestamp {
-    id: number
+export interface ConversationModel extends BaseModel {
     is_group: boolean
     name?: string
     avatar?: string
@@ -47,14 +86,15 @@ export interface ConversationModel extends Timestamp {
     members: ConversationMember[]
     last_message: MessageModel
     emoji: string
+    theme_id: number
+    theme: ConversationThemeModel
 }
 
 export interface ConversationResponse {
     data: ConversationModel[]
 }
 
-export interface ConversationMember extends Timestamp {
-    id: number
+export interface ConversationMember extends BaseModel {
     user_id: number
     conversation_id: number
     nickname: string
@@ -72,8 +112,7 @@ export interface TopReaction {
     user_reaction: UserModel
 }
 
-export interface MessageModel extends Timestamp {
-    id: number
+export interface MessageModel extends BaseModel {
     conversation_id: number
     content: string | null
     sender_id: number
@@ -112,8 +151,7 @@ export interface MessageImagesResponse extends MetaPagination {
     data: MessageModel[]
 }
 
-export interface MessageStatus extends Timestamp {
-    id: number
+export interface MessageStatus extends BaseModel {
     message_id: number
     receiver_id: number
     status: 'sent' | 'delivered' | 'read' | 'sending'
@@ -134,8 +172,7 @@ export interface SearchMessageResponse extends MetaPagination {
 
 // ========================================== Message reaction model ==========================================
 
-export interface MessageReactionModel extends Timestamp {
-    id: number
+export interface MessageReactionModel extends BaseModel {
     message_id: number
     user_id: number
     react: string
@@ -148,8 +185,7 @@ export interface MessageReactionResponse extends MetaPagination {
 
 // ========================================== Friends model ==========================================
 
-export interface FriendsShip extends Timestamp {
-    id: number
+export interface FriendsShip extends BaseModel {
     user_id: number
     friend_id: number
     status: string
@@ -175,8 +211,7 @@ export interface MetaPagination {
 
 // ========================================== Notification model ==========================================
 
-export interface NotificationData extends Timestamp {
-    id: number
+export interface NotificationData extends BaseModel {
     recipient_id: number
     is_read: boolean
     is_seen: boolean
@@ -192,8 +227,7 @@ export interface NotificationResponse extends MetaPagination {
 
 // ========================================== Search history model ==========================================
 
-export interface SearchHistoryData extends Timestamp {
-    id: number
+export interface SearchHistoryData extends BaseModel {
     user_id: number
     user_search_id: number
     user_search: UserModel

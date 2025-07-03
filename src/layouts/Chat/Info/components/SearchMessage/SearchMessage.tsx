@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { useParams } from 'next/navigation'
 
@@ -61,6 +61,12 @@ const SearchMessage: React.FC = () => {
         inputRef.current?.focus()
     }, [])
 
+    const handleClearSearch = useCallback(() => {
+        setSearchValue('')
+        setSearchResult(null)
+        setPage(1)
+    }, [])
+
     return (
         <>
             <div className="flex items-center gap-2">
@@ -73,7 +79,7 @@ const SearchMessage: React.FC = () => {
                 </Button>
                 <span>Tìm kiếm</span>
             </div>
-            <div className="relative mt-4 rounded-3xl bg-lightGray px-4 pl-3 dark:bg-[#313233]">
+            <div className="relative mt-4 flex items-center rounded-3xl bg-lightGray pl-3 dark:bg-[#313233]">
                 <FontAwesomeIcon
                     icon={faSearch}
                     className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"
@@ -89,6 +95,20 @@ const SearchMessage: React.FC = () => {
                     value={searchValue}
                     onChange={(e) => setSearchValue(e.target.value)}
                 />
+                {searchResult && (
+                    <div className="flex items-center gap-2">
+                        <span className="whitespace-nowrap text-sm leading-none text-gray-500 dark:text-gray-400">
+                            {searchResult.meta.pagination.total} kết quả
+                        </span>
+                        <Button
+                            buttonType="icon"
+                            className="!h-8 !w-8 bg-[#E2E5E9] dark:bg-[#FFFFFF1A]"
+                            onClick={handleClearSearch}
+                        >
+                            <FontAwesomeIcon icon={faXmark} width={24} height={24} />
+                        </Button>
+                    </div>
+                )}
             </div>
 
             <div className="mt-1">
