@@ -113,7 +113,7 @@ const Header: React.FC<HeaderProps> = ({ className = '', isInfoOpen, conversatio
 
     return (
         <div
-            className={`${className} flex items-center justify-between bg-[var(--light-header-background-color)] px-2 py-1 shadow-sm shadow-gray-200 dark:bg-[var(--dark-header-bg-color)] dark:[box-shadow:1px_2px_4px_rgba(0,0,0,0.1)]`}
+            className={`${className} z-10 flex items-center justify-between bg-[var(--background-theme-light-header-color)] px-2 py-1 shadow-sm [box-shadow:1px_0px_8px_rgba(0,0,0,0.1)] dark:bg-[var(--background-theme-dark-header-color)] dark:[box-shadow:1px_0px_8px_rgba(0,0,0,0.2)]`}
         >
             <div className="flex items-center">
                 <div
@@ -159,7 +159,7 @@ const Header: React.FC<HeaderProps> = ({ className = '', isInfoOpen, conversatio
                     icon={faCircleInfo}
                     width={20}
                     height={20}
-                    className="cursor-pointer text-xl text-[var(--sender-light-bg-color)] dark:text-[var(--sender-dark-bg-color)]"
+                    className="cursor-pointer text-xl text-[var(--sender-light-background-color)] dark:text-[var(--sender-dark-background-color)]"
                     onClick={handleToggleInfo}
                 />
             </div>

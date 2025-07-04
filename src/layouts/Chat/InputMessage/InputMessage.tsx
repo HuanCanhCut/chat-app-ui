@@ -307,7 +307,7 @@ const InputMessage: React.FC<InputMessageProps> = () => {
     return (
         <div
             onKeyDown={handleEnterMessage}
-            className="bg-[var(--light-footer-color)] dark:bg-[var(--dark-footer-color)]"
+            className="bg-[var(--background-theme-light-footer-color)] dark:bg-[var(--background-theme-dark-footer-color)]"
         >
             {replyMessage && (
                 <div className="flex items-center justify-between border-t border-zinc-300 px-4 py-2 pt-1 dark:border-zinc-700">

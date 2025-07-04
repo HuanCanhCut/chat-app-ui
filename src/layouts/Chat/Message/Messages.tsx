@@ -13,7 +13,7 @@ import SWRKey from '~/enum/SWRKey'
 import { listenEvent, sendEvent } from '~/helpers/events'
 import socket from '~/helpers/socket'
 import { useAppSelector } from '~/redux'
-import { getCurrentUser } from '~/redux/selector'
+import { getCurrentTheme, getCurrentUser } from '~/redux/selector'
 import * as messageServices from '~/services/messageService'
 import { ConversationModel, MessageModel, MessageResponse, SocketMessage } from '~/type/type'
 import { toast } from '~/utils/toast'
@@ -31,6 +31,8 @@ const Message: React.FC<MessageProps> = ({ conversation }) => {
     const { uuid } = useParams()
 
     const currentUser = useAppSelector(getCurrentUser)
+
+    const theme = useAppSelector(getCurrentTheme)
 
     // save offset range for scroll down and scroll up
     const [offsetRange, setOffsetRange] = useState({
@@ -485,8 +487,14 @@ const Message: React.FC<MessageProps> = ({ conversation }) => {
 
     return (
         <div
-            className={`relative flex-grow !overflow-hidden bg-[var(--light-bg)] bg-cover bg-center bg-no-repeat dark:bg-[var(--dark-bg)]`}
+            className={`relative flex-grow !overflow-hidden`}
             onKeyDown={handleEnterMessage}
+            style={{
+                backgroundImage: `var(--background-theme-${theme}-background)`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat',
+            }}
         >
             <div
                 className="flex h-full max-h-full flex-col-reverse overflow-y-auto scroll-smooth"

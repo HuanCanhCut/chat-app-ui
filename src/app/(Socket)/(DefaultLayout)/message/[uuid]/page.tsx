@@ -18,7 +18,7 @@ import { UserStatus } from '~/type/type'
 const MessagePage = () => {
     const { uuid } = useParams()
 
-    const [infoOpen, setInfoOpen] = useState(false)
+    const [infoOpen, setInfoOpen] = useState(true)
 
     const { data: conversation, mutate: mutateConversation } = useSWR(
         uuid ? [SWRKey.GET_CONVERSATION_BY_UUID, uuid] : null,
@@ -101,7 +101,10 @@ const MessagePage = () => {
 
                 cssVariables.forEach((variable) => {
                     if (variable.value) {
-                        console.log('--' + variable.key, variable.value)
+                        document.documentElement.style.setProperty(
+                            `--${variable.key.replaceAll('_', '-')}`,
+                            variable.value,
+                        )
                     }
                 })
             }
