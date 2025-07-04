@@ -125,11 +125,9 @@ const MessagePage = () => {
                     </>
                 )}
             </div>
-            {infoOpen && (
-                <Info
-                    className={`${infoOpen ? 'block' : 'hidden'} w-full sm:w-auto sm:min-w-[300px] md:block lg:min-w-[320px]`}
-                />
-            )}
+            <Info
+                className={`${infoOpen ? 'block w-full sm:w-auto sm:min-w-[300px] md:block lg:min-w-[320px]' : 'hidden w-0'} `}
+            />
         </div>
     )
 }

@@ -7,6 +7,25 @@
     --header-height-mobile: 90px;
     --sidebar-width: 330px;
     --sidebar-width-tablet: 280px;
+
+    /* Css variables for conversation theme */
+    /* Default theme */
+    --sender-light-text-color: #fff;
+    --sender-light-background-color: #0099ff;
+    --sender-dark-text-color: #fff;
+    --sender-dark-background-color: #0e92eb;
+    --receiver-light-text-color: #000;
+    --receiver-light-background-color: #f0f0f0;
+    --receiver-dark-text-color: #fff;
+    --receiver-dark-background-color: #303030;
+    --background-theme-light-background: #fff;
+    --background-theme-light-header-color: #ffffff;
+    --background-theme-light-footer-color: #ffffff;
+    --background-theme-dark-background: #212223;
+    --background-theme-dark-header-color: #212223;
+    --background-theme-dark-footer-color: #212223;
+    --reply-message-light-background-color: #f6f6f6;
+    --reply-message-dark-background-color: #8383838d;
 }
 
 @layer base {

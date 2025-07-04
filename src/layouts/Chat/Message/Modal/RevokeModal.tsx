@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import { useSelector } from 'react-redux'
 import { useParams } from 'next/navigation'
 import { mutate } from 'swr'
 
@@ -8,6 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Button from '~/components/Button'
 import PopperWrapper from '~/components/PopperWrapper'
 import SWRKey from '~/enum/SWRKey'
+import { useAppSelector } from '~/redux'
 import { getCurrentUser } from '~/redux/selector'
 import * as messageServices from '~/services/messageService'
 import { MessageModel, MessageResponse } from '~/type/type'
@@ -18,7 +18,7 @@ interface RevokeModalProps {
 }
 
 const RevokeModal = ({ message, onClose }: RevokeModalProps) => {
-    const { data: currentUser } = useSelector(getCurrentUser)
+    const { data: currentUser } = useAppSelector(getCurrentUser)
 
     const { uuid } = useParams()
 

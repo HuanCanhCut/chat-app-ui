@@ -121,16 +121,7 @@ export interface MessageModel extends BaseModel {
     sender: UserModel
     message_status: MessageStatus[]
     is_read: boolean
-    type:
-        | 'text'
-        | 'image'
-        | 'icon'
-        | 'system_change_group_name'
-        | 'system_set_nickname'
-        | 'system_change_theme'
-        | 'system_add_user'
-        | 'system_remove_user'
-        | 'typing'
+    type: string
     top_reactions?: TopReaction[]
     total_reactions: number
     parent_id: number | null

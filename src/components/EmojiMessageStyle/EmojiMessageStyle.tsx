@@ -45,7 +45,7 @@ const EmojiMessageStyle: React.FC<EmojiMessageStyleProps> = ({
                 )
             }
 
-            lastIndex = matchIndex + 2
+            lastIndex = matchIndex + emoji.length
         }
 
         // Thêm phần văn bản còn lại

@@ -26,7 +26,7 @@ const ConfirmModel = ({ title, onConfirm, isOpen, closeModal }: ConfirmModelProp
                         <h3 className="text-center text-2xl">{title}</h3>
                     </header>
 
-                    <div className="flex-center mt-2 gap-4">
+                    <div className="flex-center mt-4 gap-4">
                         <Button buttonType="primary" className="flex-1 rounded-sm !py-2" onClick={onConfirm}>
                             Xác nhận
                         </Button>

@@ -4,6 +4,7 @@ import { useParams } from 'next/navigation'
 import AvatarGroup from '../AvatarGroup'
 import EmojiMessageStyle from '../EmojiMessageStyle'
 import UserAvatar from '~/components/UserAvatar'
+import SystemMessage from '~/layouts/Chat/Message/SystemMessage'
 import { useAppSelector } from '~/redux'
 import { getCurrentUser } from '~/redux/selector'
 import { ConversationModel, MessageModel } from '~/type/type'
@@ -70,11 +71,19 @@ const ConversationItem: React.FC<Props> = ({ conversation, className = '' }) => 
                         className={`flex items-center text-[13px] font-normal [&_*]:text-[13px] ${isRead ? 'text-gray-600 dark:text-gray-400' : 'font-medium text-black dark:text-gray-200'} `}
                     >
                         <span className="truncate pr-1 [&>p]:w-auto">
-                            <EmojiMessageStyle
-                                text={content(conversation.last_message)}
-                                className="ml-1"
-                                textClassName="truncate line-clamp-1 text-ellipsis flex-1 w-full"
-                            />
+                            {conversation.last_message.type.startsWith('system') ? (
+                                <SystemMessage
+                                    message={conversation.last_message}
+                                    messageIndex={-1}
+                                    className="[&_p]:line-clamp-1 [&_p]:w-full [&_p]:truncate [&_p]:text-ellipsis"
+                                />
+                            ) : (
+                                <EmojiMessageStyle
+                                    text={content(conversation.last_message)}
+                                    className="ml-1"
+                                    textClassName="truncate line-clamp-1 text-ellipsis flex-1 w-full"
+                                />
+                            )}
                         </span>
                         <span className="flex-shrink-0 text-[13px]">
                             · {momentTimezone(conversation.last_message?.created_at)}

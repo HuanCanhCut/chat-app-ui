@@ -165,7 +165,14 @@ const MessageItem = ({ message, messageIndex, messages, currentUser, messageRef 
     }, [])
 
     if (message.type.startsWith('system')) {
-        return <SystemMessage message={message} messageIndex={messageIndex} ref={firstMessageRef} />
+        return (
+            <SystemMessage
+                message={message}
+                messageIndex={messageIndex}
+                ref={firstMessageRef}
+                className="mb-2 flex justify-center"
+            />
+        )
     }
 
     const isLastMessageInConsecutiveGroup = () => {
@@ -187,6 +194,13 @@ const MessageItem = ({ message, messageIndex, messages, currentUser, messageRef 
         }
 
         return true
+    }
+
+    if (messageIndex === 0) {
+        console.log({
+            message,
+            diffTime: diffTime(message, messages.data[messageIndex + 1]),
+        })
     }
 
     return (
@@ -254,9 +268,14 @@ const MessageItem = ({ message, messageIndex, messages, currentUser, messageRef 
                 handleFormatTime={handleFormatTime}
             />
 
-            {/* Show time between two message if the time is greater than 7 minutes */}
+            {/* Show time between two message if the time is greater than 7 minutes and the message is not the system message */}
             <p
-                className={`my-3 text-center text-xs font-medium text-[#65686C] dark:text-[#A1A4A9] ${diffTime(message, messages.data[messageIndex - 1]) < BETWEEN_TIME_MESSAGE ? 'hidden' : 'block'}`}
+                className={`my-3 text-center text-xs font-medium text-[#65686C] dark:text-[#A1A4A9] ${
+                    diffTime(message, messages.data[messageIndex - 1]) < BETWEEN_TIME_MESSAGE ||
+                    messages.data[messageIndex - 1]?.type.startsWith('system')
+                        ? 'hidden'
+                        : 'block'
+                }`}
             >
                 {messageIndex > 0 && handleFormatTime(messages.data[messageIndex - 1].created_at)}
             </p>
