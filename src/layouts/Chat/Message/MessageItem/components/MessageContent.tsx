@@ -119,8 +119,8 @@ const MessageContent = (
                 ref={combinedRef}
                 className={`relative w-fit max-w-[80%] rounded-3xl px-4 py-1.5 italic opacity-85 [word-break:break-word] ${
                     message.sender_id === currentUser?.id
-                        ? 'bg-milk-tea text-zinc-300'
-                        : 'bg-lightGray text-zinc-600 dark:bg-[#313233] dark:text-zinc-400'
+                        ? 'bg-[var(--sender-light-bg-color)] text-[var(--sender-light-text-color)] dark:bg-[var(--sender-dark-bg-color)] dark:text-[var(--sender-dark-text-color)]'
+                        : 'dark:text-[var(--receiver-dark-text -color)] bg-[var(--receiver-light-bg-color)] text-[var(--receiver-light-text-color)] dark:bg-[var(--receiver-dark-bg-color)]'
                 } ${consecutiveMessageStyle()}`}
             >
                 {message.sender.id === currentUser?.id ? 'Bạn ' : `${message.sender.full_name} `}
@@ -136,8 +136,8 @@ const MessageContent = (
                     ref={combinedRef}
                     className={`relative w-fit max-w-[80%] whitespace-pre-wrap rounded-3xl px-4 py-1.5 font-normal [word-break:break-word] ${
                         message.sender_id === currentUser?.id
-                            ? 'bg-milk-tea text-white'
-                            : 'bg-lightGray text-black dark:bg-[#313233] dark:text-dark'
+                            ? 'bg-[var(--sender-light-bg-color)] text-[var(--sender-light-text-color)] dark:bg-[var(--sender-dark-bg-color)] dark:text-[var(--sender-dark-text-color)]'
+                            : 'bg-[var(--receiver-light-bg-color)] text-[var(--receiver-light-text-color)] dark:bg-[var(--receiver-dark-bg-color)] dark:text-[var(--receiver-dark-text-color)]'
                     } ${consecutiveMessageStyle()}`}
                 >
                     <span className="max-w-fit break-words">

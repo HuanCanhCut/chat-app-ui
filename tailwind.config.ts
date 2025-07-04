@@ -24,6 +24,8 @@ const config: Config = {
                 error: '#ff453a',
                 dark: '#18191a',
                 darkGray: '#252728',
+                systemMessageLight: '#65686C',
+                systemMessageDark: '#A1A4A9',
             },
             borderColor: {
                 dark: '#212223',
@@ -35,7 +37,6 @@ const config: Config = {
                 dark: '#212223',
                 lightGray: '#f0f2f5',
                 darkGray: '#313233',
-                'milk-tea': '#ab885d',
             },
             textColor: {
                 dark: '#ffffffe6',

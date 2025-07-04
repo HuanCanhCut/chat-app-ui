@@ -305,7 +305,10 @@ const InputMessage: React.FC<InputMessageProps> = () => {
     }, [])
 
     return (
-        <div onKeyDown={handleEnterMessage}>
+        <div
+            onKeyDown={handleEnterMessage}
+            className="bg-[var(--light-footer-color)] dark:bg-[var(--dark-footer-color)]"
+        >
             {replyMessage && (
                 <div className="flex items-center justify-between border-t border-zinc-300 px-4 py-2 pt-1 dark:border-zinc-700">
                     <div className="flex-1">
@@ -328,7 +331,7 @@ const InputMessage: React.FC<InputMessageProps> = () => {
                     </button>
                 </div>
             )}
-            <div className="flex w-full items-center justify-between gap-2 px-2 py-4 pt-0">
+            <div className="flex w-full items-center justify-between gap-2 px-2 py-4 pt-2">
                 <input
                     ref={inputFileRef}
                     id="image-input"

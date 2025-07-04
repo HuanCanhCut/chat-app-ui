@@ -17,7 +17,7 @@ import { momentTimezone } from '~/utils/moment'
 interface HeaderProps {
     className?: string
     isInfoOpen: boolean
-    conversation: ConversationModel | undefined
+    conversation: ConversationModel
 }
 
 const Header: React.FC<HeaderProps> = ({ className = '', isInfoOpen, conversation }) => {
@@ -28,14 +28,14 @@ const Header: React.FC<HeaderProps> = ({ className = '', isInfoOpen, conversatio
     const offlineTimer = useRef<NodeJS.Timeout | null>(null)
 
     const handleNavigate = () => {
-        if (!conversation?.is_group) {
-            const member = conversation?.members.find((member) => member.user_id !== currentUser?.data.id)
+        if (!conversation.is_group) {
+            const member = conversation.members.find((member) => member.user_id !== currentUser?.data.id)
 
             router.push(`${config.routes.user}/@${member?.user.nickname}`)
         }
     }
 
-    const conversationMember = conversation?.members.find((member) => member.user_id !== currentUser?.data.id)
+    const conversationMember = conversation.members.find((member) => member.user_id !== currentUser?.data.id)
 
     const [lastOnlineTime, setLastOnlineTime] = useState<Date | null>(null)
 
@@ -113,7 +113,7 @@ const Header: React.FC<HeaderProps> = ({ className = '', isInfoOpen, conversatio
 
     return (
         <div
-            className={`${className} flex items-center justify-between px-2 py-1 shadow-sm shadow-gray-200 dark:[box-shadow:1px_2px_4px_rgba(0,0,0,0.1)]`}
+            className={`${className} flex items-center justify-between bg-[var(--light-header-background-color)] px-2 py-1 shadow-sm shadow-gray-200 dark:bg-[var(--dark-header-bg-color)] dark:[box-shadow:1px_2px_4px_rgba(0,0,0,0.1)]`}
         >
             <div className="flex items-center">
                 <div
@@ -133,18 +133,18 @@ const Header: React.FC<HeaderProps> = ({ className = '', isInfoOpen, conversatio
                 >
                     <div className="relative flex-shrink-0">
                         <UserAvatar
-                            src={conversation?.is_group ? conversation?.avatar : conversationMember?.user?.avatar}
+                            src={conversation.is_group ? conversation.avatar : conversationMember?.user?.avatar}
                             size={40}
                             isOnline={conversationMember?.user?.is_online}
                         />
                     </div>
                     <div className="flex flex-col">
                         <h4 className="max-w-[150px] truncate whitespace-nowrap font-semibold xs:max-w-[200px] sm:max-w-[250px] md:max-w-[350px]">
-                            {conversation?.is_group
-                                ? conversation?.name
+                            {conversation.is_group
+                                ? conversation.name
                                 : conversationMember?.nickname || conversationMember?.user?.full_name}
                         </h4>
-                        {!conversation?.is_group && (
+                        {!conversation.is_group && (
                             <span className="text-xs font-normal text-zinc-700 dark:text-gray-400">
                                 {conversationMember?.user?.is_online
                                     ? 'Đang hoạt động'
@@ -159,7 +159,7 @@ const Header: React.FC<HeaderProps> = ({ className = '', isInfoOpen, conversatio
                     icon={faCircleInfo}
                     width={20}
                     height={20}
-                    className="cursor-pointer text-xl dark:text-gray-500"
+                    className="cursor-pointer text-xl text-[var(--sender-light-bg-color)] dark:text-[var(--sender-dark-bg-color)]"
                     onClick={handleToggleInfo}
                 />
             </div>

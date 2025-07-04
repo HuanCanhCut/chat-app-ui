@@ -66,11 +66,13 @@ export interface ConversationThemeModel extends BaseModel {
         background_theme: {
             light: {
                 background_image: string | null
-                background_color: string
+                header_color: string
+                footer_color: string
             }
             dark: {
                 background_image: string | null
-                background_color: string
+                header_color: string
+                footer_color: string
             }
         }
         emoji: string

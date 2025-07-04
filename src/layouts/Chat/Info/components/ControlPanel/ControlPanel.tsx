@@ -1,7 +1,7 @@
 import { Dispatch, SetStateAction, useCallback, useEffect, useMemo, useState } from 'react'
-import Image from 'next/image'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
+import { Emoji, EmojiStyle } from 'emoji-picker-react'
 import useSWR from 'swr'
 
 import AccountOptions from './AccountOptions'
@@ -101,26 +101,12 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ setSearchMode }) => {
                     : null,
                 {
                     title: 'Đổi chủ đề',
-                    leftIcon: (
-                        <Image
-                            src="https://res.cloudinary.com/dkmwrkngj/image/upload/v1750481947/chat-app/avatar/1-chat-app/avatar.webp"
-                            alt="edit"
-                            width={16}
-                            height={16}
-                        />
-                    ),
+                    leftIcon: <UserAvatar src={conversation?.data.theme.logo} size={22} />,
                     type: 'change_topic',
                 },
                 {
                     title: 'Thay đổi biểu tượng cảm xúc',
-                    leftIcon: (
-                        <Image
-                            src="https://res.cloudinary.com/dkmwrkngj/image/upload/v1750481947/chat-app/avatar/1-chat-app/avatar.webp"
-                            alt="edit"
-                            width={16}
-                            height={16}
-                        />
-                    ),
+                    leftIcon: <Emoji unified={conversation!.data.emoji} emojiStyle={EmojiStyle.FACEBOOK} size={20} />,
                     type: 'change_emoji',
                 },
                 {

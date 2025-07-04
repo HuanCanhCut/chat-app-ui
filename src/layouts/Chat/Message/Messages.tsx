@@ -15,7 +15,7 @@ import socket from '~/helpers/socket'
 import { useAppSelector } from '~/redux'
 import { getCurrentUser } from '~/redux/selector'
 import * as messageServices from '~/services/messageService'
-import { MessageModel, MessageResponse, SocketMessage } from '~/type/type'
+import { ConversationModel, MessageModel, MessageResponse, SocketMessage } from '~/type/type'
 import { toast } from '~/utils/toast'
 
 interface MessageRef {
@@ -24,7 +24,10 @@ interface MessageRef {
 
 const PER_PAGE = 20
 
-const Message: React.FC = () => {
+interface MessageProps {
+    conversation: ConversationModel
+}
+const Message: React.FC<MessageProps> = ({ conversation }) => {
     const { uuid } = useParams()
 
     const currentUser = useAppSelector(getCurrentUser)
@@ -481,7 +484,10 @@ const Message: React.FC = () => {
     }, [messages?.data, mutateMessages, offsetRange.end, uuid])
 
     return (
-        <div className="relative flex-grow !overflow-hidden" onKeyDown={handleEnterMessage}>
+        <div
+            className={`relative flex-grow !overflow-hidden bg-[var(--light-bg)] bg-cover bg-center bg-no-repeat dark:bg-[var(--dark-bg)]`}
+            onKeyDown={handleEnterMessage}
+        >
             <div
                 className="flex h-full max-h-full flex-col-reverse overflow-y-auto scroll-smooth"
                 id="message-scrollable"

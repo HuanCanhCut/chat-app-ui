@@ -74,15 +74,53 @@ const MessagePage = () => {
         return remove
     }, [])
 
+    useEffect(() => {
+        if (conversation?.data) {
+            if (conversation.data.theme?.theme_config) {
+                const themeConfig = conversation.data.theme.theme_config
+                const parsedThemeConfig = typeof themeConfig === 'string' ? JSON.parse(themeConfig) : themeConfig
+
+                const cssVariables: { key: string; value: string }[] = []
+
+                const processThemeObject = (obj: any, prefix: string = '') => {
+                    for (const key in obj) {
+                        const newPrefix = prefix ? `${prefix}_${key}` : key
+
+                        if (typeof obj[key] === 'object' && obj[key] !== null) {
+                            processThemeObject(obj[key], newPrefix)
+                        } else {
+                            cssVariables.push({
+                                key: newPrefix,
+                                value: obj[key].startsWith('https') ? `url('${obj[key]}')` : obj[key],
+                            })
+                        }
+                    }
+                }
+
+                processThemeObject(parsedThemeConfig)
+
+                cssVariables.forEach((variable) => {
+                    if (variable.value) {
+                        console.log('--' + variable.key, variable.value)
+                    }
+                })
+            }
+        }
+    }, [conversation?.data])
+
     return (
         <div className="flex h-full max-w-full">
             {/* Don't change the invisible below to hidden to avoid uncontrolled scrolling in the message component */}
             <div
                 className={`flex max-w-full flex-grow flex-col ${infoOpen ? 'invisible w-0 sm:visible sm:flex sm:w-auto' : 'flex'}`}
             >
-                <Header isInfoOpen={infoOpen} conversation={conversation?.data} />
-                <Message />
-                <InputMessage />
+                {conversation?.data && (
+                    <>
+                        <Header isInfoOpen={infoOpen} conversation={conversation.data} />
+                        <Message conversation={conversation.data} />
+                        <InputMessage />
+                    </>
+                )}
             </div>
             {infoOpen && (
                 <Info
