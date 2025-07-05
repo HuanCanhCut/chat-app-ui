@@ -2,7 +2,9 @@ name: Chat App UI Deployment
 
 on:
     push:
-        branches: [main]
+        branches: [production]
+    pull_request:
+        branches: [production]
 
 jobs:
     deploy:
@@ -17,7 +19,6 @@ jobs:
                   key: ${{ secrets.SSH_PRIVATE_KEY }}
                   script: |
                       cd /var/www/nextjs/chat-app-ui
-                      git fetch origin
                       git checkout main
                       git pull
                       yarn install
