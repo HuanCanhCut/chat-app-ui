@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 
 import { faChevronLeft, faCircleInfo } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import Button from '~/components/Button'
 import UserAvatar from '~/components/UserAvatar'
 import config from '~/config'
 import { SocketEvent } from '~/enum/SocketEvent'
@@ -155,13 +156,14 @@ const Header: React.FC<HeaderProps> = ({ className = '', isInfoOpen, conversatio
                 </div>
             </div>
             <div className="flex items-center">
-                <FontAwesomeIcon
-                    icon={faCircleInfo}
-                    width={20}
-                    height={20}
-                    className="cursor-pointer text-xl text-[var(--sender-light-background-color)] dark:text-[var(--sender-dark-background-color)]"
-                    onClick={handleToggleInfo}
-                />
+                <Button buttonType="icon" className="bg-transparent dark:bg-transparent" onClick={handleToggleInfo}>
+                    <FontAwesomeIcon
+                        icon={faCircleInfo}
+                        width={20}
+                        height={20}
+                        className="cursor-pointer text-xl text-[var(--sender-light-background-color)] dark:text-[var(--sender-dark-background-color)]"
+                    />
+                </Button>
             </div>
         </div>
     )
