@@ -17,7 +17,7 @@ export const getConversations = async ({
         })
         return response.data
     } catch (error: any) {
-        console.log(error)
+        throw error
     }
 }
 
@@ -30,7 +30,7 @@ export const getConversationByUuid = async ({
         const response = await request.get(`/conversations/${uuid}`)
         return response.data
     } catch (error: any) {
-        console.log(error)
+        throw error
     }
 }
 
@@ -39,6 +39,15 @@ export const searchConversation = async ({ q }: { q: string }): Promise<Conversa
         const response = await request.get(`/conversations/search`, { params: { q } })
         return response.data
     } catch (error: any) {
-        console.log(error)
+        throw error
+    }
+}
+
+export const renameConversation = async ({ uuid, name }: { uuid: string; name: string }) => {
+    try {
+        const response = await request.patch(`/conversations/${uuid}/rename`, { name })
+        return response.data
+    } catch (error: any) {
+        throw error
     }
 }

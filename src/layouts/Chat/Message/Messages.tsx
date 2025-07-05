@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { memo, useEffect, useRef, useState } from 'react'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { useParams } from 'next/navigation'
 import useSWR from 'swr'
@@ -581,4 +581,4 @@ const Message: React.FC<MessageProps> = ({ conversation }) => {
     )
 }
 
-export default Message
+export default memo(Message)

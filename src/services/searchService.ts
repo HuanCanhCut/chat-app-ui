@@ -12,7 +12,7 @@ export const searchUser = async (value: string) => {
 
         return response.data
     } catch (error) {
-        console.log(error)
+        throw error
     }
 }
 
@@ -22,7 +22,7 @@ export const getSearchHistory = async (): Promise<SearchHistory | undefined> => 
 
         return response.data
     } catch (error) {
-        console.log(error)
+        throw error
     }
 }
 
@@ -30,7 +30,7 @@ export const setSearchHistory = async (user_search_id: number) => {
     try {
         await request.post('users/search-history', { user_search_id })
     } catch (error) {
-        console.log(error)
+        throw error
     }
 }
 
@@ -57,7 +57,6 @@ export const searchMessage = async ({
 
         return response.data
     } catch (error) {
-        console.log(error)
         throw error
     }
 }

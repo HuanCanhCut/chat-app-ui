@@ -8,7 +8,7 @@ export const toast = (
     return toastify[type](message, {
         position: 'top-right',
         autoClose: duration || 2500,
-        hideProgressBar: false,
+        hideProgressBar: true,
         closeOnClick: true,
         pauseOnHover: true,
         draggable: true,

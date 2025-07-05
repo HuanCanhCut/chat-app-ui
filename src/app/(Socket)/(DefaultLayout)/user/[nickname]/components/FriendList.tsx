@@ -5,6 +5,7 @@ import useSWR from 'swr'
 import UserAvatar from '~/components/UserAvatar/UserAvatar'
 import config from '~/config'
 import SWRKey from '~/enum/SWRKey'
+import handleApiError from '~/helpers/handleApiError'
 import * as friendService from '~/services/friendService'
 import { FriendsResponse, FriendsShip, UserResponse } from '~/type/type'
 
@@ -57,21 +58,25 @@ const FriendList = ({ user }: FriendListProps) => {
         }
 
         const getMoreFriends = async () => {
-            const res = await friendService.getFriends({ page, user_id: user.data.id })
+            try {
+                const res = await friendService.getFriends({ page, user_id: user.data.id })
 
-            if (!friends?.data) {
-                return
-            }
-
-            if (res) {
-                const newData: FriendsResponse = {
-                    ...res,
-                    data: [...friends.data, ...res.data],
+                if (!friends?.data) {
+                    return
                 }
 
-                mutateFriends(newData, {
-                    revalidate: false,
-                })
+                if (res) {
+                    const newData: FriendsResponse = {
+                        ...res,
+                        data: [...friends.data, ...res.data],
+                    }
+
+                    mutateFriends(newData, {
+                        revalidate: false,
+                    })
+                }
+            } catch (error: any) {
+                handleApiError(error)
             }
         }
 

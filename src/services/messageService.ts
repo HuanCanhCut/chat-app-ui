@@ -22,7 +22,7 @@ export const getMessages = async ({
 
         return response.data
     } catch (error: any) {
-        console.log(error)
+        throw error
     }
 }
 
@@ -45,7 +45,7 @@ export const getMessageImages = async ({
 
         return response.data
     } catch (error: any) {
-        console.log(error)
+        throw error
     }
 }
 
@@ -64,7 +64,7 @@ export const getReactionTypes = async ({
 
         return response.data
     } catch (error: any) {
-        console.log(error)
+        throw error
     }
 }
 

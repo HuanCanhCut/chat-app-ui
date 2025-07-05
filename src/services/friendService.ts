@@ -25,7 +25,7 @@ export const getFriends = async ({
 
         return response.data
     } catch (error: any) {
-        console.log(error)
+        throw error
     }
 }
 

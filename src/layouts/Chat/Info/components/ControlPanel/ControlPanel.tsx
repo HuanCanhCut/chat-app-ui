@@ -21,10 +21,12 @@ import Accordion from '~/components/Accordion'
 import Button from '~/components/Button'
 import CustomTippy from '~/components/CustomTippy'
 import { FontIcon, GalleryImageIcon } from '~/components/Icons'
+import Modal from '~/components/Modal'
 import UserAvatar from '~/components/UserAvatar'
 import config from '~/config'
 import SWRKey from '~/enum/SWRKey'
 import { listenEvent, sendEvent } from '~/helpers/events'
+import RenameConversationModal from '~/layouts/Chat/Modal/RenameConversationModal'
 import { useAppSelector } from '~/redux'
 import { getCurrentUser } from '~/redux/selector'
 import * as conversationServices from '~/services/conversationService'
@@ -48,6 +50,16 @@ interface AccordionItem {
 const ControlPanel: React.FC<ControlPanelProps> = ({ setSearchMode }) => {
     const currentUser = useAppSelector(getCurrentUser)
     const { uuid } = useParams()
+
+    const [modalState, setModalState] = useState<{
+        isOpen: boolean
+        component: React.ReactNode
+        title: string
+    }>({
+        isOpen: false,
+        component: null,
+        title: '',
+    })
 
     const { data: conversation } = useSWR(uuid ? [SWRKey.GET_CONVERSATION_BY_UUID, uuid] : null, () => {
         return conversationServices.getConversationByUuid({ uuid: uuid as string })
@@ -218,9 +230,31 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ setSearchMode }) => {
         },
     ].filter(Boolean) as AccordionItem[]
 
-    const handleChose = useCallback((type: string) => {
-        console.log(type)
+    const handleCloseModal = useCallback(() => {
+        setModalState((prev) => {
+            return {
+                ...prev,
+                isOpen: false,
+            }
+        })
     }, [])
+
+    const handleChose = useCallback(
+        (type: string) => {
+            switch (type) {
+                case 'rename_conversation':
+                    setModalState({
+                        isOpen: true,
+                        component: (
+                            <RenameConversationModal onClose={handleCloseModal} name={conversation?.data.name} />
+                        ),
+                        title: 'Đổi tên đoạn chat',
+                    })
+                    break
+            }
+        },
+        [conversation?.data.name, handleCloseModal],
+    )
 
     useEffect(() => {
         interface UserStatus {
@@ -250,6 +284,15 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ setSearchMode }) => {
             >
                 <FontAwesomeIcon icon={faArrowLeft} />
             </Button>
+
+            <Modal
+                isOpen={modalState.isOpen}
+                onClose={handleCloseModal}
+                popperClassName="px-0"
+                title={modalState.title}
+            >
+                {modalState.component}
+            </Modal>
 
             <div className="flex flex-col items-center pt-2">
                 <UserAvatar
