@@ -4,10 +4,9 @@ import { useParams, useRouter } from 'next/navigation'
 import { Emoji, EmojiStyle } from 'emoji-picker-react'
 import useSWR from 'swr'
 
-import { faSpinner, faXmark } from '@fortawesome/free-solid-svg-icons'
+import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import Button from '~/components/Button'
-import PopperWrapper from '~/components/PopperWrapper'
+import Modal from '~/components/Modal'
 import UserAvatar from '~/components/UserAvatar'
 import config from '~/config'
 import { SocketEvent } from '~/enum/SocketEvent'
@@ -19,13 +18,14 @@ import * as messageServices from '~/services/messageService'
 import { MessageReactionModel, TopReaction } from '~/type/type'
 
 interface Props {
+    isOpen: boolean
     onClose: () => void
     messageId: number
 }
 
 const PER_PAGE = 7
 
-const ReactionModal: React.FC<Props> = ({ onClose, messageId }) => {
+const ReactionModal: React.FC<Props> = ({ isOpen, onClose, messageId }) => {
     const { uuid } = useParams()
 
     const router = useRouter()
@@ -173,13 +173,12 @@ const ReactionModal: React.FC<Props> = ({ onClose, messageId }) => {
     }, [currentUser.data.id, messageId, mutateReactionTypes, mutateReactions, reactionTypes, reactions])
 
     return (
-        <PopperWrapper className="w-[548px] max-w-[calc(100vw-40px)] !p-0">
-            <header className="relative flex justify-center border-b border-gray-300 p-4 dark:border-zinc-700">
-                <h3>Cảm xúc về tin nhắn</h3>
-                <Button buttonType="icon" onClick={onClose} className="absolute right-2 top-1/2 -translate-y-1/2">
-                    <FontAwesomeIcon icon={faXmark} className="text-xl" />
-                </Button>
-            </header>
+        <Modal
+            isOpen={isOpen}
+            onClose={onClose}
+            title="Cảm xúc về tin nhắn"
+            popperClassName="w-[548px] max-w-[calc(100vw-40px)] !p-0"
+        >
             <main className="p-4">
                 <div>
                     {tabs.map((tab) => (
@@ -247,7 +246,7 @@ const ReactionModal: React.FC<Props> = ({ onClose, messageId }) => {
                     </InfiniteScroll>
                 </div>
             </main>
-        </PopperWrapper>
+        </Modal>
     )
 }
 

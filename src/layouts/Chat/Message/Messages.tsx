@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { memo, useEffect, useRef, useState } from 'react'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { useParams } from 'next/navigation'
 import useSWR from 'swr'
@@ -103,6 +103,7 @@ const Message: React.FC<MessageProps> = ({ conversation }) => {
                             revalidate: false,
                         },
                     )
+
                     setOffsetRange((prev) => {
                         return {
                             ...prev,
@@ -110,6 +111,7 @@ const Message: React.FC<MessageProps> = ({ conversation }) => {
                             end: prev.end + 1,
                         }
                     })
+
                     return
                 }
 
@@ -146,6 +148,14 @@ const Message: React.FC<MessageProps> = ({ conversation }) => {
                         revalidate: false,
                     },
                 )
+
+                setOffsetRange((prev) => {
+                    return {
+                        ...prev,
+                        start: prev.start,
+                        end: prev.end + 1,
+                    }
+                })
             }
         }
 
@@ -581,4 +591,4 @@ const Message: React.FC<MessageProps> = ({ conversation }) => {
     )
 }
 
-export default Message
+export default memo(Message)

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { memo, useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 
 import { faChevronLeft, faCircleInfo } from '@fortawesome/free-solid-svg-icons'
@@ -129,7 +129,7 @@ const Header: React.FC<HeaderProps> = ({ className = '', isInfoOpen, conversatio
                     />
                 </div>
                 <div
-                    className="flex h-full cursor-pointer items-center gap-3 rounded-lg p-2 hover:bg-lightGray dark:hover:bg-darkGray"
+                    className="flex h-full cursor-pointer items-center gap-3 rounded-lg p-2 pr-4 hover:bg-[#99999926] dark:bg-transparent dark:hover:bg-[#383b3b25]"
                     onClick={handleNavigate}
                 >
                     <div className="relative flex-shrink-0">
@@ -156,7 +156,11 @@ const Header: React.FC<HeaderProps> = ({ className = '', isInfoOpen, conversatio
                 </div>
             </div>
             <div className="flex items-center">
-                <Button buttonType="icon" className="bg-transparent dark:bg-transparent" onClick={handleToggleInfo}>
+                <Button
+                    buttonType="icon"
+                    className="bg-transparent hover:bg-[#99999926] dark:bg-transparent dark:hover:bg-[#383b3b25]"
+                    onClick={handleToggleInfo}
+                >
                     <FontAwesomeIcon
                         icon={faCircleInfo}
                         width={20}
@@ -169,4 +173,4 @@ const Header: React.FC<HeaderProps> = ({ className = '', isInfoOpen, conversatio
     )
 }
 
-export default Header
+export default memo(Header)

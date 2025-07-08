@@ -7,6 +7,6 @@ export const getAnUser = async (nickname: string): Promise<UserResponse | undefi
 
         return response.data
     } catch (error: any) {
-        console.log(error)
+        throw error
     }
 }

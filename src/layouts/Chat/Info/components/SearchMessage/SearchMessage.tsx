@@ -51,7 +51,7 @@ const SearchMessage: React.FC = () => {
 
                 setSearchResult(response)
             } catch (error) {
-                handleApiError(error, 'Lỗi tìm kiếm tin nhắn')
+                handleApiError(error)
             }
         })()
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -136,7 +136,7 @@ const SearchMessage: React.FC = () => {
 
                             setPage(page + 1)
                         } catch (error) {
-                            handleApiError(error, 'Có lỗi trong quá trình tải thêm tin nhắn.')
+                            handleApiError(error)
                         }
                     }}
                     className="!overflow-hidden"

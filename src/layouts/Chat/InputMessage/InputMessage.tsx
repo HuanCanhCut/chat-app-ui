@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import React, { memo, useEffect, useMemo, useRef, useState } from 'react'
 import { useParams } from 'next/navigation'
 import { Emoji as EmojiPicker, EmojiStyle } from 'emoji-picker-react'
 import { EmojiClickData } from 'emoji-picker-react'
@@ -473,4 +473,4 @@ const InputMessage: React.FC<InputMessageProps> = () => {
     )
 }
 
-export default InputMessage
+export default memo(InputMessage)

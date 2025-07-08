@@ -23,7 +23,7 @@ export const getNotifications = async ({
 
         return response.data
     } catch (error: any) {
-        console.log(error)
+        throw error
     }
 }
 

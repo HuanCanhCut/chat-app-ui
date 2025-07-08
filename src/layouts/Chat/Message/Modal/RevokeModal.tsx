@@ -2,10 +2,8 @@ import React, { useState } from 'react'
 import { useParams } from 'next/navigation'
 import { mutate } from 'swr'
 
-import { faXmark } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Button from '~/components/Button'
-import PopperWrapper from '~/components/PopperWrapper'
+import Modal from '~/components/Modal'
 import SWRKey from '~/enum/SWRKey'
 import { useAppSelector } from '~/redux'
 import { getCurrentUser } from '~/redux/selector'
@@ -15,9 +13,10 @@ import { toast } from '~/utils/toast'
 interface RevokeModalProps {
     message: MessageModel
     onClose: () => void
+    isOpen: boolean
 }
 
-const RevokeModal = ({ message, onClose }: RevokeModalProps) => {
+const RevokeModal = ({ isOpen, message, onClose }: RevokeModalProps) => {
     const { data: currentUser } = useAppSelector(getCurrentUser)
 
     const { uuid } = useParams()
@@ -112,22 +111,12 @@ const RevokeModal = ({ message, onClose }: RevokeModalProps) => {
     }
 
     return (
-        <PopperWrapper
-            className={`!max-w-[calc(100vw-30px)] !border-none !p-0 ${revokeType === 'for-me' ? '!w-[550px]' : '!w-[700px]'}`}
+        <Modal
+            isOpen={isOpen}
+            onClose={onClose}
+            title={revokeType === 'for-me' ? 'Gỡ đối với bạn?' : 'Bạn muốn tin nhắn này thu hồi ở phía ai?'}
+            popperClassName={`!max-w-[calc(100vw-30px)] !border-none !p-0 ${revokeType === 'for-me' ? '!w-[550px]' : '!w-[700px]'}`}
         >
-            <header className="relative border-b border-gray-200 p-3 text-center dark:border-zinc-700">
-                <span className="text-center text-xl font-medium">
-                    {revokeType === 'for-me' ? 'Gỡ đối với bạn?' : 'Bạn muốn tin nhắn này thu hồi ở phía ai?'}
-                </span>
-
-                <Button
-                    buttonType="icon"
-                    className="absolute right-2 top-1/2 -translate-y-1/2 text-2xl"
-                    onClick={onClose}
-                >
-                    <FontAwesomeIcon icon={faXmark} />
-                </Button>
-            </header>
             <main className="px-5 py-3">
                 {revokeType === 'for-me' ? (
                     <>
@@ -188,7 +177,7 @@ const RevokeModal = ({ message, onClose }: RevokeModalProps) => {
                     </Button>
                 </div>
             </main>
-        </PopperWrapper>
+        </Modal>
     )
 }
 

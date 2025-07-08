@@ -8,6 +8,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Tippy from '@tippyjs/react/headless'
 import SWRKey from '~/enum/SWRKey'
 import { sendEvent } from '~/helpers/events'
+import handleApiError from '~/helpers/handleApiError'
 import useDebounce from '~/hooks/useDebounce'
 import * as searchService from '~/services/searchService'
 import { SearchHistory, SearchHistoryData, UserModel } from '~/type/type'
@@ -44,9 +45,13 @@ const Search: React.FC<SearchProps> = ({ placeholder = 'Tìm kiếm', className 
         }
 
         const searchUser = async () => {
-            const response = await searchService.searchUser(debounceValue)
-            if (response) {
-                setSearchResult(response.data)
+            try {
+                const response = await searchService.searchUser(debounceValue)
+                if (response) {
+                    setSearchResult(response.data)
+                }
+            } catch (error) {
+                handleApiError(error)
             }
         }
 

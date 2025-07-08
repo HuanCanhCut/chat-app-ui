@@ -1,4 +1,5 @@
 import { memo, useCallback, useEffect, useRef, useState } from 'react'
+import ReactModal from 'react-modal'
 import { useParams } from 'next/navigation'
 import moment from 'moment-timezone'
 
@@ -8,7 +9,6 @@ import MessageContent from './components/MessageContent'
 import ReplyMessage from './components/ReplyMessage'
 import Viewed from './components/UserViewed'
 import Tippy from '@tippyjs/react'
-import Modal from '~/components/Modal'
 import UserAvatar from '~/components/UserAvatar'
 import { SocketEvent } from '~/enum/SocketEvent'
 import { sendEvent } from '~/helpers/events'
@@ -196,33 +196,28 @@ const MessageItem = ({ message, messageIndex, messages, currentUser, messageRef 
         return true
     }
 
-    if (messageIndex === 0) {
-        console.log({
-            message,
-            diffTime: diffTime(message, messages.data[messageIndex + 1]),
-        })
-    }
-
     return (
         <div>
             {message.type === 'image' && (
-                <Modal
+                <ReactModal
                     isOpen={openImageModal.isOpen}
-                    onClose={handleCloseImageModal}
+                    ariaHideApp={false}
                     overlayClassName="overlay"
+                    closeTimeoutMS={200}
+                    onRequestClose={handleCloseImageModal}
                     className="fixed bottom-0 left-0 right-0 top-0"
                 >
                     <MessageImagesModel onClose={handleCloseImageModal} imageUrl={openImageModal.image} />
-                </Modal>
+                </ReactModal>
             )}
 
-            <Modal isOpen={openReactionModal.isOpen} onClose={handleCloseReactionModal}>
-                <ReactionModal onClose={handleCloseReactionModal} messageId={openReactionModal.messageId} />
-            </Modal>
+            <ReactionModal
+                isOpen={openReactionModal.isOpen}
+                onClose={handleCloseReactionModal}
+                messageId={openReactionModal.messageId}
+            />
 
-            <Modal isOpen={openRevokeModal} onClose={handleCloseRevokeModal}>
-                <RevokeModal message={message} onClose={handleCloseRevokeModal} />
-            </Modal>
+            <RevokeModal isOpen={openRevokeModal} message={message} onClose={handleCloseRevokeModal} />
 
             <div ref={groupMessageRef} className={`group relative flex w-full items-end gap-3`}>
                 {message.sender_id !== currentUser?.id && (

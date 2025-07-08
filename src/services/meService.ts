@@ -18,7 +18,7 @@ export const getCurrentUser = async (): Promise<Response | undefined> => {
 
         return response.data
     } catch (error: any) {
-        console.log(error)
+        throw error
     }
 }
 
