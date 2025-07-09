@@ -15,4 +15,16 @@ export enum SocketEvent {
     // ------------------------------- Reaction -------------------------------
     REACT_MESSAGE = 'message:react',
     REMOVE_REACTION = 'message:remove_reaction',
+
+    // ------------------------------- Conversation -------------------------------
+    CONVERSATION_RENAMED = 'conversation:renamed',
+    CONVERSATION_AVATAR_CHANGED = 'conversation:avatar_changed',
+    CONVERSATION_THEME_CHANGED = 'conversation:theme_changed',
+    CONVERSATION_EMOJI_CHANGED = 'conversation:emoji_changed',
+    CONVERSATION_MEMBER_NICKNAME_CHANGED = 'conversation:member_nickname_changed',
+    CONVERSATION_MEMBER_ADDED = 'conversation:member_added',
+    CONVERSATION_LEADER_CHANGED = 'conversation:leader_changed',
+    CONVERSATION_MEMBER_REMOVED = 'conversation:member_removed',
+    CONVERSATION_MEMBER_LEAVED = 'conversation:member_leaved',
+    CONVERSATION_BLOCKED = 'conversation:blocked',
 }

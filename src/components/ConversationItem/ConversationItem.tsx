@@ -68,14 +68,14 @@ const ConversationItem: React.FC<Props> = ({ conversation, className = '' }) => 
                         {conversation.name || userMember?.nickname || userMember?.user.full_name}
                     </p>
                     <div
-                        className={`flex items-center text-[13px] font-normal [&_*]:text-[13px] ${isRead ? 'text-gray-600 dark:text-gray-400' : 'font-medium text-black dark:text-gray-200'} `}
+                        className={`flex items-center text-[13px] font-normal [&_*]:text-[13px] ${isRead ? '[&_*]:text-gray-600 dark:[&_*]:text-gray-400' : '[&_*]:text-black dark:[&_*]:text-gray-200'}`}
                     >
-                        <span className="truncate pr-1 [&>p]:w-auto">
+                        <span className={`truncate pr-1 [&>p]:w-auto`}>
                             {conversation.last_message.type.startsWith('system') ? (
                                 <SystemMessage
                                     message={conversation.last_message}
                                     messageIndex={-1}
-                                    className="[&_p]:line-clamp-1 [&_p]:w-full [&_p]:truncate [&_p]:text-ellipsis"
+                                    className={`[&_p]:line-clamp-1 [&_p]:w-full [&_p]:truncate [&_p]:text-ellipsis`}
                                 />
                             ) : (
                                 <EmojiMessageStyle
