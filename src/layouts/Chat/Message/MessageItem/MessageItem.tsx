@@ -176,15 +176,19 @@ const MessageItem = ({ message, messageIndex, messages, currentUser, messageRef 
     }
 
     const isLastMessageInConsecutiveGroup = () => {
-        if (message.type.startsWith('system')) {
-            return true
-        }
-
         if (messageIndex >= messages.data.length - 1) {
             return true
         }
 
         const prevMessage = messages.data[messageIndex - 1]
+
+        if (prevMessage?.type.startsWith('system') && !message.type.startsWith('system')) {
+            return true
+        }
+
+        if (message.type.startsWith('system')) {
+            return true
+        }
 
         if (prevMessage) {
             const isConsecutiveWithPrev =

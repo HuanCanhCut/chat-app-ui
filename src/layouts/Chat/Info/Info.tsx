@@ -1,13 +1,66 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useParams } from 'next/navigation'
+import { mutate } from 'swr'
 
 import ControlPanel from './components/ControlPanel'
 import SearchMessage from './components/SearchMessage'
+import { SocketEvent } from '~/enum/SocketEvent'
+import SWRKey from '~/enum/SWRKey'
+import socket from '~/helpers/socket'
+import { ConversationModel, ConversationThemeModel } from '~/type/type'
+
 interface InfoProps {
     className?: string
 }
 
 const Info: React.FC<InfoProps> = ({ className = '' }) => {
+    const { uuid } = useParams()
+
     const [searchMode, setSearchMode] = useState(false)
+
+    useEffect(() => {
+        interface ConversationRenamedPayload {
+            conversation_uuid: string
+            value: string | ConversationThemeModel
+            key: 'name' | 'avatar' | 'theme' | 'emoji'
+        }
+
+        const socketHandler = ({ conversation_uuid, key, value }: ConversationRenamedPayload) => {
+            if (uuid === conversation_uuid) {
+                mutate(
+                    [SWRKey.GET_CONVERSATION_BY_UUID, uuid],
+                    (prev: { data: ConversationModel } | undefined) => {
+                        if (!prev) {
+                            return prev
+                        }
+
+                        if (!prev?.data) {
+                            return prev
+                        }
+
+                        return {
+                            ...prev,
+                            data: {
+                                ...prev.data,
+                                [key]: value,
+                            },
+                        }
+                    },
+                    {
+                        revalidate: false,
+                    },
+                )
+            }
+        }
+
+        socket.on(SocketEvent.CONVERSATION_RENAMED, socketHandler)
+        socket.on(SocketEvent.CONVERSATION_AVATAR_CHANGED, socketHandler)
+
+        return () => {
+            socket.off(SocketEvent.CONVERSATION_RENAMED, socketHandler)
+            socket.off(SocketEvent.CONVERSATION_AVATAR_CHANGED, socketHandler)
+        }
+    }, [uuid])
 
     return (
         <div

@@ -118,12 +118,12 @@ const Header: React.FC<HeaderProps> = ({ className = '', isInfoOpen, conversatio
         >
             <div className="flex items-center">
                 <div
-                    className="flex-center cursor-pointer rounded-lg px-1 py-1 hover:bg-lightGray dark:hover:bg-darkGray bp900:hidden"
+                    className="flex-center cursor-pointer rounded-lg px-1 py-1 hover:!bg-[#99999926] dark:hover:!bg-[#383b3b25] bp900:hidden"
                     onClick={() => router.push('/message')}
                 >
                     <FontAwesomeIcon
                         icon={faChevronLeft}
-                        className="text-xl dark:text-gray-500"
+                        className="text-xl text-[var(--sender-light-background-color)] dark:text-[var(--sender-dark-background-color)]"
                         width={22}
                         height={22}
                     />
@@ -158,7 +158,7 @@ const Header: React.FC<HeaderProps> = ({ className = '', isInfoOpen, conversatio
             <div className="flex items-center">
                 <Button
                     buttonType="icon"
-                    className="bg-transparent hover:bg-[#99999926] dark:bg-transparent dark:hover:bg-[#383b3b25]"
+                    className="bg-transparent hover:!bg-[#99999926] dark:bg-transparent dark:hover:!bg-[#383b3b25]"
                     onClick={handleToggleInfo}
                 >
                     <FontAwesomeIcon

@@ -29,8 +29,6 @@ const RenameConversationModal: React.FC<RenameConversationModalProps> = ({ onClo
             const response = await conversationService.renameConversation({ uuid: uuid as string, name })
 
             if (response) {
-                toast.success('Đổi tên đoạn chat thành công')
-
                 onClose()
             }
         } catch (error: any) {
@@ -62,6 +60,7 @@ const RenameConversationModal: React.FC<RenameConversationModalProps> = ({ onClo
                         maxLength={MAX_LENGTH}
                         value={name}
                         onChange={handleChangeName}
+                        spellCheck={false}
                     />
                     <span className="absolute right-3 top-2 text-xs">
                         {name.length}/{MAX_LENGTH}

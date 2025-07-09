@@ -44,13 +44,18 @@ export default function UserPage() {
             }
 
             if (data.user_id === user.data.id) {
-                mutate({
-                    ...user,
-                    data: {
-                        ...user.data,
-                        is_online: data.is_online,
+                mutate(
+                    {
+                        ...user,
+                        data: {
+                            ...user.data,
+                            is_online: data.is_online,
+                        },
                     },
-                })
+                    {
+                        revalidate: false,
+                    },
+                )
             }
         }
 

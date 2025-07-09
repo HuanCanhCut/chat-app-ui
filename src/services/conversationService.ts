@@ -51,3 +51,13 @@ export const renameConversation = async ({ uuid, name }: { uuid: string; name: s
         throw error
     }
 }
+
+export const changeConversationAvatar = async ({ uuid, data }: { uuid: string; data: FormData }) => {
+    try {
+        const response = await request.patch(`/conversations/${uuid}/avatar`, data)
+
+        return response.data
+    } catch (error: any) {
+        throw error
+    }
+}

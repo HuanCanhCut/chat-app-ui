@@ -1,3 +1,5 @@
+export type AxiosApiError = AxiosError<{ message: string; status_code: number }>
+
 export interface BaseModel {
     id: number
     created_at: Date

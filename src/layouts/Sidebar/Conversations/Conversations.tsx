@@ -13,7 +13,14 @@ import socket from '~/helpers/socket'
 import { useAppSelector } from '~/redux'
 import { getCurrentTheme } from '~/redux/selector'
 import * as conversationService from '~/services/conversationService'
-import { ConversationMember, ConversationModel, MessageModel, SocketMessage, UserStatus } from '~/type/type'
+import {
+    ConversationMember,
+    ConversationModel,
+    ConversationThemeModel,
+    MessageModel,
+    SocketMessage,
+    UserStatus,
+} from '~/type/type'
 
 interface Conversation<T> {
     [key: string]: T
@@ -273,6 +280,40 @@ const Conversations = () => {
             socket.off(SocketEvent.UPDATE_READ_MESSAGE, socketHandler)
         }
     }, [conversations, mutateConversations])
+
+    useEffect(() => {
+        interface ConversationRenamedPayload {
+            conversation_uuid: string
+            value: string | ConversationThemeModel
+            key: 'name' | 'avatar' | 'theme' | 'emoji'
+        }
+
+        const socketHandler = ({ conversation_uuid, value, key }: ConversationRenamedPayload) => {
+            mutateConversations((prev) => {
+                if (!prev) {
+                    return prev
+                }
+
+                const newData = {
+                    ...prev,
+                    [conversation_uuid]: {
+                        ...prev[conversation_uuid],
+                        [key]: value,
+                    },
+                }
+
+                return newData
+            })
+        }
+
+        socket.on(SocketEvent.CONVERSATION_RENAMED, socketHandler)
+        socket.on(SocketEvent.CONVERSATION_AVATAR_CHANGED, socketHandler)
+
+        return () => {
+            socket.off(SocketEvent.CONVERSATION_RENAMED, socketHandler)
+            socket.off(SocketEvent.CONVERSATION_AVATAR_CHANGED, socketHandler)
+        }
+    }, [mutateConversations])
 
     return (
         <div className="h-full w-full pt-4">

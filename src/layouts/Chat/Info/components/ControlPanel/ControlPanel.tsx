@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useCallback, useEffect, useMemo, useState } from 'react'
+import { Dispatch, SetStateAction, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { Emoji, EmojiStyle } from 'emoji-picker-react'
@@ -26,11 +26,12 @@ import UserAvatar from '~/components/UserAvatar'
 import config from '~/config'
 import SWRKey from '~/enum/SWRKey'
 import { listenEvent, sendEvent } from '~/helpers/events'
+import handleApiError from '~/helpers/handleApiError'
 import RenameConversationModal from '~/layouts/Chat/Modal/RenameConversationModal'
 import { useAppSelector } from '~/redux'
 import { getCurrentUser } from '~/redux/selector'
 import * as conversationServices from '~/services/conversationService'
-import { ConversationMember } from '~/type/type'
+import { AxiosApiError, ConversationMember } from '~/type/type'
 import { momentTimezone } from '~/utils/moment'
 
 interface ControlPanelProps {
@@ -50,6 +51,8 @@ interface AccordionItem {
 const ControlPanel: React.FC<ControlPanelProps> = ({ setSearchMode }) => {
     const currentUser = useAppSelector(getCurrentUser)
     const { uuid } = useParams()
+
+    const fileInputRef = useRef<HTMLInputElement>(null)
 
     const [modalState, setModalState] = useState<{
         isOpen: boolean
@@ -251,10 +254,33 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ setSearchMode }) => {
                         title: 'Đổi tên đoạn chat',
                     })
                     break
+                case 'change_avatar':
+                    if (fileInputRef.current) {
+                        fileInputRef.current.click()
+                    }
+                    break
             }
         },
         [conversation?.data.name, handleCloseModal],
     )
+
+    const handleChangeAvatar = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0]
+
+        if (file) {
+            const formData = new FormData()
+            formData.append('avatar', file)
+
+            try {
+                await conversationServices.changeConversationAvatar({
+                    uuid: conversation?.data.uuid as string,
+                    data: formData,
+                })
+            } catch (error) {
+                handleApiError(error as AxiosApiError)
+            }
+        }
+    }
 
     useEffect(() => {
         interface UserStatus {
@@ -293,6 +319,8 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ setSearchMode }) => {
             >
                 {modalState.component}
             </Modal>
+
+            <input type="file" hidden accept="image/*" ref={fileInputRef} onChange={handleChangeAvatar} />
 
             <div className="flex flex-col items-center pt-2">
                 <UserAvatar
