@@ -7,7 +7,7 @@ import SearchMessage from './components/SearchMessage'
 import { SocketEvent } from '~/enum/SocketEvent'
 import SWRKey from '~/enum/SWRKey'
 import socket from '~/helpers/socket'
-import { ConversationModel } from '~/type/type'
+import { ConversationModel, ConversationThemeModel } from '~/type/type'
 
 interface InfoProps {
     className?: string
@@ -21,16 +21,15 @@ const Info: React.FC<InfoProps> = ({ className = '' }) => {
     useEffect(() => {
         interface ConversationRenamedPayload {
             conversation_uuid: string
-            conversation_name: string
+            value: string | ConversationThemeModel
+            key: 'name' | 'avatar' | 'theme' | 'emoji'
         }
 
-        const socketHandler = ({ conversation_uuid, conversation_name }: ConversationRenamedPayload) => {
+        const socketHandler = ({ conversation_uuid, key, value }: ConversationRenamedPayload) => {
             if (uuid === conversation_uuid) {
                 mutate(
                     [SWRKey.GET_CONVERSATION_BY_UUID, uuid],
                     (prev: { data: ConversationModel } | undefined) => {
-                        console.log(prev)
-
                         if (!prev) {
                             return prev
                         }
@@ -43,7 +42,7 @@ const Info: React.FC<InfoProps> = ({ className = '' }) => {
                             ...prev,
                             data: {
                                 ...prev.data,
-                                name: conversation_name,
+                                [key]: value,
                             },
                         }
                     },
@@ -55,9 +54,11 @@ const Info: React.FC<InfoProps> = ({ className = '' }) => {
         }
 
         socket.on(SocketEvent.CONVERSATION_RENAMED, socketHandler)
+        socket.on(SocketEvent.CONVERSATION_AVATAR_CHANGED, socketHandler)
 
         return () => {
             socket.off(SocketEvent.CONVERSATION_RENAMED, socketHandler)
+            socket.off(SocketEvent.CONVERSATION_AVATAR_CHANGED, socketHandler)
         }
     }, [uuid])
 
