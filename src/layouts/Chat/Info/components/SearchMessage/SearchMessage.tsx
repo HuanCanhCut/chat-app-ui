@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { useParams } from 'next/navigation'
+import { AxiosError } from 'axios'
 
 import SearchResult from './SearchResult'
 import { faSearch, faSpinner, faXmark } from '@fortawesome/free-solid-svg-icons'
@@ -51,7 +52,9 @@ const SearchMessage: React.FC = () => {
 
                 setSearchResult(response)
             } catch (error) {
-                handleApiError(error)
+                if (error instanceof AxiosError) {
+                    handleApiError(error)
+                }
             }
         })()
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -136,7 +139,9 @@ const SearchMessage: React.FC = () => {
 
                             setPage(page + 1)
                         } catch (error) {
-                            handleApiError(error)
+                            if (error instanceof AxiosError) {
+                                handleApiError(error)
+                            }
                         }
                     }}
                     className="!overflow-hidden"

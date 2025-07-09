@@ -2,6 +2,7 @@
 
 import { useCallback, useState } from 'react'
 import ReactModal from 'react-modal'
+import { AxiosError } from 'axios'
 
 import { faUserFriends, faUserPlus, faXmark } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -29,8 +30,10 @@ const FriendButton = ({ user, className = '' }: FriendButtonProps) => {
             })
 
             return await friendService.addFriend(user.id)
-        } catch (error: any) {
-            handleApiError(error)
+        } catch (error) {
+            if (error instanceof AxiosError) {
+                handleApiError(error)
+            }
         }
     }, [user])
 
@@ -41,8 +44,10 @@ const FriendButton = ({ user, className = '' }: FriendButtonProps) => {
                 detail: { sent_friend_request: false },
             })
             return await friendService.cancelFriendRequest(user.id)
-        } catch (error: any) {
-            handleApiError(error)
+        } catch (error) {
+            if (error instanceof AxiosError) {
+                handleApiError(error)
+            }
         }
     }, [user.id])
 
@@ -68,8 +73,10 @@ const FriendButton = ({ user, className = '' }: FriendButtonProps) => {
                 detail: { is_friend: false, friend_request: false },
             })
             closeModal()
-        } catch (error: any) {
-            handleApiError(error)
+        } catch (error) {
+            if (error instanceof AxiosError) {
+                handleApiError(error)
+            }
         }
     }, [closeModal, user.id])
 

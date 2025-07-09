@@ -1,6 +1,7 @@
 import { Dispatch, SetStateAction, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
+import { AxiosError } from 'axios'
 import { Emoji, EmojiStyle } from 'emoji-picker-react'
 import useSWR from 'swr'
 
@@ -31,7 +32,7 @@ import RenameConversationModal from '~/layouts/Chat/Modal/RenameConversationModa
 import { useAppSelector } from '~/redux'
 import { getCurrentUser } from '~/redux/selector'
 import * as conversationServices from '~/services/conversationService'
-import { AxiosApiError, ConversationMember } from '~/type/type'
+import { ConversationMember } from '~/type/type'
 import { momentTimezone } from '~/utils/moment'
 
 interface ControlPanelProps {
@@ -277,7 +278,9 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ setSearchMode }) => {
                     data: formData,
                 })
             } catch (error) {
-                handleApiError(error as AxiosApiError)
+                if (error instanceof AxiosError) {
+                    handleApiError(error)
+                }
             }
         }
     }
