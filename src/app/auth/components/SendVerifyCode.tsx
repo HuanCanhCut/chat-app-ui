@@ -1,6 +1,7 @@
 'use client'
 
 import { memo, MutableRefObject, useEffect, useRef, useState } from 'react'
+import { AxiosError } from 'axios'
 
 import handleApiError from '~/helpers/handleApiError'
 import * as authService from '~/services/authService'
@@ -59,8 +60,10 @@ const SendVerifyCode: React.FC<Props> = ({ emailRef }) => {
                 )
                 setSendSuccess(true)
             }
-        } catch (error: any) {
-            handleApiError(error)
+        } catch (error) {
+            if (error instanceof AxiosError) {
+                handleApiError(error)
+            }
         }
     }
 

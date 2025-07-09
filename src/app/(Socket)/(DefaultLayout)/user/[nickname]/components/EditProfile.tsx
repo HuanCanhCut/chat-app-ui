@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
+import { AxiosError } from 'axios'
 import { mutate } from 'swr'
 
 import { faCamera, faXmark } from '@fortawesome/free-solid-svg-icons'
@@ -125,8 +126,10 @@ const EditProfile = ({ closeModal }: EditProfileProps) => {
 
             // replace state to update url without reloading page
             window.history.replaceState({}, '', `${config.routes.user}/@${newData.data.nickname}`)
-        } catch (error: any) {
-            handleApiError(error)
+        } catch (error) {
+            if (error instanceof AxiosError) {
+                handleApiError(error)
+            }
         }
     }
 
