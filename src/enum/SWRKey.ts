@@ -52,6 +52,11 @@ enum SWRKey {
      */
     GET_REACTIONS_TYPE = '/reactions/:messageId/types',
     GET_REACTIONS = '/reactions/:messageId',
+
+    /**
+     * Theme
+     */
+    GET_THEMES = '/themes',
 }
 
 export default SWRKey

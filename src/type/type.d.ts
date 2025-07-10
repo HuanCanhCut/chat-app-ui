@@ -39,6 +39,8 @@ export interface UserStatus {
     last_online_at: string
 }
 
+// ========================================== Theme model ==========================================
+
 export interface ConversationThemeModel extends BaseModel {
     name: string
     logo: string
@@ -67,18 +69,22 @@ export interface ConversationThemeModel extends BaseModel {
         }
         background_theme: {
             light: {
-                background_image: string | null
+                background: string | null
                 header_color: string
                 footer_color: string
             }
             dark: {
-                background_image: string | null
+                background: string | null
                 header_color: string
                 footer_color: string
             }
         }
         emoji: string
     }
+}
+
+export interface ConversationThemeResponse extends MetaPagination {
+    data: ConversationThemeModel[]
 }
 
 // ========================================== Conversation model ==========================================
