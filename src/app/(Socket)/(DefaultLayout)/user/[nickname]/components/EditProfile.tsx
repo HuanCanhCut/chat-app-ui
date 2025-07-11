@@ -47,9 +47,10 @@ const EditProfile = ({ closeModal }: EditProfileProps) => {
     type FileType = 'avatar' | 'cover_photo'
     const handleChange = (e: any, type: FileType) => {
         const file = e.target.files?.[0]
-        file.preview = URL.createObjectURL(file)
 
         if (file) {
+            file.preview = URL.createObjectURL(file)
+
             switch (type) {
                 case 'avatar':
                     setAvatar(file)

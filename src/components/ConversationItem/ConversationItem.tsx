@@ -76,6 +76,7 @@ const ConversationItem: React.FC<Props> = ({ conversation, className = '' }) => 
                                     message={conversation.last_message}
                                     messageIndex={-1}
                                     className={`[&_p]:line-clamp-1 [&_p]:w-full [&_p]:truncate [&_p]:text-ellipsis`}
+                                    hiddenQuickAction={true}
                                 />
                             ) : (
                                 <EmojiMessageStyle

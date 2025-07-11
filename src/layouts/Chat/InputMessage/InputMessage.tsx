@@ -15,7 +15,7 @@ import { SendHorizontalIcon } from '~/components/Icons'
 import CustomImage from '~/components/Image/Image'
 import { SocketEvent } from '~/enum/SocketEvent'
 import SWRKey from '~/enum/SWRKey'
-import { listenEvent } from '~/helpers/events'
+import { listenEvent, sendEvent } from '~/helpers/events'
 import socket from '~/helpers/socket'
 import { useAppSelector } from '~/redux'
 import { getCurrentUser } from '~/redux/selector'
@@ -116,6 +116,10 @@ const InputMessage: React.FC<InputMessageProps> = () => {
                 type: onlyIcon ? 'icon' : 'text',
                 parent_id: replyMessage?.id,
             })
+
+            sendEvent({
+                eventName: 'message:send',
+            })
         }
 
         // handle image message
@@ -169,7 +173,7 @@ const InputMessage: React.FC<InputMessageProps> = () => {
                 images.map((image) =>
                     uploadToCloudinary(
                         image,
-                        'chat-app/messages',
+                        `chat-app-${process.env.NODE_ENV}/messages`,
                         `${uuid}-${image.name}-${Math.random().toString().substring(2, 15)}`,
                     ),
                 ),
@@ -179,6 +183,10 @@ const InputMessage: React.FC<InputMessageProps> = () => {
                 conversation_uuid,
                 message: JSON.stringify(payload.map((item) => item.secure_url)),
                 type: 'image',
+            })
+
+            sendEvent({
+                eventName: 'message:send',
             })
         }
 
@@ -456,6 +464,10 @@ const InputMessage: React.FC<InputMessageProps> = () => {
                                         message: emoji,
                                         type: 'icon',
                                         parent_id: replyMessage?.id,
+                                    })
+
+                                    sendEvent({
+                                        eventName: 'message:send',
                                     })
                                 }
                             }}

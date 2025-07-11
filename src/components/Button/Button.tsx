@@ -1,7 +1,7 @@
 import { memo } from 'react'
 import Link from 'next/link'
 
-interface ButtonProps {
+interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement | HTMLAnchorElement> {
     children: React.ReactNode
     className?: string
     href?: string
@@ -25,6 +25,7 @@ const Button = ({
 }: ButtonProps) => {
     const primaryClass =
         buttonType === 'primary' ? 'bg-primary px-4 py-[6px] rounded-md text-white hover:bg-primary/85' : ''
+
     const outlineClass =
         buttonType === 'outline'
             ? 'border border-gray-300 px-4 py-[6px] rounded-md  dark:hover:bg-[rgba(255,255,255,0.05)] hover:bg-[rgba(0,0,0,0.05)]'
@@ -37,6 +38,10 @@ const Button = ({
         buttonType === 'rounded'
             ? 'rounded-md px-4 py-[6px] dark:bg-[#313233] hover:bg-[#99999936] dark:hover:bg-[#333636] bg-gray-200'
             : ''
+
+    const baseClass = `flex-center ${primaryClass} ${outlineClass} ${buttonIconClass} ${roundedClass} ${className}`
+
+    const disabledClass = `opacity-50 cursor-not-allowed dark:bg-[#ffffff19] bg-[#E2E5E9] rounded-md px-4 py-[6px] ${className}`
 
     if (href) {
         return (
@@ -61,12 +66,7 @@ const Button = ({
     }
 
     return (
-        <button
-            className={`flex-center ${primaryClass} ${outlineClass} ${buttonIconClass} ${roundedClass} ${className}`}
-            {...props}
-            onClick={onClick}
-            type={type}
-        >
+        <button className={props.disabled ? disabledClass : baseClass} onClick={onClick} type={type} {...props}>
             {leftIcon && (
                 <span data-left-icon className="mr-2">
                     {leftIcon}

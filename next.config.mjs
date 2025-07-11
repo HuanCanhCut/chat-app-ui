@@ -15,12 +15,6 @@ const nextConfig = {
                 port: '',
                 pathname: '/**',
             },
-            {
-                protocol: 'https',
-                hostname: 'cellphones.com.vn',
-                port: '',
-                pathname: '/**',
-            },
         ],
     },
 }

@@ -5,6 +5,7 @@ import { AxiosError } from 'axios'
 import { Emoji, EmojiStyle } from 'emoji-picker-react'
 import useSWR from 'swr'
 
+import ConversationTheme from '../../Modal/Theme'
 import AccountOptions from './AccountOptions'
 import {
     faArrowLeft,
@@ -28,7 +29,7 @@ import config from '~/config'
 import SWRKey from '~/enum/SWRKey'
 import { listenEvent, sendEvent } from '~/helpers/events'
 import handleApiError from '~/helpers/handleApiError'
-import RenameConversationModal from '~/layouts/Chat/Modal/RenameConversationModal'
+import RenameConversationModal from '~/layouts/Chat/Info/Modal/RenameConversationModal'
 import { useAppSelector } from '~/redux'
 import { getCurrentUser } from '~/redux/selector'
 import * as conversationServices from '~/services/conversationService'
@@ -59,10 +60,12 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ setSearchMode }) => {
         isOpen: boolean
         component: React.ReactNode
         title: string
+        type: string
     }>({
         isOpen: false,
         component: null,
         title: '',
+        type: '',
     })
 
     const { data: conversation } = useSWR(uuid ? [SWRKey.GET_CONVERSATION_BY_UUID, uuid] : null, () => {
@@ -253,6 +256,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ setSearchMode }) => {
                             <RenameConversationModal onClose={handleCloseModal} name={conversation?.data.name} />
                         ),
                         title: 'Đổi tên đoạn chat',
+                        type: 'rename_conversation',
                     })
                     break
                 case 'change_avatar':
@@ -260,9 +264,19 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ setSearchMode }) => {
                         fileInputRef.current.click()
                     }
                     break
+                case 'change_topic':
+                    setModalState({
+                        isOpen: true,
+                        component: (
+                            <ConversationTheme onClose={handleCloseModal} currentTheme={conversation!.data.theme} />
+                        ),
+                        title: 'Xem trước và chọn chủ đề',
+                        type: 'change_topic',
+                    })
+                    break
             }
         },
-        [conversation?.data.name, handleCloseModal],
+        [conversation, handleCloseModal],
     )
 
     const handleChangeAvatar = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -304,6 +318,25 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ setSearchMode }) => {
         return remove
     }, [member?.user.id])
 
+    useEffect(() => {
+        const remove = listenEvent({
+            eventName: 'conversation:open-modal',
+            handler: ({ detail: type }) => {
+                if (type === 'theme') {
+                    setModalState({
+                        isOpen: true,
+                        component: (
+                            <ConversationTheme onClose={handleCloseModal} currentTheme={conversation!.data.theme} />
+                        ),
+                        title: 'Xem trước và chọn chủ đề',
+                        type: 'change_topic',
+                    })
+                }
+            },
+        })
+
+        return remove
+    }, [conversation, handleCloseModal])
     return (
         <>
             <Button
@@ -317,7 +350,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ setSearchMode }) => {
             <Modal
                 isOpen={modalState.isOpen}
                 onClose={handleCloseModal}
-                popperClassName="px-0"
+                popperClassName={`p-0 !overflow-hidden flex flex-col`}
                 title={modalState.title}
             >
                 {modalState.component}

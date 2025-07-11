@@ -55,10 +55,12 @@ const Info: React.FC<InfoProps> = ({ className = '' }) => {
 
         socket.on(SocketEvent.CONVERSATION_RENAMED, socketHandler)
         socket.on(SocketEvent.CONVERSATION_AVATAR_CHANGED, socketHandler)
+        socket.on(SocketEvent.CONVERSATION_THEME_CHANGED, socketHandler)
 
         return () => {
             socket.off(SocketEvent.CONVERSATION_RENAMED, socketHandler)
             socket.off(SocketEvent.CONVERSATION_AVATAR_CHANGED, socketHandler)
+            socket.off(SocketEvent.CONVERSATION_THEME_CHANGED, socketHandler)
         }
     }, [uuid])
 
