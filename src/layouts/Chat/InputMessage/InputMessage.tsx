@@ -1,4 +1,4 @@
-import React, { memo, useEffect, useMemo, useRef, useState } from 'react'
+import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useParams } from 'next/navigation'
 import { Emoji as EmojiPicker, EmojiStyle } from 'emoji-picker-react'
 import { EmojiClickData } from 'emoji-picker-react'
@@ -208,9 +208,9 @@ const InputMessage: React.FC<InputMessageProps> = () => {
         }))
     }
 
-    const handleEmojiClick = (emojiData: EmojiClickData) => {
+    const handleEmojiClick = useCallback((emojiData: EmojiClickData) => {
         setMessageValue((prev) => prev + emojiData.emoji)
-    }
+    }, [])
 
     useEffect(() => {
         const remove = listenEvent({

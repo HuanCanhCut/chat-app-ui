@@ -1,5 +1,6 @@
 'use client'
 
+import { memo } from 'react'
 import { Categories, EmojiClickData, EmojiStyle } from 'emoji-picker-react'
 import { Theme } from 'emoji-picker-react'
 
@@ -10,10 +11,10 @@ import { getCurrentTheme } from '~/redux/selector'
 
 interface EmojiProps {
     placeholder?: string
-    // eslint-disable-next-line no-unused-vars
     onEmojiClick: (emojiData: EmojiClickData, event: MouseEvent) => void
     isReaction?: boolean
     isOpen?: boolean
+    className?: string
 }
 
 const Emoji: React.FC<EmojiProps> = ({
@@ -21,6 +22,7 @@ const Emoji: React.FC<EmojiProps> = ({
     placeholder = 'Tìm kiếm biểu tượng cảm xúc',
     isReaction = false,
     isOpen = false,
+    className = '',
 }) => {
     const theme = useAppSelector(getCurrentTheme)
 
@@ -62,6 +64,7 @@ const Emoji: React.FC<EmojiProps> = ({
     return (
         <div tabIndex={-1}>
             <Picker
+                className={`bg-transparent ${className}`}
                 open={isOpen}
                 theme={theme === 'light' ? Theme.LIGHT : Theme.DARK}
                 onEmojiClick={onEmojiClick}
@@ -79,4 +82,4 @@ const Emoji: React.FC<EmojiProps> = ({
     )
 }
 
-export default Emoji
+export default memo(Emoji)

@@ -5,8 +5,9 @@ import { AxiosError } from 'axios'
 import { Emoji, EmojiStyle } from 'emoji-picker-react'
 import useSWR from 'swr'
 
+import ChangeEmojiModal from '../../Modal/ChangeEmojiModal'
 import ChangeNicknameModal from '../../Modal/ChangeNicknameModal'
-import ConversationTheme from '../../Modal/Theme'
+import ConversationTheme from '../../Modal/ThemeModal'
 import AccountOptions from './AccountOptions'
 import {
     faArrowLeft,
@@ -281,6 +282,16 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ setSearchMode }) => {
                         component: <ChangeNicknameModal />,
                         title: 'Biệt danh',
                         type: 'change_nickname',
+                    })
+                    break
+                case 'change_emoji':
+                    setModalState({
+                        isOpen: true,
+                        component: (
+                            <ChangeEmojiModal onClose={handleCloseModal} currentEmoji={conversation?.data.emoji} />
+                        ),
+                        title: 'Biểu tượng cảm xúc',
+                        type: 'change_emoji',
                     })
                     break
             }

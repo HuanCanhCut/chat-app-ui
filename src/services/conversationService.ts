@@ -81,3 +81,12 @@ export const changeConversationMemberNickname = async ({
         throw error
     }
 }
+
+export const changeConversationEmoji = async ({ uuid, emoji }: { uuid: string; emoji: string }) => {
+    try {
+        const response = await request.patch(`/conversations/${uuid}/emoji`, { emoji })
+        return response.data
+    } catch (error: any) {
+        throw error
+    }
+}

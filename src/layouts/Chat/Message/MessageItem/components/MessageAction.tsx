@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useParams } from 'next/navigation'
 import { EmojiClickData } from 'emoji-picker-react'
 
@@ -93,20 +93,23 @@ const MessageAction: React.FC<MessageActionProps> = ({
         }))
     }
 
-    const handleChooseReaction = (EmojiClickData: EmojiClickData) => {
-        setIsOpenReaction((prev) => ({
-            ...prev,
-            reactionOpen: true,
-            reactionWrapperOpen: false,
-        }))
+    const handleChooseReaction = useCallback(
+        (EmojiClickData: EmojiClickData) => {
+            setIsOpenReaction((prev) => ({
+                ...prev,
+                reactionOpen: true,
+                reactionWrapperOpen: false,
+            }))
 
-        socket.emit(SocketEvent.REACT_MESSAGE, {
-            conversation_uuid: uuid as string,
-            message_id: message.id,
-            react: EmojiClickData.unified,
-            user_react_id: currentUser?.id,
-        })
-    }
+            socket.emit(SocketEvent.REACT_MESSAGE, {
+                conversation_uuid: uuid as string,
+                message_id: message.id,
+                react: EmojiClickData.unified,
+                user_react_id: currentUser?.id,
+            })
+        },
+        [currentUser?.id, message.id, uuid],
+    )
 
     return (
         <div

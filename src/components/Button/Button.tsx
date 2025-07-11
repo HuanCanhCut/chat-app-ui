@@ -37,7 +37,7 @@ const Button = ({
             ? 'rounded-md px-4 py-[6px] dark:bg-[#313233] hover:bg-[#99999936] dark:hover:bg-[#333636] bg-gray-200'
             : ''
 
-    const baseClass = `flex-center ${primaryClass} ${outlineClass} ${buttonIconClass} ${roundedClass} ${className}`
+    const baseClass = `flex-center font-medium ${primaryClass} ${outlineClass} ${buttonIconClass} ${roundedClass} ${className}`
 
     const disabledClass = `opacity-50 cursor-not-allowed dark:bg-[#ffffff19] bg-[#E2E5E9] rounded-md px-4 py-[6px] ${className}`
 
