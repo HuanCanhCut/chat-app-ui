@@ -318,6 +318,25 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ setSearchMode }) => {
         return remove
     }, [member?.user.id])
 
+    useEffect(() => {
+        const remove = listenEvent({
+            eventName: 'conversation:open-modal',
+            handler: ({ detail: type }) => {
+                if (type === 'theme') {
+                    setModalState({
+                        isOpen: true,
+                        component: (
+                            <ConversationTheme onClose={handleCloseModal} currentTheme={conversation!.data.theme} />
+                        ),
+                        title: 'Xem trước và chọn chủ đề',
+                        type: 'change_topic',
+                    })
+                }
+            },
+        })
+
+        return remove
+    }, [conversation, handleCloseModal])
     return (
         <>
             <Button

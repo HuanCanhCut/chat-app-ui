@@ -9,18 +9,29 @@ interface SystemMessageProps {
     message: MessageModel
     messageIndex: number
     className?: string
+    hiddenQuickAction?: boolean
 }
 
+const quickActionTypes = ['system_change_theme']
+
 const SystemMessage = (
-    { message, messageIndex, className = '' }: SystemMessageProps,
+    { message, messageIndex, className = '', hiddenQuickAction = false }: SystemMessageProps,
     ref: React.Ref<HTMLDivElement>,
 ) => {
     const currentUser = useAppSelector(getCurrentUser)
 
-    const handleQuickAction = () => {
-        sendEvent({
-            eventName: 'theme:open-modal',
-        })
+    const handleQuickAction = (type: string) => {
+        switch (type) {
+            case 'system_change_theme':
+                sendEvent({
+                    eventName: 'conversation:open-modal',
+                    detail: 'theme',
+                })
+                break
+
+            default:
+                break
+        }
     }
 
     const handleReplaceJson = (text: string) => {
@@ -60,12 +71,14 @@ const SystemMessage = (
 
         jsx.push(<span key={`text-end`}>{text.slice(lastIndex)}</span>)
 
-        if (message.type === 'system_change_theme') {
+        if (quickActionTypes.includes(message.type) && !hiddenQuickAction) {
             jsx.push(
                 <span key={`quick-action`}>
                     <span
                         className="cursor-pointer select-none font-medium text-[var(--sender-light-background-color)] hover:underline dark:text-[var(--sender-dark-background-color)]"
-                        onClick={handleQuickAction}
+                        onClick={() => {
+                            handleQuickAction(message.type)
+                        }}
                     >
                         {' '}
                         Thay đổi

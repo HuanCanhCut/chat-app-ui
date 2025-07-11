@@ -51,6 +51,10 @@ const MessageContent = (
     }
 
     const consecutiveMessageStyle = () => {
+        if (messages.data.length === 1) {
+            return ''
+        }
+
         let style = ''
 
         // Nếu là tin nhắn đầu tiên, cuối cùng, system hoặc có parent thì không cần style
