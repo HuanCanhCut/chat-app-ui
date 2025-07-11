@@ -293,7 +293,11 @@ const InputMessage: React.FC<InputMessageProps> = () => {
 
     const handleRemoveImage = (index: number) => {
         // revoke object url of image
-        images[index].preview && URL.revokeObjectURL(images[index].preview)
+        const imagePreview = images[index].preview
+
+        if (imagePreview) {
+            URL.revokeObjectURL(imagePreview)
+        }
 
         const newImages = [...images]
         newImages.splice(index, 1)
