@@ -173,7 +173,7 @@ const InputMessage: React.FC<InputMessageProps> = () => {
                 images.map((image) =>
                     uploadToCloudinary(
                         image,
-                        'chat-app/messages',
+                        `chat-app-${process.env.NODE_ENV}/messages`,
                         `${uuid}-${image.name}-${Math.random().toString().substring(2, 15)}`,
                     ),
                 ),

@@ -65,7 +65,7 @@ html {
 
 html *::-webkit-scrollbar {
     border-radius: 0;
-    width: 6px;
+    width: 0px;
 }
 
 html {

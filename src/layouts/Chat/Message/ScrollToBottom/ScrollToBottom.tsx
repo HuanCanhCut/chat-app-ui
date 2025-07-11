@@ -117,12 +117,14 @@ const ScrollToBottom = ({ offsetRange, scrollableRef, messageRefs, PER_PAGE, set
         const remove = listenEvent({
             eventName: 'message:send',
             handler: () => {
-                handleScrollToBottom('start')
+                if (offsetRange.start !== 0) {
+                    handleScrollToBottom('start')
+                }
             },
         })
 
         return remove
-    }, [handleScrollToBottom])
+    }, [handleScrollToBottom, offsetRange.start])
 
     return (
         <button
