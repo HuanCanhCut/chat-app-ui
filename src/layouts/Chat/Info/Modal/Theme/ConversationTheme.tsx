@@ -149,7 +149,7 @@ const ConversationTheme: React.FC<ConversationThemeProps> = ({ onClose, currentT
             <main className="flex w-[700px] max-w-full flex-1 flex-col overflow-hidden">
                 <div
                     ref={themeContainerRef}
-                    className="flex h-full w-[200%] flex-1 overflow-hidden py-4 pr-0 transition-all duration-100 ease-linear md:w-full md:translate-x-0 md:p-4"
+                    className="flex h-full w-[200%] flex-1 overflow-hidden py-4 pr-0 transition-all duration-100 ease-linear md:w-full md:translate-x-0 md:p-5"
                 >
                     <div className="w-full pr-1 [overflow-y:overlay] md:w-1/2" id="theme-scrollable">
                         <div className="border-1 border-b border-[#D0D3D7] pb-3 dark:border-[#65686C]">

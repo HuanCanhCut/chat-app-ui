@@ -13,6 +13,13 @@ interface InfoProps {
     className?: string
 }
 
+const sharedSocketEvents = [
+    SocketEvent.CONVERSATION_RENAMED,
+    SocketEvent.CONVERSATION_AVATAR_CHANGED,
+    SocketEvent.CONVERSATION_THEME_CHANGED,
+    SocketEvent.CONVERSATION_EMOJI_CHANGED,
+]
+
 const Info: React.FC<InfoProps> = ({ className = '' }) => {
     const { uuid } = useParams()
 
@@ -53,14 +60,64 @@ const Info: React.FC<InfoProps> = ({ className = '' }) => {
             }
         }
 
-        socket.on(SocketEvent.CONVERSATION_RENAMED, socketHandler)
-        socket.on(SocketEvent.CONVERSATION_AVATAR_CHANGED, socketHandler)
-        socket.on(SocketEvent.CONVERSATION_THEME_CHANGED, socketHandler)
+        sharedSocketEvents.forEach((event) => {
+            socket.on(event, socketHandler)
+        })
 
         return () => {
-            socket.off(SocketEvent.CONVERSATION_RENAMED, socketHandler)
-            socket.off(SocketEvent.CONVERSATION_AVATAR_CHANGED, socketHandler)
-            socket.off(SocketEvent.CONVERSATION_THEME_CHANGED, socketHandler)
+            sharedSocketEvents.forEach((event) => {
+                socket.off(event, socketHandler)
+            })
+        }
+    }, [uuid])
+
+    useEffect(() => {
+        interface ConversationRenamedPayload {
+            conversation_uuid: string
+            member_id: number
+            nickname: string
+        }
+
+        const socketHandler = ({ conversation_uuid, member_id, nickname }: ConversationRenamedPayload) => {
+            if (uuid === conversation_uuid) {
+                mutate(
+                    [SWRKey.GET_CONVERSATION_BY_UUID, uuid],
+                    (prev: { data: ConversationModel } | undefined) => {
+                        if (!prev) {
+                            return prev
+                        }
+
+                        if (!prev?.data) {
+                            return prev
+                        }
+
+                        const members = prev.data.members.map((member) => {
+                            if (member.user.id === member_id) {
+                                return { ...member, nickname }
+                            }
+
+                            return member
+                        })
+
+                        return {
+                            ...prev,
+                            data: {
+                                ...prev.data,
+                                members: [...members],
+                            },
+                        }
+                    },
+                    {
+                        revalidate: false,
+                    },
+                )
+            }
+        }
+
+        socket.on(SocketEvent.CONVERSATION_MEMBER_NICKNAME_CHANGED, socketHandler)
+
+        return () => {
+            socket.off(SocketEvent.CONVERSATION_MEMBER_NICKNAME_CHANGED, socketHandler)
         }
     }, [uuid])
 

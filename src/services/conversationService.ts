@@ -61,3 +61,23 @@ export const changeConversationAvatar = async ({ uuid, data }: { uuid: string; d
         throw error
     }
 }
+
+export const changeConversationMemberNickname = async ({
+    uuid,
+    memberId,
+    nickname,
+}: {
+    uuid: string
+    memberId: number
+    nickname: string
+}) => {
+    try {
+        const response = await request.patch(`/conversations/${uuid}/nickname`, {
+            member_id: memberId,
+            nickname,
+        })
+        return response.data
+    } catch (error: any) {
+        throw error
+    }
+}

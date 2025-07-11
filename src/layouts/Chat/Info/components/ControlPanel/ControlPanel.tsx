@@ -5,6 +5,7 @@ import { AxiosError } from 'axios'
 import { Emoji, EmojiStyle } from 'emoji-picker-react'
 import useSWR from 'swr'
 
+import ChangeNicknameModal from '../../Modal/ChangeNicknameModal'
 import ConversationTheme from '../../Modal/Theme'
 import AccountOptions from './AccountOptions'
 import {
@@ -29,7 +30,7 @@ import config from '~/config'
 import SWRKey from '~/enum/SWRKey'
 import { listenEvent, sendEvent } from '~/helpers/events'
 import handleApiError from '~/helpers/handleApiError'
-import RenameConversationModal from '~/layouts/Chat/Info/Modal/RenameConversationModal'
+import RenameConversationModal from '~/layouts/Chat/Info/Modal/RenameConversationModal/RenameConversationModal'
 import { useAppSelector } from '~/redux'
 import { getCurrentUser } from '~/redux/selector'
 import * as conversationServices from '~/services/conversationService'
@@ -274,6 +275,14 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ setSearchMode }) => {
                         type: 'change_topic',
                     })
                     break
+                case 'change_nickname':
+                    setModalState({
+                        isOpen: true,
+                        component: <ChangeNicknameModal />,
+                        title: 'Biệt danh',
+                        type: 'change_nickname',
+                    })
+                    break
             }
         },
         [conversation, handleCloseModal],
@@ -350,7 +359,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ setSearchMode }) => {
             <Modal
                 isOpen={modalState.isOpen}
                 onClose={handleCloseModal}
-                popperClassName={`p-0 !overflow-hidden flex flex-col`}
+                popperClassName={`!p-0 !overflow-hidden flex flex-col`}
                 title={modalState.title}
             >
                 {modalState.component}

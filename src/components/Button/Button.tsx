@@ -8,7 +8,6 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement | HTM
     buttonType?: 'primary' | 'outline' | 'icon' | 'rounded'
     leftIcon?: React.ReactNode
     rightIcon?: React.ReactNode
-    onClick?: () => void
     type?: 'button' | 'submit' | 'reset'
 }
 
@@ -20,7 +19,6 @@ const Button = ({
     leftIcon,
     rightIcon,
     type = 'button',
-    onClick,
     ...props
 }: ButtonProps) => {
     const primaryClass =
@@ -66,7 +64,7 @@ const Button = ({
     }
 
     return (
-        <button className={props.disabled ? disabledClass : baseClass} onClick={onClick} type={type} {...props}>
+        <button className={props.disabled ? disabledClass : baseClass} type={type} {...props}>
             {leftIcon && (
                 <span data-left-icon className="mr-2">
                     {leftIcon}

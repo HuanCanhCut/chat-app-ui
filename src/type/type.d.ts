@@ -107,7 +107,7 @@ export interface ConversationResponse {
 export interface ConversationMember extends BaseModel {
     user_id: number
     conversation_id: number
-    nickname: string
+    nickname: string | null
     role: 'admin' | 'leader' | 'member'
     user: UserModel
     joined_at: Date

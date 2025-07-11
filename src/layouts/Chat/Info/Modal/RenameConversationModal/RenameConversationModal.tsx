@@ -49,7 +49,7 @@ const RenameConversationModal: React.FC<RenameConversationModalProps> = ({ onClo
     }
 
     return (
-        <main className="w-[550px]">
+        <main className="w-[550px] max-w-full">
             <div className="p-4">
                 <p className="mb-4 text-sm">Mọi người đều biết khi tên nhóm chat thay đổi.</p>
                 <div className="relative mb-4">
