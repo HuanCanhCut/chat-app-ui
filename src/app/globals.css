@@ -72,12 +72,12 @@ html {
     background-color: #fff;
     ::-webkit-scrollbar-thumb {
         border-radius: 4px;
-        background-color: rgba(22, 24, 35, 0.3);
+        background-color: rgba(22, 24, 35, 0.2);
     }
 
     *::-webkit-scrollbar-track {
         border-radius: 0;
-        background-color: #fff !important;
+        background-color: transparent !important;
     }
 }
 
