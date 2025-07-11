@@ -21,3 +21,21 @@ export const getThemes = async ({
         throw error
     }
 }
+
+export const updateConversationTheme = async ({
+    conversationUuid,
+    themeId,
+}: {
+    conversationUuid: string
+    themeId: number
+}) => {
+    try {
+        const response = await request.patch(`conversations/${conversationUuid}/theme`, {
+            theme_id: themeId,
+        })
+
+        return response.data
+    } catch (error: any) {
+        throw error
+    }
+}

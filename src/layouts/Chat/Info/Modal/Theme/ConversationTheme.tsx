@@ -1,6 +1,8 @@
 import { memo, useCallback, useEffect, useRef, useState } from 'react'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { useSelector } from 'react-redux'
+import { useParams } from 'next/navigation'
+import { AxiosError } from 'axios'
 import useSWR from 'swr'
 
 import MessagePreview from './MessagePreview'
@@ -9,6 +11,7 @@ import { faArrowLeft, faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Button from '~/components/Button'
 import SWRKey from '~/enum/SWRKey'
+import handleApiError from '~/helpers/handleApiError'
 import { getCurrentTheme } from '~/redux/selector'
 import * as themeService from '~/services/themeService'
 import { ConversationThemeModel, ConversationThemeResponse } from '~/type/type'
@@ -56,6 +59,8 @@ const mockMessage: MessagePreviewProps[] = [
 ]
 
 const ConversationTheme: React.FC<ConversationThemeProps> = ({ onClose, currentTheme }) => {
+    const { uuid } = useParams()
+
     const theme: 'light' | 'dark' = useSelector(getCurrentTheme)
 
     const themeContainerRef = useRef<HTMLDivElement>(null)
@@ -119,6 +124,25 @@ const ConversationTheme: React.FC<ConversationThemeProps> = ({ onClose, currentT
             themeContainerRef.current.style.transform = `translateX(0)`
         }
     }, [])
+
+    const handleChangeTheme = useCallback(async () => {
+        if (activeTheme.id === currentTheme.id) return
+
+        try {
+            const res = await themeService.updateConversationTheme({
+                conversationUuid: uuid as string,
+                themeId: activeTheme.id,
+            })
+
+            if (res) {
+                onClose()
+            }
+        } catch (error) {
+            if (error instanceof AxiosError) {
+                handleApiError(error)
+            }
+        }
+    }, [activeTheme.id, currentTheme.id, onClose, uuid])
 
     return (
         <>
@@ -209,10 +233,17 @@ const ConversationTheme: React.FC<ConversationThemeProps> = ({ onClose, currentT
                 </div>
             </main>
             <footer className="flex items-center justify-end gap-2 p-4 [&_button]:flex-1">
-                <Button buttonType="rounded" onClick={onClose}>
+                <Button buttonType="rounded" onClick={onClose} className="font-medium">
                     Hủy
                 </Button>
-                <Button buttonType="primary">Chọn</Button>
+                <Button
+                    buttonType="primary"
+                    disabled={activeTheme.id === currentTheme.id}
+                    className="font-medium"
+                    onClick={handleChangeTheme}
+                >
+                    Chọn
+                </Button>
             </footer>
         </>
     )
