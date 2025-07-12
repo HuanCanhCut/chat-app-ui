@@ -7,7 +7,7 @@ import SystemMessage from '../SystemMessage'
 import MessageAction from './components/MessageAction'
 import MessageContent from './components/MessageContent'
 import ReplyMessage from './components/ReplyMessage'
-import Viewed from './components/UserViewed'
+import UserViewed from './components/UserViewed'
 import Tippy from '@tippyjs/react'
 import UserAvatar from '~/components/UserAvatar'
 import { SocketEvent } from '~/enum/SocketEvent'
@@ -260,7 +260,7 @@ const MessageItem = ({ message, messageIndex, messages, currentUser, messageRef 
                 </div>
             </div>
 
-            <Viewed
+            <UserViewed
                 message={message}
                 currentUser={currentUser}
                 messageIndex={messageIndex}
