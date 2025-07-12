@@ -124,7 +124,7 @@ const MessageContent = (
                 className={`relative w-fit max-w-[80%] rounded-3xl px-4 py-1.5 italic opacity-85 [word-break:break-word] ${
                     message.sender_id === currentUser?.id
                         ? 'bg-[var(--sender-light-background-color)] text-[var(--sender-light-text-color)] dark:bg-[var(--sender-dark-background-color)] dark:text-[var(--sender-dark-text-color)]'
-                        : 'dark:text-[var(--receiver-dark-text -color)] bg-[var(--receiver-light-background-color)] text-[var(--receiver-light-text-color)] dark:bg-[var(--receiver-dark-background-color)]'
+                        : 'bg-[var(--receiver-light-background-color)] text-[var(--receiver-light-text-color)] dark:bg-[var(--receiver-dark-background-color)] dark:text-[var(--receiver-dark-text-color)]'
                 } ${consecutiveMessageStyle()}`}
             >
                 {message.sender.id === currentUser?.id ? 'Bạn ' : `${message.sender.full_name} `}

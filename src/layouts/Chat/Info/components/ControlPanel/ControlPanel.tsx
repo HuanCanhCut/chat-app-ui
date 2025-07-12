@@ -101,6 +101,14 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ setSearchMode }) => {
         })
     }, [])
 
+    // if current user is admin or leader in conversation
+    const isAdmin = useMemo(() => {
+        return conversation?.data.members.some(
+            (member) =>
+                member.user_id === currentUser?.data.id && (member.role === 'admin' || member.role === 'leader'),
+        )
+    }, [conversation?.data.members, currentUser])
+
     const ACCORDION_DATA: AccordionItem[] = [
         {
             title: 'Tùy chỉnh đoạn chat',
@@ -181,7 +189,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ setSearchMode }) => {
                           rightIcon: (
                               <CustomTippy
                                   renderItem={() => {
-                                      return <AccountOptions member={member} />
+                                      return <AccountOptions member={member} isAdmin={isAdmin} />
                                   }}
                               >
                                   <Tippy content="Lựa chọn của thành viên" delay={[350, 0]}>

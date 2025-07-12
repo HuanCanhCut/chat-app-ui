@@ -1,9 +1,11 @@
 import React from 'react'
 
-import { faUserCircle, faUserXmark } from '@fortawesome/free-solid-svg-icons'
+import { faSignOut, faUserCircle, faUserXmark } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { StarShieldIcon } from '~/components/Icons'
 import PopperWrapper from '~/components/PopperWrapper'
+import { useAppSelector } from '~/redux'
+import { getCurrentUser } from '~/redux/selector'
 import { ConversationMember } from '~/type/type'
 
 interface Option {
@@ -12,44 +14,64 @@ interface Option {
     type: string
 }
 
-const OPTIONS: Option[] = [
+const BASE_OPTIONS: Option[] = [
     {
         title: 'Xem trang cá nhân',
-        leftIcon: <FontAwesomeIcon icon={faUserCircle} />,
+        leftIcon: <FontAwesomeIcon width={20} height={20} icon={faUserCircle} />,
         type: 'view_profile',
-    },
-    {
-        title: 'Chỉ định làm quản trị viên',
-        leftIcon: <StarShieldIcon />,
-        type: 'designate_admin',
-    },
-    {
-        title: 'Xóa thành viên',
-        leftIcon: <FontAwesomeIcon icon={faUserXmark} />,
-        type: 'remove_member',
     },
 ]
 
 interface AccountOptionsProps {
     member: ConversationMember
+    isAdmin?: boolean
 }
 
-const AccountOptions: React.FC<AccountOptionsProps> = ({ member }) => {
+const AccountOptions: React.FC<AccountOptionsProps> = ({ member, isAdmin }) => {
+    const currentUser = useAppSelector(getCurrentUser)
+
     const handleChose = (type: string) => {
         switch (type) {
             case 'view_profile':
                 break
             case 'designate_admin':
                 break
+            case 'remove_admin':
+                break
             case 'remove_member':
+                break
+            case 'leave_group':
                 break
         }
     }
 
+    const ADMIN_OPTIONS: Option[] = [
+        isAdmin && {
+            title: member.role === 'member' ? 'Chỉ định làm quản trị viên' : 'Gỡ vai trò quản trị viên',
+            leftIcon: <StarShieldIcon />,
+            type: member.role === 'member' ? 'designate_admin' : 'remove_admin',
+        },
+        isAdmin && {
+            title: 'Xóa thành viên',
+            leftIcon: <FontAwesomeIcon width={20} height={20} icon={faUserXmark} />,
+            type: 'remove_member',
+        },
+    ].filter(Boolean) as Option[]
+
+    const USER_OPTIONS: Option[] = [
+        ...BASE_OPTIONS,
+        ...(currentUser?.data.id !== member.user_id && member.role !== 'admin' ? ADMIN_OPTIONS : []),
+        currentUser?.data.id === member.user_id && {
+            title: 'Rời nhóm',
+            leftIcon: <FontAwesomeIcon width={20} height={20} icon={faSignOut} />,
+            type: 'leave_group',
+        },
+    ].filter(Boolean) as Option[]
+
     return (
         <PopperWrapper className="w-80 p-2">
             <div>
-                {OPTIONS.map((option, index) => {
+                {USER_OPTIONS.map((option, index) => {
                     return (
                         <div
                             key={index}
@@ -60,7 +82,7 @@ const AccountOptions: React.FC<AccountOptionsProps> = ({ member }) => {
                                 handleChose(option.type)
                             }}
                         >
-                            <span className="w-6">{option.leftIcon}</span>
+                            <span className="w-6 text-xl">{option.leftIcon}</span>
                             <span>{option.title}</span>
                         </div>
                     )
