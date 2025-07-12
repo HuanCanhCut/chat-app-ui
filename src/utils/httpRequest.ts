@@ -1,46 +1,80 @@
-import axios, { AxiosResponse } from 'axios'
+import axios from 'axios'
 
 const request = axios.create({
     baseURL: process.env.NEXT_PUBLIC_BASE_URL,
     withCredentials: true,
 })
+let isRefreshing = false
+let failedQueue: { resolve: (value: unknown) => void; reject: (reason?: unknown) => void }[] = []
 
-// once refresh token
-let refreshTokenRequest: null | Promise<AxiosResponse<any, any>> = null
-
-const refreshToken = async () => {
-    return await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/auth/refresh`, {
-        withCredentials: true,
+const processQueue = (error: unknown) => {
+    failedQueue.forEach((prom) => {
+        if (error) {
+            prom.reject(error)
+        } else {
+            prom.resolve('')
+        }
     })
+
+    failedQueue = []
 }
 
-// interceptors refresh token
-request.interceptors.request.use(
-    async (config) => {
-        const tokenExpired = localStorage.getItem('exp')
+const refreshToken = async () => {
+    try {
+        await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/auth/refresh`, {
+            withCredentials: true,
+        })
 
-        if (!tokenExpired) {
-            return config
-        }
+        processQueue(null)
+    } catch (error) {
+        processQueue(error)
+        throw error
+    }
+}
 
-        if (Number(tokenExpired) < Math.floor(Date.now() / 1000)) {
+const getNewToken = async () => {
+    if (isRefreshing) {
+        // if isRefreshing is true, push next failed request to queue
+        return new Promise((resolve, reject) => {
+            failedQueue.push({ resolve, reject })
+        })
+    }
+
+    isRefreshing = true
+
+    try {
+        await refreshToken()
+        isRefreshing = false
+        return
+    } catch (error) {
+        isRefreshing = false
+        throw error
+    }
+}
+
+request.interceptors.response.use(
+    (response) => response,
+    async (error) => {
+        const originalRequest = error.config
+
+        const shouldRenewToken =
+            error.response?.status === 401 &&
+            !originalRequest._retry &&
+            error.response.headers['x-refresh-token-required'] === 'true'
+
+        if (shouldRenewToken) {
+            originalRequest._retry = true
+
             try {
-                refreshTokenRequest = refreshTokenRequest ? refreshTokenRequest : refreshToken()
+                await getNewToken()
 
-                const response = await refreshTokenRequest
-
-                localStorage.setItem('exp', response?.data?.exp)
-                refreshTokenRequest = null
-            } catch (error: any) {
-                console.log(error)
-
-                localStorage.removeItem('exp')
+                return request(originalRequest)
+            } catch (refreshError) {
+                console.error('Token refresh failed:', refreshError)
+                return Promise.reject(refreshError)
             }
         }
 
-        return config
-    },
-    (error) => {
         return Promise.reject(error)
     },
 )

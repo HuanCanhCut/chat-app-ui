@@ -5,7 +5,8 @@ import { Provider } from 'react-redux'
 import { useRouter } from 'next/navigation'
 import useSWR from 'swr'
 
-import { AppStore,makeStore } from '../../redux/store'
+import { AppStore, makeStore } from '../../redux/store'
+import config from '~/config'
 import SWRKey from '~/enum/SWRKey'
 import { actions } from '~/redux'
 import * as meServices from '~/services/meService'
@@ -14,8 +15,14 @@ export default function ReduxProvider({ children }: { children: React.ReactNode 
     const router = useRouter()
     const storeRef = useRef<AppStore>()
 
-    const { data: currentUser } = useSWR(SWRKey.GET_CURRENT_USER, () => {
-        return meServices.getCurrentUser()
+    const { data: currentUser } = useSWR(SWRKey.GET_CURRENT_USER, async () => {
+        try {
+            const response = await meServices.getCurrentUser()
+
+            return response
+        } catch (error) {
+            router.push(config.routes.auth)
+        }
     })
 
     if (!storeRef.current) {

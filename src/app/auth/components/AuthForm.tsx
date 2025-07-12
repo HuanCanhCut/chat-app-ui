@@ -55,7 +55,6 @@ const AuthForm = () => {
 
                 if (response) {
                     window.location.reload()
-                    localStorage.setItem('exp', JSON.stringify(response.meta?.pagination?.exp))
                     return
                 }
 
@@ -142,9 +141,6 @@ const AuthForm = () => {
 
                 if (response) {
                     window.location.reload()
-                    if (response.meta) {
-                        localStorage.setItem('exp', JSON.stringify(response.meta.pagination.exp))
-                    }
                 }
             }
         } catch (error: any) {
