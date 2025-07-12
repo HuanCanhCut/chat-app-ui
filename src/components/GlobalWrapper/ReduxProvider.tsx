@@ -15,14 +15,8 @@ export default function ReduxProvider({ children }: { children: React.ReactNode 
     const router = useRouter()
     const storeRef = useRef<AppStore>()
 
-    const { data: currentUser } = useSWR(SWRKey.GET_CURRENT_USER, async () => {
-        try {
-            const response = await meServices.getCurrentUser()
-
-            return response
-        } catch (error) {
-            router.push(config.routes.auth)
-        }
+    const { data: currentUser } = useSWR(SWRKey.GET_CURRENT_USER, () => {
+        return meServices.getCurrentUser()
     })
 
     if (!storeRef.current) {
