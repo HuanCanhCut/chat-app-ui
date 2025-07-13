@@ -414,6 +414,7 @@ const InputMessage: React.FC<InputMessageProps> = () => {
                             onKeyDown={handleTextareaKeyDown}
                             rows={1}
                             ref={textareaRef}
+                            spellCheck={false}
                         />
                     </div>
                     {/* show placeholder if messageValue is empty */}

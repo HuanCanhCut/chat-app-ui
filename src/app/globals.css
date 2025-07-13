@@ -42,6 +42,12 @@
     }
 }
 
+@layer utilities {
+    .flex-center {
+        @apply flex items-center justify-center;
+    }
+}
+
 @keyframes scale-up {
     0% {
         transform: scale(1);
@@ -79,6 +85,8 @@ html {
         border-radius: 0;
         background-color: transparent !important;
     }
+
+    --typing-dot-background-color: var(--receiver-light-text-color);
 }
 
 html.dark {
@@ -92,6 +100,8 @@ html.dark {
         border-radius: 0;
         background-color: transparent !important;
     }
+
+    --typing-dot-background-color: var(--receiver-dark-text-color);
 }
 
 html.dark .tippy-box {
@@ -123,12 +133,6 @@ body {
 
 body.ReactModal__Body--open {
     overflow-y: hidden;
-}
-
-@layer utilities {
-    .flex-center {
-        @apply flex items-center justify-center;
-    }
 }
 
 .overlay {
@@ -163,52 +167,4 @@ body.ReactModal__Body--open {
 
 .ReactModal__Overlay--before-close {
     opacity: 0;
-}
-
-.animate-scale {
-    animation: scale 0.3s ease-in-out;
-}
-
-.typing {
-    align-items: center;
-    display: flex;
-    height: 17px;
-}
-
-.typing .dot {
-    animation: mercuryTypingAnimation 1.8s infinite ease-in-out;
-    background-color: #d3d3d3;
-    border-radius: 50%;
-    height: 5px;
-    width: 5px;
-    margin-right: 4px;
-    vertical-align: middle;
-    display: inline-block;
-}
-.typing .dot:nth-child(1) {
-    animation-delay: 200ms;
-}
-.typing .dot:nth-child(2) {
-    animation-delay: 300ms;
-}
-.typing .dot:nth-child(3) {
-    animation-delay: 400ms;
-}
-.typing .dot:last-child {
-    margin-right: 0;
-}
-
-@keyframes mercuryTypingAnimation {
-    0% {
-        transform: translateY(0px);
-        background-color: #d3d3d3;
-    }
-    28% {
-        transform: translateY(-7px);
-        background-color: #d3d3d3;
-    }
-    44% {
-        transform: translateY(0px);
-        background-color: #d3d3d3;
-    }
 }
