@@ -7,6 +7,8 @@ import SearchMessage from './components/SearchMessage'
 import { SocketEvent } from '~/enum/SocketEvent'
 import SWRKey from '~/enum/SWRKey'
 import socket from '~/helpers/socket'
+import { useAppSelector } from '~/redux'
+import { getCurrentUser } from '~/redux/selector'
 import { ConversationModel, ConversationThemeModel } from '~/type/type'
 
 interface InfoProps {
@@ -27,6 +29,7 @@ const sharedSocketEventMemberHandlers = [
 
 const Info: React.FC<InfoProps> = ({ className = '' }) => {
     const { uuid } = useParams()
+    const currentUser = useAppSelector(getCurrentUser)
 
     const [searchMode, setSearchMode] = useState(false)
 
@@ -130,6 +133,57 @@ const Info: React.FC<InfoProps> = ({ className = '' }) => {
             })
         }
     }, [uuid])
+
+    useEffect(() => {
+        const socketHandler = ({ conversation_uuid, member_id }: { conversation_uuid: string; member_id: number }) => {
+            if (uuid === conversation_uuid) {
+                mutate(
+                    [SWRKey.GET_CONVERSATION_BY_UUID, uuid],
+                    (prev: { data: ConversationModel } | undefined) => {
+                        if (!prev) {
+                            return prev
+                        }
+
+                        if (!prev?.data) {
+                            return prev
+                        }
+
+                        let newMembers = prev.data.members
+
+                        // if member_id is current user, set deleted_at to current time
+                        if (member_id === currentUser.data.id) {
+                            newMembers = newMembers.map((member) => {
+                                if (member.id === member_id) {
+                                    return { ...member, deleted_at: new Date() }
+                                }
+
+                                return member
+                            })
+                        } else {
+                            newMembers = newMembers.filter((member) => member.id !== member_id)
+                        }
+
+                        return {
+                            ...prev,
+                            data: {
+                                ...prev.data,
+                                members: [...newMembers],
+                            },
+                        }
+                    },
+                    {
+                        revalidate: false,
+                    },
+                )
+            }
+        }
+
+        socket.on(SocketEvent.CONVERSATION_MEMBER_REMOVED, socketHandler)
+
+        return () => {
+            socket.off(SocketEvent.CONVERSATION_MEMBER_REMOVED, socketHandler)
+        }
+    }, [currentUser?.data.id, uuid])
 
     return (
         <div

@@ -19,10 +19,10 @@
     --receiver-dark-text-color: #fff;
     --receiver-dark-background-color: #303030;
     --background-theme-light-background: #fff;
-    --background-theme-light-header-color: #ffffff;
-    --background-theme-light-footer-color: #ffffff;
     --background-theme-dark-background: #212223;
+    --background-theme-light-header-color: #ffffff;
     --background-theme-dark-header-color: #212223;
+    --background-theme-light-footer-color: #ffffff;
     --background-theme-dark-footer-color: #212223;
     --reply-message-light-background-color: #f6f6f6;
     --reply-message-dark-background-color: #8383838d;

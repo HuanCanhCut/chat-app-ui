@@ -108,3 +108,12 @@ export const removeLeader = async ({ uuid, userId }: { uuid: string; userId: num
         throw error
     }
 }
+
+export const removeMember = async ({ uuid, memberId }: { uuid: string; memberId: number }) => {
+    try {
+        const response = await request.del(`/conversations/${uuid}/user/${memberId}`)
+        return response.data
+    } catch (error: any) {
+        throw error
+    }
+}

@@ -55,17 +55,18 @@ const NotificationItem = ({
     }, [isAccept, notification.id])
 
     const handleReadNotification = async () => {
+        sendEvent({
+            eventName: 'notification:update-read-status',
+            detail: { notificationId: notification.id, type: 'read' },
+        })
+
         if (notification.is_read) {
             return
         }
 
         await NotificationServices.markAsRead(notification.id)
 
-        sendEvent({
-            eventName: 'notification:update-read-status',
-            detail: { notificationId: notification.id, type: 'read' },
-        })
-        sendEvent({ eventName: 'tippy:hide' })
+        tippyInstance.current?.hide()
     }
 
     const handleDeleteNotification = async () => {
@@ -99,7 +100,7 @@ const NotificationItem = ({
 
         const handleDeleteNotification = async () => {
             setIsOpenConfirmModel(true)
-            sendEvent({ eventName: 'tippy:hide' })
+            tippyInstance.current?.hide()
         }
 
         return (

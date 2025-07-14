@@ -14,6 +14,7 @@ import { useAppSelector } from '~/redux'
 import { getCurrentUser } from '~/redux/selector'
 import * as conversationService from '~/services/conversationService'
 import { ConversationMember } from '~/type/type'
+
 interface Option {
     title: string
     leftIcon: React.ReactNode
@@ -103,6 +104,28 @@ const AccountOptions: React.FC<AccountOptionsProps> = ({ member, isAdmin }) => {
 
                 break
             case 'remove_member':
+                setConfirmModalState({
+                    isOpen: true,
+                    title: 'Xóa khỏi đoạn chat?',
+                    description: `"Bạn có chắc chắn muốn xóa người này khỏi cuộc trò chuyện không? Họ sẽ không thể gửi hay nhận tin nhắn mới nữa.`,
+                    onConfirm: async () => {
+                        try {
+                            await conversationService.removeMember({
+                                uuid: uuid as string,
+                                memberId: member.id,
+                            })
+
+                            setConfirmModalState({
+                                ...confirmModalState,
+                                isOpen: false,
+                            })
+                        } catch (error) {
+                            if (error instanceof AxiosError) {
+                                handleApiError(error)
+                            }
+                        }
+                    },
+                })
                 break
             case 'leave_group':
                 break

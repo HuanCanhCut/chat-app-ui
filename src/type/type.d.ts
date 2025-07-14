@@ -113,6 +113,7 @@ export interface ConversationMember extends BaseModel {
     joined_at: Date
     added_by?: UserModel
     added_by_id?: number
+    deleted_at: Date | null
 }
 
 // ========================================== Message model ==========================================

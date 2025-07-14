@@ -187,6 +187,8 @@ const Notification = () => {
                 }
 
                 mutateNotifications(newNotifications, { revalidate: false })
+
+                tippyInstanceRef.current?.hide()
             },
         })
 

@@ -28,7 +28,8 @@ const config: Config = {
                 systemMessageDark: '#A1A4A9',
             },
             borderColor: {
-                dark: '#212223',
+                dark: '#A1A4A9',
+                light: '#65686C',
             },
             outline: {
                 none: 'none',

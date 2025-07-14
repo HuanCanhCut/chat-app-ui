@@ -30,11 +30,13 @@ const ChangeNicknameModal: React.FC = () => {
         setNickname(member.nickname || '')
     }
 
-    useClickOutside(inputRef, () => {
-        setTimeout(() => {
-            setCurrentChange(null)
-            setNickname('')
-        }, 100)
+    useClickOutside(inputRef, (e: MouseEvent | TouchEvent) => {
+        const isClickInsideAbc = (e.target as HTMLElement).closest('#rename-account-container')
+
+        if (isClickInsideAbc) return
+
+        setCurrentChange(null)
+        setNickname('')
     })
 
     const handleChangeNickname = async (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -60,7 +62,12 @@ const ChangeNicknameModal: React.FC = () => {
         <main className="flex w-[550px] max-w-full flex-col gap-7 px-5 py-8">
             {conversation?.data.members.map((member, index) => {
                 return (
-                    <div key={index} className="flex items-center justify-between" onClick={() => handleClick(member)}>
+                    <div
+                        key={index}
+                        id="rename-account-container"
+                        className="flex items-center justify-between"
+                        onClick={() => handleClick(member)}
+                    >
                         <div className="flex flex-1 cursor-pointer">
                             <UserAvatar size={50} src={member.user.avatar} />
 

@@ -164,17 +164,6 @@ const MessageItem = ({ message, messageIndex, messages, currentUser, messageRef 
         setOpenRevokeModal(false)
     }, [])
 
-    if (message.type.startsWith('system')) {
-        return (
-            <SystemMessage
-                message={message}
-                messageIndex={messageIndex}
-                ref={firstMessageRef}
-                className="mb-2 flex justify-center"
-            />
-        )
-    }
-
     const isLastMessageInConsecutiveGroup = () => {
         if (messageIndex >= messages.data.length - 1) {
             return true
@@ -198,6 +187,17 @@ const MessageItem = ({ message, messageIndex, messages, currentUser, messageRef 
         }
 
         return true
+    }
+
+    if (message.type.startsWith('system')) {
+        return (
+            <SystemMessage
+                message={message}
+                messageIndex={messageIndex}
+                ref={firstMessageRef}
+                className="mb-2 flex justify-center"
+            />
+        )
     }
 
     return (
