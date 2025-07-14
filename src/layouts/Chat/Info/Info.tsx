@@ -98,19 +98,11 @@ const Info: React.FC<InfoProps> = ({ className = '' }) => {
                         }
 
                         const members = prev.data.members.map((member) => {
-                            if (member.user.id === user_id) {
+                            if (member.user.id === Number(user_id)) {
                                 return { ...member, [key]: value }
                             }
 
                             return member
-                        })
-
-                        console.log({
-                            ...prev,
-                            data: {
-                                ...prev.data,
-                                members: [...members],
-                            },
                         })
 
                         return {

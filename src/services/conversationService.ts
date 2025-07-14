@@ -64,16 +64,16 @@ export const changeConversationAvatar = async ({ uuid, data }: { uuid: string; d
 
 export const changeConversationMemberNickname = async ({
     uuid,
-    memberId,
+    userId,
     nickname,
 }: {
     uuid: string
-    memberId: number
+    userId: number
     nickname: string
 }) => {
     try {
         const response = await request.patch(`/conversations/${uuid}/nickname`, {
-            member_id: memberId,
+            user_id: userId,
             nickname,
         })
         return response.data
@@ -91,18 +91,18 @@ export const changeConversationEmoji = async ({ uuid, emoji }: { uuid: string; e
     }
 }
 
-export const designateLeader = async ({ uuid, memberId }: { uuid: string; memberId: number }) => {
+export const designateLeader = async ({ uuid, userId }: { uuid: string; userId: number }) => {
     try {
-        const response = await request.patch(`/conversations/${uuid}/designate-leader`, { member_id: memberId })
+        const response = await request.patch(`/conversations/${uuid}/designate-leader`, { user_id: userId })
         return response.data
     } catch (error: any) {
         throw error
     }
 }
 
-export const removeLeader = async ({ uuid, memberId }: { uuid: string; memberId: number }) => {
+export const removeLeader = async ({ uuid, userId }: { uuid: string; userId: number }) => {
     try {
-        const response = await request.patch(`/conversations/${uuid}/remove-leader`, { member_id: memberId })
+        const response = await request.patch(`/conversations/${uuid}/remove-leader`, { user_id: userId })
         return response.data
     } catch (error: any) {
         throw error

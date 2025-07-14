@@ -80,12 +80,12 @@ const InputMessage: React.FC<InputMessageProps> = () => {
                 message: {
                     id: Math.random(),
                     content: content,
-                    sender_id: currentUser.data.id,
+                    sender_id: currentUser?.data.id,
                     type,
                     is_preview: true,
                     created_at: new Date().toISOString(),
                     updated_at: new Date().toISOString(),
-                    sender: currentUser.data,
+                    sender: currentUser?.data,
                     message_status: conversation?.data.members.map((conversation) => {
                         return {
                             receiver_id: conversation.user_id,
@@ -256,7 +256,7 @@ const InputMessage: React.FC<InputMessageProps> = () => {
         if (messageValue.trim().length === 0 && e.target.value.trim().length > 0) {
             socket.emit(SocketEvent.MESSAGE_TYPING, {
                 conversation_uuid: uuid as string,
-                user_id: currentUser.data.id,
+                user_id: currentUser?.data.id,
                 is_typing: true,
             })
         }
@@ -265,7 +265,7 @@ const InputMessage: React.FC<InputMessageProps> = () => {
         if (e.target.value.trim().length === 0) {
             socket.emit(SocketEvent.MESSAGE_TYPING, {
                 conversation_uuid: uuid as string,
-                user_id: currentUser.data.id,
+                user_id: currentUser?.data.id,
                 is_typing: false,
             })
         }
@@ -326,7 +326,7 @@ const InputMessage: React.FC<InputMessageProps> = () => {
                     <div className="flex-1">
                         <span className="text-sm text-zinc-800 dark:text-zinc-200">
                             Đang trả lời{' '}
-                            {replyMessage.sender_id === currentUser.data.id
+                            {replyMessage.sender_id === currentUser?.data.id
                                 ? 'chính mình'
                                 : (memberMap && memberMap[replyMessage.sender_id]?.nickname) ||
                                   (memberMap && memberMap[replyMessage.sender_id]?.user.full_name)}

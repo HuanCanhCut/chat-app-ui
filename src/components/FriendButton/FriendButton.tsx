@@ -1,13 +1,12 @@
 'use client'
 
 import { useCallback, useState } from 'react'
-import ReactModal from 'react-modal'
 import { AxiosError } from 'axios'
 
-import { faUserFriends, faUserPlus, faXmark } from '@fortawesome/free-solid-svg-icons'
+import ConfirmModal from '../ConfirmModal/ConfirmModal'
+import { faUserFriends, faUserPlus } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Button from '~/components/Button/Button'
-import PopperWrapper from '~/components/PopperWrapper/PopperWrapper'
 import { sendEvent } from '~/helpers/events'
 import handleApiError from '~/helpers/handleApiError'
 import * as friendService from '~/services/friendService'
@@ -82,46 +81,13 @@ const FriendButton = ({ user, className = '' }: FriendButtonProps) => {
 
     return (
         <>
-            <ReactModal
+            <ConfirmModal
+                title={`Hủy kết bạn với ${user.full_name}`}
+                description={`Bạn có chắc chắn muốn hủy kết bạn với ${user.full_name} không?`}
+                onConfirm={handleUnfriend}
                 isOpen={modalIsOpen}
-                ariaHideApp={false}
-                overlayClassName="overlay"
-                closeTimeoutMS={200}
-                onRequestClose={() => setModalIsOpen(false)}
-                className="modal"
-            >
-                <PopperWrapper className="w-[600px] px-0 pb-4">
-                    <>
-                        <header className="relative border-b border-gray-300 py-4 text-center dark:border-zinc-700">
-                            <h2>Hủy kết bạn với {user.full_name}</h2>
-                            <Button
-                                buttonType="icon"
-                                onClick={closeModal}
-                                className="absolute right-[10px] top-1/2 -translate-y-1/2"
-                            >
-                                <FontAwesomeIcon icon={faXmark} />
-                            </Button>
-                        </header>
-                        <main className="px-4">
-                            <p className="mt-2 text-sm text-zinc-700 dark:text-zinc-300">
-                                Bạn có chắc chắn muốn hủy kết bạn với {user.full_name} không?
-                            </p>
-                            <div className="mt-8 flex justify-end gap-2">
-                                <Button
-                                    buttonType="outline"
-                                    className="border-none px-4 py-1 text-primary"
-                                    onClick={closeModal}
-                                >
-                                    Hủy
-                                </Button>
-                                <Button buttonType="primary" className="px-6 py-1" onClick={handleUnfriend}>
-                                    Xác nhận
-                                </Button>
-                            </div>
-                        </main>
-                    </>
-                </PopperWrapper>
-            </ReactModal>
+                closeModal={closeModal}
+            />
             {user.sent_friend_request && !user.friend_request ? (
                 <Button
                     buttonType="rounded"

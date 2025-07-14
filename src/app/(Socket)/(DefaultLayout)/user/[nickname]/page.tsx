@@ -120,8 +120,8 @@ export default function UserPage() {
                     <div className="w-1100px mx-auto max-w-[1100px]">
                         <CustomImage
                             src={
-                                currentUser.data.id === user.data.id
-                                    ? currentUser.data.cover_photo
+                                currentUser?.data.id === user.data.id
+                                    ? currentUser?.data.cover_photo
                                     : user.data.cover_photo
                             }
                             fallback="/static/media/login-form.jpg"

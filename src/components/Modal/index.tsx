@@ -33,7 +33,7 @@ const Modal = ({
             onRequestClose={onClose}
             className={className}
         >
-            <PopperWrapper className={popperClassName}>
+            <PopperWrapper className={`p-0 ${popperClassName}`}>
                 <header className="relative flex justify-center border-b border-gray-300 p-4 dark:border-zinc-700">
                     <h3 className="text-xl font-semibold">{title}</h3>
                     <Button buttonType="icon" onClick={onClose} className="absolute right-3 top-1/2 -translate-y-1/2">

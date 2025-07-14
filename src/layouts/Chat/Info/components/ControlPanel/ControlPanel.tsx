@@ -57,6 +57,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ setSearchMode }) => {
     const { uuid } = useParams()
 
     const fileInputRef = useRef<HTMLInputElement>(null)
+    const accountOptionsTippyRef = useRef<InstanceType<any>>(null)
 
     const [modalState, setModalState] = useState<{
         isOpen: boolean
@@ -80,6 +81,18 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ setSearchMode }) => {
 
     const [lastOnlineTime, setLastOnlineTime] = useState<Date | null>(member?.user.last_online_at || null)
 
+    useEffect(() => {
+        const remove = listenEvent({
+            eventName: 'tippy:hide',
+            handler: () => {
+                if (accountOptionsTippyRef.current) {
+                    accountOptionsTippyRef.current.hide()
+                }
+            },
+        })
+
+        return remove
+    }, [])
     const memberMap = useMemo(() => {
         const member: ConversationMember[] = conversation?.data.members || []
 
@@ -153,7 +166,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ setSearchMode }) => {
                   type: 'member_in_conversation',
                   children: conversation.data.members.map((member, index) => {
                       const addedBy = () => {
-                          if (member.added_by_id === currentUser.data.id) {
+                          if (member.added_by_id === currentUser?.data.id) {
                               return 'bạn'
                           }
 
@@ -188,6 +201,9 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ setSearchMode }) => {
                               'hover:bg-transparent dark:hover:bg-transparent [&>*[data-right-icon]]:ml-auto cursor-default [&_#accordion-title]:cursor-pointer',
                           rightIcon: (
                               <CustomTippy
+                                  onShow={(tippyInstance) => {
+                                      accountOptionsTippyRef.current = tippyInstance
+                                  }}
                                   renderItem={() => {
                                       return <AccountOptions member={member} isAdmin={isAdmin} />
                                   }}

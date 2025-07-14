@@ -168,7 +168,7 @@ const EditProfile = ({ closeModal }: EditProfileProps) => {
                         {currentUser && (
                             <label htmlFor="avatar">
                                 <UserAvatar
-                                    src={avatar?.preview || currentUser.data.avatar}
+                                    src={avatar?.preview || currentUser?.data.avatar}
                                     alt="avatar"
                                     size={130}
                                     className="mx-auto aspect-square w-[130px] cursor-pointer rounded-full border-2 border-gray-200 object-cover p-1 dark:border-gray-600 sm:w-[168px]"
@@ -199,7 +199,7 @@ const EditProfile = ({ closeModal }: EditProfileProps) => {
                         {currentUser && (
                             <label htmlFor="cover_photo">
                                 <CustomImage
-                                    src={coverPhoto?.preview || currentUser.data.cover_photo}
+                                    src={coverPhoto?.preview || currentUser?.data.cover_photo}
                                     fallback={defaultCoverPhoto}
                                     className="mx-auto aspect-[12/5] w-[80%] cursor-pointer rounded-lg object-cover"
                                 />

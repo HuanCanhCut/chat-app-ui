@@ -1,18 +1,19 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { AxiosError } from 'axios'
 
 import { faSignOut, faUserCircle, faUserXmark } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import ConfirmModel from '~/components/ConfirmModal'
 import { StarShieldIcon } from '~/components/Icons'
 import PopperWrapper from '~/components/PopperWrapper'
 import config from '~/config'
+import { sendEvent } from '~/helpers/events'
 import handleApiError from '~/helpers/handleApiError'
 import { useAppSelector } from '~/redux'
 import { getCurrentUser } from '~/redux/selector'
 import * as conversationService from '~/services/conversationService'
 import { ConversationMember } from '~/type/type'
-
 interface Option {
     title: string
     leftIcon: React.ReactNode
@@ -39,40 +40,75 @@ const AccountOptions: React.FC<AccountOptionsProps> = ({ member, isAdmin }) => {
 
     const currentUser = useAppSelector(getCurrentUser)
 
+    const [confirmModalState, setConfirmModalState] = useState({
+        isOpen: false,
+        title: '',
+        description: '',
+        onConfirm: () => {},
+    })
+
     const handleChose = async (type: string) => {
         switch (type) {
             case 'view_profile':
                 router.push(`${config.routes.user}/@${member.user.nickname}`)
                 break
             case 'designate_admin':
-                try {
-                    await conversationService.designateLeader({
-                        uuid: uuid as string,
-                        memberId: member.user_id,
-                    })
-                } catch (error) {
-                    if (error instanceof AxiosError) {
-                        handleApiError(error)
-                    }
-                }
+                setConfirmModalState({
+                    isOpen: true,
+                    title: 'Thêm quản trị viên nhóm?',
+                    description: `Là quản trị viên nhóm, "${member.user.full_name}" có thể quyết định ai có thể tham gia và tùy chỉnh cuộc trò chuyện này.`,
+                    onConfirm: async () => {
+                        try {
+                            await conversationService.designateLeader({
+                                uuid: uuid as string,
+                                userId: member.user_id,
+                            })
+
+                            setConfirmModalState({
+                                ...confirmModalState,
+                                isOpen: false,
+                            })
+                        } catch (error) {
+                            if (error instanceof AxiosError) {
+                                handleApiError(error)
+                            }
+                        }
+                    },
+                })
+
                 break
             case 'remove_leader':
-                try {
-                    await conversationService.removeLeader({
-                        uuid: uuid as string,
-                        memberId: member.user_id,
-                    })
-                } catch (error) {
-                    if (error instanceof AxiosError) {
-                        handleApiError(error)
-                    }
-                }
+                setConfirmModalState({
+                    isOpen: true,
+                    title: 'Gỡ vai trò quản trị viên nhóm?',
+                    description: `"${member.user.full_name}" sẽ không quản lý được người có thể tham gia và tùy chỉnh cuộc trò chuyện này nữa.`,
+                    onConfirm: async () => {
+                        try {
+                            await conversationService.removeLeader({
+                                uuid: uuid as string,
+                                userId: member.user_id,
+                            })
+
+                            setConfirmModalState({
+                                ...confirmModalState,
+                                isOpen: false,
+                            })
+                        } catch (error) {
+                            if (error instanceof AxiosError) {
+                                handleApiError(error)
+                            }
+                        }
+                    },
+                })
+
                 break
             case 'remove_member':
                 break
             case 'leave_group':
                 break
         }
+
+        sendEvent({ eventName: 'tippy:hide' })
     }
 
     const ADMIN_OPTIONS: Option[] = [
@@ -100,6 +136,13 @@ const AccountOptions: React.FC<AccountOptionsProps> = ({ member, isAdmin }) => {
 
     return (
         <PopperWrapper className="w-80 p-2">
+            <ConfirmModel
+                title={confirmModalState.title}
+                description={confirmModalState.description}
+                onConfirm={confirmModalState.onConfirm}
+                isOpen={confirmModalState.isOpen}
+                closeModal={() => setConfirmModalState({ ...confirmModalState, isOpen: false })}
+            />
             <div>
                 {USER_OPTIONS.map((option, index) => {
                     return (

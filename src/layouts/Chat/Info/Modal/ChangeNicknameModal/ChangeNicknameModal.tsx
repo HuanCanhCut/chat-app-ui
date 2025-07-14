@@ -43,7 +43,7 @@ const ChangeNicknameModal: React.FC = () => {
 
             await conversationServices.changeConversationMemberNickname({
                 uuid: uuid as string,
-                memberId: currentChange?.user.id || 0,
+                userId: currentChange?.user.id || 0,
                 nickname,
             })
 

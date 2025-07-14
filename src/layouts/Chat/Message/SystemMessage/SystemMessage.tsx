@@ -57,7 +57,7 @@ const SystemMessage = (
             jsx.push(
                 <span key={`text-${Math.random()}`}>
                     {(() => {
-                        if (Number(jsonParsed.user_id) === currentUser.data.id) {
+                        if (Number(jsonParsed.user_id) === currentUser?.data.id) {
                             return matchIndex === 0 ? 'Bạn' : 'bạn'
                         }
 

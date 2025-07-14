@@ -1,5 +1,5 @@
 import { memo, useEffect, useState } from 'react'
-import { motion,useSpring } from 'framer-motion'
+import { motion, useSpring } from 'framer-motion'
 
 import Tippy from '@tippyjs/react/headless'
 import { sendEvent } from '~/helpers/events'

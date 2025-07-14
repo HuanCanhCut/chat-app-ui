@@ -1,42 +1,29 @@
-import ReactModal from 'react-modal'
-
-import Button from '~/components/Button'
-import PopperWrapper from '~/components/PopperWrapper/PopperWrapper'
+import Button from '../Button'
+import Modal from '../Modal'
 
 interface ConfirmModelProps {
     title: string
     onConfirm: () => void
     isOpen: boolean
     closeModal: () => void
+    description?: string
 }
 
-const ConfirmModel = ({ title, onConfirm, isOpen, closeModal }: ConfirmModelProps) => {
+const ConfirmModel = ({ title, description, onConfirm, isOpen, closeModal }: ConfirmModelProps) => {
     return (
-        <ReactModal
-            isOpen={isOpen}
-            ariaHideApp={false}
-            overlayClassName="overlay"
-            closeTimeoutMS={200}
-            onRequestClose={closeModal}
-            className="modal"
-        >
-            <PopperWrapper className="w-[400px] p-4">
-                <>
-                    <header>
-                        <h3 className="text-center text-2xl">{title}</h3>
-                    </header>
-
-                    <div className="flex-center mt-4 gap-4">
-                        <Button buttonType="primary" className="flex-1 rounded-sm !py-2" onClick={onConfirm}>
-                            Xác nhận
-                        </Button>
-                        <Button buttonType="outline" className="flex-1 rounded-sm !py-2" onClick={closeModal}>
-                            Hủy
-                        </Button>
-                    </div>
-                </>
-            </PopperWrapper>
-        </ReactModal>
+        <Modal isOpen={isOpen} onClose={closeModal} title={title} popperClassName="w-[550px] pb-4">
+            <main className="px-4">
+                <p className="mt-2 text-base text-zinc-700 dark:text-zinc-200">{description}</p>
+                <div className="mt-8 flex justify-end gap-2">
+                    <Button buttonType="outline" className="border-none px-4 py-1 text-primary" onClick={closeModal}>
+                        Hủy
+                    </Button>
+                    <Button buttonType="primary" className="px-6 py-1" onClick={onConfirm}>
+                        Xác nhận
+                    </Button>
+                </div>
+            </main>
+        </Modal>
     )
 }
 

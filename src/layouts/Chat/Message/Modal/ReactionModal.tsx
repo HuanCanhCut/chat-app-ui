@@ -81,7 +81,7 @@ const ReactionModal: React.FC<Props> = ({ isOpen, onClose, messageId }) => {
         if (reaction.user_id === currentUser?.data.id) {
             socket.emit(SocketEvent.REMOVE_REACTION, {
                 message_id: messageId,
-                user_reaction_id: currentUser.data.id,
+                user_reaction_id: currentUser?.data.id,
                 conversation_uuid: uuid,
                 react: reaction.react,
             })
@@ -136,7 +136,7 @@ const ReactionModal: React.FC<Props> = ({ isOpen, onClose, messageId }) => {
             }
 
             if (data.message_id === messageId) {
-                const newReactions = reactions?.data.filter((reaction) => reaction.user_id !== currentUser.data.id)
+                const newReactions = reactions?.data.filter((reaction) => reaction.user_id !== currentUser?.data.id)
 
                 const newReactionTypes = reactionTypes?.map((reaction) => {
                     if (reaction.react === data.react) {
@@ -170,7 +170,7 @@ const ReactionModal: React.FC<Props> = ({ isOpen, onClose, messageId }) => {
         return () => {
             socket.off(SocketEvent.REMOVE_REACTION, socketHandler)
         }
-    }, [currentUser.data.id, messageId, mutateReactionTypes, mutateReactions, reactionTypes, reactions])
+    }, [currentUser?.data.id, messageId, mutateReactionTypes, mutateReactions, reactionTypes, reactions])
 
     return (
         <Modal
