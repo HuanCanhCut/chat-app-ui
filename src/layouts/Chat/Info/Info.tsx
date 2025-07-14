@@ -20,6 +20,11 @@ const sharedSocketEvents = [
     SocketEvent.CONVERSATION_EMOJI_CHANGED,
 ]
 
+const sharedSocketEventMemberHandlers = [
+    SocketEvent.CONVERSATION_MEMBER_NICKNAME_CHANGED,
+    SocketEvent.CONVERSATION_LEADER_CHANGED,
+]
+
 const Info: React.FC<InfoProps> = ({ className = '' }) => {
     const { uuid } = useParams()
 
@@ -74,11 +79,12 @@ const Info: React.FC<InfoProps> = ({ className = '' }) => {
     useEffect(() => {
         interface ConversationRenamedPayload {
             conversation_uuid: string
-            member_id: number
-            nickname: string
+            user_id: number
+            key: string
+            value: string
         }
 
-        const socketHandler = ({ conversation_uuid, member_id, nickname }: ConversationRenamedPayload) => {
+        const socketHandler = ({ conversation_uuid, user_id, key, value }: ConversationRenamedPayload) => {
             if (uuid === conversation_uuid) {
                 mutate(
                     [SWRKey.GET_CONVERSATION_BY_UUID, uuid],
@@ -92,11 +98,19 @@ const Info: React.FC<InfoProps> = ({ className = '' }) => {
                         }
 
                         const members = prev.data.members.map((member) => {
-                            if (member.user.id === member_id) {
-                                return { ...member, nickname }
+                            if (member.user.id === user_id) {
+                                return { ...member, [key]: value }
                             }
 
                             return member
+                        })
+
+                        console.log({
+                            ...prev,
+                            data: {
+                                ...prev.data,
+                                members: [...members],
+                            },
                         })
 
                         return {
@@ -114,10 +128,14 @@ const Info: React.FC<InfoProps> = ({ className = '' }) => {
             }
         }
 
-        socket.on(SocketEvent.CONVERSATION_MEMBER_NICKNAME_CHANGED, socketHandler)
+        sharedSocketEventMemberHandlers.forEach((event) => {
+            socket.on(event, socketHandler)
+        })
 
         return () => {
-            socket.off(SocketEvent.CONVERSATION_MEMBER_NICKNAME_CHANGED, socketHandler)
+            sharedSocketEventMemberHandlers.forEach((event) => {
+                socket.off(event, socketHandler)
+            })
         }
     }, [uuid])
 

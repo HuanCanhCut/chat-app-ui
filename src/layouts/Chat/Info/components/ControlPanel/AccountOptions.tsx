@@ -1,11 +1,16 @@
 import React from 'react'
+import { useParams, useRouter } from 'next/navigation'
+import { AxiosError } from 'axios'
 
 import { faSignOut, faUserCircle, faUserXmark } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { StarShieldIcon } from '~/components/Icons'
 import PopperWrapper from '~/components/PopperWrapper'
+import config from '~/config'
+import handleApiError from '~/helpers/handleApiError'
 import { useAppSelector } from '~/redux'
 import { getCurrentUser } from '~/redux/selector'
+import * as conversationService from '~/services/conversationService'
 import { ConversationMember } from '~/type/type'
 
 interface Option {
@@ -28,15 +33,40 @@ interface AccountOptionsProps {
 }
 
 const AccountOptions: React.FC<AccountOptionsProps> = ({ member, isAdmin }) => {
+    const { uuid } = useParams()
+
+    const router = useRouter()
+
     const currentUser = useAppSelector(getCurrentUser)
 
-    const handleChose = (type: string) => {
+    const handleChose = async (type: string) => {
         switch (type) {
             case 'view_profile':
+                router.push(`${config.routes.user}/@${member.user.nickname}`)
                 break
             case 'designate_admin':
+                try {
+                    await conversationService.designateLeader({
+                        uuid: uuid as string,
+                        memberId: member.user_id,
+                    })
+                } catch (error) {
+                    if (error instanceof AxiosError) {
+                        handleApiError(error)
+                    }
+                }
                 break
-            case 'remove_admin':
+            case 'remove_leader':
+                try {
+                    await conversationService.removeLeader({
+                        uuid: uuid as string,
+                        memberId: member.user_id,
+                    })
+                } catch (error) {
+                    if (error instanceof AxiosError) {
+                        handleApiError(error)
+                    }
+                }
                 break
             case 'remove_member':
                 break
@@ -49,7 +79,7 @@ const AccountOptions: React.FC<AccountOptionsProps> = ({ member, isAdmin }) => {
         isAdmin && {
             title: member.role === 'member' ? 'Chỉ định làm quản trị viên' : 'Gỡ vai trò quản trị viên',
             leftIcon: <StarShieldIcon />,
-            type: member.role === 'member' ? 'designate_admin' : 'remove_admin',
+            type: member.role === 'member' ? 'designate_admin' : 'remove_leader',
         },
         isAdmin && {
             title: 'Xóa thành viên',

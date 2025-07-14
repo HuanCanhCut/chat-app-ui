@@ -90,3 +90,21 @@ export const changeConversationEmoji = async ({ uuid, emoji }: { uuid: string; e
         throw error
     }
 }
+
+export const designateLeader = async ({ uuid, memberId }: { uuid: string; memberId: number }) => {
+    try {
+        const response = await request.patch(`/conversations/${uuid}/designate-leader`, { member_id: memberId })
+        return response.data
+    } catch (error: any) {
+        throw error
+    }
+}
+
+export const removeLeader = async ({ uuid, memberId }: { uuid: string; memberId: number }) => {
+    try {
+        const response = await request.patch(`/conversations/${uuid}/remove-leader`, { member_id: memberId })
+        return response.data
+    } catch (error: any) {
+        throw error
+    }
+}
