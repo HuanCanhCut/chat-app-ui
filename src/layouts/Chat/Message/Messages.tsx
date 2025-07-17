@@ -63,19 +63,37 @@ const Message: React.FC<MessageProps> = ({ conversation }) => {
     // Join room when component mount and current user is not banned
     useEffect(() => {
         const member = conversation?.members.find((member) => member.user_id === currentUser?.data?.id)
-
         // if current user is banned, not join room
         if (member?.deleted_at || !member) {
             return
         }
 
-        if (!socket.connected) {
-            setTimeout(() => {
+        let timeout: NodeJS.Timeout | null = null
+        let delayRetry = 1000
+        let retryCount = 0
+        const maxRetries = 5
+
+        const joinRoom = () => {
+            if (!socket.connected) {
+                if (retryCount >= maxRetries) {
+                    return
+                }
+
+                if (timeout) {
+                    clearTimeout(timeout)
+                }
+
+                retryCount++
+                timeout = setTimeout(() => {
+                    joinRoom()
+                }, delayRetry)
+            } else {
+                retryCount = 0
                 socket.emit(SocketEvent.JOIN_ROOM, uuid)
-            }, 1000)
-        } else {
-            socket.emit(SocketEvent.JOIN_ROOM, uuid)
+            }
         }
+
+        joinRoom()
     }, [conversation?.members, currentUser?.data?.id, uuid])
 
     const handleEnterMessage = (e: React.KeyboardEvent<HTMLDivElement>) => {

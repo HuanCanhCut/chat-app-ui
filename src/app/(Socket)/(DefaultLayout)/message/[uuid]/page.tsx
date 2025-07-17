@@ -45,23 +45,21 @@ const MessagePage = () => {
                 return
             }
 
-            conversation.data.members.find((member) => {
-                if (member.id === data.user_id) {
-                    mutateConversation({
-                        ...conversation,
-                        data: {
-                            ...conversation.data,
-                            members: conversation.data.members.map((member) => ({
-                                ...member,
-                                user: {
-                                    ...member.user,
-                                    is_online: data.is_online,
-                                },
-                            })),
-                        },
-                    })
-                }
-            })
+            mutateConversation(
+                {
+                    ...conversation,
+                    data: {
+                        ...conversation.data,
+                        members: conversation.data.members.map((member) => ({
+                            ...member,
+                            user: { ...member.user, is_online: data.is_online },
+                        })),
+                    },
+                },
+                {
+                    revalidate: false,
+                },
+            )
         }
 
         socket.on(SocketEvent.USER_STATUS, socketHandler)
