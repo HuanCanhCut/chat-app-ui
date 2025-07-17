@@ -12,7 +12,7 @@ interface SystemMessageProps {
     hiddenQuickAction?: boolean
 }
 
-const quickActionTypes = ['system_change_theme']
+const allowedQuickActions = ['system_change_theme']
 
 const SystemMessage = (
     { message, messageIndex, className = '', hiddenQuickAction = false }: SystemMessageProps,
@@ -71,7 +71,7 @@ const SystemMessage = (
 
         jsx.push(<span key={`text-end`}>{text.slice(lastIndex)}</span>)
 
-        if (quickActionTypes.includes(message.type) && !hiddenQuickAction) {
+        if (allowedQuickActions.includes(message.type) && !hiddenQuickAction) {
             jsx.push(
                 <span key={`quick-action`}>
                     <span

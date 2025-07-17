@@ -26,6 +26,8 @@ const ChangeNicknameModal: React.FC = () => {
     const [currentChange, setCurrentChange] = useState<ConversationMember | null>(null)
 
     const handleClick = (member: ConversationMember) => {
+        if (currentChange && currentChange.id === member.id) return
+
         setCurrentChange(member)
         setNickname(member.nickname || '')
     }

@@ -131,7 +131,7 @@ const MessagePage = () => {
                         <Message conversation={conversation.data} />
 
                         {currentMember?.deleted_at || !currentMember ? (
-                            <div className="border-light flex flex-col gap-2 border-t bg-[var(--background-theme-light-footer-color)] px-4 py-2 text-center text-systemMessageLight dark:border-dark dark:bg-[var(--background-theme-dark-footer-color)] dark:text-systemMessageDark">
+                            <div className="flex flex-col gap-2 border-t border-light bg-[var(--background-theme-light-footer-color)] px-4 py-2 text-center text-systemMessageLight dark:border-darkGray dark:bg-[var(--background-theme-dark-footer-color)] dark:text-systemMessageDark">
                                 <p className="font-bold text-gray-700 dark:text-gray-300">
                                     Bạn không thể nhắn tin cho nhóm này
                                 </p>

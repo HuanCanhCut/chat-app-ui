@@ -60,8 +60,15 @@ const Message: React.FC<MessageProps> = ({ conversation }) => {
         },
     )
 
-    // Join room when component mount
+    // Join room when component mount and current user is not banned
     useEffect(() => {
+        const member = conversation?.members.find((member) => member.user_id === currentUser?.data?.id)
+
+        // if current user is banned, not join room
+        if (member?.deleted_at || !member) {
+            return
+        }
+
         if (!socket.connected) {
             setTimeout(() => {
                 socket.emit(SocketEvent.JOIN_ROOM, uuid)
@@ -69,7 +76,7 @@ const Message: React.FC<MessageProps> = ({ conversation }) => {
         } else {
             socket.emit(SocketEvent.JOIN_ROOM, uuid)
         }
-    }, [uuid])
+    }, [conversation?.members, currentUser?.data?.id, uuid])
 
     const handleEnterMessage = (e: React.KeyboardEvent<HTMLDivElement>) => {
         if (e.key === 'Enter') {

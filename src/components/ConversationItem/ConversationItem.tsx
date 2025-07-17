@@ -48,6 +48,30 @@ const ConversationItem: React.FC<Props> = ({ conversation, className = '' }) => 
         return (content += messageType.has(type) ? messageType.get(type) : message?.content)
     }
 
+    // check if last message is system message and block current user
+    const isMessageBlocked = () => {
+        if (conversation.last_message.type === 'system_remove_user') {
+            const regex = /\{(.*?)\}/g
+
+            for (const match of conversation.last_message.content?.matchAll(regex) || []) {
+                const json = match[0]
+
+                interface JsonParsed {
+                    user_id: string | number
+                    name: string
+                }
+
+                const jsonParsed: JsonParsed = JSON.parse(json)
+
+                const matchIndex = match.index || 0
+
+                if (Number(jsonParsed.user_id) === currentUser?.data.id) {
+                    return matchIndex > 0
+                }
+            }
+        }
+    }
+
     return (
         <>
             <Link
@@ -68,7 +92,7 @@ const ConversationItem: React.FC<Props> = ({ conversation, className = '' }) => 
                         {conversation.name || userMember?.nickname || userMember?.user.full_name}
                     </p>
                     <div
-                        className={`flex items-center text-[13px] font-normal [&_*]:text-[13px] ${isRead ? '[&_*]:text-gray-600 dark:[&_*]:text-gray-400' : '[&_*]:text-black dark:[&_*]:text-gray-200'}`}
+                        className={`flex items-center text-[13px] font-normal [&_*]:text-[13px] ${isRead || isMessageBlocked() ? '[&_*]:text-gray-600 dark:[&_*]:text-gray-400' : '[&_*]:text-black dark:[&_*]:text-gray-200'}`}
                     >
                         <span className={`truncate pr-1 [&>p]:w-auto`}>
                             {conversation.last_message.type.startsWith('system') ? (
