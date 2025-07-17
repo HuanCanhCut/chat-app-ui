@@ -174,7 +174,19 @@ const Message: React.FC<MessageProps> = ({ conversation }) => {
     }, [messages, mutateMessages, offsetRange.start, uuid])
 
     useEffect(() => {
-        const socketHandler = ({ message: data, user_read_id }: { message: MessageModel; user_read_id: number }) => {
+        const socketHandler = ({
+            message: data,
+            user_read_id,
+            conversation_uuid,
+        }: {
+            message: MessageModel
+            user_read_id: number
+            conversation_uuid: string
+        }) => {
+            if (conversation_uuid !== uuid) {
+                return
+            }
+
             if (!messages?.data) {
                 return
             }
@@ -211,7 +223,7 @@ const Message: React.FC<MessageProps> = ({ conversation }) => {
                 return {
                     ...message,
                     message_status: message.message_status.map((status) => {
-                        if (status?.receiver_id !== currentUser?.data?.id) {
+                        if (status?.receiver_id !== currentUser?.data?.id && user_read_id === status.receiver_id) {
                             return {
                                 ...status,
                                 receiver: {
@@ -245,7 +257,7 @@ const Message: React.FC<MessageProps> = ({ conversation }) => {
         return () => {
             socket.off(SocketEvent.UPDATE_READ_MESSAGE, socketHandler)
         }
-    }, [currentUser?.data?.id, messages?.data, messages?.meta, mutateMessages])
+    }, [currentUser?.data?.id, messages?.data, messages?.meta, mutateMessages, uuid])
 
     useEffect(() => {
         interface RevokeMessage {
