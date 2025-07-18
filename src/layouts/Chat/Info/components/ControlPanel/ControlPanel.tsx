@@ -182,7 +182,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ setSearchMode }) => {
                       const descriptionMap = {
                           admin: 'Người tạo nhóm',
                           leader: `Quản trị viên · Do ${addedBy()} thêm`,
-                          member: `Do ${addedBy()} thêm`,
+                          member: `${addedBy() ? `Do ${addedBy()} thêm` : ''}`,
                       }
 
                       return {

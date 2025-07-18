@@ -163,6 +163,12 @@ const Info: React.FC<InfoProps> = ({ className = '' }) => {
                             newMembers = newMembers.filter((member) => member.id !== member_id)
                         }
 
+                        // leave conversation
+                        socket.emit(SocketEvent.LEAVE_ROOM, {
+                            conversation_uuid: uuid,
+                            user_id: prev.data.members.find((member) => member.id === member_id)?.user.id,
+                        })
+
                         return {
                             ...prev,
                             data: {
