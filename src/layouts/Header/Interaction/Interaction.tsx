@@ -72,8 +72,14 @@ const Interaction = () => {
                 <section>
                     <div className="border-b border-t border-gray-300 px-5 py-2 dark:border-zinc-700">
                         <label className="text-base font-semibold">Tài khoản</label>
-                        <div className="flex max-w-full items-center justify-between overflow-hidden">
-                            {currentUser && <AccountItem user={currentUser?.data} className="mt-2" />}
+                        <div className="flex max-w-full items-center justify-between gap-2 overflow-hidden">
+                            {currentUser && (
+                                <AccountItem
+                                    user={currentUser?.data}
+                                    className="mt-2 w-full"
+                                    href={`${config.routes.user}/@${currentUser?.data?.nickname}`}
+                                />
+                            )}
                             <Button
                                 buttonType="icon"
                                 className="flex-shrink-0"

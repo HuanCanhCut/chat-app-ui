@@ -5,6 +5,7 @@ import { AxiosError } from 'axios'
 import { Emoji, EmojiStyle } from 'emoji-picker-react'
 import useSWR from 'swr'
 
+import AddMember from '../../Modal/AddMember'
 import ChangeEmojiModal from '../../Modal/ChangeEmojiModal'
 import ChangeNicknameModal from '../../Modal/ChangeNicknameModal'
 import ConversationTheme from '../../Modal/ThemeModal'
@@ -18,6 +19,7 @@ import {
     faMagnifyingGlass,
     faPen,
     faUser,
+    faUserPlus,
 } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Tippy from '@tippyjs/react'
@@ -63,12 +65,10 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ setSearchMode }) => {
         isOpen: boolean
         component: React.ReactNode
         title: string
-        type: string
     }>({
         isOpen: false,
         component: null,
         title: '',
-        type: '',
     })
 
     const { data: conversation } = useSWR(uuid ? [SWRKey.GET_CONVERSATION_BY_UUID, uuid] : null, () => {
@@ -164,65 +164,73 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ setSearchMode }) => {
             ? {
                   title: 'Thành viên trong đoạn chat',
                   type: 'member_in_conversation',
-                  children: conversation.data.members.map((member, index) => {
-                      const addedBy = () => {
-                          if (member.added_by_id === currentUser?.data.id) {
-                              return 'bạn'
+                  children: [
+                      ...conversation.data.members.map((member) => {
+                          const addedBy = () => {
+                              if (member.added_by_id === currentUser?.data.id) {
+                                  return 'bạn'
+                              }
+
+                              if (member.added_by_id) {
+                                  return (
+                                      memberMap[member.added_by_id].nickname ||
+                                      memberMap[member.added_by_id].user.full_name
+                                  )
+                              }
+
+                              return ''
                           }
 
-                          if (member.added_by_id) {
-                              return (
-                                  memberMap[member.added_by_id].nickname || memberMap[member.added_by_id].user.full_name
-                              )
+                          const descriptionMap = {
+                              admin: 'Người tạo nhóm',
+                              leader: `Quản trị viên · Do ${addedBy()} thêm`,
+                              member: `${addedBy() ? `Do ${addedBy()} thêm` : ''}`,
                           }
 
-                          return ''
-                      }
-
-                      const descriptionMap = {
-                          admin: 'Người tạo nhóm',
-                          leader: `Quản trị viên · Do ${addedBy()} thêm`,
-                          member: `${addedBy() ? `Do ${addedBy()} thêm` : ''}`,
-                      }
-
-                      return {
-                          title: member.nickname || member.user.full_name,
-                          leftIcon: (
-                              <UserAvatar
-                                  src={member.user.avatar}
-                                  size={36}
-                                  href={`${config.routes.user}/@${member.user.nickname}`}
-                              />
-                          ),
-                          description: descriptionMap[member.role],
-                          type: 'member',
-                          href: `${config.routes.user}/@${member.user.nickname}`,
-                          className:
-                              'hover:bg-transparent dark:hover:bg-transparent [&>*[data-right-icon]]:ml-auto cursor-default [&_#accordion-title]:cursor-pointer',
-                          rightIcon: (
-                              <CustomTippy
-                                  onShow={(tippyInstance) => {
-                                      accountOptionsTippyRef.current = tippyInstance
-                                  }}
-                                  renderItem={() => {
-                                      return <AccountOptions member={member} isAdmin={isAdmin} />
-                                  }}
-                              >
-                                  <Tippy content="Lựa chọn của thành viên" delay={[350, 0]}>
-                                      <div
-                                          className="flex-center h-9 w-9 cursor-pointer rounded-full hover:bg-[#99999936] dark:hover:bg-[#333636]"
-                                          onClick={(e) => {
-                                              e.stopPropagation()
-                                              e.preventDefault()
-                                          }}
-                                      >
-                                          <FontAwesomeIcon icon={faEllipsis} />
-                                      </div>
-                                  </Tippy>
-                              </CustomTippy>
-                          ),
-                      }
-                  }),
+                          return {
+                              title: member.nickname || member.user.full_name,
+                              leftIcon: (
+                                  <UserAvatar
+                                      src={member.user.avatar}
+                                      size={36}
+                                      href={`${config.routes.user}/@${member.user.nickname}`}
+                                  />
+                              ),
+                              description: descriptionMap[member.role],
+                              type: 'member',
+                              href: `${config.routes.user}/@${member.user.nickname}`,
+                              className:
+                                  'hover:bg-transparent dark:hover:bg-transparent [&>*[data-right-icon]]:ml-auto cursor-default [&_#accordion-title]:cursor-pointer',
+                              rightIcon: (
+                                  <CustomTippy
+                                      onShow={(tippyInstance) => {
+                                          accountOptionsTippyRef.current = tippyInstance
+                                      }}
+                                      renderItem={() => {
+                                          return <AccountOptions member={member} isAdmin={isAdmin} />
+                                      }}
+                                  >
+                                      <Tippy content="Lựa chọn của thành viên" delay={[350, 0]}>
+                                          <div
+                                              className="flex-center h-9 w-9 cursor-pointer rounded-full hover:bg-[#99999936] dark:hover:bg-[#333636]"
+                                              onClick={(e) => {
+                                                  e.stopPropagation()
+                                                  e.preventDefault()
+                                              }}
+                                          >
+                                              <FontAwesomeIcon icon={faEllipsis} />
+                                          </div>
+                                      </Tippy>
+                                  </CustomTippy>
+                              ),
+                          }
+                      }),
+                      {
+                          title: 'Thêm người',
+                          leftIcon: <FontAwesomeIcon icon={faUserPlus} width={20} height={20} />,
+                          type: 'add_member',
+                      },
+                  ],
               }
             : null,
         {
@@ -282,7 +290,6 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ setSearchMode }) => {
                             <RenameConversationModal onClose={handleCloseModal} name={conversation?.data.name} />
                         ),
                         title: 'Đổi tên đoạn chat',
-                        type: 'rename_conversation',
                     })
                     break
                 case 'change_avatar':
@@ -297,7 +304,6 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ setSearchMode }) => {
                             <ConversationTheme onClose={handleCloseModal} currentTheme={conversation!.data.theme} />
                         ),
                         title: 'Xem trước và chọn chủ đề',
-                        type: 'change_topic',
                     })
                     break
                 case 'change_nickname':
@@ -305,7 +311,6 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ setSearchMode }) => {
                         isOpen: true,
                         component: <ChangeNicknameModal />,
                         title: 'Biệt danh',
-                        type: 'change_nickname',
                     })
                     break
                 case 'change_emoji':
@@ -315,7 +320,13 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ setSearchMode }) => {
                             <ChangeEmojiModal onClose={handleCloseModal} currentEmoji={conversation?.data.emoji} />
                         ),
                         title: 'Biểu tượng cảm xúc',
-                        type: 'change_emoji',
+                    })
+                    break
+                case 'add_member':
+                    setModalState({
+                        isOpen: true,
+                        component: <AddMember />,
+                        title: 'Thêm người',
                     })
                     break
             }
@@ -373,7 +384,6 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ setSearchMode }) => {
                             <ConversationTheme onClose={handleCloseModal} currentTheme={conversation!.data.theme} />
                         ),
                         title: 'Xem trước và chọn chủ đề',
-                        type: 'change_topic',
                     })
                 }
             },

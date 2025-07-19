@@ -7,6 +7,7 @@ import PopperWrapper from '../PopperWrapper'
 import { faSearch, faXmark } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Tippy from '@tippyjs/react/headless'
+import config from '~/config'
 import SWRKey from '~/enum/SWRKey'
 import { sendEvent } from '~/helpers/events'
 import handleApiError from '~/helpers/handleApiError'
@@ -39,7 +40,6 @@ const Search: React.FC<SearchProps> = ({ placeholder = 'Tìm kiếm', className 
     }, [searchHistory])
 
     useEffect(() => {
-        // Nếu không có giá trị thì không cần tìm kiếm
         if (!debounceValue.trim()) {
             setSearchResult([])
             return
@@ -105,6 +105,7 @@ const Search: React.FC<SearchProps> = ({ placeholder = 'Tìm kiếm', className 
                                           key={item.id}
                                           user={item.user_search}
                                           onClick={handleSetSearchHistory}
+                                          href={`${config.routes.user}/@${item.user_search.nickname}`}
                                       />
                                   )
                               })}
