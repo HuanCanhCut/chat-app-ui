@@ -21,6 +21,6 @@ jobs:
                       cd /var/www/nextjs/chat-app-ui
                       git checkout main
                       git pull
-                      yarn install
+                      yarn install --frozen-lockfile
                       yarn build
                       pm2 restart chat-app-ui
