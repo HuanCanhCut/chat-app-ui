@@ -1,11 +1,9 @@
 import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useParams } from 'next/navigation'
-import { Emoji as EmojiPicker, EmojiStyle } from 'emoji-picker-react'
-import { EmojiClickData } from 'emoji-picker-react'
-import useSWR, { mutate, useSWRConfig } from 'swr'
+import { Emoji as EmojiPicker, EmojiClickData, EmojiStyle } from 'emoji-picker-react'
+import useSWR, { mutate } from 'swr'
 
-import { faSmile } from '@fortawesome/free-regular-svg-icons'
-import { faImage } from '@fortawesome/free-regular-svg-icons'
+import { faImage, faSmile } from '@fortawesome/free-regular-svg-icons'
 import { faFolderPlus, faXmark } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Tippy from '@tippyjs/react'
@@ -20,7 +18,7 @@ import socket from '~/helpers/socket'
 import { useAppSelector } from '~/redux'
 import { getCurrentUser } from '~/redux/selector'
 import * as conversationServices from '~/services/conversationService'
-import { ConversationMember, ConversationModel, MessageModel } from '~/type/type'
+import { ConversationMember, MessageModel } from '~/type/type'
 
 interface InputMessageProps {
     className?: string
@@ -50,13 +48,8 @@ const InputMessage: React.FC<InputMessageProps> = () => {
     const [images, setImages] = useState<IFile[]>([])
     const [replyMessage, setReplyMessage] = useState<MessageModel | null>(null)
 
-    const { cache: swrCache } = useSWRConfig()
-
     const memberMap = useMemo(() => {
-        if (!replyMessage) return
-        const conversation: ConversationModel = swrCache.get(SWRKey.GET_CONVERSATIONS)?.data[uuid as string]
-
-        const member: ConversationMember[] = conversation.members
+        const member: ConversationMember[] = conversation?.data.members || []
 
         return member.reduce(
             (mem, cur) => {
@@ -65,7 +58,7 @@ const InputMessage: React.FC<InputMessageProps> = () => {
             },
             {} as Record<number, ConversationMember>,
         )
-    }, [replyMessage, swrCache, uuid])
+    }, [conversation?.data.members])
 
     const handleEnterMessage = (e: React.KeyboardEvent<HTMLDivElement>) => {
         if (e.key === 'Enter') {

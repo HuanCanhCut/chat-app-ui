@@ -1,38 +1,18 @@
-import React, { forwardRef, LegacyRef, useMemo } from 'react'
-import { useParams } from 'next/navigation'
-import { useSWRConfig } from 'swr'
+import { forwardRef, LegacyRef } from 'react'
 
 import { faReply } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Image from '~/components/Image'
-import SWRKey from '~/enum/SWRKey'
 import { sendEvent } from '~/helpers/events'
-import { ConversationMember, ConversationModel, MessageModel, UserModel } from '~/type/type'
+import { ConversationMember, MessageModel, UserModel } from '~/type/type'
 
 interface ReplyMessageProps {
     message: MessageModel
     currentUser?: UserModel
+    memberMap: Record<number, ConversationMember>
 }
 
-const ReplyMessage = ({ message, currentUser }: ReplyMessageProps, ref: LegacyRef<HTMLDivElement>) => {
-    const { uuid } = useParams()
-
-    const { cache: swrCache } = useSWRConfig()
-
-    const memberMap = useMemo(() => {
-        const conversation: ConversationModel = swrCache.get(SWRKey.GET_CONVERSATIONS)?.data[uuid as string]
-
-        const member: ConversationMember[] = conversation.members
-
-        return member.reduce(
-            (mem, cur) => {
-                mem[cur.user_id] = cur
-                return mem
-            },
-            {} as Record<number, ConversationMember>,
-        )
-    }, [swrCache, uuid])
-
+const ReplyMessage = ({ message, currentUser, memberMap }: ReplyMessageProps, ref: LegacyRef<HTMLDivElement>) => {
     const handleScrollToMessage = (message: MessageModel) => {
         sendEvent({
             eventName: 'message:scroll-to-message',

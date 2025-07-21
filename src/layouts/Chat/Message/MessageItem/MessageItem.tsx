@@ -1,7 +1,8 @@
-import { memo, useCallback, useEffect, useRef, useState } from 'react'
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import ReactModal from 'react-modal'
 import { useParams } from 'next/navigation'
 import moment from 'moment-timezone'
+import useSWR from 'swr'
 
 import SystemMessage from '../SystemMessage'
 import MessageAction from './components/MessageAction'
@@ -11,13 +12,15 @@ import UserViewed from './components/UserViewed'
 import Tippy from '@tippyjs/react'
 import UserAvatar from '~/components/UserAvatar'
 import { SocketEvent } from '~/enum/SocketEvent'
+import SWRKey from '~/enum/SWRKey'
 import { sendEvent } from '~/helpers/events'
 import socket from '~/helpers/socket'
 import useVisible from '~/hooks/useVisible'
 import MessageImagesModel from '~/layouts/Chat/Message/Modal/MessageImagesModal'
 import ReactionModal from '~/layouts/Chat/Message/Modal/ReactionModal'
 import RevokeModal from '~/layouts/Chat/Message/Modal/RevokeModal'
-import { MessageModel, MessageResponse, UserModel } from '~/type/type'
+import * as conversationServices from '~/services/conversationService'
+import { ConversationMember, MessageModel, MessageResponse, UserModel } from '~/type/type'
 
 const BETWEEN_TIME_MESSAGE = 7 // minute
 
@@ -32,6 +35,10 @@ interface MessageItemProps {
 
 const MessageItem = ({ message, messageIndex, messages, currentUser, messageRef }: MessageItemProps) => {
     const { uuid } = useParams()
+
+    const { data: conversation } = useSWR(uuid ? [SWRKey.GET_CONVERSATION_BY_UUID, uuid] : null, () => {
+        return conversationServices.getConversationByUuid({ uuid: uuid as string })
+    })
 
     const options = { root: null, rootMargin: '0px', threshold: 0.5 }
     const firstMessageRef = useRef<HTMLDivElement>(null)
@@ -51,6 +58,18 @@ const MessageItem = ({ message, messageIndex, messages, currentUser, messageRef 
     })
 
     const [openRevokeModal, setOpenRevokeModal] = useState(false)
+
+    const memberMap = useMemo(() => {
+        const member: ConversationMember[] = conversation?.data.members || []
+
+        return member.reduce(
+            (mem, cur) => {
+                mem[cur.user_id] = cur
+                return mem
+            },
+            {} as Record<number, ConversationMember>,
+        )
+    }, [conversation?.data.members])
 
     // handle margin top of reply message
     useEffect(() => {
@@ -189,6 +208,23 @@ const MessageItem = ({ message, messageIndex, messages, currentUser, messageRef 
         return true
     }
 
+    const isFirstMessageInConsecutiveGroup = () => {
+        const nextMessage = messages.data[messageIndex + 1]
+
+        if (message.content === '15') {
+            console.log(nextMessage)
+        }
+
+        if (nextMessage) {
+            const isConsecutiveWithNext =
+                nextMessage.sender_id === message.sender_id && diffTime(message, nextMessage) < BETWEEN_TIME_MESSAGE
+
+            return !isConsecutiveWithNext
+        }
+
+        return true
+    }
+
     if (message.type.startsWith('system')) {
         return (
             <SystemMessage
@@ -231,32 +267,46 @@ const MessageItem = ({ message, messageIndex, messages, currentUser, messageRef 
                         size={28}
                     />
                 )}
-                <div
-                    className={`relative flex w-full items-center ${message?.top_reactions?.length ? 'mb-[10px]' : ''} ${message.sender_id === currentUser?.id ? 'justify-end' : 'justify-start'}`}
-                >
-                    <ReplyMessage message={message} currentUser={currentUser} ref={replyMessageRef} />
-                    {/* More action */}
-                    <MessageAction
-                        message={message}
-                        currentUser={currentUser}
-                        messageIndex={messageIndex}
-                        messages={messages}
-                        setOpenRevokeModal={setOpenRevokeModal}
-                    />
-                    {/* Message content */}
-                    <Tippy content={handleFormatTime(message.created_at)} placement="left">
-                        <MessageContent
+                <div className="flex w-full flex-col text-[15px]">
+                    {message.sender_id !== currentUser.id &&
+                        isFirstMessageInConsecutiveGroup() &&
+                        conversation?.data.is_group && (
+                            <p className="mb-1 ml-2 flex w-fit items-center gap-2 text-right text-xs text-systemMessageLight dark:text-systemMessageDark">
+                                {memberMap[message.sender_id]?.nickname || memberMap[message.sender_id]?.user.full_name}
+                            </p>
+                        )}
+                    <div
+                        className={`relative flex w-full items-center ${message?.top_reactions?.length ? 'mb-[10px]' : ''} ${message.sender_id === currentUser?.id ? 'justify-end' : 'justify-start'}`}
+                    >
+                        <ReplyMessage
                             message={message}
-                            messageIndex={messageIndex}
-                            ref={firstMessageRef}
-                            messageRef={messageRef}
                             currentUser={currentUser}
-                            handleOpenImageModal={handleOpenImageModal}
-                            handleOpenReactionModal={handleOpenReactionModal}
-                            messages={messages}
-                            diffTime={diffTime}
+                            ref={replyMessageRef}
+                            memberMap={memberMap}
                         />
-                    </Tippy>
+                        {/* More action */}
+                        <MessageAction
+                            message={message}
+                            currentUser={currentUser}
+                            messageIndex={messageIndex}
+                            messages={messages}
+                            setOpenRevokeModal={setOpenRevokeModal}
+                        />
+                        {/* Message content */}
+                        <Tippy content={handleFormatTime(message.created_at)} placement="left">
+                            <MessageContent
+                                message={message}
+                                messageIndex={messageIndex}
+                                ref={firstMessageRef}
+                                messageRef={messageRef}
+                                currentUser={currentUser}
+                                handleOpenImageModal={handleOpenImageModal}
+                                handleOpenReactionModal={handleOpenReactionModal}
+                                messages={messages}
+                                diffTime={diffTime}
+                            />
+                        </Tippy>
+                    </div>
                 </div>
             </div>
 
