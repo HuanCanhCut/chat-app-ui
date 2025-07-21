@@ -117,3 +117,12 @@ export const removeMember = async ({ uuid, memberId }: { uuid: string; memberId:
         throw error
     }
 }
+
+export const addMember = async ({ uuid, formData }: { uuid: string; formData: FormData }) => {
+    try {
+        const response = await request.post(`/conversations/${uuid}/user`, formData)
+        return response.data
+    } catch (error: any) {
+        throw error
+    }
+}

@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import Skeleton from 'react-loading-skeleton'
 import Image from 'next/image'
 import useSWR from 'swr'
@@ -312,6 +312,18 @@ const Conversations = () => {
         return () => {
             socket.off(SocketEvent.CONVERSATION_RENAMED, socketHandler)
             socket.off(SocketEvent.CONVERSATION_AVATAR_CHANGED, socketHandler)
+        }
+    }, [mutateConversations])
+
+    useEffect(() => {
+        const socketHandler = () => {
+            mutateConversations()
+        }
+
+        socket.on(SocketEvent.CONVERSATION_MEMBER_JOINED, socketHandler)
+
+        return () => {
+            socket.off(SocketEvent.CONVERSATION_MEMBER_JOINED, socketHandler)
         }
     }, [mutateConversations])
 

@@ -95,7 +95,12 @@ const Search: React.FC<SearchProps> = ({ placeholder = 'Tìm kiếm', className 
                         {searchResult.length > 0
                             ? searchValue.trim() !== '' &&
                               searchResult.map((user, index) => (
-                                  <AccountItem key={index} user={user} onClick={handleSetSearchHistory} />
+                                  <AccountItem
+                                      key={index}
+                                      user={user}
+                                      onClick={handleSetSearchHistory}
+                                      href={`${config.routes.user}/@${user.nickname}`}
+                                  />
                               ))
                             : searchHistoryResult.length > 0 &&
                               searchValue.trim() === '' &&

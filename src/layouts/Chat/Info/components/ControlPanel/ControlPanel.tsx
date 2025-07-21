@@ -325,7 +325,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ setSearchMode }) => {
                 case 'add_member':
                     setModalState({
                         isOpen: true,
-                        component: <AddMember />,
+                        component: <AddMember onClose={handleCloseModal} />,
                         title: 'Thêm người',
                     })
                     break

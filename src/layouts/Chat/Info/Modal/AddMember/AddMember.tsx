@@ -1,10 +1,11 @@
 import { useCallback, useState } from 'react'
 import InfiniteScroll from 'react-infinite-scroll-component'
+import { useParams } from 'next/navigation'
 import { AxiosError } from 'axios'
 import useSWR from 'swr'
 
 import { faCircle } from '@fortawesome/free-regular-svg-icons'
-import { faSpinner, faXmark } from '@fortawesome/free-solid-svg-icons'
+import { faCircleCheck, faSpinner, faXmark } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import AccountItem from '~/components/AccountItem/AccountItem'
 import Button from '~/components/Button'
@@ -14,16 +15,22 @@ import SWRKey from '~/enum/SWRKey'
 import handleApiError from '~/helpers/handleApiError'
 import { useAppSelector } from '~/redux'
 import { getCurrentUser } from '~/redux/selector'
+import * as conversationService from '~/services/conversationService'
 import * as friendService from '~/services/friendService'
 import { FriendsResponse, FriendsShip, UserModel } from '~/type/type'
 
 const PER_PAGE = 20
 
-const AddMember: React.FC = () => {
+interface AddMemberProps {
+    onClose: () => void
+}
+
+const AddMember: React.FC<AddMemberProps> = ({ onClose }) => {
+    const { uuid } = useParams()
     const currentUser = useAppSelector(getCurrentUser)
 
     const [searchResult, setSearchResult] = useState<FriendsShip[]>([])
-    const [addedMembers, setAddedMembers] = useState<UserModel[]>([])
+    const [previewMember, setPreviewMember] = useState<UserModel[]>([])
 
     const { data: friends, mutate: mutateFriends } = useSWR<FriendsResponse | undefined>(
         [SWRKey.GET_ALL_FRIENDS, currentUser?.data.id],
@@ -58,17 +65,37 @@ const AddMember: React.FC = () => {
     }, [currentUser?.data.id, friends, mutateFriends])
 
     const handleAddPreview = (friend: UserModel) => {
-        const added = addedMembers.find((user) => user.id === friend.id)
+        const added = previewMember.find((user) => user.id === friend.id)
 
         if (!added) {
-            setAddedMembers((prev) => [...prev, friend])
+            setPreviewMember((prev) => [...prev, friend])
         }
     }
 
     const handleRemovePreview = (user: UserModel) => {
-        setAddedMembers((prev) => {
+        setPreviewMember((prev) => {
             return prev.filter((userPreview) => userPreview.id !== user.id)
         })
+    }
+
+    const handleAddMember = async () => {
+        try {
+            const formData = new FormData()
+
+            previewMember.forEach((user) => {
+                formData.append('user_id[]', user.id.toString())
+            })
+
+            const res = await conversationService.addMember({ uuid: uuid as string, formData })
+
+            if (!res) return
+
+            onClose()
+        } catch (error) {
+            if (error instanceof AxiosError) {
+                handleApiError(error)
+            }
+        }
     }
 
     return (
@@ -77,9 +104,9 @@ const AddMember: React.FC = () => {
                 <SearchFriend placeholder="Tìm kiếm" setSearchResult={setSearchResult} />
 
                 <div className="px-4 py-8">
-                    {addedMembers.length > 0 ? (
+                    {previewMember.length > 0 ? (
                         <div className="flex gap-4 py-1 [overflow-x:overlay]">
-                            {addedMembers.map((user) => {
+                            {previewMember.map((user) => {
                                 return (
                                     <div key={user.id} className="relative">
                                         <button
@@ -135,10 +162,17 @@ const AddMember: React.FC = () => {
                                     >
                                         <AccountItem user={friend.user} avatarSize={35} />
 
-                                        <FontAwesomeIcon
-                                            icon={faCircle}
-                                            className="absolute right-3 top-1/2 -translate-y-1/2"
-                                        />
+                                        {previewMember.some((user) => user.id === friend.user.id) ? (
+                                            <FontAwesomeIcon
+                                                icon={faCircleCheck}
+                                                className="absolute right-3 top-1/2 -translate-y-1/2 text-primary"
+                                            />
+                                        ) : (
+                                            <FontAwesomeIcon
+                                                icon={faCircle}
+                                                className="absolute right-3 top-1/2 -translate-y-1/2"
+                                            />
+                                        )}
                                     </div>
                                 )
                             },
@@ -146,7 +180,12 @@ const AddMember: React.FC = () => {
                     </InfiniteScroll>
                 </div>
 
-                <Button buttonType="primary" disabled={addedMembers.length === 0} className="mt-4 w-full">
+                <Button
+                    buttonType="primary"
+                    disabled={previewMember.length === 0}
+                    className="mt-4 w-full"
+                    onClick={handleAddMember}
+                >
                     Thêm nguời
                 </Button>
             </div>

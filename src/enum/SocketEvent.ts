@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 export enum SocketEvent {
     // ------------------------------- User -------------------------------
     VISIBILITY_CHANGE = 'visibility_change',
@@ -11,6 +10,7 @@ export enum SocketEvent {
     USER_STATUS = 'user:status',
     MESSAGE_REVOKE = 'message:revoke',
     MESSAGE_TYPING = 'message:typing',
+
     // ------------------------------- Notification -------------------------------
     NEW_NOTIFICATION = 'notification:new',
     REMOVE_NOTIFICATION = 'notification:remove',
@@ -26,6 +26,7 @@ export enum SocketEvent {
     CONVERSATION_EMOJI_CHANGED = 'conversation:emoji_changed',
     CONVERSATION_MEMBER_NICKNAME_CHANGED = 'conversation:member_nickname_changed',
     CONVERSATION_MEMBER_ADDED = 'conversation:member_added',
+    CONVERSATION_MEMBER_JOINED = 'conversation:member_joined',
     CONVERSATION_LEADER_CHANGED = 'conversation:leader_changed',
     CONVERSATION_MEMBER_REMOVED = 'conversation:member_removed',
     CONVERSATION_MEMBER_LEAVED = 'conversation:member_leaved',

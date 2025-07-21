@@ -9,7 +9,7 @@ import SWRKey from '~/enum/SWRKey'
 import socket from '~/helpers/socket'
 import { useAppSelector } from '~/redux'
 import { getCurrentUser } from '~/redux/selector'
-import { ConversationModel, ConversationThemeModel } from '~/type/type'
+import { ConversationMember, ConversationModel, ConversationThemeModel } from '~/type/type'
 
 interface InfoProps {
     className?: string
@@ -188,6 +188,48 @@ const Info: React.FC<InfoProps> = ({ className = '' }) => {
 
         return () => {
             socket.off(SocketEvent.CONVERSATION_MEMBER_REMOVED, socketHandler)
+        }
+    }, [currentUser?.data.id, uuid])
+
+    useEffect(() => {
+        const socketHandler = ({
+            conversation_uuid,
+            members,
+        }: {
+            conversation_uuid: string
+            members: ConversationMember[]
+        }) => {
+            if (uuid === conversation_uuid) {
+                mutate(
+                    [SWRKey.GET_CONVERSATION_BY_UUID, uuid],
+                    (prev: { data: ConversationModel } | undefined) => {
+                        if (!prev) {
+                            return prev
+                        }
+
+                        if (!prev?.data) {
+                            return prev
+                        }
+
+                        return {
+                            ...prev,
+                            data: {
+                                ...prev.data,
+                                members: [...prev.data.members, ...members],
+                            },
+                        }
+                    },
+                    {
+                        revalidate: false,
+                    },
+                )
+            }
+        }
+
+        socket.on(SocketEvent.CONVERSATION_MEMBER_ADDED, socketHandler)
+
+        return () => {
+            socket.off(SocketEvent.CONVERSATION_MEMBER_ADDED, socketHandler)
         }
     }, [currentUser?.data.id, uuid])
 
