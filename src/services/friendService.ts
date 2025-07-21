@@ -68,3 +68,19 @@ export const rejectFriend = async (userId: number): Promise<AxiosResponse<void>>
         throw error
     }
 }
+
+export const searchFriend = async (searchValue: string, page: number, per_page: number): Promise<FriendsResponse> => {
+    try {
+        const response = await request.get(`users/friends/search`, {
+            params: {
+                q: searchValue,
+                page,
+                per_page,
+            },
+        })
+
+        return response.data
+    } catch (error: any) {
+        throw error
+    }
+}

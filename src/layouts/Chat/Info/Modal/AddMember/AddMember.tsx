@@ -15,14 +15,14 @@ import handleApiError from '~/helpers/handleApiError'
 import { useAppSelector } from '~/redux'
 import { getCurrentUser } from '~/redux/selector'
 import * as friendService from '~/services/friendService'
-import { FriendsResponse, UserModel } from '~/type/type'
+import { FriendsResponse, FriendsShip, UserModel } from '~/type/type'
 
 const PER_PAGE = 20
 
 const AddMember: React.FC = () => {
     const currentUser = useAppSelector(getCurrentUser)
 
-    const [searchResult, setSearchResult] = useState<UserModel[]>([])
+    const [searchResult, setSearchResult] = useState<FriendsShip[]>([])
     const [addedMembers, setAddedMembers] = useState<UserModel[]>([])
 
     const { data: friends, mutate: mutateFriends } = useSWR<FriendsResponse | undefined>(
@@ -109,7 +109,7 @@ const AddMember: React.FC = () => {
 
                 <div className="flex-1 [overflow-y:overlay]">
                     <InfiniteScroll
-                        dataLength={friends?.data.length || 0} //This is important field to render the next data
+                        dataLength={searchResult.length || friends?.data.length || 0}
                         next={handleLoadMoreFriend}
                         className="!overflow-hidden"
                         hasMore={
@@ -125,21 +125,24 @@ const AddMember: React.FC = () => {
                         }
                         scrollableTarget="theme-scrollable"
                     >
-                        {(searchResult && searchResult.length > 0
-                            ? searchResult
-                            : friends?.data.map((friend) => friend.user) || []
-                        ).map((friend) => {
-                            return (
-                                <div key={friend.id} className="relative" onClick={() => handleAddPreview(friend)}>
-                                    <AccountItem user={friend} avatarSize={35} />
+                        {(searchResult && searchResult.length > 0 ? searchResult : friends?.data || []).map(
+                            (friend) => {
+                                return (
+                                    <div
+                                        key={friend.id}
+                                        className="relative"
+                                        onClick={() => handleAddPreview(friend.user)}
+                                    >
+                                        <AccountItem user={friend.user} avatarSize={35} />
 
-                                    <FontAwesomeIcon
-                                        icon={faCircle}
-                                        className="absolute right-3 top-1/2 -translate-y-1/2"
-                                    />
-                                </div>
-                            )
-                        })}
+                                        <FontAwesomeIcon
+                                            icon={faCircle}
+                                            className="absolute right-3 top-1/2 -translate-y-1/2"
+                                        />
+                                    </div>
+                                )
+                            },
+                        )}
                     </InfiniteScroll>
                 </div>
 

@@ -3,11 +3,12 @@ import React, { useEffect, useState } from 'react'
 import { faSearch } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import useDebounce from '~/hooks/useDebounce'
-import { UserModel } from '~/type/type'
+import * as friendService from '~/services/friendService'
+import { FriendsShip } from '~/type/type'
 
 interface SearchFriendProps {
     placeholder?: string
-    setSearchResult: (result: UserModel[]) => void
+    setSearchResult: (result: FriendsShip[]) => void
     className?: string
 }
 
@@ -21,6 +22,16 @@ const SearchFriend: React.FC<SearchFriendProps> = ({ placeholder = 'Tìm kiếm'
             setSearchResult([])
             return
         }
+
+        ;(async () => {
+            try {
+                const response = await friendService.searchFriend(debounceValue, 1, 10)
+
+                setSearchResult(response.data)
+            } catch (error) {
+                console.log(error)
+            }
+        })()
     }, [debounceValue, setSearchResult])
 
     return (
