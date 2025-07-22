@@ -81,7 +81,8 @@ const MessageContent = (
         if (messageIndex >= messages.data.length - 1) {
             if (
                 messages.data[messageIndex - 1].sender_id === message.sender_id &&
-                diffTime(message, messages.data[messageIndex - 1]) < BETWEEN_TIME_MESSAGE
+                diffTime(message, messages.data[messageIndex - 1]) < BETWEEN_TIME_MESSAGE &&
+                !messages.data[messageIndex - 1].type.startsWith('system')
             ) {
                 style += isCurrentUser ? ' rounded-br-[6px]' : ' rounded-bl-[6px]'
             }
@@ -91,7 +92,9 @@ const MessageContent = (
 
         const nextMessage = messages.data[messageIndex + 1]
         const isConsecutiveWithNext =
-            nextMessage.sender_id === message.sender_id && diffTime(message, nextMessage) < BETWEEN_TIME_MESSAGE
+            nextMessage.sender_id === message.sender_id &&
+            diffTime(message, nextMessage) < BETWEEN_TIME_MESSAGE &&
+            !nextMessage.type.startsWith('system')
 
         if (messageIndex === 0) {
             if (isConsecutiveWithNext) {
@@ -104,7 +107,9 @@ const MessageContent = (
         const prevMessage = messages.data[messageIndex - 1]
 
         const isConsecutiveWithPrev =
-            prevMessage.sender_id === message.sender_id && diffTime(message, prevMessage) < BETWEEN_TIME_MESSAGE
+            prevMessage.sender_id === message.sender_id &&
+            diffTime(message, prevMessage) < BETWEEN_TIME_MESSAGE &&
+            !prevMessage.type.startsWith('system')
 
         if (message.parent) {
             if (prevMessage.parent) {
