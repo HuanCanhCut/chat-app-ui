@@ -136,3 +136,23 @@ export const getAroundMessages = async ({
         console.log(error)
     }
 }
+
+interface LinkPreviewResponse {
+    data: {
+        title: string | null
+        description: string | null
+        image: string | null
+        url: string
+        author: string | null
+    }
+}
+
+export const getLinkPreview = async ({ url }: { url: string }): Promise<LinkPreviewResponse | undefined> => {
+    try {
+        const response = await request.post('/messages/link-preview', { url })
+
+        return response.data
+    } catch (error: any) {
+        throw error
+    }
+}

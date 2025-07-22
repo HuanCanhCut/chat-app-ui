@@ -1,8 +1,10 @@
-import { forwardRef, LegacyRef } from 'react'
+import { forwardRef, LegacyRef, useEffect, useState } from 'react'
+import Link from 'next/link'
 
 import Reaction from './Reaction'
 import EmojiMessageStyle from '~/components/EmojiMessageStyle'
 import CustomImage from '~/components/Image/Image'
+import * as messageServices from '~/services/messageService'
 import { MessageModel, MessageResponse, UserModel } from '~/type/type'
 
 interface MessageContentProps {
@@ -22,6 +24,16 @@ interface MessageContentProps {
 
 const BETWEEN_TIME_MESSAGE = 7 // minute
 
+const linkRegex = /(http|ftp|https):\/\/([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:\/~+#-]*[\w@?^=%&\/~+#-])/
+
+interface LinkPreview {
+    title: string | null
+    description: string | null
+    image: string | null
+    url: string
+    author: string | null
+}
+
 const MessageContent = (
     {
         message,
@@ -35,6 +47,8 @@ const MessageContent = (
     }: MessageContentProps,
     ref: LegacyRef<HTMLDivElement>,
 ) => {
+    const [linkPreview, setLinkPreview] = useState<LinkPreview | null>(null)
+
     const combinedRef = (el: HTMLDivElement) => {
         if (messageIndex === 0) {
             if (ref) {
@@ -116,6 +130,30 @@ const MessageContent = (
         return style
     }
 
+    useEffect(() => {
+        if (message.type !== 'text') {
+            return
+        }
+
+        const linkMatch = message.content?.match(linkRegex)
+
+        if (linkMatch) {
+            const link = linkMatch[0]
+
+            ;(async () => {
+                try {
+                    const response = await messageServices.getLinkPreview({ url: link })
+
+                    if (response) {
+                        setLinkPreview(response.data)
+                    }
+                } catch (error) {
+                    console.log(error)
+                }
+            })()
+        }
+    }, [message.content, message.type])
+
     // message is revoked
     if (message.content === null) {
         return (
@@ -137,17 +175,46 @@ const MessageContent = (
         case 'text':
             return (
                 <div
-                    ref={combinedRef}
-                    className={`relative w-fit max-w-[80%] whitespace-pre-wrap rounded-3xl px-4 py-1.5 font-normal [word-break:break-word] ${
-                        message.sender_id === currentUser?.id
-                            ? 'bg-[var(--sender-light-background-color)] text-[var(--sender-light-text-color)] dark:bg-[var(--sender-dark-background-color)] dark:text-[var(--sender-dark-text-color)]'
-                            : 'bg-[var(--receiver-light-background-color)] text-[var(--receiver-light-text-color)] dark:bg-[var(--receiver-dark-background-color)] dark:text-[var(--receiver-dark-text-color)]'
+                    className={`relative overflow-hidden rounded-3xl ${
+                        linkPreview?.image ? 'w-[300px] max-w-[80%]' : 'w-fit max-w-[80%]'
                     } ${consecutiveMessageStyle()}`}
                 >
-                    <span className="max-w-fit break-words">
-                        <EmojiMessageStyle text={message.content} />
-                    </span>
-
+                    <div
+                        ref={combinedRef}
+                        className={`whitespace-pre-wrap px-4 py-1.5 font-normal [word-break:break-word] ${
+                            message.sender_id === currentUser?.id
+                                ? 'bg-[var(--sender-light-background-color)] text-[var(--sender-light-text-color)] dark:bg-[var(--sender-dark-background-color)] dark:text-[var(--sender-dark-text-color)]'
+                                : 'bg-[var(--receiver-light-background-color)] text-[var(--receiver-light-text-color)] dark:bg-[var(--receiver-dark-background-color)] dark:text-[var(--receiver-dark-text-color)]'
+                        }`}
+                    >
+                        <span className="max-w-fit break-words">
+                            <EmojiMessageStyle text={message.content} showLink={true} />
+                        </span>
+                    </div>
+                    {linkPreview && (
+                        <Link
+                            href={linkPreview.url}
+                            target="_blank"
+                            className="block bg-[var(--receiver-light-background-color)] dark:bg-[var(--receiver-dark-background-color)]"
+                        >
+                            {linkPreview?.image && (
+                                // eslint-disable-next-line @next/next/no-img-element
+                                <img
+                                    src={linkPreview.image}
+                                    alt="link preview"
+                                    className="aspect-video w-full object-cover" // Ảnh sẽ follow width của container
+                                />
+                            )}
+                            <div className="flex flex-col px-4 py-2">
+                                <p className="font-medium">{linkPreview?.title}</p>
+                                {linkPreview.description !== linkPreview.title && (
+                                    <p className="text-sm text-[var(--receiver-light-text-color)] dark:text-[var(--receiver-dark-text-color)]">
+                                        {linkPreview?.description}
+                                    </p>
+                                )}
+                            </div>
+                        </Link>
+                    )}
                     <Reaction message={message} handleOpenReactionModal={handleOpenReactionModal} />
                 </div>
             )
@@ -177,7 +244,6 @@ const MessageContent = (
                             </div>
                         ))}
                     </div>
-
                     <Reaction message={message} handleOpenReactionModal={handleOpenReactionModal} />
                 </div>
             )
@@ -188,7 +254,7 @@ const MessageContent = (
                     className={`relative w-fit max-w-[80%] whitespace-pre-wrap rounded-3xl py-[2px] font-normal [word-break:break-word]`}
                 >
                     <span className="max-w-fit break-words text-3xl">
-                        <EmojiMessageStyle text={message.content} size={32} />
+                        <EmojiMessageStyle text={message.content} size={32} showLink={true} />
                     </span>
 
                     <Reaction message={message} handleOpenReactionModal={handleOpenReactionModal} />
