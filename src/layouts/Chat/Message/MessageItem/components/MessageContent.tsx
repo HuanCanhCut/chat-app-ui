@@ -176,7 +176,7 @@ const MessageContent = (
             return (
                 <div
                     className={`relative overflow-hidden rounded-3xl ${
-                        linkPreview?.image ? 'w-[300px] max-w-[80%]' : 'w-fit max-w-[80%]'
+                        linkPreview?.image ? 'max-w-[300px]' : 'w-fit max-w-[80%]'
                     } ${consecutiveMessageStyle()}`}
                 >
                     <div

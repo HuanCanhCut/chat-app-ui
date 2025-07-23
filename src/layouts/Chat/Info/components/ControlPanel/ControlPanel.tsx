@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { AxiosError } from 'axios'
@@ -41,7 +41,7 @@ import { ConversationMember } from '~/type/type'
 import { momentTimezone } from '~/utils/moment'
 
 interface ControlPanelProps {
-    setSearchMode: Dispatch<SetStateAction<boolean>>
+    onChose: (type: string) => void
 }
 
 interface AccordionItem {
@@ -54,7 +54,7 @@ interface AccordionItem {
     children?: AccordionItem[]
 }
 
-const ControlPanel: React.FC<ControlPanelProps> = ({ setSearchMode }) => {
+const ControlPanel: React.FC<ControlPanelProps> = ({ onChose }) => {
     const currentUser = useAppSelector(getCurrentUser)
     const { uuid } = useParams()
 
@@ -446,7 +446,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ setSearchMode }) => {
                         <p className="mt-2 text-xs text-zinc-600 dark:text-zinc-300">Trang cá nhân</p>
                     </div>
                     <div className="flex flex-col items-center">
-                        <Button buttonType="icon" className="h-8 w-8" onClick={() => setSearchMode(true)}>
+                        <Button buttonType="icon" className="h-8 w-8" onClick={() => onChose('search_message')}>
                             <FontAwesomeIcon icon={faMagnifyingGlass} width={16} height={16} />
                         </Button>
                         <p className="mt-2 text-xs text-zinc-600 dark:text-zinc-300">Tìm kiếm</p>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useParams } from 'next/navigation'
 import { mutate } from 'swr'
 
@@ -13,6 +13,7 @@ import { ConversationMember, ConversationModel, ConversationThemeModel } from '~
 
 interface InfoProps {
     className?: string
+    isOpen: boolean
 }
 
 const sharedSocketEvents = [
@@ -27,11 +28,70 @@ const sharedSocketEventMemberHandlers = [
     SocketEvent.CONVERSATION_LEADER_CHANGED,
 ]
 
-const Info: React.FC<InfoProps> = ({ className = '' }) => {
+interface InfoHierarchyItem {
+    type: string
+    component: React.ReactNode
+    children?: InfoHierarchyItem[]
+}
+
+const Info: React.FC<InfoProps> = ({ className = '', isOpen }) => {
     const { uuid } = useParams()
     const currentUser = useAppSelector(getCurrentUser)
 
-    const [searchMode, setSearchMode] = useState(false)
+    const handleChose = useCallback(
+        (type: string) => {
+            let hierarchyItem: InfoHierarchyItem | undefined
+
+            const handleFindItem = (items: InfoHierarchyItem[]) => {
+                for (const item of items) {
+                    if (item.type === type) {
+                        hierarchyItem = item
+                        break
+                    }
+
+                    if (item.children) {
+                        handleFindItem(item.children)
+                    }
+                }
+            }
+
+            handleFindItem(INFO_HIERARCHY)
+
+            if (hierarchyItem) {
+                setHistory((prev: { data: InfoHierarchyItem[] }[]) => {
+                    const newHistory = [...prev, { data: [hierarchyItem!] }]
+                    return newHistory
+                })
+            }
+        },
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [],
+    )
+
+    const INFO_HIERARCHY: InfoHierarchyItem[] = useMemo(() => {
+        return [
+            {
+                type: 'control_panel',
+                component: <ControlPanel onChose={handleChose} />,
+                children: [
+                    {
+                        type: 'search_message',
+                        component: <SearchMessage />,
+                    },
+                ],
+            },
+        ]
+    }, [handleChose])
+
+    const [history, setHistory] = useState([{ data: INFO_HIERARCHY }])
+
+    const current = history[history.length - 1]
+
+    useEffect(() => {
+        if (!isOpen) {
+            setHistory([{ data: INFO_HIERARCHY }])
+        }
+    }, [INFO_HIERARCHY, isOpen])
 
     useEffect(() => {
         interface ConversationRenamedPayload {
@@ -238,7 +298,9 @@ const Info: React.FC<InfoProps> = ({ className = '' }) => {
             id="info-container"
             className={`${className} min-h-[calc(100dvh-var(--header-mobile-height))] px-2 py-3 [overflow:overlay] sm:min-h-[calc(100dvh-var(--header-height))]`}
         >
-            {searchMode ? <SearchMessage /> : <ControlPanel setSearchMode={setSearchMode} />}
+            {current.data.map((item, index) => {
+                return <React.Fragment key={index}>{item.component}</React.Fragment>
+            })}
         </div>
     )
 }
