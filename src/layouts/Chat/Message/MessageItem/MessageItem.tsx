@@ -231,7 +231,7 @@ const MessageItem = ({ message, messageIndex, messages, currentUser, messageRef 
                 message={message}
                 messageIndex={messageIndex}
                 ref={firstMessageRef}
-                className="mb-2 flex justify-center"
+                className="my-1 flex justify-center"
             />
         )
     }

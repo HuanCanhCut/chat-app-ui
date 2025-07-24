@@ -181,7 +181,7 @@ const MessageContent = (
             return (
                 <div
                     className={`relative overflow-hidden rounded-3xl ${
-                        linkPreview?.image ? 'max-w-[300px]' : 'w-fit max-w-[80%]'
+                        linkPreview?.image ? 'w-full max-w-[300px]' : 'w-fit max-w-[80%]'
                     } ${consecutiveMessageStyle()}`}
                 >
                     <div
@@ -234,14 +234,14 @@ const MessageContent = (
                     }`}
                 >
                     <div
-                        className={`flex w-full flex-wrap gap-1 overflow-hidden rounded-2xl [word-break:break-word] ${consecutiveMessageStyle()}`}
+                        className={`flex w-full max-w-full flex-wrap gap-1 overflow-hidden rounded-2xl [word-break:break-word] ${consecutiveMessageStyle()}`}
                     >
                         {JSON.parse(message.content as string).map((url: string, index: number) => (
-                            <div className="flex-1" key={index}>
+                            <div className="w-full max-w-full flex-1" key={index}>
                                 <CustomImage
                                     src={url}
                                     alt="message"
-                                    className={`max-h-[260px] sm:min-w-[150px] ${JSON.parse(message.content as string).length === 1 ? 'min-w-[240px]' : 'aspect-square'} h-full w-full min-w-[180px] cursor-pointer rounded-md object-cover`}
+                                    className={`max-h-[260px] sm:min-w-[100px] ${JSON.parse(message.content as string).length === 1 ? 'min-w-[180px]' : 'aspect-square'} h-full w-full min-w-[160px] !max-w-full cursor-pointer rounded-md object-cover object-center`}
                                     priority
                                     quality={100}
                                     onClick={() => handleOpenImageModal(url, message.id)}

@@ -1,13 +1,12 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { memo, useCallback, useEffect, useRef, useState } from 'react'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { useParams } from 'next/navigation'
 import { AxiosError } from 'axios'
 
 import SearchResult from './SearchResult'
-import { faSearch, faSpinner, faXmark } from '@fortawesome/free-solid-svg-icons'
+import { faArrowLeft, faSearch, faSpinner, faXmark } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Button from '~/components/Button'
-import { sendEvent } from '~/helpers/events'
 import handleApiError from '~/helpers/handleApiError'
 import useDebounce from '~/hooks/useDebounce'
 import * as searchServices from '~/services/searchService'
@@ -15,7 +14,11 @@ import { SearchMessageResponse } from '~/type/type'
 
 const PER_PAGE = 20
 
-const SearchMessage: React.FC = () => {
+interface SearchMessageProps {
+    onBack: () => void
+}
+
+const SearchMessage: React.FC<SearchMessageProps> = ({ onBack }) => {
     const { uuid } = useParams()
 
     const [searchValue, setSearchValue] = useState('')
@@ -25,15 +28,6 @@ const SearchMessage: React.FC = () => {
     const debounceValue = useDebounce(searchValue, 400)
 
     const inputRef = useRef<HTMLInputElement>(null)
-
-    const handleCloseInfo = () => {
-        sendEvent({
-            eventName: 'info:toggle',
-            detail: {
-                isOpen: false,
-            },
-        })
-    }
 
     useEffect(() => {
         if (!debounceValue) {
@@ -73,14 +67,10 @@ const SearchMessage: React.FC = () => {
     return (
         <>
             <div className="flex items-center gap-2">
-                <Button
-                    buttonType="icon"
-                    className="bg-transparent text-xl dark:bg-transparent"
-                    onClick={handleCloseInfo}
-                >
-                    <FontAwesomeIcon icon={faXmark} width={24} height={24} />
+                <Button buttonType="icon" className="bg-transparent dark:bg-transparent" onClick={onBack}>
+                    <FontAwesomeIcon icon={faArrowLeft} width={16} height={16} />
                 </Button>
-                <span>Tìm kiếm</span>
+                <span className="font-medium">Tìm kiếm</span>
             </div>
             <div className="relative mt-4 flex items-center rounded-3xl bg-lightGray pl-3 dark:bg-[#313233]">
                 <FontAwesomeIcon
@@ -169,4 +159,4 @@ const SearchMessage: React.FC = () => {
     )
 }
 
-export default SearchMessage
+export default memo(SearchMessage)

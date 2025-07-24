@@ -56,7 +56,7 @@ const ReplyMessage = ({ message, currentUser, memberMap }: ReplyMessageProps, re
                         className={`absolute bottom-[calc(100%-20px)] cursor-pointer ${message.sender_id === currentUser?.id ? 'flex flex-col items-end' : 'flex flex-col items-start'}`}
                         ref={ref}
                     >
-                        <p className="mb-1 flex w-fit items-center gap-2 text-right text-xs text-zinc-400 dark:text-zinc-500">
+                        <p className="mb-1 flex w-fit items-center gap-2 text-right text-xs text-systemMessageLight dark:text-systemMessageDark">
                             <FontAwesomeIcon icon={faReply} />
                             {'  '}
                             {message.sender_id === currentUser?.id

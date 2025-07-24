@@ -1,4 +1,4 @@
-import React, { memo, useCallback,useEffect, useRef, useState } from 'react'
+import React, { memo, useCallback, useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import { useParams } from 'next/navigation'
 import useSWR from 'swr'
@@ -28,6 +28,7 @@ const MessageImagesModel = ({ onClose, imageUrl }: MessageImagesModelProps) => {
     const imageRefs = useRef<(HTMLImageElement | null)[]>([])
 
     const [currentUrl, setCurrentUrl] = useState(imageUrl)
+    const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null)
 
     const [page, setPage] = useState(1)
 
@@ -52,6 +53,12 @@ const MessageImagesModel = ({ onClose, imageUrl }: MessageImagesModelProps) => {
             }
         },
     )
+
+    useEffect(() => {
+        if (images?.data) {
+            setSelectedImageIndex(images?.data.findIndex((image) => image === imageUrl))
+        }
+    }, [images, imageUrl])
 
     useEffect(() => {
         if (page === 1) return
@@ -142,41 +149,39 @@ const MessageImagesModel = ({ onClose, imageUrl }: MessageImagesModelProps) => {
         if (targetImage) {
             targetImage.scrollIntoView({ behavior: 'smooth', inline: 'center' })
         }
+
+        setSelectedImageIndex(index)
     }
 
     const handlePreviousImage = useCallback(() => {
-        const imageIndex = images?.data?.findIndex((image) => image === currentUrl)
+        if (selectedImageIndex === null) return
 
-        if (imageIndex === 0 || !imageIndex) return
+        if (selectedImageIndex === 0) return
 
-        const targetImage = imageRefs.current[imageIndex - 1]
+        const targetImage = imageRefs.current[selectedImageIndex - 1]
 
         if (targetImage) {
             targetImage.scrollIntoView({ behavior: 'smooth', inline: 'center' })
         }
 
-        setCurrentUrl(images?.data?.[imageIndex - 1] || '')
-    }, [currentUrl, images?.data])
+        setCurrentUrl(images?.data?.[selectedImageIndex - 1] || '')
+        setSelectedImageIndex(selectedImageIndex - 1)
+    }, [images?.data, selectedImageIndex])
 
     const handleNextImage = useCallback(() => {
-        if (!images?.data) return
+        if (selectedImageIndex === null) return
 
-        const imageIndex = images?.data?.findIndex((image) => image === currentUrl)
+        if (selectedImageIndex === (images?.data?.length || 0) - 1) return
 
-        if (imageIndex === images?.data?.length - 1) {
-            return
-        }
-
-        if (imageIndex === -1) return
-
-        const targetImage = imageRefs.current[imageIndex + 1]
+        const targetImage = imageRefs.current[selectedImageIndex + 1]
 
         if (targetImage) {
             targetImage.scrollIntoView({ behavior: 'smooth', inline: 'center' })
         }
 
-        setCurrentUrl(images?.data?.[imageIndex + 1] || '')
-    }, [currentUrl, images?.data])
+        setCurrentUrl(images?.data?.[selectedImageIndex + 1] || '')
+        setSelectedImageIndex(selectedImageIndex + 1)
+    }, [images?.data, selectedImageIndex])
 
     useEffect(() => {
         if (imageRefs.current.length === 0) return
@@ -287,7 +292,7 @@ const MessageImagesModel = ({ onClose, imageUrl }: MessageImagesModelProps) => {
                 <footer id="message-images-scrollable" className="flex-center h-16 px-4">
                     <div
                         ref={scrollableRef}
-                        className="flex items-center gap-3 overflow-x-auto"
+                        className="flex items-center gap-3 [overflow-x:overlay]"
                         onScroll={handleScroll}
                     >
                         {images?.data?.map((image, index) => {
@@ -299,7 +304,9 @@ const MessageImagesModel = ({ onClose, imageUrl }: MessageImagesModelProps) => {
                                     height={100}
                                     key={index}
                                     className={`mb-1 h-10 w-10 cursor-pointer select-none rounded-md ${
-                                        currentUrl === image ? 'opacity-100 brightness-100' : 'opacity-80 brightness-50'
+                                        selectedImageIndex === index
+                                            ? 'opacity-100 brightness-100'
+                                            : 'opacity-80 brightness-50'
                                     }`}
                                     priority
                                     quality={100}

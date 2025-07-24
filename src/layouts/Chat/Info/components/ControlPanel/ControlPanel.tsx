@@ -329,9 +329,13 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ onChose }) => {
                         title: 'Thêm người',
                     })
                     break
+                case 'media':
+                case 'link':
+                    onChose('media_and_link')
+                    break
             }
         },
-        [conversation, handleCloseModal],
+        [conversation, handleCloseModal, onChose],
     )
 
     const handleChangeAvatar = async (e: React.ChangeEvent<HTMLInputElement>) => {

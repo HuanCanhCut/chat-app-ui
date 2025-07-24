@@ -3,6 +3,7 @@ import { useParams } from 'next/navigation'
 import { mutate } from 'swr'
 
 import ControlPanel from './components/ControlPanel'
+import MediaAndLink from './components/MediaAndLink'
 import SearchMessage from './components/SearchMessage'
 import { SocketEvent } from '~/enum/SocketEvent'
 import SWRKey from '~/enum/SWRKey'
@@ -68,6 +69,12 @@ const Info: React.FC<InfoProps> = ({ className = '', isOpen }) => {
         [],
     )
 
+    const handleBack = useCallback(() => {
+        setHistory((prev: { data: InfoHierarchyItem[] }[]) => {
+            return prev.slice(0, prev.length - 1)
+        })
+    }, [])
+
     const INFO_HIERARCHY: InfoHierarchyItem[] = useMemo(() => {
         return [
             {
@@ -76,12 +83,16 @@ const Info: React.FC<InfoProps> = ({ className = '', isOpen }) => {
                 children: [
                     {
                         type: 'search_message',
-                        component: <SearchMessage />,
+                        component: <SearchMessage onBack={handleBack} />,
+                    },
+                    {
+                        type: 'media_and_link',
+                        component: <MediaAndLink onBack={handleBack} />,
                     },
                 ],
             },
         ]
-    }, [handleChose])
+    }, [handleBack, handleChose])
 
     const [history, setHistory] = useState([{ data: INFO_HIERARCHY }])
 
@@ -296,7 +307,7 @@ const Info: React.FC<InfoProps> = ({ className = '', isOpen }) => {
     return (
         <div
             id="info-container"
-            className={`${className} min-h-[calc(100dvh-var(--header-mobile-height))] px-2 py-3 [overflow:overlay] sm:min-h-[calc(100dvh-var(--header-height))]`}
+            className={`${className} min-h-[calc(100dvh-var(--header-height-mobile))] px-2 py-3 [overflow:overlay] sm:min-h-[calc(100dvh-var(--header-height))]`}
         >
             {current.data.map((item, index) => {
                 return <React.Fragment key={index}>{item.component}</React.Fragment>
