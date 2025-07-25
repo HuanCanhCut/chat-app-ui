@@ -1,6 +1,7 @@
 import React, { useCallback, useState } from 'react'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import ReactModal from 'react-modal'
+import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { AxiosError } from 'axios'
 import useSWR from 'swr'
@@ -17,6 +18,7 @@ import { MessageModel } from '~/type/type'
 
 interface MediaAndLinkProps {
     onBack: () => void
+    defaultActiveTab: 'media' | 'link'
 }
 
 interface Tab {
@@ -37,10 +39,10 @@ const tabs: Tab[] = [
 
 const PER_PAGE = 20
 
-const MediaAndLink: React.FC<MediaAndLinkProps> = ({ onBack }) => {
+const MediaAndLink: React.FC<MediaAndLinkProps> = ({ onBack, defaultActiveTab }) => {
     const { uuid } = useParams()
 
-    const [activeTab, setActiveTab] = useState<Tab>(tabs[0])
+    const [activeTab, setActiveTab] = useState<Tab>(tabs.find((tab) => tab.type === defaultActiveTab) || tabs[0])
     const [openImageModal, setOpenImageModal] = useState({
         isOpen: false,
         image: '',
@@ -71,7 +73,7 @@ const MediaAndLink: React.FC<MediaAndLinkProps> = ({ onBack }) => {
     const { data: media, mutate: mutateMedia } = useSWR<{
         data: Record<string, MessageModel[]>
         meta: { pagination: { current_page: number; total_pages: number } }
-    }>(activeTab.type === 'media' ? [SWRKey.GET_MESSAGE_IMAGES, activeTab.type] : null, async () => {
+    }>(activeTab.type === 'media' ? [SWRKey.GET_MESSAGE_IMAGES, activeTab.type, uuid] : null, async () => {
         const response = await messageServices.getMessageImages({
             conversationUuid: uuid as string,
             page: 1,
@@ -89,6 +91,17 @@ const MediaAndLink: React.FC<MediaAndLinkProps> = ({ onBack }) => {
             meta: response?.meta,
         }
     })
+
+    const { data: links, mutate: mutateLinks } = useSWR(
+        activeTab.type === 'link' ? [SWRKey.GET_MESSAGE_LINKS_PREVIEW, activeTab.type, uuid] : null,
+        async () => {
+            return await messageServices.getMessageLinksPreview({
+                conversationUuid: uuid as string,
+                page: 1,
+                per_page: PER_PAGE,
+            })
+        },
+    )
 
     const handleCloseImageModal = useCallback(() => {
         setOpenImageModal({
@@ -207,7 +220,6 @@ const MediaAndLink: React.FC<MediaAndLinkProps> = ({ onBack }) => {
                                 </div>
                             }
                             scrollableTarget="media-scrollable"
-                            scrollThreshold={0.7}
                         >
                             <div className="space-y-4">
                                 {Object.keys(media.data).map((title, index) => {
@@ -248,7 +260,85 @@ const MediaAndLink: React.FC<MediaAndLinkProps> = ({ onBack }) => {
                     </>
                 )}
 
-                {activeTab.type === 'link' && <></>}
+                {activeTab.type === 'link' && (
+                    <>
+                        <InfiniteScroll
+                            dataLength={links?.data.length || 0}
+                            next={async () => {
+                                try {
+                                    const response = await messageServices.getMessageLinksPreview({
+                                        conversationUuid: uuid as string,
+                                        page: links!.meta.pagination.current_page + 1,
+                                        per_page: PER_PAGE,
+                                    })
+
+                                    if (!response?.data) return
+
+                                    mutateLinks(
+                                        (prev) => {
+                                            if (!prev) {
+                                                return prev
+                                            }
+
+                                            return {
+                                                ...prev,
+                                                data: [...prev.data, ...response.data],
+                                                meta: {
+                                                    pagination: {
+                                                        ...prev.meta.pagination,
+                                                        current_page: prev.meta.pagination.current_page + 1,
+                                                        total_pages: response.meta.pagination.total_pages,
+                                                    },
+                                                },
+                                            }
+                                        },
+                                        {
+                                            revalidate: false,
+                                        },
+                                    )
+                                } catch (error) {
+                                    if (error instanceof AxiosError) {
+                                        handleApiError(error)
+                                    }
+                                }
+                            }}
+                            className="!overflow-hidden pr-2"
+                            hasMore={
+                                links?.meta
+                                    ? links.meta.pagination.current_page < links.meta.pagination.total_pages
+                                    : false
+                            }
+                            loader={
+                                <div className="flex justify-center">
+                                    <FontAwesomeIcon icon={faSpinner} className="animate-spin" />
+                                </div>
+                            }
+                            scrollableTarget="media-scrollable"
+                        >
+                            <div className="">
+                                {links?.data.map((link, index) => {
+                                    return (
+                                        <Link
+                                            href={link.originalUrl}
+                                            target="_blank"
+                                            key={index}
+                                            className={`flex items-center overflow-hidden py-3 ${index !== 0 && index !== links?.data.length - 1 ? 'border-t border-black/10 dark:border-white/10' : ''}`}
+                                        >
+                                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                                            <img
+                                                src={link.image}
+                                                alt={link.title}
+                                                className="aspect-square w-[52px] rounded-md object-cover object-center"
+                                            />
+
+                                            <p className="ml-2 truncate text-base font-medium">{link.title}</p>
+                                        </Link>
+                                    )
+                                })}
+                            </div>
+                        </InfiniteScroll>
+                    </>
+                )}
             </div>
         </div>
     )

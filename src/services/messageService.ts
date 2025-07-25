@@ -1,6 +1,12 @@
 import { AxiosResponse } from 'axios'
 
-import { LinkPreviewResponse, MessageImagesResponse, MessageReactionResponse, MessageResponse } from '~/type/type'
+import {
+    LinkPreviewResponse,
+    MessageImagesResponse,
+    MessageLinksPreviewResponse,
+    MessageReactionResponse,
+    MessageResponse,
+} from '~/type/type'
 import * as request from '~/utils/httpRequest'
 
 export const getMessages = async ({
@@ -140,6 +146,29 @@ export const getAroundMessages = async ({
 export const getLinkPreview = async ({ urls }: { urls: string[] }): Promise<LinkPreviewResponse | undefined> => {
     try {
         const response = await request.post('/messages/link-preview', { urls })
+
+        return response.data
+    } catch (error: any) {
+        throw error
+    }
+}
+
+export const getMessageLinksPreview = async ({
+    conversationUuid,
+    page,
+    per_page,
+}: {
+    conversationUuid: string
+    page: number
+    per_page: number
+}): Promise<MessageLinksPreviewResponse | undefined> => {
+    try {
+        const response = await request.get(`messages/${conversationUuid}/links`, {
+            params: {
+                page,
+                per_page,
+            },
+        })
 
         return response.data
     } catch (error: any) {

@@ -199,11 +199,13 @@ const MessageContent = (
                                 <img
                                     src={linkPreview.image}
                                     alt="link preview"
-                                    className="aspect-video w-full object-cover" // Ảnh sẽ follow width của container
+                                    className="aspect-video w-full object-cover"
                                 />
                             )}
                             <div className="flex flex-col px-4 py-2">
-                                <p className="font-medium">{linkPreview?.title}</p>
+                                <p className="line-clamp-3 overflow-hidden text-ellipsis font-medium">
+                                    {linkPreview?.title}
+                                </p>
                             </div>
                         </Link>
                     )}

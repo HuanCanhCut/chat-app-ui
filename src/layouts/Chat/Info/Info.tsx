@@ -86,8 +86,12 @@ const Info: React.FC<InfoProps> = ({ className = '', isOpen }) => {
                         component: <SearchMessage onBack={handleBack} />,
                     },
                     {
-                        type: 'media_and_link',
-                        component: <MediaAndLink onBack={handleBack} />,
+                        type: 'media',
+                        component: <MediaAndLink onBack={handleBack} defaultActiveTab="media" />,
+                    },
+                    {
+                        type: 'link',
+                        component: <MediaAndLink onBack={handleBack} defaultActiveTab="link" />,
                     },
                 ],
             },

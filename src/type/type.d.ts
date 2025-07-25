@@ -195,6 +195,10 @@ export interface LinkPreviewResponse {
     }
 }
 
+export interface MessageLinksPreviewResponse extends MetaPagination {
+    data: LinkPreviewModel[]
+}
+
 // ========================================== Message reaction model ==========================================
 
 export interface MessageReactionModel extends BaseModel {

@@ -46,7 +46,7 @@ enum SWRKey {
      */
     GET_MESSAGES = '/messages/:conversationUuid',
     GET_MESSAGE_IMAGES = '/messages/:conversationUuid/images',
-
+    GET_MESSAGE_LINKS_PREVIEW = '/messages/:conversationUuid/links',
     /**
      * Reaction
      */

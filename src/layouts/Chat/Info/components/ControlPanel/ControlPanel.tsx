@@ -330,8 +330,10 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ onChose }) => {
                     })
                     break
                 case 'media':
+                    onChose('media')
+                    break
                 case 'link':
-                    onChose('media_and_link')
+                    onChose('link')
                     break
             }
         },
