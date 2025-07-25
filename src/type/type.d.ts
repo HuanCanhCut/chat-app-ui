@@ -172,6 +172,29 @@ export interface SearchMessageResponse extends MetaPagination {
     data: SearchMessageModel[]
 }
 
+// ========================================== Link preview model ==========================================
+
+export interface LinkPreviewModel {
+    originalUrl: string
+    title: string
+    description: string
+    image: string
+    author: string
+    url: string
+    success: boolean
+}
+
+export interface LinkPreviewResponse {
+    data: LinkPreviewModel[]
+    meta: {
+        failed: number
+        invalidUrls: string[]
+        results: LinkPreviewModel[]
+        successful: number
+        total: number
+    }
+}
+
 // ========================================== Message reaction model ==========================================
 
 export interface MessageReactionModel extends BaseModel {

@@ -5,7 +5,7 @@ import Reaction from './Reaction'
 import EmojiMessageStyle from '~/components/EmojiMessageStyle'
 import CustomImage from '~/components/Image/Image'
 import * as messageServices from '~/services/messageService'
-import { MessageModel, MessageResponse, UserModel } from '~/type/type'
+import { LinkPreviewModel, MessageModel, MessageResponse, UserModel } from '~/type/type'
 
 interface MessageContentProps {
     message: MessageModel
@@ -26,14 +26,6 @@ const BETWEEN_TIME_MESSAGE = 7 // minute
 
 const linkRegex = /(http|ftp|https):\/\/([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:\/~+#-]*[\w@?^=%&\/~+#-])/
 
-interface LinkPreview {
-    title: string | null
-    description: string | null
-    image: string | null
-    url: string
-    author: string | null
-}
-
 const MessageContent = (
     {
         message,
@@ -47,7 +39,7 @@ const MessageContent = (
     }: MessageContentProps,
     ref: LegacyRef<HTMLDivElement>,
 ) => {
-    const [linkPreview, setLinkPreview] = useState<LinkPreview | null>(null)
+    const [linkPreview, setLinkPreview] = useState<LinkPreviewModel | null>(null)
 
     const combinedRef = (el: HTMLDivElement) => {
         if (messageIndex === 0) {
@@ -147,10 +139,10 @@ const MessageContent = (
 
             ;(async () => {
                 try {
-                    const response = await messageServices.getLinkPreview({ url: link })
+                    const response = await messageServices.getLinkPreview({ urls: [link] })
 
-                    if (response) {
-                        setLinkPreview(response.data)
+                    if (response && response.data[0].success) {
+                        setLinkPreview(response.data[0])
                     }
                 } catch (error) {
                     console.log(error)
@@ -212,11 +204,6 @@ const MessageContent = (
                             )}
                             <div className="flex flex-col px-4 py-2">
                                 <p className="font-medium">{linkPreview?.title}</p>
-                                {linkPreview.description !== linkPreview.title && (
-                                    <p className="text-sm text-[var(--receiver-light-text-color)] dark:text-[var(--receiver-dark-text-color)]">
-                                        {linkPreview?.description}
-                                    </p>
-                                )}
                             </div>
                         </Link>
                     )}

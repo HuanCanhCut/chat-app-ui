@@ -1,6 +1,6 @@
 import { AxiosResponse } from 'axios'
 
-import { MessageImagesResponse, MessageReactionResponse, MessageResponse } from '~/type/type'
+import { LinkPreviewResponse, MessageImagesResponse, MessageReactionResponse, MessageResponse } from '~/type/type'
 import * as request from '~/utils/httpRequest'
 
 export const getMessages = async ({
@@ -137,19 +137,9 @@ export const getAroundMessages = async ({
     }
 }
 
-interface LinkPreviewResponse {
-    data: {
-        title: string | null
-        description: string | null
-        image: string | null
-        url: string
-        author: string | null
-    }
-}
-
-export const getLinkPreview = async ({ url }: { url: string }): Promise<LinkPreviewResponse | undefined> => {
+export const getLinkPreview = async ({ urls }: { urls: string[] }): Promise<LinkPreviewResponse | undefined> => {
     try {
-        const response = await request.post('/messages/link-preview', { url })
+        const response = await request.post('/messages/link-preview', { urls })
 
         return response.data
     } catch (error: any) {
