@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import useSWR from 'swr'
 
@@ -12,14 +12,10 @@ import Header from '~/layouts/Chat/Header'
 import Info from '~/layouts/Chat/Info/Info'
 import InputMessage from '~/layouts/Chat/InputMessage'
 import Message from '~/layouts/Chat/Message'
-import { useAppSelector } from '~/redux'
-import { getCurrentUser } from '~/redux/selector'
 import * as conversationServices from '~/services/conversationService'
 import { UserStatus } from '~/type/type'
 
 const MessagePage = () => {
-    const currentUser = useAppSelector(getCurrentUser)
-
     const { uuid } = useParams()
 
     const [infoOpen, setInfoOpen] = useState(false)
@@ -30,10 +26,6 @@ const MessagePage = () => {
             return conversationServices.getConversationByUuid({ uuid: uuid as string })
         },
     )
-
-    const currentMember = useMemo(() => {
-        return conversation?.data?.members.find((member) => member.user_id === currentUser?.data.id)
-    }, [conversation?.data?.members, currentUser?.data.id])
 
     useEffect(() => {
         const socketHandler = (data: UserStatus) => {
@@ -128,19 +120,7 @@ const MessagePage = () => {
                         <Header isInfoOpen={infoOpen} conversation={conversation.data} />
                         <Message conversation={conversation.data} />
 
-                        {currentMember?.deleted_at || !currentMember ? (
-                            <div className="flex flex-col gap-2 border-t border-light bg-[var(--background-theme-light-footer-color)] px-4 py-2 text-center text-systemMessageLight dark:border-darkGray dark:bg-[var(--background-theme-dark-footer-color)] dark:text-systemMessageDark">
-                                <p className="font-bold text-gray-700 dark:text-gray-300">
-                                    Bạn không thể nhắn tin cho nhóm này
-                                </p>
-                                <p className="text-xs">
-                                    Bạn không thể nhắn tin cho nhóm này. Bạn không còn trong nhóm này và không thể gửi
-                                    hoặc nhận cuộc gọi hoặc tin nhắn trừ khi bạn được thêm lại vào nhóm.
-                                </p>
-                            </div>
-                        ) : (
-                            <InputMessage />
-                        )}
+                        <InputMessage />
                     </>
                 )}
             </div>

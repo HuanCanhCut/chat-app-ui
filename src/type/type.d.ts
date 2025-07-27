@@ -87,6 +87,13 @@ export interface ConversationThemeResponse extends MetaPagination {
     data: ConversationThemeModel[]
 }
 
+export interface BlockModel extends BaseModel {
+    user_id: number
+    blockable_id: number
+    blockable_type: 'User' | 'Conversation'
+    blocker: UserModel
+}
+
 // ========================================== Conversation model ==========================================
 export interface ConversationModel extends BaseModel {
     is_group: boolean
@@ -98,6 +105,7 @@ export interface ConversationModel extends BaseModel {
     emoji: string
     theme_id: number
     theme: ConversationThemeModel
+    block_conversation: BlockModel
 }
 
 export interface ConversationResponse {

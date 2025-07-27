@@ -87,7 +87,7 @@ const ConversationItem: React.FC<Props> = ({ conversation, className = '' }) => 
                         onlineClassName="h-4 w-4"
                     />
                 </div>
-                <div className="ml-3 flex-1 overflow-hidden">
+                <div className="ml-3 flex-1 overflow-hidden pr-2">
                     <p className="truncate font-medium">
                         {conversation.name || userMember?.nickname || userMember?.user.full_name}
                     </p>
@@ -135,7 +135,10 @@ const ConversationItem: React.FC<Props> = ({ conversation, className = '' }) => 
                                         avatars={avatars.slice(0, 2)}
                                         size={16}
                                         translate={3}
-                                        className="flex h-5 w-7 items-center gap-2 [&>img]:h-5 [&>img]:w-5 [&>img]:border-2 [&>img]:border-white [&>img]:dark:border-dark"
+                                        className="flex h-5 items-center gap-2 [&>img]:h-5 [&>img]:w-5 [&>img]:border-2 [&>img]:border-white [&>img]:dark:border-dark"
+                                        style={{
+                                            width: `${16 * avatars.slice(0, 2).length}px`,
+                                        }}
                                     />
                                 )
                             }
