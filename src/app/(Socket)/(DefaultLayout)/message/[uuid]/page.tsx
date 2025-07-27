@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useParams } from 'next/navigation'
 import useSWR from 'swr'
 
@@ -11,12 +11,17 @@ import socket from '~/helpers/socket'
 import Header from '~/layouts/Chat/Header'
 import Info from '~/layouts/Chat/Info/Info'
 import InputMessage from '~/layouts/Chat/InputMessage'
+import Block from '~/layouts/Chat/InputMessage/Block'
 import Message from '~/layouts/Chat/Message'
+import { useAppSelector } from '~/redux'
+import { getCurrentUser } from '~/redux/selector'
 import * as conversationServices from '~/services/conversationService'
 import { UserStatus } from '~/type/type'
 
 const MessagePage = () => {
     const { uuid } = useParams()
+
+    const currentUser = useAppSelector(getCurrentUser)
 
     const [infoOpen, setInfoOpen] = useState(false)
 
@@ -26,6 +31,12 @@ const MessagePage = () => {
             return conversationServices.getConversationByUuid({ uuid: uuid as string })
         },
     )
+
+    const currentMember = useMemo(() => {
+        return conversation?.data?.members.find((member) => member.user_id === currentUser?.data.id)
+    }, [conversation?.data?.members, currentUser?.data.id])
+
+    const isBlocked = currentMember?.deleted_at || !currentMember || conversation?.data.block_conversation
 
     useEffect(() => {
         const socketHandler = (data: UserStatus) => {
@@ -120,7 +131,7 @@ const MessagePage = () => {
                         <Header isInfoOpen={infoOpen} conversation={conversation.data} />
                         <Message conversation={conversation.data} />
 
-                        <InputMessage />
+                        {isBlocked ? <Block currentMember={currentMember} /> : <InputMessage />}
                     </>
                 )}
             </div>
