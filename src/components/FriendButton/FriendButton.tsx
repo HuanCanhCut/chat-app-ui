@@ -1,7 +1,6 @@
 'use client'
 
 import { useCallback, useState } from 'react'
-import { AxiosError } from 'axios'
 
 import ConfirmModal from '../ConfirmModal/ConfirmModal'
 import { faUserFriends, faUserPlus } from '@fortawesome/free-solid-svg-icons'
@@ -29,10 +28,8 @@ const FriendButton = ({ user, className = '' }: FriendButtonProps) => {
             })
 
             return await friendService.addFriend(user.id)
-        } catch (error) {
-            if (error instanceof AxiosError) {
-                handleApiError(error)
-            }
+        } catch (error: any) {
+            handleApiError(error)
         }
     }, [user])
 
@@ -43,10 +40,8 @@ const FriendButton = ({ user, className = '' }: FriendButtonProps) => {
                 detail: { sent_friend_request: false },
             })
             return await friendService.cancelFriendRequest(user.id)
-        } catch (error) {
-            if (error instanceof AxiosError) {
-                handleApiError(error)
-            }
+        } catch (error: any) {
+            handleApiError(error)
         }
     }, [user.id])
 
@@ -72,10 +67,8 @@ const FriendButton = ({ user, className = '' }: FriendButtonProps) => {
                 detail: { is_friend: false, friend_request: false },
             })
             closeModal()
-        } catch (error) {
-            if (error instanceof AxiosError) {
-                handleApiError(error)
-            }
+        } catch (error: any) {
+            handleApiError(error)
         }
     }, [closeModal, user.id])
 
@@ -87,6 +80,7 @@ const FriendButton = ({ user, className = '' }: FriendButtonProps) => {
                 onConfirm={handleUnfriend}
                 isOpen={modalIsOpen}
                 closeModal={closeModal}
+                confirmText="Hủy kết bạn"
             />
             {user.sent_friend_request && !user.friend_request ? (
                 <Button

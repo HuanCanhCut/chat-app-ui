@@ -1,6 +1,5 @@
 import React, { useRef, useState } from 'react'
 import { useParams } from 'next/navigation'
-import { AxiosError } from 'axios'
 import useSWR from 'swr'
 
 import { faCheck, faPencil } from '@fortawesome/free-solid-svg-icons'
@@ -53,10 +52,8 @@ const ChangeNicknameModal: React.FC = () => {
 
             setCurrentChange(null)
             setNickname('')
-        } catch (error) {
-            if (error instanceof AxiosError) {
-                handleApiError(error)
-            }
+        } catch (error: any) {
+            handleApiError(error)
         }
     }
 

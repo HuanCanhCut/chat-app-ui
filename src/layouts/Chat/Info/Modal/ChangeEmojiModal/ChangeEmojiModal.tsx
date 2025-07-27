@@ -1,6 +1,5 @@
 import { useCallback } from 'react'
 import { useParams } from 'next/navigation'
-import { AxiosError } from 'axios'
 import { Emoji as EmojiPicker, EmojiClickData } from 'emoji-picker-react'
 
 import { faXmark } from '@fortawesome/free-solid-svg-icons'
@@ -25,9 +24,7 @@ const ChangeEmojiModal: React.FC<ChangeEmojiModalProps> = ({ onClose, currentEmo
                 await conversationServices.changeConversationEmoji({ uuid: uuid as string, emoji })
                 onClose()
             } catch (error) {
-                if (error instanceof AxiosError) {
-                    handleApiError(error)
-                }
+                handleApiError(error)
             }
         },
         [onClose, uuid],
@@ -37,10 +34,8 @@ const ChangeEmojiModal: React.FC<ChangeEmojiModalProps> = ({ onClose, currentEmo
         try {
             await conversationServices.changeConversationEmoji({ uuid: uuid as string, emoji: '👍' })
             onClose()
-        } catch (error) {
-            if (error instanceof AxiosError) {
-                handleApiError(error)
-            }
+        } catch (error: any) {
+            handleApiError(error)
         }
     }, [onClose, uuid])
 

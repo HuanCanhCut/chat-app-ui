@@ -3,7 +3,6 @@ import InfiniteScroll from 'react-infinite-scroll-component'
 import ReactModal from 'react-modal'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
-import { AxiosError } from 'axios'
 import useSWR from 'swr'
 
 import { faArrowLeft, faSpinner } from '@fortawesome/free-solid-svg-icons'
@@ -205,9 +204,7 @@ const MediaAndLink: React.FC<MediaAndLinkProps> = ({ onBack, defaultActiveTab })
                                         },
                                     )
                                 } catch (error) {
-                                    if (error instanceof AxiosError) {
-                                        handleApiError(error)
-                                    }
+                                    handleApiError(error)
                                 }
                             }}
                             className="!overflow-hidden pr-2"
@@ -297,9 +294,7 @@ const MediaAndLink: React.FC<MediaAndLinkProps> = ({ onBack, defaultActiveTab })
                                         },
                                     )
                                 } catch (error) {
-                                    if (error instanceof AxiosError) {
-                                        handleApiError(error)
-                                    }
+                                    handleApiError(error)
                                 }
                             }}
                             className="!overflow-hidden pr-2"

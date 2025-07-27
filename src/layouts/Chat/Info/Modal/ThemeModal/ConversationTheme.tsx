@@ -2,7 +2,6 @@ import { memo, useCallback, useEffect, useRef, useState } from 'react'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { useSelector } from 'react-redux'
 import { useParams } from 'next/navigation'
-import { AxiosError } from 'axios'
 import useSWR from 'swr'
 
 import MessagePreview from './MessagePreview'
@@ -137,10 +136,8 @@ const ConversationTheme: React.FC<ConversationThemeProps> = ({ onClose, currentT
             if (res) {
                 onClose()
             }
-        } catch (error) {
-            if (error instanceof AxiosError) {
-                handleApiError(error)
-            }
+        } catch (error: any) {
+            handleApiError(error)
         }
     }, [activeTheme.id, currentTheme.id, onClose, uuid])
 

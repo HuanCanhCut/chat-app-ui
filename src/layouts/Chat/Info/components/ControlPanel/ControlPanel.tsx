@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
-import { AxiosError } from 'axios'
 import { Emoji, EmojiStyle } from 'emoji-picker-react'
 import useSWR from 'swr'
 
@@ -361,9 +360,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ onChose }) => {
                     data: formData,
                 })
             } catch (error) {
-                if (error instanceof AxiosError) {
-                    handleApiError(error)
-                }
+                handleApiError(error)
             }
         }
     }

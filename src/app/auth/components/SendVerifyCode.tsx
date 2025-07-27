@@ -1,7 +1,6 @@
 'use client'
 
 import { memo, MutableRefObject, useEffect, useRef, useState } from 'react'
-import { AxiosError } from 'axios'
 
 import handleApiError from '~/helpers/handleApiError'
 import * as authService from '~/services/authService'
@@ -58,12 +57,11 @@ const SendVerifyCode: React.FC<Props> = ({ emailRef }) => {
                     'Mã xác nhận đã được gửi đến email của bạn, nếu không thấy hãy kiểm tra thư rác hoặc spam',
                     'success',
                 )
+
                 setSendSuccess(true)
             }
-        } catch (error) {
-            if (error instanceof AxiosError) {
-                handleApiError(error)
-            }
+        } catch (error: any) {
+            handleApiError(error)
         }
     }
 

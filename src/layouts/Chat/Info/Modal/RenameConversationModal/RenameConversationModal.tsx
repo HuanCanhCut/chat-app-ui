@@ -1,7 +1,6 @@
 import { memo, useCallback, useState } from 'react'
 import { toast } from 'react-toastify'
 import { useParams } from 'next/navigation'
-import { AxiosError } from 'axios'
 
 import Button from '~/components/Button'
 import handleApiError from '~/helpers/handleApiError'
@@ -31,11 +30,8 @@ const RenameConversationModal: React.FC<RenameConversationModalProps> = ({ onClo
             if (response) {
                 onClose()
             }
-        } catch (error: any) {
-            if (error instanceof AxiosError) {
-                handleApiError(error)
-            }
-            console.log(error)
+        } catch (error) {
+            handleApiError(error)
         }
     }, [name, onClose, uuid])
 

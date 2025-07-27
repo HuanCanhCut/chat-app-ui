@@ -1,5 +1,3 @@
-import { AxiosError } from 'axios'
-
 import { sendEvent } from '../helpers/events'
 import handleApiError from '../helpers/handleApiError'
 import * as friendService from '~/services/friendService'
@@ -12,9 +10,7 @@ export const handleAcceptFriend = async (userID: number) => {
         })
         return await friendService.acceptFriend(userID)
     } catch (error) {
-        if (error instanceof AxiosError) {
-            handleApiError(error)
-        }
+        handleApiError(error)
     }
 }
 
@@ -26,8 +22,6 @@ export const handleRejectFriendRequest = async (userID: number) => {
         })
         return await friendService.rejectFriend(userID)
     } catch (error) {
-        if (error instanceof AxiosError) {
-            handleApiError(error)
-        }
+        handleApiError(error)
     }
 }

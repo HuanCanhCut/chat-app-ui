@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import { AxiosError } from 'axios'
 
 import { faSignOut, faUserCircle, faUserXmark } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -70,9 +69,7 @@ const AccountOptions: React.FC<AccountOptionsProps> = ({ member, isAdmin }) => {
                                 isOpen: false,
                             })
                         } catch (error) {
-                            if (error instanceof AxiosError) {
-                                handleApiError(error)
-                            }
+                            handleApiError(error)
                         }
                     },
                 })
@@ -95,9 +92,7 @@ const AccountOptions: React.FC<AccountOptionsProps> = ({ member, isAdmin }) => {
                                 isOpen: false,
                             })
                         } catch (error) {
-                            if (error instanceof AxiosError) {
-                                handleApiError(error)
-                            }
+                            handleApiError(error)
                         }
                     },
                 })
@@ -120,9 +115,7 @@ const AccountOptions: React.FC<AccountOptionsProps> = ({ member, isAdmin }) => {
                                 isOpen: false,
                             })
                         } catch (error) {
-                            if (error instanceof AxiosError) {
-                                handleApiError(error)
-                            }
+                            handleApiError(error)
                         }
                     },
                 })

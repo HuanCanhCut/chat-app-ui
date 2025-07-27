@@ -1,5 +1,4 @@
 import { memo, useCallback, useEffect, useState } from 'react'
-import { AxiosError } from 'axios'
 import useSWR from 'swr'
 
 import AccountItem from '../AccountItem'
@@ -51,10 +50,8 @@ const Search: React.FC<SearchProps> = ({ placeholder = 'Tìm kiếm', className 
                 if (response) {
                     setSearchResult(response.data)
                 }
-            } catch (error) {
-                if (error instanceof AxiosError) {
-                    handleApiError(error)
-                }
+            } catch (error: any) {
+                handleApiError(error)
             }
         }
 

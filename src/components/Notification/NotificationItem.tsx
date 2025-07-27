@@ -138,6 +138,7 @@ const NotificationItem = ({
                 isOpen={isOpenConfirmModel}
                 closeModal={() => setIsOpenConfirmModel(false)}
                 onConfirm={handleDeleteNotification}
+                confirmText="Xóa"
             />
             <div className="group relative mt-3 flex items-center gap-2">
                 <CustomTippy renderItem={RenderMoreOptions} onShow={tippyShow}>

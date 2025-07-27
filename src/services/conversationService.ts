@@ -135,3 +135,13 @@ export const blockConversation = async ({ uuid }: { uuid: string }) => {
         throw error
     }
 }
+
+export const unblockConversation = async ({ uuid }: { uuid: string }) => {
+    try {
+        const response = await request.del(`/conversations/${uuid}/block`)
+
+        return response.data
+    } catch (error: any) {
+        throw error
+    }
+}

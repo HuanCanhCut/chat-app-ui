@@ -1,7 +1,6 @@
+import { useParams } from 'next/navigation'
 import { useCallback, useState } from 'react'
 import InfiniteScroll from 'react-infinite-scroll-component'
-import { useParams } from 'next/navigation'
-import { AxiosError } from 'axios'
 import useSWR from 'swr'
 
 import { faCircle } from '@fortawesome/free-regular-svg-icons'
@@ -57,10 +56,8 @@ const AddMember: React.FC<AddMemberProps> = ({ onClose }) => {
                     meta: res.meta,
                 }
             })
-        } catch (error) {
-            if (error instanceof AxiosError) {
-                handleApiError(error)
-            }
+        } catch (error: any) {
+            handleApiError(error)
         }
     }, [currentUser?.data.id, friends, mutateFriends])
 
@@ -91,10 +88,8 @@ const AddMember: React.FC<AddMemberProps> = ({ onClose }) => {
             if (!res) return
 
             onClose()
-        } catch (error) {
-            if (error instanceof AxiosError) {
-                handleApiError(error)
-            }
+        } catch (error: any) {
+            handleApiError(error)
         }
     }
 

@@ -1,6 +1,5 @@
 import { memo, useCallback } from 'react'
 import { useParams } from 'next/navigation'
-import { AxiosError } from 'axios'
 
 import ConfirmModel from '~/components/ConfirmModal'
 import handleApiError from '~/helpers/handleApiError'
@@ -13,10 +12,8 @@ const BlockConversation = ({ member, handleCloseModal }: { member: any; handleCl
         try {
             await conversationService.blockConversation({ uuid: uuid as string })
             handleCloseModal()
-        } catch (error) {
-            if (error instanceof AxiosError) {
-                handleApiError(error)
-            }
+        } catch (error: any) {
+            handleApiError(error)
         }
     }, [handleCloseModal, uuid])
 
@@ -27,6 +24,7 @@ const BlockConversation = ({ member, handleCloseModal }: { member: any; handleCl
             onConfirm={handleBlockConversation}
             isOpen={true}
             closeModal={handleCloseModal}
+            confirmText="Chặn"
         />
     )
 }
