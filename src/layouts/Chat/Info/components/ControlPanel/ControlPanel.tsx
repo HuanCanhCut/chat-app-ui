@@ -6,6 +6,7 @@ import { Emoji, EmojiStyle } from 'emoji-picker-react'
 import useSWR from 'swr'
 
 import AddMember from '../../Modal/AddMember'
+import BlockUser from '../../Modal/BlockConversation'
 import ChangeEmojiModal from '../../Modal/ChangeEmojiModal'
 import ChangeNicknameModal from '../../Modal/ChangeNicknameModal'
 import ConversationTheme from '../../Modal/ThemeModal'
@@ -335,9 +336,16 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ onChose }) => {
                 case 'link':
                     onChose('link')
                     break
+                case 'block':
+                    setModalState({
+                        isOpen: true,
+                        component: <BlockUser member={member} handleCloseModal={handleCloseModal} />,
+                        title: 'Chặn',
+                    })
+                    break
             }
         },
-        [conversation, handleCloseModal, onChose],
+        [conversation, handleCloseModal, member, onChose],
     )
 
     const handleChangeAvatar = async (e: React.ChangeEvent<HTMLInputElement>) => {

@@ -126,3 +126,12 @@ export const addMember = async ({ uuid, formData }: { uuid: string; formData: Fo
         throw error
     }
 }
+
+export const blockConversation = async ({ uuid }: { uuid: string }) => {
+    try {
+        const response = await request.post(`/conversations/${uuid}/block`)
+        return response.data
+    } catch (error: any) {
+        throw error
+    }
+}

@@ -1,3 +1,5 @@
+import { memo } from 'react'
+
 import Button from '../Button'
 import Modal from '../Modal'
 
@@ -27,4 +29,4 @@ const ConfirmModel = ({ title, description, onConfirm, isOpen, closeModal }: Con
     )
 }
 
-export default ConfirmModel
+export default memo(ConfirmModel)
