@@ -1,9 +1,8 @@
-import React from 'react'
+import React, { useEffect, useReducer } from 'react'
 import { useRouter } from 'next/navigation'
 
 import MenuItem from '../MenuItem'
-import { faCircleDot, faPen, faSignOut } from '@fortawesome/free-solid-svg-icons'
-import { faMoon, IconDefinition } from '@fortawesome/free-solid-svg-icons'
+import { faCircleDot, faMoon, faPen, faSignOut, IconDefinition } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Tippy from '@tippyjs/react'
 import AccountItem from '~/components/AccountItem'
@@ -15,8 +14,8 @@ import PopperWrapper from '~/components/PopperWrapper'
 import UserAvatar from '~/components/UserAvatar/UserAvatar'
 import config from '~/config'
 import { sendEvent } from '~/helpers/events'
-import { useAppSelector } from '~/redux'
-import { getCurrentUser } from '~/redux/selector'
+import { actions, useAppDispatch, useAppSelector } from '~/redux'
+import { getCurrentTheme, getCurrentUser } from '~/redux/selector'
 import * as authService from '~/services/authService'
 
 export interface MenuItemType {
@@ -25,31 +24,58 @@ export interface MenuItemType {
     label: string
     line?: boolean
     switchButton?: boolean
+    isOn?: boolean
 }
 
-const MENU_ITEMS: MenuItemType[] = [
-    {
-        type: 'theme',
-        icon: faMoon,
-        label: 'Chế độ tối',
-        switchButton: true,
-    },
-    {
-        type: 'status',
-        icon: faCircleDot,
-        label: 'Trạng thái hoạt động',
-    },
-    {
-        type: 'logout',
-        icon: faSignOut,
-        label: 'Đăng xuất',
-        line: true,
-    },
-]
+const reducer = (state: MenuItemType[], action: { type: MenuItemType['type']; isOn?: boolean }) => {
+    switch (action.type) {
+        case 'theme':
+            const newState = [...state]
+            for (let i = 0; i < newState.length; ++i) {
+                if (action.type === newState[i].type) {
+                    newState[i] = { ...newState[i], isOn: action.isOn }
+                    break
+                }
+            }
+
+            return newState
+
+        default:
+            return state
+    }
+}
 
 const Interaction = () => {
+    const reduxDispatch = useAppDispatch()
     const router = useRouter()
     const currentUser = useAppSelector(getCurrentUser)
+
+    const theme = useAppSelector(getCurrentTheme)
+
+    const MENU_ITEMS: MenuItemType[] = [
+        {
+            type: 'theme',
+            icon: faMoon,
+            label: 'Chế độ tối',
+            switchButton: true,
+            isOn: theme === 'dark',
+        },
+        {
+            type: 'status',
+            icon: faCircleDot,
+            label: 'Trạng thái hoạt động',
+            switchButton: true,
+            isOn: false,
+        },
+        {
+            type: 'logout',
+            icon: faSignOut,
+            label: 'Đăng xuất',
+            line: true,
+        },
+    ]
+
+    const [menuItems, dispatch] = useReducer(reducer, MENU_ITEMS)
 
     const handleChoose = (type: MenuItemType['type']) => {
         switch (type) {
@@ -62,6 +88,27 @@ const Interaction = () => {
                 break
         }
     }
+
+    const handleToggleSwitch = (type: MenuItemType['type']) => {
+        switch (type) {
+            case 'theme':
+                const isOn = menuItems.find((item) => item.type === 'theme')?.isOn
+
+                reduxDispatch(actions.setTheme(isOn ? 'light' : 'dark'))
+                document.documentElement.classList.toggle('dark')
+
+                dispatch({ type: 'theme', isOn: !isOn })
+                break
+            default:
+                break
+        }
+    }
+
+    console.log(theme)
+
+    useEffect(() => {
+        dispatch({ type: 'theme', isOn: theme === 'dark' })
+    }, [theme])
 
     const renderTooltip = () => {
         return (
@@ -90,9 +137,9 @@ const Interaction = () => {
                         </div>
                     </div>
                     <div className="mt-4">
-                        {MENU_ITEMS.map((item: MenuItemType, index: number) => (
+                        {menuItems.map((item: MenuItemType, index: number) => (
                             <React.Fragment key={index}>
-                                <MenuItem item={item} onChoose={handleChoose} />
+                                <MenuItem item={item} onChoose={handleChoose} onToggleSwitch={handleToggleSwitch} />
                             </React.Fragment>
                         ))}
                     </div>

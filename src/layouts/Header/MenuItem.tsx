@@ -1,30 +1,15 @@
-import { useState } from 'react'
-
 import { MenuItemType } from './Interaction/Interaction'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Button from '~/components/Button/Button'
 import SwitchButton from '~/components/SwitchButton/SwitchButton'
-import { actions, useAppDispatch, useAppSelector } from '~/redux'
-import { getCurrentTheme } from '~/redux/selector'
 
 interface MenuItemProps {
     item: MenuItemType
-    // eslint-disable-next-line no-unused-vars
     onChoose: (type: MenuItemType['type']) => void
+    onToggleSwitch: (type: MenuItemType['type']) => void
 }
 
-export default function MenuItem({ item, onChoose }: MenuItemProps) {
-    const theme = useAppSelector(getCurrentTheme)
-    const dispatch = useAppDispatch()
-
-    const [isOn, setIsOn] = useState(theme === 'dark')
-
-    const handleSwitch = () => {
-        setIsOn(!isOn)
-        dispatch(actions.setTheme(isOn ? 'light' : 'dark'))
-        document.documentElement.classList.toggle('dark')
-    }
-
+const MenuItem = ({ item, onChoose, onToggleSwitch }: MenuItemProps) => {
     const handleChoose = () => {
         onChoose(item.type)
     }
@@ -41,7 +26,16 @@ export default function MenuItem({ item, onChoose }: MenuItemProps) {
                 <span className="text-base font-medium">{item.label}</span>
             </div>
 
-            {item.switchButton && <SwitchButton onClick={handleSwitch} isOn={isOn} />}
+            {item.switchButton && (
+                <SwitchButton
+                    onClick={() => {
+                        onToggleSwitch(item.type)
+                    }}
+                    isOn={item.isOn}
+                />
+            )}
         </div>
     )
 }
+
+export default MenuItem
