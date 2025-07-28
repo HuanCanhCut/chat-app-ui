@@ -31,5 +31,6 @@ export enum SocketEvent {
     CONVERSATION_MEMBER_REMOVED = 'conversation:member_removed',
     CONVERSATION_MEMBER_LEAVED = 'conversation:member_leaved',
     CONVERSATION_BLOCKED = 'conversation:blocked',
+    CONVERSATION_UNBLOCKED = 'conversation:unblocked',
     LEAVE_ROOM = 'conversation:leave',
 }

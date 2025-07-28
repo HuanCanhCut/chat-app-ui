@@ -22,6 +22,8 @@ const sharedSocketEvents = [
     SocketEvent.CONVERSATION_AVATAR_CHANGED,
     SocketEvent.CONVERSATION_THEME_CHANGED,
     SocketEvent.CONVERSATION_EMOJI_CHANGED,
+    SocketEvent.CONVERSATION_BLOCKED,
+    SocketEvent.CONVERSATION_UNBLOCKED,
 ]
 
 const sharedSocketEventMemberHandlers = [
