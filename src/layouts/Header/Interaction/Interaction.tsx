@@ -104,8 +104,6 @@ const Interaction = () => {
         }
     }
 
-    console.log(theme)
-
     useEffect(() => {
         dispatch({ type: 'theme', isOn: theme === 'dark' })
     }, [theme])

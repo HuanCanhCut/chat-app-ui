@@ -58,11 +58,11 @@ const Header: React.FC<HeaderProps> = ({ className = '', isInfoOpen, conversatio
                     detail: {
                         user_id: conversationMember?.user.id,
                         is_online: false,
-                        last_online_at: new Date(conversationMember?.user.last_online_at),
+                        last_online_at: new Date(conversationMember?.user.last_online_at || new Date()),
                     },
                 })
                 offlineTimerSocket.current = setInterval(() => {
-                    setLastOnlineTime(new Date(data.last_online_at))
+                    setLastOnlineTime(new Date(data.last_online_at || new Date()))
                 }, 1000 * 30) // 30 seconds
             }
         }
@@ -91,7 +91,7 @@ const Header: React.FC<HeaderProps> = ({ className = '', isInfoOpen, conversatio
                 })
 
                 offlineTimer.current = setInterval(() => {
-                    setLastOnlineTime(new Date(conversationMember?.user.last_online_at))
+                    setLastOnlineTime(new Date(conversationMember?.user.last_online_at || new Date()))
                 }, 1000 * 30) // 30 seconds
             }
         }

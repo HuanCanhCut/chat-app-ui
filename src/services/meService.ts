@@ -24,7 +24,7 @@ export const getCurrentUser = async (): Promise<Response | undefined> => {
 
 export const updateCurrentUser = async (formData: FormData): Promise<AxiosResponse<void>> => {
     try {
-        return await request.patch('/me/update', formData)
+        return await request.patch('/me', formData)
     } catch (error: any) {
         throw error
     }

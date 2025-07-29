@@ -19,8 +19,8 @@ export interface UserModel<K = any, V = any> extends BaseModel {
     friend_request: boolean
     sent_friend_request: boolean
     conversation: ConversationModel
-    is_online: boolean
-    last_online_at: Date
+    is_online?: boolean
+    last_online_at?: Date
     [key: K]: V
 }
 
@@ -35,8 +35,8 @@ export interface UserResponse {
 
 export interface UserStatus {
     user_id: number
-    is_online: boolean
-    last_online_at: string
+    is_online?: boolean
+    last_online_at?: string
 }
 
 // ========================================== Theme model ==========================================
