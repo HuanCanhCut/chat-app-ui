@@ -21,6 +21,7 @@ export interface UserModel<K = any, V = any> extends BaseModel {
     conversation: ConversationModel
     is_online?: boolean
     last_online_at?: Date
+    active_status: boolean
     [key: K]: V
 }
 

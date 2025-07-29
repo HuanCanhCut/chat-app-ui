@@ -17,6 +17,7 @@ import { sendEvent } from '~/helpers/events'
 import { actions, useAppDispatch, useAppSelector } from '~/redux'
 import { getCurrentTheme, getCurrentUser } from '~/redux/selector'
 import * as authService from '~/services/authService'
+import * as meService from '~/services/meService'
 
 export interface MenuItemType {
     type: 'theme' | 'status' | 'logout'
@@ -39,7 +40,8 @@ const reducer = (state: MenuItemType[], action: { type: MenuItemType['type']; is
             }
 
             return newState
-
+        case 'status':
+            return state.map((item) => ({ ...item, isOn: item.type === 'status' ? action.isOn : item.isOn }))
         default:
             return state
     }
@@ -65,7 +67,7 @@ const Interaction = () => {
             icon: faCircleDot,
             label: 'Trạng thái hoạt động',
             switchButton: true,
-            isOn: false,
+            isOn: currentUser?.data?.active_status,
         },
         {
             type: 'logout',
@@ -89,15 +91,25 @@ const Interaction = () => {
         }
     }
 
-    const handleToggleSwitch = (type: MenuItemType['type']) => {
+    const handleToggleSwitch = async (type: MenuItemType['type']) => {
+        const isOn = menuItems.find((item) => item.type === type)?.isOn
+
         switch (type) {
             case 'theme':
-                const isOn = menuItems.find((item) => item.type === 'theme')?.isOn
-
                 reduxDispatch(actions.setTheme(isOn ? 'light' : 'dark'))
                 document.documentElement.classList.toggle('dark')
 
-                dispatch({ type: 'theme', isOn: !isOn })
+                dispatch({ type, isOn: !isOn })
+                break
+            case 'status':
+                try {
+                    dispatch({ type, isOn: !isOn })
+
+                    await meService.updateActiveStatus(!isOn)
+                } catch (error) {
+                    dispatch({ type, isOn })
+                }
+
                 break
             default:
                 break
@@ -106,7 +118,8 @@ const Interaction = () => {
 
     useEffect(() => {
         dispatch({ type: 'theme', isOn: theme === 'dark' })
-    }, [theme])
+        dispatch({ type: 'status', isOn: currentUser?.data?.active_status })
+    }, [theme, currentUser])
 
     const renderTooltip = () => {
         return (

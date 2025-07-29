@@ -29,3 +29,11 @@ export const updateCurrentUser = async (formData: FormData): Promise<AxiosRespon
         throw error
     }
 }
+
+export const updateActiveStatus = async (is_online: boolean): Promise<AxiosResponse<void>> => {
+    try {
+        return await request.patch('/me/active-status', { is_online })
+    } catch (error: any) {
+        throw error
+    }
+}
