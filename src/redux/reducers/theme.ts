@@ -1,3 +1,4 @@
+import { SET_THEME } from '../constant'
 interface InitState {
     theme: string
 }
@@ -8,7 +9,7 @@ const initialState: InitState = {
 
 const themeReducer = (state = initialState, action: any) => {
     switch (action.type) {
-        case 'set-theme':
+        case SET_THEME:
             return {
                 ...state,
                 theme: action.payload,

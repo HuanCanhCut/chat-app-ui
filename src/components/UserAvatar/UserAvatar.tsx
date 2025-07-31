@@ -3,6 +3,10 @@
 import { memo, useState } from 'react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
+
+import { useAppSelector } from '~/redux'
+import { getCurrentUser } from '~/redux/selector'
+
 interface Props {
     src?: string
     alt?: string
@@ -30,6 +34,8 @@ const UserAvatar = ({
 }: Props) => {
     const router = useRouter()
     const [fallback, setFallback] = useState<string>()
+
+    const currentUser = useAppSelector(getCurrentUser)
 
     const handleError = () => {
         setFallback(defaultAvatar)
@@ -59,7 +65,7 @@ const UserAvatar = ({
                 quality={100}
                 style={style}
             />
-            {isOnline && (
+            {isOnline && currentUser?.data?.active_status && (
                 <div
                     className={`absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-white bg-green-500 dark:border-dark ${onlineClassName}`}
                 ></div>

@@ -106,6 +106,8 @@ const Interaction = () => {
                     dispatch({ type, isOn: !isOn })
 
                     await meService.updateActiveStatus(!isOn)
+
+                    reduxDispatch(actions.setActiveStatus(!isOn))
                 } catch (error) {
                     dispatch({ type, isOn })
                 }

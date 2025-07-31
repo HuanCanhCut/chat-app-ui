@@ -12,3 +12,10 @@ export const setTheme = (payload: 'light' | 'dark') => {
         payload,
     }
 }
+
+export const setActiveStatus = (payload: boolean) => {
+    return {
+        type: 'set-active-status',
+        payload,
+    }
+}

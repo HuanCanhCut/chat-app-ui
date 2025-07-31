@@ -1,7 +1,8 @@
-import { UserModel } from '~/type/type'
+import { LOG_OUT, SET_ACTIVE_STATUS, SET_CURRENT_USER } from '../constant'
+import { UserResponse } from '~/type/type'
 
 interface InitState {
-    currentUser: UserModel | null
+    currentUser: UserResponse | null
 }
 
 const initialState: InitState = {
@@ -10,15 +11,23 @@ const initialState: InitState = {
 
 const authReducer = (state = initialState, action: any) => {
     switch (action.type) {
-        case 'set-current-user':
+        case SET_CURRENT_USER:
             return {
                 ...state,
                 currentUser: action.payload,
             }
-        case 'log-out':
+        case LOG_OUT:
             return {
                 ...state,
                 currentUser: null,
+            }
+        case SET_ACTIVE_STATUS:
+            return {
+                ...state,
+                currentUser: {
+                    ...state.currentUser,
+                    data: { ...state.currentUser?.data, active_status: action.payload },
+                },
             }
         default:
             return state
