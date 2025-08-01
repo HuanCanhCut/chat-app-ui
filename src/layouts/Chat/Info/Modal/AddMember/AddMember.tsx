@@ -1,6 +1,6 @@
-import { useParams } from 'next/navigation'
 import { useCallback, useState } from 'react'
 import InfiniteScroll from 'react-infinite-scroll-component'
+import { useParams } from 'next/navigation'
 import useSWR from 'swr'
 
 import { faCircle } from '@fortawesome/free-regular-svg-icons'

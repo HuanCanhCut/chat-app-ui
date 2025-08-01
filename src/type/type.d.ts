@@ -109,7 +109,7 @@ export interface ConversationModel extends BaseModel {
     block_conversation: BlockModel
 }
 
-export interface ConversationResponse {
+export interface ConversationResponse extends MetaPagination {
     data: ConversationModel[]
 }
 

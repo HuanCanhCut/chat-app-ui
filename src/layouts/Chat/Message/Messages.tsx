@@ -69,9 +69,9 @@ const Message: React.FC<MessageProps> = ({ conversation }) => {
         }
 
         let timeout: NodeJS.Timeout | null = null
-        let delayRetry = 1000
+        let delayRetry = 500
         let retryCount = 0
-        const maxRetries = 5
+        const maxRetries = 10
 
         const joinRoom = () => {
             if (!socket.connected) {
