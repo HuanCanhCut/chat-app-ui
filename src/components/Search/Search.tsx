@@ -88,7 +88,7 @@ const Search: React.FC<SearchProps> = ({ placeholder = 'Tìm kiếm', className 
             <PopperWrapper className="w-[360px] p-4" {...attrs} tabIndex={-1}>
                 <div>
                     <h4>Mới đây</h4>
-                    <div className="mt-2 flex flex-col gap-4">
+                    <div className="mt-2 flex flex-col gap-2">
                         {searchResult.length > 0
                             ? searchValue.trim() !== '' &&
                               searchResult.map((user, index) => (
@@ -118,38 +118,46 @@ const Search: React.FC<SearchProps> = ({ placeholder = 'Tìm kiếm', className 
     }
 
     return (
-        <Tippy
-            interactive
-            onClickOutside={handleHideTippy}
-            visible={
-                showResult && (searchResult.length > 0 || (searchHistoryResult.length > 0 && searchValue.trim() === ''))
-            }
-            render={renderResult}
-            placement="bottom-start"
-        >
-            <div className={`relative rounded-3xl bg-lightGray pl-3 dark:bg-[#313233] sm:pl-10 ${className}`}>
-                <input
-                    type="text"
-                    placeholder={placeholder}
-                    className="w-full rounded-3xl bg-transparent py-[8px] pl-[1px] pr-11 caret-primary outline-none placeholder:text-sm dark:bg-[#313233]"
-                    value={searchValue}
-                    onChange={(e) => setSearchValue(e.target.value)}
-                    onFocus={() => setShowResult(true)}
-                />
-                <FontAwesomeIcon
-                    icon={faSearch}
-                    className="absolute left-3 top-1/2 hidden -translate-y-1/2 text-xl text-gray-400 sm:block"
-                    width={16}
-                    height={16}
-                />
-                {searchResult.length > 0 ||
-                    (true && (
-                        <button className="absolute right-0 top-1/2 block aspect-square h-full -translate-y-1/2 rounded-full leading-none sm:hidden">
-                            <FontAwesomeIcon icon={faXmark} className="text-xl leading-none" width={16} height={16} />
-                        </button>
-                    ))}
-            </div>
-        </Tippy>
+        <div>
+            <Tippy
+                interactive
+                onClickOutside={handleHideTippy}
+                visible={
+                    showResult &&
+                    (searchResult.length > 0 || (searchHistoryResult.length > 0 && searchValue.trim() === ''))
+                }
+                render={renderResult}
+                placement="bottom-start"
+            >
+                <div className={`relative rounded-3xl bg-lightGray pl-3 dark:bg-[#313233] sm:pl-10 ${className}`}>
+                    <input
+                        type="text"
+                        placeholder={placeholder}
+                        className="w-full rounded-3xl bg-transparent py-[8px] pl-[1px] pr-11 caret-primary outline-none placeholder:text-sm dark:bg-[#313233]"
+                        value={searchValue}
+                        onChange={(e) => setSearchValue(e.target.value)}
+                        onFocus={() => setShowResult(true)}
+                    />
+                    <FontAwesomeIcon
+                        icon={faSearch}
+                        className="absolute left-3 top-1/2 hidden -translate-y-1/2 text-xl text-gray-400 sm:block"
+                        width={16}
+                        height={16}
+                    />
+                    {searchResult.length > 0 ||
+                        (true && (
+                            <button className="absolute right-0 top-1/2 block aspect-square h-full -translate-y-1/2 rounded-full leading-none sm:hidden">
+                                <FontAwesomeIcon
+                                    icon={faXmark}
+                                    className="text-xl leading-none"
+                                    width={16}
+                                    height={16}
+                                />
+                            </button>
+                        ))}
+                </div>
+            </Tippy>
+        </div>
     )
 }
 

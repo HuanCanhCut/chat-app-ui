@@ -8,7 +8,11 @@ import config from '~/config'
 import { useAppSelector } from '~/redux'
 import { getCurrentUser } from '~/redux/selector'
 
-const NavBar = () => {
+interface NavBarProps {
+    className?: string
+}
+
+const NavBar = ({ className }: NavBarProps) => {
     const pathname = usePathname()
     const currentUser = useAppSelector(getCurrentUser)
 
@@ -30,7 +34,7 @@ const NavBar = () => {
     }, [currentUser])
 
     return (
-        <nav className="relative flex h-full items-center">
+        <nav className={`relative flex h-full items-center ${className}`}>
             {NAV_ITEMS.map((item, index) => {
                 return (
                     <Tippy content={item.tooltip} key={index} delay={[250, 0]}>

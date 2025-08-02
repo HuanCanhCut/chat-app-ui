@@ -38,38 +38,33 @@ export default function Header() {
     }, [])
 
     return (
-        <>
-            {/* Mobile Header */}
-            <header id="header" className={`${headerStyle} hidden h-[var(--header-height)] sm:flex sm:items-center`}>
+        <header
+            id="header"
+            className={`${headerStyle} flex h-[var(--header-height-mobile)] flex-col sm:h-[var(--header-height)] sm:flex-row sm:items-center`}
+        >
+            <SearchModal isOpen={isOpen} closeModal={closeModal} />
+
+            <div className="flex items-center justify-between sm:h-full sm:w-full">
                 <div className="flex items-center gap-4">
                     <Logo className="col-span-1" />
-                    <Search className="w-[240px]" />
-                </div>
-                <Nav />
-                <Interaction />
-            </header>
 
-            {/* Desktop Header */}
-            <header className={`${headerStyle} flex h-[var(--header-height-mobile)] flex-col sm:hidden`}>
-                <SearchModal isOpen={isOpen} closeModal={closeModal} />
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                        <Logo className="col-span-1" />
-                        <Button buttonType="icon" className="sm:hidden" onClick={openModal}>
-                            <FontAwesomeIcon
-                                icon={faSearch}
-                                width={16}
-                                height={16}
-                                className="text-gray-400 sm:block"
-                            />
-                        </Button>
-                    </div>
-                    <Interaction />
+                    <Search className="hidden w-[240px] sm:block" />
+
+                    <Button buttonType="icon" className="sm:hidden" onClick={openModal}>
+                        <FontAwesomeIcon icon={faSearch} width={16} height={16} className="text-gray-400" />
+                    </Button>
                 </div>
-                <div className="mx-auto flex-1">
+
+                <div className="hidden sm:flex sm:h-full sm:items-center">
                     <Nav />
                 </div>
-            </header>
-        </>
+
+                <Interaction />
+            </div>
+
+            <div className="mx-auto flex-1 sm:hidden">
+                <Nav />
+            </div>
+        </header>
     )
 }
