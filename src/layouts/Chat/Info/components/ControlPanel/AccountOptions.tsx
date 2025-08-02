@@ -121,6 +121,10 @@ const AccountOptions: React.FC<AccountOptionsProps> = ({ member, isAdmin }) => {
                 })
                 break
             case 'leave_group':
+                sendEvent({
+                    eventName: 'conversation:leave-choose',
+                    detail: { type: 'leave_group' },
+                })
                 break
         }
 

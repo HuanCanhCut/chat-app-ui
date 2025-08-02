@@ -24,7 +24,7 @@ const ConfirmModel = ({
         <Modal isOpen={isOpen} onClose={closeModal} title={title} popperClassName="w-[550px] pb-4">
             <main className="px-4">
                 <p className="mt-2 text-[15px] text-zinc-700 dark:text-zinc-200">{description}</p>
-                <div className="mt-8 flex justify-end gap-2">
+                <div className="mt-4 flex justify-end gap-2">
                     <Button buttonType="outline" className="border-none px-4 py-1 text-primary" onClick={closeModal}>
                         Hủy
                     </Button>

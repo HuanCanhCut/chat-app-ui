@@ -228,16 +228,17 @@ const Info: React.FC<InfoProps> = ({ className = '', isOpen }) => {
                         let newMembers = prev.data.members
 
                         // if member_id is current user, set deleted_at to current time
+
                         if (member_id === currentUser.data.id) {
                             newMembers = newMembers.map((member) => {
-                                if (member.id === member_id) {
+                                if (member.id === Number(member_id)) {
                                     return { ...member, deleted_at: new Date() }
                                 }
 
                                 return member
                             })
                         } else {
-                            newMembers = newMembers.filter((member) => member.id !== member_id)
+                            newMembers = newMembers.filter((member) => member.id !== Number(member_id))
                         }
 
                         // leave conversation
@@ -262,9 +263,11 @@ const Info: React.FC<InfoProps> = ({ className = '', isOpen }) => {
         }
 
         socket.on(SocketEvent.CONVERSATION_MEMBER_REMOVED, socketHandler)
+        socket.on(SocketEvent.CONVERSATION_MEMBER_LEAVED, socketHandler)
 
         return () => {
             socket.off(SocketEvent.CONVERSATION_MEMBER_REMOVED, socketHandler)
+            socket.off(SocketEvent.CONVERSATION_MEMBER_LEAVED, socketHandler)
         }
     }, [currentUser?.data.id, uuid])
 

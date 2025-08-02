@@ -395,6 +395,29 @@ const Conversations = () => {
         }
     }, [mutateConversations])
 
+    useEffect(() => {
+        const remove = listenEvent({
+            eventName: 'conversation:leave-group',
+            handler: ({ detail }: { detail: { conversation_uuid: string } }) => {
+                const newConversationsData = { ...conversations?.data }
+
+                delete newConversationsData[detail.conversation_uuid]
+
+                mutateConversations(
+                    {
+                        data: newConversationsData,
+                        meta: conversations?.meta,
+                    },
+                    {
+                        revalidate: false,
+                    },
+                )
+            },
+        })
+
+        return remove
+    }, [conversations, mutateConversations])
+
     return (
         <div className="h-full w-full pt-4">
             {isLoading ? (

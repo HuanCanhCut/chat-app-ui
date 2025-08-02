@@ -8,6 +8,7 @@ import AddMember from '../../Modal/AddMember'
 import BlockUser from '../../Modal/BlockConversation'
 import ChangeEmojiModal from '../../Modal/ChangeEmojiModal'
 import ChangeNicknameModal from '../../Modal/ChangeNicknameModal'
+import LeaveGroupModal from '../../Modal/LeaveGroupModal'
 import ConversationTheme from '../../Modal/ThemeModal'
 import AccountOptions from './AccountOptions'
 import {
@@ -77,6 +78,10 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ onChose }) => {
 
     const member = conversation?.data.members.find((member) => {
         return member.user_id !== currentUser?.data.id
+    }) as ConversationMember | undefined
+
+    const currentUserMember = conversation?.data.members.find((member) => {
+        return member.user_id === currentUser?.data.id
     }) as ConversationMember | undefined
 
     const [lastOnlineTime, setLastOnlineTime] = useState<Date | null>(member?.user.last_online_at || null)
@@ -173,8 +178,8 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ onChose }) => {
 
                               if (member.added_by_id) {
                                   return (
-                                      memberMap[member.added_by_id].nickname ||
-                                      memberMap[member.added_by_id].user.full_name
+                                      memberMap[member.added_by_id]?.nickname ||
+                                      memberMap[member.added_by_id]?.user.full_name
                                   )
                               }
 
@@ -341,11 +346,30 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ onChose }) => {
                         component: <BlockUser member={member} handleCloseModal={handleCloseModal} />,
                         title: 'Chặn',
                     })
+                case 'leave_group':
+                    setModalState({
+                        isOpen: true,
+                        component: <LeaveGroupModal onClose={handleCloseModal} currentUserMember={currentUserMember} />,
+                        title: 'Rời nhóm',
+                    })
                     break
             }
         },
-        [conversation, handleCloseModal, member, onChose],
+        [conversation, currentUserMember, handleCloseModal, member, onChose],
     )
+
+    useEffect(() => {
+        const remove = listenEvent({
+            eventName: 'conversation:leave-choose',
+            handler: ({ detail }: { detail: { type: string } }) => {
+                if (detail.type === 'leave_group') {
+                    handleChose('leave_group')
+                }
+            },
+        })
+
+        return remove
+    }, [handleChose])
 
     const handleChangeAvatar = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0]
