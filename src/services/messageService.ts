@@ -175,3 +175,12 @@ export const getMessageLinksPreview = async ({
         throw error
     }
 }
+
+export const getUnseenCount = async (): Promise<{ count: number } | undefined> => {
+    try {
+        const response = await request.get('/messages/unseen-count')
+        return response.data
+    } catch (error: any) {
+        throw error
+    }
+}

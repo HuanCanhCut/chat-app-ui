@@ -2,13 +2,12 @@ import React, { useEffect, useReducer } from 'react'
 import { useRouter } from 'next/navigation'
 
 import MenuItem from '../MenuItem'
+import Message from './Message'
 import { faCircleDot, faMoon, faPen, faSignOut, IconDefinition } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import Tippy from '@tippyjs/react'
 import AccountItem from '~/components/AccountItem'
 import Button from '~/components/Button'
 import CustomTippy from '~/components/CustomTippy/CustomTippy'
-import { MessageIcon } from '~/components/Icons'
 import Notification from '~/components/Notification/Notification'
 import PopperWrapper from '~/components/PopperWrapper'
 import UserAvatar from '~/components/UserAvatar/UserAvatar'
@@ -165,13 +164,7 @@ const Interaction = () => {
         <div className="flex items-center gap-4">
             <>
                 <Notification />
-                <Tippy content="Messenger">
-                    <div>
-                        <Button buttonType="icon" href={config.routes.message}>
-                            <MessageIcon />
-                        </Button>
-                    </div>
-                </Tippy>
+                <Message />
             </>
             <CustomTippy
                 trigger="click"
