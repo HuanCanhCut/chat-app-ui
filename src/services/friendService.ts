@@ -1,6 +1,6 @@
 import { AxiosResponse } from 'axios'
 
-import { FriendsResponse } from '~/type/type'
+import { FriendInvitationResponse, FriendsResponse } from '~/type/type'
 import * as request from '~/utils/httpRequest'
 
 interface GetFriendsProps {
@@ -48,6 +48,27 @@ export const addFriend = async (userId: number): Promise<AxiosResponse<void>> =>
 export const cancelFriendRequest = async (userId: number): Promise<AxiosResponse<void>> => {
     try {
         return await request.post(`users/${userId}/cancel`)
+    } catch (error: any) {
+        throw error
+    }
+}
+
+export const getFriendInvitation = async ({
+    page,
+    per_page,
+}: {
+    page: number
+    per_page: number
+}): Promise<FriendInvitationResponse> => {
+    try {
+        const response = await request.get(`users/friend-invitation`, {
+            params: {
+                page,
+                per_page,
+            },
+        })
+
+        return response.data
     } catch (error: any) {
         throw error
     }

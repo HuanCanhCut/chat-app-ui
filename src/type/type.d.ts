@@ -15,6 +15,7 @@ export interface UserModel<K = any, V = any> extends BaseModel {
     nickname: string
     cover_photo: string
     friends_count: number
+    mutual_friends_count: number
     is_friend: boolean
     friend_request: boolean
     sent_friend_request: boolean
@@ -228,6 +229,10 @@ export interface FriendsShip extends BaseModel {
     friend_id: number
     status: string
     user: UserModel
+}
+
+export interface FriendInvitationResponse extends MetaPagination {
+    data: FriendsShip[]
 }
 
 export interface FriendsResponse extends MetaPagination {

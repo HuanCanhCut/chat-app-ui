@@ -52,7 +52,7 @@ const UserAvatar = ({
     }
 
     return (
-        <div className="relative" onClick={() => handleRedirect(href)}>
+        <div className="relative flex" onClick={() => handleRedirect(href)}>
             <Image
                 src={fallback || src}
                 onError={handleError}

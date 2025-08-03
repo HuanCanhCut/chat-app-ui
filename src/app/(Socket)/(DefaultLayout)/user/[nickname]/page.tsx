@@ -1,10 +1,11 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import Skeleton from 'react-loading-skeleton'
 import { useParams } from 'next/navigation'
 import useSWR from 'swr'
 
+import FriendInvitationList from './components/FriendInvitationList'
 import FriendList from './components/FriendList'
 import User from './components/User'
 import NotFound from '~/app/not-found'
@@ -18,10 +19,17 @@ import { getCurrentUser } from '~/redux/selector'
 import * as userService from '~/services/userService'
 import { UserResponse, UserStatus } from '~/type/type'
 
+interface Tab {
+    label: string
+    value: 'friend' | 'friend-invitation'
+}
+
 export default function UserPage() {
     const { nickname } = useParams()
 
     const currentUser = useAppSelector(getCurrentUser)
+
+    const [currentTab, setCurrentTab] = useState<'friend' | 'friend-invitation'>('friend')
 
     const {
         data: user,
@@ -36,6 +44,19 @@ export default function UserPage() {
             revalidateOnMount: true,
         },
     )
+
+    const TABS: Tab[] = useMemo(() => {
+        return [
+            {
+                label: 'Bạn bè',
+                value: 'friend',
+            },
+            currentUser?.data.id === user?.data.id && {
+                label: 'Lời mời kết bạn',
+                value: 'friend-invitation',
+            },
+        ].filter(Boolean) as Tab[]
+    }, [currentUser?.data.id, user?.data.id])
 
     useEffect(() => {
         const socketHandler = (data: UserStatus) => {
@@ -101,9 +122,9 @@ export default function UserPage() {
                         className="absolute top-[-100px] w-[130px] border-4 border-white dark:border-[#242526] sm:top-[-30px]"
                     />
                     <div className="top-[50px] flex-1">
-                        <Skeleton height={24} width={200} />
-                        <Skeleton height={14} width={200} />
-                        <Skeleton height={14} width={200} />
+                        {Array.from({ length: 3 }).map((_, index) => (
+                            <Skeleton key={index} height={24} width={200} />
+                        ))}
                     </div>
                     <div>
                         <Skeleton height={35} width={200} />
@@ -130,8 +151,16 @@ export default function UserPage() {
                             style={{ width: '100%', height: 'auto' }}
                         />
                         {user && currentUser && <User currentUser={currentUser} user={user} />}
-                        <div className="mt-0 w-full border-t border-gray-300 py-2 dark:border-zinc-700 sm:mt-10">
-                            <button className="px-4 py-2 text-primary">Bạn bè</button>
+                        <div className="mt-0 w-full border-t border-gray-300 px-4 dark:border-zinc-700 sm:mt-10">
+                            {TABS.map((tab) => (
+                                <button
+                                    key={tab.value}
+                                    className={`px-4 py-4 ${currentTab === tab.value ? 'border-b-[3px] border-primary' : ''}`}
+                                    onClick={() => setCurrentTab(tab.value)}
+                                >
+                                    {tab.label}
+                                </button>
+                            ))}
                         </div>
                     </div>
                 ) : !user && !isLoading ? (
@@ -141,20 +170,17 @@ export default function UserPage() {
                 )}
             </header>
             {user ? (
-                <FriendList user={user} />
+                <div className="mx-auto mt-4 max-w-[1100px] rounded-md bg-white p-4 [box-shadow:1px_2px_4px_rgba(0,0,0,0.1)] dark:bg-dark">
+                    <div className="mt-8 grid grid-cols-1 gap-2 sm:grid-cols-2">
+                        {currentTab === 'friend' ? <FriendList user={user} /> : <FriendInvitationList />}
+                    </div>
+                </div>
             ) : (
                 <div className="mx-auto mt-4 max-w-[1100px]">
                     <div className="mt-8 grid grid-cols-1 gap-2 sm:grid-cols-2">
-                        <Skeleton className="h-20 w-full" />
-                        <Skeleton className="h-20 w-full" />
-                        <Skeleton className="h-20 w-full" />
-                        <Skeleton className="h-20 w-full" />
-                        <Skeleton className="h-20 w-full" />
-                        <Skeleton className="h-20 w-full" />
-                        <Skeleton className="h-20 w-full" />
-                        <Skeleton className="h-20 w-full" />
-                        <Skeleton className="h-20 w-full" />
-                        <Skeleton className="h-20 w-full" />
+                        {Array.from({ length: 10 }).map((_, index) => (
+                            <Skeleton key={index} className="h-20 w-full" />
+                        ))}
                     </div>
                 </div>
             )}

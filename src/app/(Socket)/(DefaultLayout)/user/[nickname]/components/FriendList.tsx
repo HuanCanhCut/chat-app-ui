@@ -10,16 +10,16 @@ import * as friendService from '~/services/friendService'
 import { FriendsResponse, FriendsShip, UserResponse } from '~/type/type'
 
 interface FriendListProps {
-    user: UserResponse
+    user?: UserResponse
 }
 
 const FriendList = ({ user }: FriendListProps) => {
     const [page, setPage] = useState(1)
 
     const { data: friends, mutate: mutateFriends } = useSWR<FriendsResponse | undefined>(
-        user.data.nickname ? [SWRKey.GET_ALL_FRIENDS, user.data.nickname] : null,
+        user?.data.nickname ? [SWRKey.GET_ALL_FRIENDS, user?.data.nickname] : null,
         () => {
-            return friendService.getFriends({ page, user_id: user.data.id })
+            return friendService.getFriends({ page, user_id: user?.data.id ?? 0 })
         },
         {
             revalidateOnMount: true,
@@ -59,7 +59,7 @@ const FriendList = ({ user }: FriendListProps) => {
 
         const getMoreFriends = async () => {
             try {
-                const res = await friendService.getFriends({ page, user_id: user.data.id })
+                const res = await friendService.getFriends({ page, user_id: user?.data.id ?? 0 })
 
                 if (!friends?.data) {
                     return
@@ -85,28 +85,31 @@ const FriendList = ({ user }: FriendListProps) => {
     }, [page])
 
     return (
-        <div className="mx-auto mt-4 max-w-[1100px] rounded-md bg-white p-4 [box-shadow:1px_2px_4px_rgba(0,0,0,0.1)] dark:bg-dark">
-            <h2>Bạn bè</h2>
-            <div className="mt-8 grid grid-cols-1 gap-2 sm:grid-cols-2">
-                {friends?.data?.map((friend: FriendsShip, index: number) => {
-                    return (
-                        <Link
-                            href={`${config.routes.user}/@${friend.user.nickname}`}
-                            key={index}
-                            className="flex items-center rounded-md border border-zinc-200 px-2 py-4 dark:border-zinc-800"
-                        >
-                            <UserAvatar src={friend.user.avatar} className="rounded-lg" size={70} />
-                            <div>
-                                <h4 className="ml-4">{friend.user.full_name}</h4>
-                                <p className="ml-4 text-xs text-gray-600 dark:text-gray-400">
-                                    {friend.user.friends_count} nguời bạn
-                                </p>
-                            </div>
-                        </Link>
-                    )
-                })}
-            </div>
-        </div>
+        <>
+            {friends?.data?.map((friend: FriendsShip, index: number) => {
+                return (
+                    <Link
+                        href={`${config.routes.user}/@${friend.user?.nickname}`}
+                        key={index}
+                        className="flex items-center overflow-hidden rounded-md border border-zinc-200 px-2 py-4 dark:border-zinc-800"
+                    >
+                        <UserAvatar
+                            src={friend.user?.avatar}
+                            className="xxs::min-w-[70px] w-[60px] rounded-full"
+                            size={70}
+                        />
+                        <div className="flex-1 overflow-hidden">
+                            <h4 className="ml-4 truncate">{friend.user?.full_name}</h4>
+                            <p className="ml-4 text-xs text-gray-600 dark:text-gray-400">
+                                {friend.user?.mutual_friends_count && friend.user?.mutual_friends_count > 0
+                                    ? `${friend.user?.mutual_friends_count} bạn chung`
+                                    : ''}
+                            </p>
+                        </div>
+                    </Link>
+                )
+            })}
+        </>
     )
 }
 
