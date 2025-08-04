@@ -1,5 +1,6 @@
 import React, { memo, useEffect, useRef, useState } from 'react'
 import InfiniteScroll from 'react-infinite-scroll-component'
+import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import useSWR from 'swr'
 
@@ -8,6 +9,8 @@ import ScrollToBottom from './ScrollToBottom'
 import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Typing from '~/components/Typing'
+import UserAvatar from '~/components/UserAvatar'
+import config from '~/config'
 import { SocketEvent } from '~/enum/SocketEvent'
 import SWRKey from '~/enum/SWRKey'
 import { listenEvent, sendEvent } from '~/helpers/events'
@@ -59,6 +62,8 @@ const Message: React.FC<MessageProps> = ({ conversation }) => {
             revalidateOnMount: true,
         },
     )
+
+    const member = conversation?.members.find((member) => member.user_id !== currentUser?.data?.id)
 
     // Join room when component mount and current user is not banned
     useEffect(() => {
@@ -615,7 +620,6 @@ const Message: React.FC<MessageProps> = ({ conversation }) => {
                         </React.Fragment>
                     ))}
                 </InfiniteScroll>
-
                 <ScrollToBottom
                     offsetRange={offsetRange}
                     scrollableRef={scrollableRef}
@@ -623,6 +627,28 @@ const Message: React.FC<MessageProps> = ({ conversation }) => {
                     PER_PAGE={PER_PAGE}
                     setOffsetRange={setOffsetRange}
                 />
+
+                {/* Show conversation avatar when no more message */}
+                {messages &&
+                    messages.meta.pagination.offset / PER_PAGE + 1 >= messages.meta.pagination.total / PER_PAGE && (
+                        <div className="flex flex-col items-center pt-8 text-center text-lg font-medium">
+                            <UserAvatar
+                                src={conversation.is_group ? conversation.avatar : member?.user.avatar}
+                                size={60}
+                                className="mx-auto h-[60px] w-[60px]"
+                            />
+                            {conversation.is_group ? (
+                                <p>{conversation.is_group ? conversation.name : member?.user.full_name || ''}</p>
+                            ) : (
+                                <Link
+                                    className="hover:underline"
+                                    href={`${config.routes.user}/@${member?.user.nickname}`}
+                                >
+                                    {conversation.is_group ? conversation.name : member?.user.full_name || ''}
+                                </Link>
+                            )}
+                        </div>
+                    )}
             </div>
         </div>
     )

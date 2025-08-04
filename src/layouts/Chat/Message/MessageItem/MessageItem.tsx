@@ -211,10 +211,6 @@ const MessageItem = ({ message, messageIndex, messages, currentUser, messageRef 
     const isFirstMessageInConsecutiveGroup = () => {
         const nextMessage = messages.data[messageIndex + 1]
 
-        if (message.content === '15') {
-            console.log(nextMessage)
-        }
-
         if (nextMessage) {
             const isConsecutiveWithNext =
                 nextMessage.sender_id === message.sender_id && diffTime(message, nextMessage) < BETWEEN_TIME_MESSAGE

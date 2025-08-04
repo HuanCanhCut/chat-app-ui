@@ -80,7 +80,7 @@ const ConversationItem: React.FC<Props> = ({ conversation, className = '' }) => 
             >
                 <div className="relative flex-shrink-0">
                     <UserAvatar
-                        src={conversation?.avatar || userMember?.user.avatar}
+                        src={conversation.is_group ? conversation.avatar : userMember?.user.avatar}
                         size={56}
                         className="h-[48px] w-[48px] lg:h-[56px] lg:w-[56px]"
                         isOnline={!conversation.is_group && userMember?.user.is_online}
