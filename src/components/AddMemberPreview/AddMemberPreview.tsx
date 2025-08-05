@@ -1,31 +1,32 @@
-import { useCallback, useState } from 'react'
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useState } from 'react'
 import InfiniteScroll from 'react-infinite-scroll-component'
-import { useParams } from 'next/navigation'
 import useSWR from 'swr'
 
 import { faCircle } from '@fortawesome/free-regular-svg-icons'
 import { faCircleCheck, faSpinner, faXmark } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import AccountItem from '~/components/AccountItem/AccountItem'
-import Button from '~/components/Button'
 import SearchFriend from '~/components/SearchFriend/SearchFriend'
 import UserAvatar from '~/components/UserAvatar/UserAvatar'
 import SWRKey from '~/enum/SWRKey'
+import { sendEvent } from '~/helpers/events'
 import handleApiError from '~/helpers/handleApiError'
 import { useAppSelector } from '~/redux'
 import { getCurrentUser } from '~/redux/selector'
-import * as conversationService from '~/services/conversationService'
 import * as friendService from '~/services/friendService'
 import { FriendsResponse, FriendsShip, UserModel } from '~/type/type'
 
 const PER_PAGE = 20
 
-interface AddMemberProps {
-    onClose: () => void
+interface AddMemberPreviewProps {
+    className?: string
 }
 
-const AddMember: React.FC<AddMemberProps> = ({ onClose }) => {
-    const { uuid } = useParams()
+interface ImperativeHandle {
+    GET_PREVIEW_MEMBER: () => UserModel[]
+}
+
+const AddMemberPreview = forwardRef<ImperativeHandle, AddMemberPreviewProps>(({ className = '' }, ref) => {
     const currentUser = useAppSelector(getCurrentUser)
 
     const [searchResult, setSearchResult] = useState<FriendsShip[]>([])
@@ -37,6 +38,12 @@ const AddMember: React.FC<AddMemberProps> = ({ onClose }) => {
             return friendService.getFriends({ page: 1, user_id: currentUser?.data.id })
         },
     )
+
+    useImperativeHandle<ImperativeHandle, ImperativeHandle>(ref, () => ({
+        GET_PREVIEW_MEMBER: () => {
+            return previewMember
+        },
+    }))
 
     const handleLoadMoreFriend = useCallback(async () => {
         try {
@@ -61,13 +68,19 @@ const AddMember: React.FC<AddMemberProps> = ({ onClose }) => {
         }
     }, [currentUser?.data.id, friends, mutateFriends])
 
-    const handleAddPreview = (friend: UserModel) => {
-        const added = previewMember.find((user) => user.id === friend.id)
+    const handleToggleAddPreview = (friend: UserModel) => {
+        const isAdded = previewMember.find((user) => user.id === friend.id)
 
-        if (!added) {
+        if (!isAdded) {
             setPreviewMember((prev) => [...prev, friend])
+        } else {
+            setPreviewMember((prev) => prev.filter((user) => user.id !== friend.id))
         }
     }
+
+    useEffect(() => {
+        sendEvent({ eventName: 'add_member:preview', detail: { previewMember } })
+    }, [previewMember])
 
     const handleRemovePreview = (user: UserModel) => {
         setPreviewMember((prev) => {
@@ -75,30 +88,12 @@ const AddMember: React.FC<AddMemberProps> = ({ onClose }) => {
         })
     }
 
-    const handleAddMember = async () => {
-        try {
-            const formData = new FormData()
-
-            previewMember.forEach((user) => {
-                formData.append('user_id[]', user.id.toString())
-            })
-
-            const res = await conversationService.addMember({ uuid: uuid as string, formData })
-
-            if (!res) return
-
-            onClose()
-        } catch (error: any) {
-            handleApiError(error)
-        }
-    }
-
     return (
-        <main className="flex w-[550px] max-w-full flex-1 flex-col overflow-hidden">
+        <main className={`flex w-[550px] max-w-full flex-1 flex-col overflow-hidden ${className}`}>
             <div className="flex flex-1 flex-col overflow-hidden p-4">
                 <SearchFriend placeholder="Tìm kiếm" setSearchResult={setSearchResult} />
 
-                <div className="px-4 py-8">
+                <div className="p-4">
                     {previewMember.length > 0 ? (
                         <div className="flex gap-4 py-1 [overflow-x:overlay]">
                             {previewMember.map((user) => {
@@ -153,7 +148,7 @@ const AddMember: React.FC<AddMemberProps> = ({ onClose }) => {
                                     <div
                                         key={friend.id}
                                         className="relative"
-                                        onClick={() => handleAddPreview(friend.user)}
+                                        onClick={() => handleToggleAddPreview(friend.user)}
                                     >
                                         <AccountItem user={friend.user} avatarSize={35} />
 
@@ -174,18 +169,11 @@ const AddMember: React.FC<AddMemberProps> = ({ onClose }) => {
                         )}
                     </InfiniteScroll>
                 </div>
-
-                <Button
-                    buttonType="primary"
-                    disabled={previewMember.length === 0}
-                    className="mt-4 w-full"
-                    onClick={handleAddMember}
-                >
-                    Thêm nguời
-                </Button>
             </div>
         </main>
     )
-}
+})
 
-export default AddMember
+AddMemberPreview.displayName = 'AddMemberPreview'
+
+export default AddMemberPreview

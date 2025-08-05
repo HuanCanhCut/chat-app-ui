@@ -12,7 +12,7 @@ export default function NavLink({ children, href, className = () => '' }: NavLin
     const pathname = usePathname()
 
     const options = {
-        isActive: pathname === href,
+        isActive: pathname.startsWith(href),
     }
 
     return (

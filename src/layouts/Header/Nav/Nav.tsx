@@ -39,7 +39,7 @@ const NavBar = ({ className }: NavBarProps) => {
                 return (
                     <Tippy content={item.tooltip} key={index} delay={[250, 0]}>
                         <div
-                            className={`aspect-[16/9] h-full border-b-2 ${pathname === item.href ? 'border-b-2 border-primary' : 'border-transparent'}`}
+                            className={`aspect-[16/9] h-full border-b-2 ${pathname.startsWith(item.href) ? 'border-b-2 border-primary' : 'border-transparent'}`}
                         >
                             <NavLink
                                 href={item.href}

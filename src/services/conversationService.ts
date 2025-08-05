@@ -34,6 +34,15 @@ export const getConversationByUuid = async ({
     }
 }
 
+export const createConversation = async ({ formData }: { formData: FormData }) => {
+    try {
+        const response = await request.post(`/conversations`, formData)
+        return response.data
+    } catch (error: any) {
+        throw error
+    }
+}
+
 export const searchConversation = async ({ q }: { q: string }): Promise<ConversationResponse | undefined> => {
     try {
         const response = await request.get(`/conversations/search`, { params: { q } })

@@ -4,7 +4,7 @@ import { useParams } from 'next/navigation'
 import { Emoji, EmojiStyle } from 'emoji-picker-react'
 import useSWR from 'swr'
 
-import AddMember from '../../Modal/AddMember'
+import AddMemberModel from '../../Modal/AddMember/AddMemberModel'
 import BlockUser from '../../Modal/BlockConversation'
 import ChangeEmojiModal from '../../Modal/ChangeEmojiModal'
 import ChangeNicknameModal from '../../Modal/ChangeNicknameModal'
@@ -330,7 +330,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ onChose }) => {
                 case 'add_member':
                     setModalState({
                         isOpen: true,
-                        component: <AddMember onClose={handleCloseModal} />,
+                        component: <AddMemberModel onClose={handleCloseModal} />,
                         title: 'Thêm người',
                     })
                     break

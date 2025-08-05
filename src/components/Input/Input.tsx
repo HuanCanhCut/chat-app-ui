@@ -5,7 +5,7 @@ interface Props {
     name: string
     control: any
     rules: any
-    placeholder: string
+    placeholder?: string
     type: string
     className?: string
     showIcon?: boolean
@@ -32,6 +32,7 @@ const Input = forwardRef<HTMLInputElement, Props>(
             setShowIcon = () => {},
             IconClass = IconClasses,
             defaultValue = '',
+            ...props
         },
         ref,
     ) => {
@@ -69,6 +70,7 @@ const Input = forwardRef<HTMLInputElement, Props>(
                             {error && <span className="mt-1 text-sm text-error">{error.message}</span>}
                         </>
                     )}
+                    {...props}
                 />
             </div>
         )
