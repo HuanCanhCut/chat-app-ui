@@ -418,6 +418,29 @@ const Conversations = () => {
         return remove
     }, [conversations, mutateConversations])
 
+    useEffect(() => {
+        const socketHandler = (data: ConversationModel) => {
+            mutateConversations(
+                {
+                    data: {
+                        [data.uuid]: data,
+                        ...conversations?.data,
+                    },
+                    meta: conversations?.meta,
+                },
+                {
+                    revalidate: false,
+                },
+            )
+        }
+
+        socket.on(SocketEvent.NEW_CONVERSATION, socketHandler)
+
+        return () => {
+            socket.off(SocketEvent.NEW_CONVERSATION, socketHandler)
+        }
+    }, [conversations?.data, conversations?.meta, mutateConversations])
+
     return (
         <div className="h-full w-full pt-4">
             {isLoading ? (

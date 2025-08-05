@@ -33,4 +33,5 @@ export enum SocketEvent {
     CONVERSATION_BLOCKED = 'conversation:blocked',
     CONVERSATION_UNBLOCKED = 'conversation:unblocked',
     LEAVE_ROOM = 'conversation:leave',
+    NEW_CONVERSATION = 'conversation:new',
 }
