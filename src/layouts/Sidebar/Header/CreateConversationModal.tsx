@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { memo, useCallback, useEffect, useRef, useState } from 'react'
 
 import { faCamera, faFileUpload } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -24,7 +24,7 @@ interface ImperativeHandle {
     GET_PREVIEW_MEMBER: () => UserModel[]
 }
 
-const CreateConversationModal = () => {
+const CreateConversationModal = ({ onClose }: { onClose: () => void }) => {
     const avatarInputRef = useRef<HTMLInputElement>(null)
     const groupNameRef = useRef<HTMLInputElement>(null)
 
@@ -118,13 +118,15 @@ const CreateConversationModal = () => {
 
             toast('Đang tạo nhóm, vui lòng đợi...', 'info')
 
+            onClose()
+
             await conversationService.createConversation({ formData })
 
             toast('Tạo nhóm thành công', 'success')
         } catch (error) {
             handleApiError(error)
         }
-    }, [fields])
+    }, [fields, onClose])
 
     useEffect(() => {
         const remove = listenEvent({
@@ -199,4 +201,4 @@ const CreateConversationModal = () => {
     )
 }
 
-export default CreateConversationModal
+export default memo(CreateConversationModal)

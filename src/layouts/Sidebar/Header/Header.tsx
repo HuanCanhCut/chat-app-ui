@@ -28,6 +28,10 @@ const Header: React.FC = () => {
         setIsCreateConversationModalOpen(true)
     }, [])
 
+    const handleCloseModal = useCallback(() => {
+        setIsCreateConversationModalOpen(false)
+    }, [])
+
     return (
         <header className="p-1 pr-2">
             <Modal
@@ -36,7 +40,7 @@ const Header: React.FC = () => {
                 title="Tạo nhóm"
                 popperClassName="w-[500px] max-w-full ![overflow:hidden] flex flex-col "
             >
-                <CreateConversationModal />
+                <CreateConversationModal onClose={handleCloseModal} />
             </Modal>
             <div className="flex w-full items-center justify-between">
                 <>
