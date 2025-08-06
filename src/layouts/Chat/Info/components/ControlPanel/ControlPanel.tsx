@@ -8,7 +8,6 @@ import AddMemberModel from '../../Modal/AddMember/AddMemberModel'
 import BlockUser from '../../Modal/BlockConversation'
 import ChangeEmojiModal from '../../Modal/ChangeEmojiModal'
 import ChangeNicknameModal from '../../Modal/ChangeNicknameModal'
-import LeaveGroupModal from '../../Modal/LeaveGroupModal'
 import ConversationTheme from '../../Modal/ThemeModal'
 import AccountOptions from './AccountOptions'
 import {
@@ -28,6 +27,7 @@ import Accordion from '~/components/Accordion'
 import Button from '~/components/Button'
 import CustomTippy from '~/components/CustomTippy'
 import { FontIcon, GalleryImageIcon } from '~/components/Icons'
+import LeaveGroupModal from '~/components/LeaveGroupModal'
 import Modal from '~/components/Modal'
 import UserAvatar from '~/components/UserAvatar'
 import config from '~/config'
@@ -78,10 +78,6 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ onChose }) => {
 
     const member = conversation?.data.members.find((member) => {
         return member.user_id !== currentUser?.data.id
-    }) as ConversationMember | undefined
-
-    const currentUserMember = conversation?.data.members.find((member) => {
-        return member.user_id === currentUser?.data.id
     }) as ConversationMember | undefined
 
     const [lastOnlineTime, setLastOnlineTime] = useState<Date | null>(member?.user.last_online_at || null)
@@ -349,13 +345,13 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ onChose }) => {
                 case 'leave_group':
                     setModalState({
                         isOpen: true,
-                        component: <LeaveGroupModal onClose={handleCloseModal} currentUserMember={currentUserMember} />,
+                        component: <LeaveGroupModal onClose={handleCloseModal} conversation={conversation?.data} />,
                         title: 'Rời nhóm',
                     })
                     break
             }
         },
-        [conversation, currentUserMember, handleCloseModal, member, onChose],
+        [conversation, handleCloseModal, member, onChose],
     )
 
     useEffect(() => {

@@ -38,6 +38,7 @@ const Conversations = () => {
     const groupConversationsByUuid = (conversations: ConversationModel[]) => {
         return conversations.reduce<Conversation<ConversationModel>>((acc, conversation) => {
             acc[conversation.uuid] = conversation
+
             return acc
         }, {})
     }

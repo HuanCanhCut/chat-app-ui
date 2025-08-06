@@ -29,7 +29,6 @@ interface CustomTippyProps {
     hideOnClick?: boolean
     timeDelayOpen?: number
     timeDelayClose?: number
-    handleHide?: () => void
     // eslint-disable-next-line no-unused-vars
     onShow?: (instance: any) => void
 }

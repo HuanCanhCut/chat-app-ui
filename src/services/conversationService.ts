@@ -163,3 +163,12 @@ export const leaveConversation = async ({ uuid }: { uuid: string }) => {
         throw error
     }
 }
+
+export const deleteConversation = async ({ uuid }: { uuid: string }) => {
+    try {
+        const response = await request.del(`/conversations/${uuid}`)
+        return response.data
+    } catch (error: any) {
+        throw error
+    }
+}

@@ -4,16 +4,23 @@ import { useParams } from 'next/navigation'
 import ConfirmModel from '~/components/ConfirmModal'
 import { sendEvent } from '~/helpers/events'
 import handleApiError from '~/helpers/handleApiError'
+import { useAppSelector } from '~/redux'
+import { getCurrentUser } from '~/redux/selector'
 import * as conversationService from '~/services/conversationService'
-import { ConversationMember } from '~/type/type'
+import { ConversationMember, ConversationModel } from '~/type/type'
 
 interface LeaveGroupModalProps {
     onClose: () => void
-    currentUserMember?: ConversationMember
+    conversation?: ConversationModel
 }
 
-const LeaveGroupModal: React.FC<LeaveGroupModalProps> = ({ onClose, currentUserMember }) => {
+const LeaveGroupModal: React.FC<LeaveGroupModalProps> = ({ onClose, conversation }) => {
+    const currentUser = useAppSelector(getCurrentUser)
     const { uuid } = useParams()
+
+    const currentUserMember = conversation?.members.find((member) => {
+        return member.user_id === currentUser?.data.id
+    }) as ConversationMember | undefined
 
     const isAdmin = currentUserMember?.role === 'admin' || currentUserMember?.role === 'leader'
 

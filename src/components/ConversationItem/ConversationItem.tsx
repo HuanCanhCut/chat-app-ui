@@ -1,8 +1,14 @@
+import { useRef } from 'react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 
 import AvatarGroup from '../AvatarGroup'
+import Button from '../Button'
+import CustomTippy from '../CustomTippy'
 import EmojiMessageStyle from '../EmojiMessageStyle'
+import ConversationOptions from './ConversationOptions'
+import { faEllipsis } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import UserAvatar from '~/components/UserAvatar'
 import SystemMessage from '~/layouts/Chat/Message/SystemMessage'
 import { useAppSelector } from '~/redux'
@@ -17,6 +23,9 @@ interface Props {
 
 const ConversationItem: React.FC<Props> = ({ conversation, className = '' }) => {
     const currentUser = useAppSelector(getCurrentUser)
+
+    const tippyInstanceRef = useRef<any>(null)
+
     const { uuid } = useParams()
 
     const isActive = uuid === conversation.uuid
@@ -73,11 +82,10 @@ const ConversationItem: React.FC<Props> = ({ conversation, className = '' }) => 
     }
 
     return (
-        <>
-            <Link
-                href={`/message/${conversation.uuid}`}
-                className={`flex items-center rounded-lg p-2 pr-5 ${!isActive ? 'hover:bg-lightGray hover:dark:bg-darkGray' : ''} ${className} ${isActive ? 'bg-[#ebf5ff] dark:bg-[#222e39bd]' : ''}`}
-            >
+        <div
+            className={`group relative rounded-lg ${!isActive ? 'hover:bg-lightGray hover:dark:bg-darkGray' : ''} ${className} ${isActive ? 'bg-[#ebf5ff] dark:bg-[#222e39bd]' : ''}`}
+        >
+            <Link href={`/message/${conversation.uuid}`} className={`flex items-center p-2 pr-5`}>
                 <div className="relative flex-shrink-0">
                     <UserAvatar
                         src={conversation.is_group ? conversation.avatar : userMember?.user.avatar}
@@ -148,7 +156,27 @@ const ConversationItem: React.FC<Props> = ({ conversation, className = '' }) => 
                     </div>
                 }
             </Link>
-        </>
+            <div className="absolute right-5 top-1/2 hidden -translate-y-1/2 group-hover:block">
+                <CustomTippy
+                    renderItem={() => (
+                        <ConversationOptions conversation={conversation} tippyInstanceRef={tippyInstanceRef} />
+                    )}
+                    placement="bottom"
+                    onShow={(instance) => {
+                        tippyInstanceRef.current = instance
+                    }}
+                >
+                    <div>
+                        <Button
+                            buttonType="icon"
+                            className="group:hover:shadow-lg z-10 border border-gray-300 dark:border-zinc-700"
+                        >
+                            <FontAwesomeIcon icon={faEllipsis} className="text-xl" />
+                        </Button>
+                    </div>
+                </CustomTippy>
+            </div>
+        </div>
     )
 }
 
