@@ -178,9 +178,10 @@ export default function UserPage() {
             ) : (
                 <div className="mx-auto mt-4 max-w-[1100px]">
                     <div className="mt-8 grid grid-cols-1 gap-2 sm:grid-cols-2">
-                        {Array.from({ length: 10 }).map((_, index) => (
-                            <Skeleton key={index} className="h-20 w-full" />
-                        ))}
+                        {isLoading &&
+                            Array.from({ length: 10 }).map((_, index) => (
+                                <Skeleton key={index} className="h-20 w-full" />
+                            ))}
                     </div>
                 </div>
             )}
