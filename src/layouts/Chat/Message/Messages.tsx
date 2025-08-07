@@ -73,7 +73,7 @@ const Message: React.FC<MessageProps> = ({ conversation }) => {
             return
         }
 
-        if (conversation?.temp) {
+        if (conversation?.is_temp) {
             return
         }
 
@@ -103,7 +103,7 @@ const Message: React.FC<MessageProps> = ({ conversation }) => {
         }
 
         joinRoom()
-    }, [conversation?.members, conversation?.temp, currentUser?.data?.id, uuid])
+    }, [conversation?.is_temp, conversation?.members, currentUser?.data?.id, uuid])
 
     const handleEnterMessage = (e: React.KeyboardEvent<HTMLDivElement>) => {
         if (e.key === 'Enter') {
