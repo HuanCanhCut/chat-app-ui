@@ -155,20 +155,22 @@ const Header: React.FC<HeaderProps> = ({ className = '', isInfoOpen, conversatio
                     </div>
                 </div>
             </div>
-            <div className="flex items-center">
-                <Button
-                    buttonType="icon"
-                    className="bg-transparent hover:!bg-[#99999926] dark:bg-transparent dark:hover:!bg-[#383b3b25]"
-                    onClick={handleToggleInfo}
-                >
-                    <FontAwesomeIcon
-                        icon={faCircleInfo}
-                        width={20}
-                        height={20}
-                        className="cursor-pointer text-xl text-[var(--sender-light-background-color)] dark:text-[var(--sender-dark-background-color)]"
-                    />
-                </Button>
-            </div>
+            {!conversation.is_temp && (
+                <div className="flex items-center">
+                    <Button
+                        buttonType="icon"
+                        className="bg-transparent hover:!bg-[#99999926] dark:bg-transparent dark:hover:!bg-[#383b3b25]"
+                        onClick={handleToggleInfo}
+                    >
+                        <FontAwesomeIcon
+                            icon={faCircleInfo}
+                            width={20}
+                            height={20}
+                            className="cursor-pointer text-xl text-[var(--sender-light-background-color)] dark:text-[var(--sender-dark-background-color)]"
+                        />
+                    </Button>
+                </div>
+            )}
         </div>
     )
 }

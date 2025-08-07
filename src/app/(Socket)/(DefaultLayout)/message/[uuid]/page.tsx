@@ -16,7 +16,7 @@ import Message from '~/layouts/Chat/Message'
 import { useAppSelector } from '~/redux'
 import { getCurrentUser } from '~/redux/selector'
 import * as conversationServices from '~/services/conversationService'
-import { UserStatus } from '~/type/type'
+import { SocketMessage, UserStatus } from '~/type/type'
 
 const MessagePage = () => {
     const { uuid } = useParams()
@@ -120,6 +120,20 @@ const MessagePage = () => {
         }
     }, [conversation?.data])
 
+    useEffect(() => {
+        const socketHandler = (data: SocketMessage) => {
+            if (data.conversation.uuid === uuid && conversation?.data.is_temp) {
+                mutateConversation()
+            }
+        }
+
+        socket.on(SocketEvent.NEW_MESSAGE, socketHandler)
+
+        return () => {
+            socket.off(SocketEvent.NEW_MESSAGE, socketHandler)
+        }
+    }, [conversation?.data?.is_temp, mutateConversation, uuid])
+
     return (
         <div className="flex h-full max-w-full">
             {/* Don't change the 'invisible' below to hidden to avoid uncontrolled scrolling in the message component */}
@@ -135,10 +149,12 @@ const MessagePage = () => {
                     </>
                 )}
             </div>
-            <Info
-                className={`${infoOpen ? 'block w-full sm:max-w-[280px] md:max-w-[300px] lg:max-w-[320px] xl:max-w-[380px]' : 'hidden !w-0 !p-0'} `}
-                isOpen={infoOpen}
-            />
+            {!conversation?.data?.is_temp && (
+                <Info
+                    className={`${infoOpen ? 'block w-full sm:max-w-[280px] md:max-w-[300px] lg:max-w-[320px] xl:max-w-[380px]' : 'hidden !w-0 !p-0'} `}
+                    isOpen={infoOpen}
+                />
+            )}
         </div>
     )
 }

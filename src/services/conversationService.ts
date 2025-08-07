@@ -172,3 +172,12 @@ export const deleteConversation = async ({ uuid }: { uuid: string }) => {
         throw error
     }
 }
+
+export const createTempConversation = async ({ userId }: { userId: number }) => {
+    try {
+        const response = await request.post(`/conversations/temp`, { user_id: userId })
+        return response.data
+    } catch (error: any) {
+        throw error
+    }
+}

@@ -99,6 +99,7 @@ export interface BlockModel extends BaseModel {
 // ========================================== Conversation model ==========================================
 export interface ConversationModel extends BaseModel {
     is_group: boolean
+    is_temp?: boolean
     name?: string
     avatar?: string
     uuid: string

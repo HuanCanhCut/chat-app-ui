@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react'
 import ReactModal from 'react-modal'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import useSWR from 'swr'
 
 import EditProfile from './EditProfile'
@@ -17,6 +18,7 @@ import UserAvatar from '~/components/UserAvatar/UserAvatar'
 import config from '~/config'
 import SWRKey from '~/enum/SWRKey'
 import { listenEvent } from '~/helpers/events'
+import * as conversationService from '~/services/conversationService'
 import * as friendService from '~/services/friendService'
 import { FriendsResponse, FriendsShip, UserModel, UserResponse } from '~/type/type'
 
@@ -26,8 +28,9 @@ interface UserProps {
 }
 
 export default function User({ currentUser, user }: UserProps) {
-    const [isOpen, setIsOpen] = useState(false)
+    const router = useRouter()
 
+    const [isOpen, setIsOpen] = useState(false)
     // get friends of user
     const { data: friends, mutate: mutateFriends } = useSWR<FriendsResponse | undefined>(
         user.data.nickname ? [SWRKey.GET_ALL_FRIENDS, user.data.nickname] : null,
@@ -72,6 +75,17 @@ export default function User({ currentUser, user }: UserProps) {
 
     const renderAccountPreview = (user: UserModel) => {
         return <AccountPreview user={user} currentUser={currentUser?.data} />
+    }
+
+    const handleSendMessage = async () => {
+        // check if no conversation with user, then create temp conversation
+        if (!user.data?.conversation?.uuid) {
+            const conversation = await conversationService.createTempConversation({ userId: user.data.id })
+
+            router.push(`/message/${conversation.data.uuid}`)
+        } else {
+            router.push(`/message/${user.data?.conversation?.uuid}`)
+        }
     }
 
     return (
@@ -142,15 +156,10 @@ export default function User({ currentUser, user }: UserProps) {
                 ) : (
                     <>
                         <FriendButton user={user.data} />
-                        {user.data.is_friend && (
-                            <Button
-                                buttonType="primary"
-                                leftIcon={<MessageIcon />}
-                                href={`/message/${user.data?.conversation?.uuid}`}
-                            >
-                                Nhắn tin
-                            </Button>
-                        )}
+
+                        <Button buttonType="rounded" leftIcon={<MessageIcon />} onClick={handleSendMessage}>
+                            Nhắn tin
+                        </Button>
                     </>
                 )}
             </div>

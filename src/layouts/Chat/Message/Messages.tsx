@@ -73,6 +73,10 @@ const Message: React.FC<MessageProps> = ({ conversation }) => {
             return
         }
 
+        if (conversation?.temp) {
+            return
+        }
+
         let timeout: NodeJS.Timeout | null = null
         let delayRetry = 500
         let retryCount = 0
@@ -99,7 +103,7 @@ const Message: React.FC<MessageProps> = ({ conversation }) => {
         }
 
         joinRoom()
-    }, [conversation?.members, currentUser?.data?.id, uuid])
+    }, [conversation?.members, conversation?.temp, currentUser?.data?.id, uuid])
 
     const handleEnterMessage = (e: React.KeyboardEvent<HTMLDivElement>) => {
         if (e.key === 'Enter') {
@@ -112,6 +116,7 @@ const Message: React.FC<MessageProps> = ({ conversation }) => {
         const socketHandler = (data: SocketMessage) => {
             if (data.conversation.uuid === uuid) {
                 if (!messages?.data) {
+                    mutateMessages()
                     return
                 }
 
