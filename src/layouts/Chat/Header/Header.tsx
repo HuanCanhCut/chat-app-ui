@@ -3,7 +3,7 @@
 import { memo, useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 
-import { faChevronLeft, faCircleInfo } from '@fortawesome/free-solid-svg-icons'
+import { faChevronLeft, faCircleInfo, faPhone, faVideo } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Button from '~/components/Button'
 import UserAvatar from '~/components/UserAvatar'
@@ -112,6 +112,32 @@ const Header: React.FC<HeaderProps> = ({ className = '', isInfoOpen, conversatio
         })
     }
 
+    const handleVoiceCall = () => {
+        // window.open(
+        //     `/call?member_nickname=${conversationMember?.user.nickname}&initialize_video=false&sub_type=caller`,
+        //     'Voice Call',
+        //     `
+        //     width=${window.screen.width},
+        //     height=${window.screen.height}
+        //     `,
+        // )
+
+        router.push(`/call?member_nickname=${conversationMember?.user.nickname}&initialize_video=false&sub_type=caller`)
+    }
+
+    const handleVideoCall = () => {
+        // window.open(
+        //     `/call?member_nickname=${conversationMember?.user.nickname}&initialize_video=true&sub_type=caller`,
+        //     'Video Call',
+        //     `
+        //     width=${window.screen.width},
+        //     height=${window.screen.height}
+        //     `,
+        // )
+
+        router.push(`/call?member_nickname=${conversationMember?.user.nickname}&initialize_video=true&sub_type=caller`)
+    }
+
     return (
         <div
             className={`${className} z-10 flex items-center justify-between bg-[var(--background-theme-light-header-color)] px-2 py-1 shadow-sm [box-shadow:1px_0px_8px_rgba(0,0,0,0.1)] dark:bg-[var(--background-theme-dark-header-color)] dark:[box-shadow:1px_0px_8px_rgba(0,0,0,0.2)]`}
@@ -157,6 +183,32 @@ const Header: React.FC<HeaderProps> = ({ className = '', isInfoOpen, conversatio
             </div>
             {!conversation.is_temp && (
                 <div className="flex items-center">
+                    <Button
+                        buttonType="icon"
+                        className="bg-transparent hover:!bg-[#99999926] dark:bg-transparent dark:hover:!bg-[#383b3b25]"
+                        onClick={handleVoiceCall}
+                    >
+                        <FontAwesomeIcon
+                            icon={faPhone}
+                            width={20}
+                            height={20}
+                            className="cursor-pointer text-xl text-[var(--sender-light-background-color)] dark:text-[var(--sender-dark-background-color)]"
+                        />
+                    </Button>
+
+                    <Button
+                        buttonType="icon"
+                        className="bg-transparent hover:!bg-[#99999926] dark:bg-transparent dark:hover:!bg-[#383b3b25]"
+                        onClick={handleVideoCall}
+                    >
+                        <FontAwesomeIcon
+                            icon={faVideo}
+                            width={20}
+                            height={20}
+                            className="cursor-pointer text-xl text-[var(--sender-light-background-color)] dark:text-[var(--sender-dark-background-color)]"
+                        />
+                    </Button>
+
                     <Button
                         buttonType="icon"
                         className="bg-transparent hover:!bg-[#99999926] dark:bg-transparent dark:hover:!bg-[#383b3b25]"
