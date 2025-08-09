@@ -104,8 +104,14 @@ const CallClient = () => {
         })
 
         if (subType === 'callee') {
-            peer.on('call', (call: any) => {
-                call.answer(localStreamRef.current)
+            peer.on('call', async (call: any) => {
+                let streamToAnswer = localStreamRef.current
+
+                if (!streamToAnswer) {
+                    streamToAnswer = await getUserMedia()
+                }
+
+                call.answer(streamToAnswer)
 
                 call.on('stream', (remoteStream: MediaStream) => {
                     if (remoteVideoRef.current) {
