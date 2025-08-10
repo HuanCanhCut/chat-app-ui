@@ -19,7 +19,7 @@ jobs:
                   key: ${{ secrets.SSH_PRIVATE_KEY }}
                   script: |
                       cd /var/www/nextjs/chat-app-ui
-                      git checkout main
+                      git checkout production
                       git pull
                       yarn install --frozen-lockfile
                       yarn build
