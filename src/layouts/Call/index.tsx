@@ -41,6 +41,7 @@ const CallClient = () => {
     })
 
     const peerInstance = useRef<Peer | null>(null)
+    const currentCallRef = useRef<any>(null) // Lưu reference của call hiện tại
     const previewRef = useRef<HTMLDivElement>(null)
     const localVideoRef = useRef<HTMLVideoElement>(null)
     const remoteVideoRef = useRef<HTMLVideoElement>(null)
@@ -50,9 +51,16 @@ const CallClient = () => {
     const [isCalling, setIsCalling] = useState(false)
     const [isRemoteVideoVisible, setIsRemoteVideoVisible] = useState(true)
 
-    const { isMicOn, isCameraOn, localStreamRef, getUserMedia, toggleMic, toggleCamera } = useMediaStream(
-        initializeVideo === 'true',
-    )
+    const {
+        isMicOn,
+        isCameraOn,
+        localStreamRef,
+        getUserMedia,
+        toggleMic,
+        toggleCamera,
+        setPeerConnection,
+        setOnTrackReplaced,
+    } = useMediaStream(initializeVideo === 'true')
 
     useEffect(() => {
         if (!previewRef.current) return
@@ -63,6 +71,18 @@ const CallClient = () => {
             previewRef.current.style.transform = 'translateX(0)'
         }
     }, [previewOpen])
+
+    // Callback khi video track được thay thế
+    useEffect(() => {
+        setOnTrackReplaced((newTrack: MediaStreamTrack, oldTrack: MediaStreamTrack) => {
+            // Cập nhật local video element
+            if (localVideoRef.current && localStreamRef.current) {
+                localVideoRef.current.srcObject = localStreamRef.current
+            }
+
+            console.log('Video track replaced:', newTrack)
+        })
+    }, [setOnTrackReplaced, localStreamRef])
 
     const handleInitiateCall = useCallback(() => {
         socket.emit(SocketEvent.INITIATE_CALL, {
@@ -82,6 +102,78 @@ const CallClient = () => {
         [member?.data.id],
     )
 
+    const setupRemoteStreamMonitoring = useCallback((remoteStream: MediaStream) => {
+        if (remoteVideoRef.current) {
+            remoteVideoRef.current.srcObject = remoteStream
+        }
+
+        // Monitor remote video track status với approach đơn giản hơn
+        const videoTracks = remoteStream.getVideoTracks()
+        if (videoTracks.length > 0) {
+            const videoTrack = videoTracks[0]
+
+            const updateVideoVisibility = (isVisible: boolean) => {
+                setIsRemoteVideoVisible(isVisible)
+                // Chỉ clear srcObject khi track thực sự ended, không phải chỉ disabled
+                if (!isVisible && videoTrack.readyState === 'ended' && remoteVideoRef.current) {
+                    remoteVideoRef.current.srcObject = null
+                }
+            }
+
+            // Initial check
+            updateVideoVisibility(videoTrack.enabled && videoTrack.readyState === 'live')
+
+            // Handle track ended (khi bên kia stop track thật sự)
+            videoTrack.addEventListener('ended', () => {
+                updateVideoVisibility(false)
+                if (remoteVideoRef.current) {
+                    remoteVideoRef.current.srcObject = null
+                }
+            })
+
+            // Handle mute/unmute (khi chỉ disable/enable)
+            videoTrack.addEventListener('mute', () => {
+                updateVideoVisibility(false)
+            })
+
+            videoTrack.addEventListener('unmute', () => {
+                updateVideoVisibility(true)
+                // Restore srcObject khi unmute
+                if (remoteVideoRef.current) {
+                    remoteVideoRef.current.srcObject = remoteStream
+                }
+            })
+
+            // Listen for track replacement
+            remoteStream.addEventListener('removetrack', (event) => {
+                if (event.track.kind === 'video') {
+                    updateVideoVisibility(false)
+                }
+            })
+
+            remoteStream.addEventListener('addtrack', (event) => {
+                if (event.track.kind === 'video') {
+                    const newTrack = event.track
+
+                    // Setup listeners cho track mới
+                    newTrack.addEventListener('ended', () => updateVideoVisibility(false))
+                    newTrack.addEventListener('mute', () => updateVideoVisibility(false))
+                    newTrack.addEventListener('unmute', () => updateVideoVisibility(true))
+
+                    updateVideoVisibility(true)
+                    if (remoteVideoRef.current) {
+                        remoteVideoRef.current.srcObject = remoteStream
+                    }
+                }
+            })
+
+            // Cleanup function
+            return () => {
+                // Event listeners sẽ tự động cleanup khi track ended
+            }
+        }
+    }, [])
+
     useEffect(() => {
         const peer = new Peer({
             host: process.env.NEXT_PUBLIC_PEER_HOST,
@@ -92,7 +184,6 @@ const CallClient = () => {
 
         peer.on('open', (id: string) => {
             console.log('My peer ID is:', id)
-
             peerInstance.current = peer
 
             switch (subType) {
@@ -107,47 +198,20 @@ const CallClient = () => {
 
         if (subType === 'callee') {
             peer.on('call', async (call: any) => {
-                let streamToAnswer = localStreamRef.current
+                currentCallRef.current = call
 
+                let streamToAnswer = localStreamRef.current
                 if (!streamToAnswer) {
                     streamToAnswer = await getUserMedia()
                 }
 
                 call.answer(streamToAnswer)
 
+                // Lưu peer connection reference để có thể replace track sau này
+                setPeerConnection(call.peerConnection)
+
                 call.on('stream', (remoteStream: MediaStream) => {
-                    if (remoteVideoRef.current) {
-                        remoteVideoRef.current.srcObject = remoteStream
-                    }
-
-                    // Monitor remote video track status
-                    const videoTracks = remoteStream.getVideoTracks()
-                    if (videoTracks.length > 0) {
-                        const videoTrack = videoTracks[0]
-
-                        // Listen for track events
-                        const checkTrackStatus = () => {
-                            setIsRemoteVideoVisible(videoTrack.enabled && videoTrack.readyState === 'live')
-                        }
-
-                        // Initial check
-                        checkTrackStatus()
-
-                        // Monitor track changes
-                        videoTrack.addEventListener('ended', checkTrackStatus)
-                        videoTrack.addEventListener('mute', () => setIsRemoteVideoVisible(false))
-                        videoTrack.addEventListener('unmute', () => setIsRemoteVideoVisible(true))
-
-                        // Polling check every second for enabled status
-                        const interval = setInterval(checkTrackStatus, 1000)
-
-                        return () => {
-                            clearInterval(interval)
-                            videoTrack.removeEventListener('ended', checkTrackStatus)
-                            videoTrack.removeEventListener('mute', checkTrackStatus)
-                            videoTrack.removeEventListener('unmute', checkTrackStatus)
-                        }
-                    }
+                    setupRemoteStreamMonitoring(remoteStream)
                 })
             })
         }
@@ -155,7 +219,15 @@ const CallClient = () => {
         return () => {
             peer.destroy()
         }
-    }, [getUserMedia, handleAcceptCall, handleInitiateCall, localStreamRef, subType])
+    }, [
+        getUserMedia,
+        handleAcceptCall,
+        handleInitiateCall,
+        localStreamRef,
+        subType,
+        setPeerConnection,
+        setupRemoteStreamMonitoring,
+    ])
 
     // Update local video element when stream changes
     useEffect(() => {
@@ -173,36 +245,16 @@ const CallClient = () => {
                 setIsCalling(true)
 
                 const call = peerInstance.current?.call(data.peer_id, localStreamRef.current)
+                currentCallRef.current = call
 
-                call?.on('stream', (stream: MediaStream) => {
-                    if (remoteVideoRef.current) {
-                        remoteVideoRef.current.srcObject = stream
-                    }
+                if (call) {
+                    // Lưu peer connection reference
+                    setPeerConnection(call.peerConnection)
 
-                    // Monitor remote video track status
-                    const videoTracks = stream.getVideoTracks()
-                    if (videoTracks.length > 0) {
-                        const videoTrack = videoTracks[0]
-
-                        // Listen for track events
-                        const checkTrackStatus = () => {
-                            setIsRemoteVideoVisible(videoTrack.enabled && videoTrack.readyState === 'live')
-                        }
-
-                        // Initial check
-                        checkTrackStatus()
-
-                        // Monitor track changes
-                        videoTrack.addEventListener('ended', checkTrackStatus)
-                        videoTrack.addEventListener('mute', () => setIsRemoteVideoVisible(false))
-                        videoTrack.addEventListener('unmute', () => setIsRemoteVideoVisible(true))
-
-                        // Polling check every second for enabled status
-                        const interval = setInterval(checkTrackStatus, 1000)
-
-                        setTimeout(() => clearInterval(interval), 300000) // Stop after 5 minutes
-                    }
-                })
+                    call.on('stream', (stream: MediaStream) => {
+                        setupRemoteStreamMonitoring(stream)
+                    })
+                }
             }
         }
 
@@ -211,7 +263,7 @@ const CallClient = () => {
         return () => {
             socket.off(SocketEvent.ACCEPTED_CALL, socketHandler)
         }
-    }, [localStreamRef])
+    }, [localStreamRef, setPeerConnection, setupRemoteStreamMonitoring])
 
     useEffect(() => {
         const init = async () => {
