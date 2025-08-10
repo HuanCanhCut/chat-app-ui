@@ -100,8 +100,6 @@ const CallClient = () => {
                 return false
             })
 
-            console.log('Found video senders for cleanup:', videoSenders.length)
-
             // Chỉ giữ lại sender đầu tiên có track, remove hết các sender khác
             const activeSenders = videoSenders.filter((s: RTCRtpSender) => s.track !== null)
             const inactiveSenders = videoSenders.filter((s: RTCRtpSender) => s.track === null)
@@ -110,7 +108,6 @@ const CallClient = () => {
             inactiveSenders.forEach((sender: RTCRtpSender, index: number) => {
                 try {
                     pc.removeTrack(sender)
-                    console.log(`Removed inactive video sender ${index}`)
                 } catch (error) {
                     console.error(`Error removing inactive sender ${index}:`, error)
                 }
@@ -122,7 +119,6 @@ const CallClient = () => {
                 for (let i = 1; i < activeSenders.length; i++) {
                     try {
                         pc.removeTrack(activeSenders[i])
-                        console.log(`Removed duplicate active video sender ${i}`)
                     } catch (error) {
                         console.error(`Error removing duplicate active sender ${i}:`, error)
                     }
@@ -131,41 +127,10 @@ const CallClient = () => {
         }
     }, [])
 
-    // Custom toggle camera với debug
+    // Custom toggle camera
     const handleToggleCamera = useCallback(async () => {
-        console.log('=== TOGGLE CAMERA START ===')
-        console.log('Current camera state:', isCameraOn)
-
-        if (currentCallRef.current?.peerConnection) {
-            const pc = currentCallRef.current.peerConnection
-            const sendersBefore = pc.getSenders()
-            console.log(
-                'Senders before toggle:',
-                sendersBefore.map((s: RTCRtpSender) => ({
-                    track: s.track ? `${s.track.kind}-${s.track.id}` : 'null',
-                    dtmf: s.dtmf,
-                })),
-            )
-        }
-
         await toggleCamera()
-
-        // Wait a bit for async operations to complete
-        setTimeout(() => {
-            if (currentCallRef.current?.peerConnection) {
-                const pc = currentCallRef.current.peerConnection
-                const sendersAfter = pc.getSenders()
-                console.log(
-                    'Senders after toggle:',
-                    sendersAfter.map((s: RTCRtpSender) => ({
-                        track: s.track ? `${s.track.kind}-${s.track.id}` : 'null',
-                        dtmf: s.dtmf,
-                    })),
-                )
-            }
-            console.log('=== TOGGLE CAMERA END ===')
-        }, 500)
-    }, [isCameraOn, toggleCamera])
+    }, [toggleCamera])
 
     useEffect(() => {
         if (!previewRef.current) return
@@ -180,21 +145,6 @@ const CallClient = () => {
     // Callback khi video track được thay thế
     useEffect(() => {
         setOnTrackReplaced((newTrack: MediaStreamTrack, oldTrack: MediaStreamTrack) => {
-            console.log('Video track replaced:', { newTrack, oldTrack })
-
-            // Debug: Log current senders after track replacement
-            if (currentCallRef.current?.peerConnection) {
-                const senders = currentCallRef.current.peerConnection.getSenders()
-                console.log(
-                    'Senders after track replacement:',
-                    senders.map((s: RTCRtpSender) => ({
-                        track: s.track ? `${s.track.kind}-${s.track.id}` : 'null',
-                        dtmf: s.dtmf,
-                    })),
-                )
-            }
-
-            // Cập nhật local video element
             if (localVideoRef.current && localStreamRef.current) {
                 localVideoRef.current.srcObject = localStreamRef.current
             }
@@ -206,7 +156,6 @@ const CallClient = () => {
         const handleRenegotiation = async () => {
             if (peerInstance.current && currentCallRef.current && currentCallRef.current.peerConnection) {
                 try {
-                    console.log('Starting renegotiation process...')
                     const pc = currentCallRef.current.peerConnection
 
                     // Cleanup duplicate senders TRƯỚC KHI tạo offer
@@ -215,19 +164,8 @@ const CallClient = () => {
                     // Đợi một chút để cleanup hoàn tất
                     await new Promise((resolve) => setTimeout(resolve, 100))
 
-                    // Debug: Log current senders after cleanup
-                    const senders = pc.getSenders()
-                    console.log(
-                        'Current senders after cleanup:',
-                        senders.map((s: RTCRtpSender) => ({
-                            track: s.track ? `${s.track.kind}-${s.track.id}` : 'null',
-                            dtmf: s.dtmf,
-                        })),
-                    )
-
                     // Kiểm tra trạng thái connection với retry mechanism
                     if (pc.signalingState !== 'stable') {
-                        console.warn('PeerConnection not in stable state:', pc.signalingState)
                         // Retry với exponential backoff
                         let retryCount = 0
                         const maxRetries = 5
@@ -237,7 +175,6 @@ const CallClient = () => {
                             await new Promise((resolve) => setTimeout(resolve, 100 * Math.pow(2, retryCount - 1)))
 
                             if (pc.signalingState === 'stable') {
-                                console.log(`Retrying renegotiation (attempt ${retryCount})`)
                                 await handleRenegotiation()
                             } else if (retryCount < maxRetries) {
                                 await retryRenegotiation()
@@ -254,14 +191,7 @@ const CallClient = () => {
                     const offer = await pc.createOffer()
                     await pc.setLocalDescription(offer)
 
-                    console.log('Sending renegotiation offer:', {
-                        from_user_id: currentUser?.data.id,
-                        to_user_id: member?.data.id,
-                        caller_id: subType === 'caller' ? currentUser?.data.id : member?.data.id,
-                        callee_id: subType === 'callee' ? currentUser?.data.id : member?.data.id,
-                        offer: offer,
-                    })
-
+                    // TODO: Gửi offer mới cho remote peer
                     // Gửi offer mới cho remote peer
                     socket.emit(SocketEvent.RENEGOTIATION_OFFER, {
                         from_user_id: currentUser?.data.id,
@@ -289,14 +219,12 @@ const CallClient = () => {
             caller_id: number
             callee_id: number
         }) => {
-            console.log('Received renegotiation offer:', data)
             if (currentCallRef.current && currentCallRef.current.peerConnection) {
                 try {
                     const pc = currentCallRef.current.peerConnection
 
                     // Đợi signaling state ổn định
                     if (pc.signalingState !== 'stable') {
-                        console.warn('Waiting for stable signaling state...')
                         let waitCount = 0
                         while (pc.signalingState !== 'stable' && waitCount < 50) {
                             await new Promise((resolve) => setTimeout(resolve, 100))
@@ -313,7 +241,7 @@ const CallClient = () => {
                     const answer = await pc.createAnswer()
                     await pc.setLocalDescription(answer)
 
-                    console.log('Sending renegotiation answer:', answer)
+                    // TODO: Gửi answer mới cho remote peer
                     socket.emit(SocketEvent.RENEGOTIATION_ANSWER, {
                         from_user_id: currentUser?.data.id,
                         to_user_id: data.from_user_id,
@@ -335,12 +263,10 @@ const CallClient = () => {
             caller_id: number
             callee_id: number
         }) => {
-            console.log('Received renegotiation answer:', data)
             if (currentCallRef.current && currentCallRef.current.peerConnection) {
                 try {
                     const pc = currentCallRef.current.peerConnection
                     await pc.setRemoteDescription(data.answer)
-                    console.log('Renegotiation completed successfully, signaling state:', pc.signalingState)
                 } catch (error) {
                     console.error('Error handling renegotiation answer:', error)
                 }
@@ -359,29 +285,20 @@ const CallClient = () => {
     }, [currentUser?.data.id])
 
     const setupRemoteStreamMonitoring = useCallback((remoteStream: MediaStream) => {
-        console.log('Setting up remote stream monitoring:', remoteStream)
-
         if (remoteVideoRef.current) {
             remoteVideoRef.current.srcObject = remoteStream
         }
 
         const updateVideoVisibility = (isVisible: boolean, reason?: string) => {
-            console.log(`Remote video visibility changed: ${isVisible}, reason: ${reason}`)
             setIsRemoteVideoVisible(isVisible)
         }
 
         // Monitor remote video track status
         const monitorVideoTracks = () => {
             const videoTracks = remoteStream.getVideoTracks()
-            console.log('Current video tracks:', videoTracks.length)
 
             if (videoTracks.length > 0) {
                 const videoTrack = videoTracks[0]
-                console.log('Video track state:', {
-                    enabled: videoTrack.enabled,
-                    readyState: videoTrack.readyState,
-                    muted: videoTrack.muted,
-                })
 
                 // Initial check
                 const isVisible = videoTrack.enabled && videoTrack.readyState === 'live' && !videoTrack.muted
@@ -394,18 +311,15 @@ const CallClient = () => {
 
                 // Handle track ended (khi bên kia stop track thật sự)
                 const handleEnded = () => {
-                    console.log('Video track ended')
                     updateVideoVisibility(false, 'track ended')
                 }
 
                 // Handle mute/unmute (khi chỉ disable/enable)
                 const handleMute = () => {
-                    console.log('Video track muted')
                     updateVideoVisibility(false, 'track muted')
                 }
 
                 const handleUnmute = () => {
-                    console.log('Video track unmuted')
                     updateVideoVisibility(true, 'track unmuted')
                     // Restore srcObject khi unmute
                     if (remoteVideoRef.current) {
@@ -424,7 +338,6 @@ const CallClient = () => {
                 }
             } else {
                 // Không có video track ban đầu
-                console.log('No video tracks found')
                 updateVideoVisibility(false, 'no video tracks')
                 return () => {}
             }
@@ -435,7 +348,6 @@ const CallClient = () => {
 
         // Listen for track changes
         const handleRemoveTrack = (event: MediaStreamTrackEvent) => {
-            console.log('Track removed:', event.track.kind)
             if (event.track.kind === 'video') {
                 updateVideoVisibility(false, 'video track removed')
                 // Clean up old listeners
@@ -444,7 +356,6 @@ const CallClient = () => {
         }
 
         const handleAddTrack = (event: MediaStreamTrackEvent) => {
-            console.log('Track added:', event.track.kind)
             if (event.track.kind === 'video') {
                 // Clean up old listeners
                 if (cleanup) cleanup()
@@ -478,7 +389,6 @@ const CallClient = () => {
         })
 
         peer.on('open', (id: string) => {
-            console.log('Peer connection opened with ID:', id)
             peerInstance.current = peer
 
             switch (subType) {
@@ -493,12 +403,10 @@ const CallClient = () => {
 
         if (subType === 'callee') {
             peer.on('call', async (call: any) => {
-                console.log('Received incoming call')
                 currentCallRef.current = call
 
                 let streamToAnswer = localStreamRef.current
                 if (!streamToAnswer) {
-                    console.log('Getting user media for callee')
                     streamToAnswer = await getUserMedia()
                 }
 
@@ -508,13 +416,11 @@ const CallClient = () => {
                 setPeerConnection(call.peerConnection)
 
                 call.on('stream', (remoteStream: MediaStream) => {
-                    console.log('Received remote stream from callee side')
                     setupRemoteStreamMonitoring(remoteStream)
                 })
 
                 // Set call status to in_call when connection is established
                 call.peerConnection.addEventListener('connectionstatechange', () => {
-                    console.log('Connection state changed:', call.peerConnection.connectionState)
                     if (call.peerConnection.connectionState === 'connected') {
                         setCallStatus('in_call')
                     }
@@ -524,12 +430,10 @@ const CallClient = () => {
 
         // Handle peer errors
         peer.on('error', (error) => {
-            console.error('Peer error:', error)
             setCallStatus('failed')
         })
 
         return () => {
-            console.log('Cleaning up peer connection')
             peer.destroy()
         }
     }, [
@@ -551,7 +455,6 @@ const CallClient = () => {
 
     useEffect(() => {
         const socketHandler = (data: { peer_id: string }) => {
-            console.log('Call accepted, connecting to peer:', data.peer_id)
             setCallStatus('accepted')
 
             if (localStreamRef.current) {
@@ -565,13 +468,11 @@ const CallClient = () => {
                     setPeerConnection(call.peerConnection)
 
                     call.on('stream', (stream: MediaStream) => {
-                        console.log('Received remote stream from caller side')
                         setupRemoteStreamMonitoring(stream)
                     })
 
                     // Set call status to in_call when connection is established
                     call.peerConnection.addEventListener('connectionstatechange', () => {
-                        console.log('Connection state changed:', call.peerConnection.connectionState)
                         if (call.peerConnection.connectionState === 'connected') {
                             setCallStatus('in_call')
                         }
@@ -589,7 +490,6 @@ const CallClient = () => {
 
     useEffect(() => {
         const init = async () => {
-            console.log('Initializing user media')
             const stream = await getUserMedia()
 
             if (localVideoRef.current && stream) {
@@ -600,7 +500,6 @@ const CallClient = () => {
     }, [getUserMedia])
 
     const handleEndCall = useCallback(() => {
-        console.log('Ending call')
         // Cập nhật trạng thái cuộc gọi
         setCallStatus('ended')
 
@@ -636,7 +535,6 @@ const CallClient = () => {
     // Xử lý khi nhận được sự kiện kết thúc cuộc gọi từ người đối diện
     useEffect(() => {
         const handleRemoteEndCall = () => {
-            console.log('Remote user ended the call')
             // Hiển thị thông báo
             setCallStatus('ended')
 
