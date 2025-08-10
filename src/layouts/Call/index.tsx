@@ -41,24 +41,27 @@ const CallClient = () => {
     })
 
     const peerInstance = useRef<Peer | null>(null)
-
+    const currentCallRef = useRef<any>(null)
     const previewRef = useRef<HTMLDivElement>(null)
-    const [callStatus, setCallStatus] = useState<CallStatus>('connecting')
-
     const localVideoRef = useRef<HTMLVideoElement>(null)
     const remoteVideoRef = useRef<HTMLVideoElement>(null)
+    const remotePeerIdRef = useRef<string | null>(null) // Store remote peer ID
 
+    const [callStatus, setCallStatus] = useState<CallStatus>('connecting')
     const [previewOpen, setPreviewOpen] = useState(true)
+    const [isCalling, setIsCalling] = useState(false)
 
-    const { isMicOn, isCameraOn, localStreamRef, getUserMedia } = useMediaStream(initializeVideo === 'true')
+    const { isMicOn, isCameraOn, localStreamRef, getUserMedia, toggleMic, toggleCamera } = useMediaStream(
+        initializeVideo === 'true',
+    )
 
     useEffect(() => {
         if (!previewRef.current) return
 
         if (!previewOpen) {
-            previewRef.current.style.right = '-20%'
+            previewRef.current.style.transform = 'translateX(calc(100% - 20px))'
         } else {
-            previewRef.current.style.right = '20px'
+            previewRef.current.style.transform = 'translateX(0)'
         }
     }, [previewOpen])
 
@@ -80,6 +83,62 @@ const CallClient = () => {
         [member?.data.id],
     )
 
+    // Function to restart call with new stream
+    const restartCallWithNewStream = useCallback(async (newStream: MediaStream) => {
+        if (!remotePeerIdRef.current || !peerInstance.current) return
+
+        try {
+            // Close existing call
+            if (currentCallRef.current) {
+                currentCallRef.current.close()
+            }
+
+            // Make new call with updated stream
+            const newCall = peerInstance.current.call(remotePeerIdRef.current, newStream)
+            currentCallRef.current = newCall
+
+            newCall.on('stream', (remoteStream: MediaStream) => {
+                if (remoteVideoRef.current) {
+                    remoteVideoRef.current.srcObject = remoteStream
+                }
+            })
+
+            newCall.on('error', (error: any) => {
+                console.error('Call error:', error)
+            })
+        } catch (error) {
+            console.error('Error restarting call:', error)
+        }
+    }, [])
+
+    // Handle camera toggle
+    const handleCameraToggle = useCallback(async () => {
+        const newStream = await toggleCamera()
+
+        if (newStream && localVideoRef.current) {
+            localVideoRef.current.srcObject = newStream
+
+            // Restart call if in progress
+            if (currentCallRef.current && remotePeerIdRef.current) {
+                await restartCallWithNewStream(newStream)
+            }
+        }
+    }, [toggleCamera, restartCallWithNewStream])
+
+    // Handle mic toggle
+    const handleMicToggle = useCallback(async () => {
+        const newStream = await toggleMic()
+
+        if (newStream && localVideoRef.current) {
+            localVideoRef.current.srcObject = newStream
+
+            // Restart call if in progress
+            if (currentCallRef.current && remotePeerIdRef.current) {
+                await restartCallWithNewStream(newStream)
+            }
+        }
+    }, [toggleMic, restartCallWithNewStream])
+
     useEffect(() => {
         const peer = new Peer({
             host: process.env.NEXT_PUBLIC_PEER_HOST,
@@ -90,7 +149,6 @@ const CallClient = () => {
 
         peer.on('open', (id: string) => {
             console.log('My peer ID is:', id)
-
             peerInstance.current = peer
 
             switch (subType) {
@@ -112,19 +170,27 @@ const CallClient = () => {
                 }
 
                 call.answer(streamToAnswer)
+                currentCallRef.current = call
 
                 call.on('stream', (remoteStream: MediaStream) => {
                     if (remoteVideoRef.current) {
                         remoteVideoRef.current.srcObject = remoteStream
                     }
                 })
+
+                call.on('error', (error: any) => {
+                    console.error('Call error:', error)
+                })
             })
         }
 
         return () => {
+            if (currentCallRef.current) {
+                currentCallRef.current.close()
+            }
             peer.destroy()
         }
-    }, [handleAcceptCall, handleInitiateCall, localStreamRef, subType])
+    }, [getUserMedia, handleAcceptCall, handleInitiateCall, localStreamRef, subType])
 
     // Update local video element when stream changes
     useEffect(() => {
@@ -134,16 +200,24 @@ const CallClient = () => {
     }, [localStreamRef])
 
     useEffect(() => {
-        const socketHandler = (data: { peer_id: string }) => {
+        const socketHandler = async (data: { peer_id: string }) => {
             setCallStatus('accepted')
+            remotePeerIdRef.current = data.peer_id // Store remote peer ID
 
             if (localStreamRef.current) {
+                setIsCalling(true)
+
                 const call = peerInstance.current?.call(data.peer_id, localStreamRef.current)
+                currentCallRef.current = call
 
                 call?.on('stream', (stream: MediaStream) => {
                     if (remoteVideoRef.current) {
                         remoteVideoRef.current.srcObject = stream
                     }
+                })
+
+                call?.on('error', (error: any) => {
+                    console.error('Call error:', error)
                 })
             }
         }
@@ -189,7 +263,7 @@ const CallClient = () => {
 
     return (
         <div className="relative h-dvh max-h-dvh w-full max-w-full overflow-hidden">
-            {subType === 'caller' ? (
+            {subType === 'caller' && !isCalling ? (
                 <div className="blur-10 flex-center absolute bottom-0 left-0 right-0 top-0 z-10 backdrop-blur">
                     <div className="flex flex-col items-center gap-2">
                         <UserAvatar src={member?.data.avatar} className="h-20 w-20" />
@@ -205,32 +279,38 @@ const CallClient = () => {
                 autoPlay
                 playsInline
             ></video>
-            <div className="absolute bottom-10 left-1/2 z-10 flex -translate-x-1/2 items-center gap-8">
-                <button className="flex h-10 w-10 items-center justify-center rounded-full p-6">
+            <div className="absolute bottom-10 left-1/2 z-20 flex -translate-x-1/2 items-center gap-8">
+                <button
+                    className={`flex h-10 w-10 items-center justify-center rounded-full p-6 ${!isMicOn ? 'bg-red-500' : 'bg-gray-600'}`}
+                    onClick={handleMicToggle}
+                >
                     <FontAwesomeIcon
                         icon={isMicOn ? faMicrophone : faMicrophoneSlash}
                         width={32}
-                        className="text-3xl"
+                        className="text-3xl text-white"
                         height={32}
                     />
                 </button>
 
-                <button className="flex h-10 w-10 items-center justify-center rounded-full p-6">
+                <button
+                    className={`flex h-10 w-10 items-center justify-center rounded-full p-6 ${!isCameraOn ? 'bg-red-500' : 'bg-gray-600'}`}
+                    onClick={handleCameraToggle}
+                >
                     <FontAwesomeIcon
                         icon={isCameraOn ? faVideo : faVideoSlash}
                         width={32}
-                        className="text-3xl"
+                        className="text-3xl text-white"
                         height={32}
                     />
                 </button>
 
                 <button className="flex h-10 w-10 items-center justify-center rounded-full bg-red-500 p-6">
-                    <FontAwesomeIcon icon={faPhoneSlash} width={32} className="text-3xl" height={32} />
+                    <FontAwesomeIcon icon={faPhoneSlash} width={32} className="text-3xl text-white" height={32} />
                 </button>
             </div>
             <div
                 ref={previewRef}
-                className="absolute bottom-10 right-[20px] z-10 aspect-video w-[350px] max-w-[calc(100dvw-40px)] overflow-hidden rounded-xl transition-all duration-300 ease-in-out"
+                className="absolute bottom-auto right-[20px] top-[20px] z-10 aspect-video w-[300px] max-w-[calc(100dvw-40px)] overflow-hidden rounded-xl transition-all duration-300 ease-in-out md:!top-auto md:bottom-[20px] lg:w-[350px]"
             >
                 <Button
                     buttonType="icon"
