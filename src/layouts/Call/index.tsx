@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import Peer from 'peerjs'
 import useSWR from 'swr'
 
@@ -28,6 +29,7 @@ import * as userService from '~/services/userService'
 type CallStatus = 'connecting' | 'calling' | 'accepted' | 'in_call' | 'rejected' | 'ended' | 'failed'
 
 const CallClient = () => {
+    const router = useRouter()
     const currentUser = useAppSelector(getCurrentUser)
 
     const searchParams = useSearchParams()
@@ -60,6 +62,7 @@ const CallClient = () => {
         toggleCamera,
         setPeerConnection,
         setOnTrackReplaced,
+        stopStream,
     } = useMediaStream(initializeVideo === 'true')
 
     useEffect(() => {
@@ -79,8 +82,6 @@ const CallClient = () => {
             if (localVideoRef.current && localStreamRef.current) {
                 localVideoRef.current.srcObject = localStreamRef.current
             }
-
-            console.log('Video track replaced:', newTrack)
         })
     }, [setOnTrackReplaced, localStreamRef])
 
@@ -183,7 +184,6 @@ const CallClient = () => {
         })
 
         peer.on('open', (id: string) => {
-            console.log('My peer ID is:', id)
             peerInstance.current = peer
 
             switch (subType) {
@@ -232,7 +232,6 @@ const CallClient = () => {
     // Update local video element when stream changes
     useEffect(() => {
         if (localVideoRef.current && localStreamRef.current) {
-            console.log('Setting local video stream:', localStreamRef.current)
             localVideoRef.current.srcObject = localStreamRef.current
         }
     }, [localStreamRef])
@@ -268,15 +267,69 @@ const CallClient = () => {
     useEffect(() => {
         const init = async () => {
             const stream = await getUserMedia()
-            console.log('Initial stream:', stream)
 
             if (localVideoRef.current && stream) {
                 localVideoRef.current.srcObject = stream
-                console.log('Local video element srcObject set')
             }
         }
         init()
     }, [getUserMedia])
+
+    const handleEndCall = useCallback(() => {
+        // Cập nhật trạng thái cuộc gọi
+        setCallStatus('ended')
+
+        // Thông báo cho người đối diện về việc kết thúc cuộc gọi
+        if (currentUser?.data.id && member?.data.id) {
+            socket.emit(SocketEvent.END_CALL, {
+                caller_id: subType === 'caller' ? currentUser.data.id : member.data.id,
+                callee_id: subType === 'callee' ? currentUser.data.id : member.data.id,
+            })
+        }
+
+        // Dừng tất cả các track
+        if (localStreamRef.current) {
+            stopStream()
+        }
+
+        // Đóng kết nối peer
+        if (peerInstance.current) {
+            peerInstance.current.destroy()
+        }
+
+        // Đóng cuộc gọi hiện tại
+        if (currentCallRef.current) {
+            currentCallRef.current.close()
+        }
+    }, [currentUser.data.id, localStreamRef, member?.data.id, stopStream, subType])
+
+    // Xử lý khi nhận được sự kiện kết thúc cuộc gọi từ người đối diện
+    useEffect(() => {
+        const handleRemoteEndCall = () => {
+            // Hiển thị thông báo
+            setCallStatus('ended')
+
+            // Dừng tất cả các track và đóng kết nối
+            if (localStreamRef.current) {
+                stopStream()
+            }
+
+            if (peerInstance.current) {
+                peerInstance.current.destroy()
+            }
+
+            // Đóng cuộc gọi hiện tại
+            if (currentCallRef.current) {
+                currentCallRef.current.close()
+            }
+        }
+
+        socket.on(SocketEvent.END_CALL, handleRemoteEndCall)
+
+        return () => {
+            socket.off(SocketEvent.END_CALL, handleRemoteEndCall)
+        }
+    }, [localStreamRef, router, stopStream])
 
     const getStatusMessage = () => {
         switch (callStatus) {
@@ -310,6 +363,19 @@ const CallClient = () => {
                     </div>
                 </div>
             ) : null}
+
+            {/* Overlay khi cuộc gọi kết thúc */}
+            {(callStatus === 'ended' || callStatus === 'failed' || callStatus === 'rejected') && (
+                <div className="blur-10 flex-center absolute bottom-0 left-0 right-0 top-0 z-50 bg-black bg-opacity-80 backdrop-blur">
+                    <div className="flex flex-col items-center gap-4 text-white">
+                        <div className="flex h-20 w-20 items-center justify-center rounded-full bg-red-500">
+                            <FontAwesomeIcon icon={faPhoneSlash} className="text-3xl" />
+                        </div>
+                        <div className="text-2xl font-bold">{getStatusMessage()}</div>
+                        <div className="text-sm text-gray-300">Đang chuyển hướng về ứng dụng chat...</div>
+                    </div>
+                </div>
+            )}
 
             {/* Remote video container */}
             <div className="absolute bottom-0 left-0 right-0 top-0 h-full w-full">
@@ -358,7 +424,10 @@ const CallClient = () => {
                     <FontAwesomeIcon icon={isCameraOn ? faVideo : faVideoSlash} className="text-2xl text-white" />
                 </button>
 
-                <button className="flex h-16 w-16 items-center justify-center rounded-full bg-red-500 transition-colors duration-200 hover:bg-red-600">
+                <button
+                    className="flex h-16 w-16 items-center justify-center rounded-full bg-red-500 transition-colors duration-200 hover:bg-red-600"
+                    onClick={handleEndCall}
+                >
                     <FontAwesomeIcon icon={faPhoneSlash} className="text-2xl text-white" />
                 </button>
             </div>
