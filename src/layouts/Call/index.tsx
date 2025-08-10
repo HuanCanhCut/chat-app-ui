@@ -41,15 +41,14 @@ const CallClient = () => {
     })
 
     const peerInstance = useRef<Peer | null>(null)
-    const currentCallRef = useRef<any>(null)
     const previewRef = useRef<HTMLDivElement>(null)
     const localVideoRef = useRef<HTMLVideoElement>(null)
     const remoteVideoRef = useRef<HTMLVideoElement>(null)
-    const remotePeerIdRef = useRef<string | null>(null) // Store remote peer ID
 
     const [callStatus, setCallStatus] = useState<CallStatus>('connecting')
     const [previewOpen, setPreviewOpen] = useState(true)
     const [isCalling, setIsCalling] = useState(false)
+    const [isRemoteVideoVisible, setIsRemoteVideoVisible] = useState(true)
 
     const { isMicOn, isCameraOn, localStreamRef, getUserMedia, toggleMic, toggleCamera } = useMediaStream(
         initializeVideo === 'true',
@@ -83,62 +82,6 @@ const CallClient = () => {
         [member?.data.id],
     )
 
-    // Function to restart call with new stream
-    const restartCallWithNewStream = useCallback(async (newStream: MediaStream) => {
-        if (!remotePeerIdRef.current || !peerInstance.current) return
-
-        try {
-            // Close existing call
-            if (currentCallRef.current) {
-                currentCallRef.current.close()
-            }
-
-            // Make new call with updated stream
-            const newCall = peerInstance.current.call(remotePeerIdRef.current, newStream)
-            currentCallRef.current = newCall
-
-            newCall.on('stream', (remoteStream: MediaStream) => {
-                if (remoteVideoRef.current) {
-                    remoteVideoRef.current.srcObject = remoteStream
-                }
-            })
-
-            newCall.on('error', (error: any) => {
-                console.error('Call error:', error)
-            })
-        } catch (error) {
-            console.error('Error restarting call:', error)
-        }
-    }, [])
-
-    // Handle camera toggle
-    const handleCameraToggle = useCallback(async () => {
-        const newStream = await toggleCamera()
-
-        if (newStream && localVideoRef.current) {
-            localVideoRef.current.srcObject = newStream
-
-            // Restart call if in progress
-            if (currentCallRef.current && remotePeerIdRef.current) {
-                await restartCallWithNewStream(newStream)
-            }
-        }
-    }, [toggleCamera, restartCallWithNewStream])
-
-    // Handle mic toggle
-    const handleMicToggle = useCallback(async () => {
-        const newStream = await toggleMic()
-
-        if (newStream && localVideoRef.current) {
-            localVideoRef.current.srcObject = newStream
-
-            // Restart call if in progress
-            if (currentCallRef.current && remotePeerIdRef.current) {
-                await restartCallWithNewStream(newStream)
-            }
-        }
-    }, [toggleMic, restartCallWithNewStream])
-
     useEffect(() => {
         const peer = new Peer({
             host: process.env.NEXT_PUBLIC_PEER_HOST,
@@ -149,6 +92,7 @@ const CallClient = () => {
 
         peer.on('open', (id: string) => {
             console.log('My peer ID is:', id)
+
             peerInstance.current = peer
 
             switch (subType) {
@@ -170,24 +114,45 @@ const CallClient = () => {
                 }
 
                 call.answer(streamToAnswer)
-                currentCallRef.current = call
 
                 call.on('stream', (remoteStream: MediaStream) => {
                     if (remoteVideoRef.current) {
                         remoteVideoRef.current.srcObject = remoteStream
                     }
-                })
 
-                call.on('error', (error: any) => {
-                    console.error('Call error:', error)
+                    // Monitor remote video track status
+                    const videoTracks = remoteStream.getVideoTracks()
+                    if (videoTracks.length > 0) {
+                        const videoTrack = videoTracks[0]
+
+                        // Listen for track events
+                        const checkTrackStatus = () => {
+                            setIsRemoteVideoVisible(videoTrack.enabled && videoTrack.readyState === 'live')
+                        }
+
+                        // Initial check
+                        checkTrackStatus()
+
+                        // Monitor track changes
+                        videoTrack.addEventListener('ended', checkTrackStatus)
+                        videoTrack.addEventListener('mute', () => setIsRemoteVideoVisible(false))
+                        videoTrack.addEventListener('unmute', () => setIsRemoteVideoVisible(true))
+
+                        // Polling check every second for enabled status
+                        const interval = setInterval(checkTrackStatus, 1000)
+
+                        return () => {
+                            clearInterval(interval)
+                            videoTrack.removeEventListener('ended', checkTrackStatus)
+                            videoTrack.removeEventListener('mute', checkTrackStatus)
+                            videoTrack.removeEventListener('unmute', checkTrackStatus)
+                        }
+                    }
                 })
             })
         }
 
         return () => {
-            if (currentCallRef.current) {
-                currentCallRef.current.close()
-            }
             peer.destroy()
         }
     }, [getUserMedia, handleAcceptCall, handleInitiateCall, localStreamRef, subType])
@@ -195,29 +160,48 @@ const CallClient = () => {
     // Update local video element when stream changes
     useEffect(() => {
         if (localVideoRef.current && localStreamRef.current) {
+            console.log('Setting local video stream:', localStreamRef.current)
             localVideoRef.current.srcObject = localStreamRef.current
         }
     }, [localStreamRef])
 
     useEffect(() => {
-        const socketHandler = async (data: { peer_id: string }) => {
+        const socketHandler = (data: { peer_id: string }) => {
             setCallStatus('accepted')
-            remotePeerIdRef.current = data.peer_id // Store remote peer ID
 
             if (localStreamRef.current) {
                 setIsCalling(true)
 
                 const call = peerInstance.current?.call(data.peer_id, localStreamRef.current)
-                currentCallRef.current = call
 
                 call?.on('stream', (stream: MediaStream) => {
                     if (remoteVideoRef.current) {
                         remoteVideoRef.current.srcObject = stream
                     }
-                })
 
-                call?.on('error', (error: any) => {
-                    console.error('Call error:', error)
+                    // Monitor remote video track status
+                    const videoTracks = stream.getVideoTracks()
+                    if (videoTracks.length > 0) {
+                        const videoTrack = videoTracks[0]
+
+                        // Listen for track events
+                        const checkTrackStatus = () => {
+                            setIsRemoteVideoVisible(videoTrack.enabled && videoTrack.readyState === 'live')
+                        }
+
+                        // Initial check
+                        checkTrackStatus()
+
+                        // Monitor track changes
+                        videoTrack.addEventListener('ended', checkTrackStatus)
+                        videoTrack.addEventListener('mute', () => setIsRemoteVideoVisible(false))
+                        videoTrack.addEventListener('unmute', () => setIsRemoteVideoVisible(true))
+
+                        // Polling check every second for enabled status
+                        const interval = setInterval(checkTrackStatus, 1000)
+
+                        setTimeout(() => clearInterval(interval), 300000) // Stop after 5 minutes
+                    }
                 })
             }
         }
@@ -232,9 +216,11 @@ const CallClient = () => {
     useEffect(() => {
         const init = async () => {
             const stream = await getUserMedia()
+            console.log('Initial stream:', stream)
 
             if (localVideoRef.current && stream) {
                 localVideoRef.current.srcObject = stream
+                console.log('Local video element srcObject set')
             }
         }
         init()
@@ -273,59 +259,94 @@ const CallClient = () => {
                 </div>
             ) : null}
 
-            <video
-                ref={remoteVideoRef}
-                className="absolute bottom-0 left-0 right-0 top-0 h-full w-full object-cover"
-                autoPlay
-                playsInline
-            ></video>
+            {/* Remote video container */}
+            <div className="absolute bottom-0 left-0 right-0 top-0 h-full w-full">
+                {/* Fallback when remote video is off */}
+                {!isRemoteVideoVisible && (
+                    <div className="z-5 absolute inset-0 flex items-center justify-center bg-gray-900">
+                        <div className="text-center">
+                            <UserAvatar src={member?.data.avatar} className="mx-auto mb-4 h-32 w-32" />
+                            <div className="text-xl font-semibold text-white">{member?.data.nickname}</div>
+                            <div className="mt-2 text-sm text-gray-400">Camera đã tắt</div>
+                        </div>
+                    </div>
+                )}
+
+                <video
+                    ref={remoteVideoRef}
+                    className="h-full w-full object-cover"
+                    autoPlay
+                    playsInline
+                    style={{
+                        display: isRemoteVideoVisible ? 'block' : 'none',
+                    }}
+                />
+            </div>
+
+            {/* Control buttons */}
             <div className="absolute bottom-10 left-1/2 z-20 flex -translate-x-1/2 items-center gap-8">
                 <button
-                    className={`flex h-10 w-10 items-center justify-center rounded-full p-6 ${!isMicOn ? 'bg-red-500' : 'bg-gray-600'}`}
-                    onClick={handleMicToggle}
+                    className={`flex h-16 w-16 items-center justify-center rounded-full transition-all duration-200 ${
+                        !isMicOn ? 'bg-red-500 hover:bg-red-600' : 'bg-gray-700 bg-opacity-80 hover:bg-gray-600'
+                    }`}
+                    onClick={toggleMic}
                 >
                     <FontAwesomeIcon
                         icon={isMicOn ? faMicrophone : faMicrophoneSlash}
-                        width={32}
-                        className="text-3xl text-white"
-                        height={32}
+                        className="text-2xl text-white"
                     />
                 </button>
 
                 <button
-                    className={`flex h-10 w-10 items-center justify-center rounded-full p-6 ${!isCameraOn ? 'bg-red-500' : 'bg-gray-600'}`}
-                    onClick={handleCameraToggle}
+                    className={`flex h-16 w-16 items-center justify-center rounded-full transition-all duration-200 ${
+                        !isCameraOn ? 'bg-red-500 hover:bg-red-600' : 'bg-gray-700 bg-opacity-80 hover:bg-gray-600'
+                    }`}
+                    onClick={toggleCamera}
                 >
-                    <FontAwesomeIcon
-                        icon={isCameraOn ? faVideo : faVideoSlash}
-                        width={32}
-                        className="text-3xl text-white"
-                        height={32}
-                    />
+                    <FontAwesomeIcon icon={isCameraOn ? faVideo : faVideoSlash} className="text-2xl text-white" />
                 </button>
 
-                <button className="flex h-10 w-10 items-center justify-center rounded-full bg-red-500 p-6">
-                    <FontAwesomeIcon icon={faPhoneSlash} width={32} className="text-3xl text-white" height={32} />
+                <button className="flex h-16 w-16 items-center justify-center rounded-full bg-red-500 transition-colors duration-200 hover:bg-red-600">
+                    <FontAwesomeIcon icon={faPhoneSlash} className="text-2xl text-white" />
                 </button>
             </div>
+
+            {/* Local video preview */}
             <div
                 ref={previewRef}
-                className="absolute bottom-auto right-[20px] top-[20px] z-10 aspect-video w-[300px] max-w-[calc(100dvw-40px)] overflow-hidden rounded-xl transition-all duration-300 ease-in-out md:!top-auto md:bottom-[20px] lg:w-[350px]"
+                className="absolute bottom-auto right-[20px] top-[20px] z-10 aspect-video w-[300px] max-w-[calc(100dvw-40px)] overflow-hidden rounded-xl bg-gray-900 transition-all duration-300 ease-in-out md:!top-auto md:bottom-[20px] lg:w-[350px]"
             >
                 <Button
                     buttonType="icon"
-                    className="absolute left-2 top-1/2 z-10 -translate-y-1/2 !cursor-pointer bg-transparent hover:bg-transparent dark:bg-transparent dark:hover:bg-transparent"
+                    className="absolute left-2 top-1/2 z-10 -translate-y-1/2 !cursor-pointer rounded-full bg-black bg-opacity-50 p-2 hover:bg-opacity-70 dark:bg-black dark:bg-opacity-50 dark:hover:bg-opacity-70"
                     onClick={() => setPreviewOpen(!previewOpen)}
                 >
                     <FontAwesomeIcon
                         icon={previewOpen ? faChevronRight : faChevronLeft}
-                        width={32}
-                        className="text-3xl"
-                        height={32}
+                        className="text-lg text-white"
                     />
                 </Button>
 
-                <video ref={localVideoRef} className="w-full" autoPlay muted playsInline></video>
+                {/* Always show video element but conditionally show placeholder */}
+                <video
+                    ref={localVideoRef}
+                    className="h-full w-full object-cover"
+                    autoPlay
+                    muted
+                    playsInline
+                    style={{
+                        display: isCameraOn ? 'block' : 'none',
+                    }}
+                />
+
+                {!isCameraOn && (
+                    <div className="absolute inset-0 flex h-full w-full items-center justify-center bg-gray-800">
+                        <div className="text-center">
+                            <UserAvatar src={currentUser?.data.avatar} className="mx-auto mb-2 h-16 w-16" />
+                            <div className="text-sm text-white">Camera tắt</div>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     )
