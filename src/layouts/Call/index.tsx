@@ -62,29 +62,11 @@ const CallClient = () => {
         toggleCamera,
         setPeerConnection,
         setOnTrackReplaced,
+        setOnNeedRenegotiation,
         stopStream,
     } = useMediaStream(initializeVideo === 'true')
 
-    useEffect(() => {
-        if (!previewRef.current) return
-
-        if (!previewOpen) {
-            previewRef.current.style.transform = 'translateX(calc(100% - 20px))'
-        } else {
-            previewRef.current.style.transform = 'translateX(0)'
-        }
-    }, [previewOpen])
-
-    // Callback khi video track được thay thế
-    useEffect(() => {
-        setOnTrackReplaced((newTrack: MediaStreamTrack, oldTrack: MediaStreamTrack) => {
-            // Cập nhật local video element
-            if (localVideoRef.current && localStreamRef.current) {
-                localVideoRef.current.srcObject = localStreamRef.current
-            }
-        })
-    }, [setOnTrackReplaced, localStreamRef])
-
+    // Các hàm khởi tạo và chấp nhận cuộc gọi - đặt ở đây để tránh lỗi "used before declaration"
     const handleInitiateCall = useCallback(() => {
         socket.emit(SocketEvent.INITIATE_CALL, {
             caller_id: currentUser?.data.id,
@@ -103,75 +85,387 @@ const CallClient = () => {
         [member?.data.id],
     )
 
+    // IMPROVED: Cleanup function - remove sender thay vì chỉ remove track
+    const cleanupDuplicateSenders = useCallback(() => {
+        if (currentCallRef.current?.peerConnection) {
+            const pc = currentCallRef.current.peerConnection
+            const senders = pc.getSenders()
+
+            // Tìm tất cả video senders (bao gồm cả null track)
+            const videoSenders = senders.filter((s: RTCRtpSender) => {
+                // Sender có video track hoạt động
+                if (s.track && s.track.kind === 'video') return true
+                // Sender đã từng có video track (dtmf === null cho video sender)
+                if (!s.track && s.dtmf === null) return true
+                return false
+            })
+
+            console.log('Found video senders for cleanup:', videoSenders.length)
+
+            // Chỉ giữ lại sender đầu tiên có track, remove hết các sender khác
+            const activeSenders = videoSenders.filter((s: RTCRtpSender) => s.track !== null)
+            const inactiveSenders = videoSenders.filter((s: RTCRtpSender) => s.track === null)
+
+            // Remove tất cả inactive senders
+            inactiveSenders.forEach((sender: RTCRtpSender, index: number) => {
+                try {
+                    pc.removeTrack(sender)
+                    console.log(`Removed inactive video sender ${index}`)
+                } catch (error) {
+                    console.error(`Error removing inactive sender ${index}:`, error)
+                }
+            })
+
+            // Nếu có nhiều hơn 1 active sender, chỉ giữ lại cái đầu tiên
+            if (activeSenders.length > 1) {
+                console.warn('Detected multiple active video senders, cleaning up...')
+                for (let i = 1; i < activeSenders.length; i++) {
+                    try {
+                        pc.removeTrack(activeSenders[i])
+                        console.log(`Removed duplicate active video sender ${i}`)
+                    } catch (error) {
+                        console.error(`Error removing duplicate active sender ${i}:`, error)
+                    }
+                }
+            }
+        }
+    }, [])
+
+    // Custom toggle camera với debug
+    const handleToggleCamera = useCallback(async () => {
+        console.log('=== TOGGLE CAMERA START ===')
+        console.log('Current camera state:', isCameraOn)
+
+        if (currentCallRef.current?.peerConnection) {
+            const pc = currentCallRef.current.peerConnection
+            const sendersBefore = pc.getSenders()
+            console.log(
+                'Senders before toggle:',
+                sendersBefore.map((s: RTCRtpSender) => ({
+                    track: s.track ? `${s.track.kind}-${s.track.id}` : 'null',
+                    dtmf: s.dtmf,
+                })),
+            )
+        }
+
+        await toggleCamera()
+
+        // Wait a bit for async operations to complete
+        setTimeout(() => {
+            if (currentCallRef.current?.peerConnection) {
+                const pc = currentCallRef.current.peerConnection
+                const sendersAfter = pc.getSenders()
+                console.log(
+                    'Senders after toggle:',
+                    sendersAfter.map((s: RTCRtpSender) => ({
+                        track: s.track ? `${s.track.kind}-${s.track.id}` : 'null',
+                        dtmf: s.dtmf,
+                    })),
+                )
+            }
+            console.log('=== TOGGLE CAMERA END ===')
+        }, 500)
+    }, [isCameraOn, toggleCamera])
+
+    useEffect(() => {
+        if (!previewRef.current) return
+
+        if (!previewOpen) {
+            previewRef.current.style.transform = 'translateX(calc(100% - 20px))'
+        } else {
+            previewRef.current.style.transform = 'translateX(0)'
+        }
+    }, [previewOpen])
+
+    // Callback khi video track được thay thế
+    useEffect(() => {
+        setOnTrackReplaced((newTrack: MediaStreamTrack, oldTrack: MediaStreamTrack) => {
+            console.log('Video track replaced:', { newTrack, oldTrack })
+
+            // Debug: Log current senders after track replacement
+            if (currentCallRef.current?.peerConnection) {
+                const senders = currentCallRef.current.peerConnection.getSenders()
+                console.log(
+                    'Senders after track replacement:',
+                    senders.map((s: RTCRtpSender) => ({
+                        track: s.track ? `${s.track.kind}-${s.track.id}` : 'null',
+                        dtmf: s.dtmf,
+                    })),
+                )
+            }
+
+            // Cập nhật local video element
+            if (localVideoRef.current && localStreamRef.current) {
+                localVideoRef.current.srcObject = localStreamRef.current
+            }
+        })
+    }, [setOnTrackReplaced, localStreamRef])
+
+    // IMPROVED: Renegotiation handler với cleanup tốt hơn
+    useEffect(() => {
+        const handleRenegotiation = async () => {
+            if (peerInstance.current && currentCallRef.current && currentCallRef.current.peerConnection) {
+                try {
+                    console.log('Starting renegotiation process...')
+                    const pc = currentCallRef.current.peerConnection
+
+                    // Cleanup duplicate senders TRƯỚC KHI tạo offer
+                    cleanupDuplicateSenders()
+
+                    // Đợi một chút để cleanup hoàn tất
+                    await new Promise((resolve) => setTimeout(resolve, 100))
+
+                    // Debug: Log current senders after cleanup
+                    const senders = pc.getSenders()
+                    console.log(
+                        'Current senders after cleanup:',
+                        senders.map((s: RTCRtpSender) => ({
+                            track: s.track ? `${s.track.kind}-${s.track.id}` : 'null',
+                            dtmf: s.dtmf,
+                        })),
+                    )
+
+                    // Kiểm tra trạng thái connection với retry mechanism
+                    if (pc.signalingState !== 'stable') {
+                        console.warn('PeerConnection not in stable state:', pc.signalingState)
+                        // Retry với exponential backoff
+                        let retryCount = 0
+                        const maxRetries = 5
+
+                        const retryRenegotiation = async () => {
+                            retryCount++
+                            await new Promise((resolve) => setTimeout(resolve, 100 * Math.pow(2, retryCount - 1)))
+
+                            if (pc.signalingState === 'stable') {
+                                console.log(`Retrying renegotiation (attempt ${retryCount})`)
+                                await handleRenegotiation()
+                            } else if (retryCount < maxRetries) {
+                                await retryRenegotiation()
+                            } else {
+                                console.error('Max retry attempts reached for renegotiation')
+                            }
+                        }
+
+                        await retryRenegotiation()
+                        return
+                    }
+
+                    // Tạo và gửi offer
+                    const offer = await pc.createOffer()
+                    await pc.setLocalDescription(offer)
+
+                    console.log('Sending renegotiation offer:', {
+                        from_user_id: currentUser?.data.id,
+                        to_user_id: member?.data.id,
+                        caller_id: subType === 'caller' ? currentUser?.data.id : member?.data.id,
+                        callee_id: subType === 'callee' ? currentUser?.data.id : member?.data.id,
+                        offer: offer,
+                    })
+
+                    // Gửi offer mới cho remote peer
+                    socket.emit(SocketEvent.RENEGOTIATION_OFFER, {
+                        from_user_id: currentUser?.data.id,
+                        to_user_id: member?.data.id,
+                        caller_id: subType === 'caller' ? currentUser?.data.id : member?.data.id,
+                        callee_id: subType === 'callee' ? currentUser?.data.id : member?.data.id,
+                        offer: offer,
+                    })
+                } catch (error) {
+                    console.error('Error during renegotiation:', error)
+                }
+            } else {
+                console.warn('Cannot perform renegotiation: missing peer instance or current call')
+            }
+        }
+
+        setOnNeedRenegotiation(handleRenegotiation)
+    }, [setOnNeedRenegotiation, currentUser?.data.id, member?.data.id, subType, cleanupDuplicateSenders])
+
+    // IMPROVED: Xử lý renegotiation events với error handling tốt hơn
+    useEffect(() => {
+        const handleRenegotiationOffer = async (data: {
+            offer: RTCSessionDescriptionInit
+            from_user_id: number
+            caller_id: number
+            callee_id: number
+        }) => {
+            console.log('Received renegotiation offer:', data)
+            if (currentCallRef.current && currentCallRef.current.peerConnection) {
+                try {
+                    const pc = currentCallRef.current.peerConnection
+
+                    // Đợi signaling state ổn định
+                    if (pc.signalingState !== 'stable') {
+                        console.warn('Waiting for stable signaling state...')
+                        let waitCount = 0
+                        while (pc.signalingState !== 'stable' && waitCount < 50) {
+                            await new Promise((resolve) => setTimeout(resolve, 100))
+                            waitCount++
+                        }
+
+                        if (pc.signalingState !== 'stable') {
+                            console.error('Signaling state did not become stable within timeout')
+                            return
+                        }
+                    }
+
+                    await pc.setRemoteDescription(data.offer)
+                    const answer = await pc.createAnswer()
+                    await pc.setLocalDescription(answer)
+
+                    console.log('Sending renegotiation answer:', answer)
+                    socket.emit(SocketEvent.RENEGOTIATION_ANSWER, {
+                        from_user_id: currentUser?.data.id,
+                        to_user_id: data.from_user_id,
+                        caller_id: data.caller_id,
+                        callee_id: data.callee_id,
+                        answer: answer,
+                    })
+                } catch (error) {
+                    console.error('Error handling renegotiation offer:', error)
+                }
+            } else {
+                console.warn('Cannot handle renegotiation offer: missing current call')
+            }
+        }
+
+        const handleRenegotiationAnswer = async (data: {
+            answer: RTCSessionDescriptionInit
+            from_user_id: number
+            caller_id: number
+            callee_id: number
+        }) => {
+            console.log('Received renegotiation answer:', data)
+            if (currentCallRef.current && currentCallRef.current.peerConnection) {
+                try {
+                    const pc = currentCallRef.current.peerConnection
+                    await pc.setRemoteDescription(data.answer)
+                    console.log('Renegotiation completed successfully, signaling state:', pc.signalingState)
+                } catch (error) {
+                    console.error('Error handling renegotiation answer:', error)
+                }
+            } else {
+                console.warn('Cannot handle renegotiation answer: missing current call')
+            }
+        }
+
+        socket.on(SocketEvent.RENEGOTIATION_OFFER, handleRenegotiationOffer)
+        socket.on(SocketEvent.RENEGOTIATION_ANSWER, handleRenegotiationAnswer)
+
+        return () => {
+            socket.off(SocketEvent.RENEGOTIATION_OFFER, handleRenegotiationOffer)
+            socket.off(SocketEvent.RENEGOTIATION_ANSWER, handleRenegotiationAnswer)
+        }
+    }, [currentUser?.data.id])
+
     const setupRemoteStreamMonitoring = useCallback((remoteStream: MediaStream) => {
+        console.log('Setting up remote stream monitoring:', remoteStream)
+
         if (remoteVideoRef.current) {
             remoteVideoRef.current.srcObject = remoteStream
         }
 
-        // Monitor remote video track status với approach đơn giản hơn
-        const videoTracks = remoteStream.getVideoTracks()
-        if (videoTracks.length > 0) {
-            const videoTrack = videoTracks[0]
+        const updateVideoVisibility = (isVisible: boolean, reason?: string) => {
+            console.log(`Remote video visibility changed: ${isVisible}, reason: ${reason}`)
+            setIsRemoteVideoVisible(isVisible)
+        }
 
-            const updateVideoVisibility = (isVisible: boolean) => {
-                setIsRemoteVideoVisible(isVisible)
-                // Chỉ clear srcObject khi track thực sự ended, không phải chỉ disabled
-                if (!isVisible && videoTrack.readyState === 'ended' && remoteVideoRef.current) {
-                    remoteVideoRef.current.srcObject = null
+        // Monitor remote video track status
+        const monitorVideoTracks = () => {
+            const videoTracks = remoteStream.getVideoTracks()
+            console.log('Current video tracks:', videoTracks.length)
+
+            if (videoTracks.length > 0) {
+                const videoTrack = videoTracks[0]
+                console.log('Video track state:', {
+                    enabled: videoTrack.enabled,
+                    readyState: videoTrack.readyState,
+                    muted: videoTrack.muted,
+                })
+
+                // Initial check
+                const isVisible = videoTrack.enabled && videoTrack.readyState === 'live' && !videoTrack.muted
+                updateVideoVisibility(isVisible, 'initial check')
+
+                // Remove existing listeners to avoid duplicates
+                videoTrack.removeEventListener('ended', () => {})
+                videoTrack.removeEventListener('mute', () => {})
+                videoTrack.removeEventListener('unmute', () => {})
+
+                // Handle track ended (khi bên kia stop track thật sự)
+                const handleEnded = () => {
+                    console.log('Video track ended')
+                    updateVideoVisibility(false, 'track ended')
                 }
-            }
 
-            // Initial check
-            updateVideoVisibility(videoTrack.enabled && videoTrack.readyState === 'live')
-
-            // Handle track ended (khi bên kia stop track thật sự)
-            videoTrack.addEventListener('ended', () => {
-                updateVideoVisibility(false)
-                if (remoteVideoRef.current) {
-                    remoteVideoRef.current.srcObject = null
+                // Handle mute/unmute (khi chỉ disable/enable)
+                const handleMute = () => {
+                    console.log('Video track muted')
+                    updateVideoVisibility(false, 'track muted')
                 }
-            })
 
-            // Handle mute/unmute (khi chỉ disable/enable)
-            videoTrack.addEventListener('mute', () => {
-                updateVideoVisibility(false)
-            })
-
-            videoTrack.addEventListener('unmute', () => {
-                updateVideoVisibility(true)
-                // Restore srcObject khi unmute
-                if (remoteVideoRef.current) {
-                    remoteVideoRef.current.srcObject = remoteStream
-                }
-            })
-
-            // Listen for track replacement
-            remoteStream.addEventListener('removetrack', (event) => {
-                if (event.track.kind === 'video') {
-                    updateVideoVisibility(false)
-                }
-            })
-
-            remoteStream.addEventListener('addtrack', (event) => {
-                if (event.track.kind === 'video') {
-                    const newTrack = event.track
-
-                    // Setup listeners cho track mới
-                    newTrack.addEventListener('ended', () => updateVideoVisibility(false))
-                    newTrack.addEventListener('mute', () => updateVideoVisibility(false))
-                    newTrack.addEventListener('unmute', () => updateVideoVisibility(true))
-
-                    updateVideoVisibility(true)
+                const handleUnmute = () => {
+                    console.log('Video track unmuted')
+                    updateVideoVisibility(true, 'track unmuted')
+                    // Restore srcObject khi unmute
                     if (remoteVideoRef.current) {
                         remoteVideoRef.current.srcObject = remoteStream
                     }
                 }
-            })
 
-            // Cleanup function
-            return () => {
-                // Event listeners sẽ tự động cleanup khi track ended
+                videoTrack.addEventListener('ended', handleEnded)
+                videoTrack.addEventListener('mute', handleMute)
+                videoTrack.addEventListener('unmute', handleUnmute)
+
+                return () => {
+                    videoTrack.removeEventListener('ended', handleEnded)
+                    videoTrack.removeEventListener('mute', handleMute)
+                    videoTrack.removeEventListener('unmute', handleUnmute)
+                }
+            } else {
+                // Không có video track ban đầu
+                console.log('No video tracks found')
+                updateVideoVisibility(false, 'no video tracks')
+                return () => {}
             }
+        }
+
+        // Initial monitoring
+        let cleanup = monitorVideoTracks()
+
+        // Listen for track changes
+        const handleRemoveTrack = (event: MediaStreamTrackEvent) => {
+            console.log('Track removed:', event.track.kind)
+            if (event.track.kind === 'video') {
+                updateVideoVisibility(false, 'video track removed')
+                // Clean up old listeners
+                if (cleanup) cleanup()
+            }
+        }
+
+        const handleAddTrack = (event: MediaStreamTrackEvent) => {
+            console.log('Track added:', event.track.kind)
+            if (event.track.kind === 'video') {
+                // Clean up old listeners
+                if (cleanup) cleanup()
+                // Set up monitoring for new track
+                cleanup = monitorVideoTracks()
+                updateVideoVisibility(true, 'new video track added')
+
+                if (remoteVideoRef.current) {
+                    remoteVideoRef.current.srcObject = remoteStream
+                }
+            }
+        }
+
+        remoteStream.addEventListener('removetrack', handleRemoveTrack)
+        remoteStream.addEventListener('addtrack', handleAddTrack)
+
+        // Return cleanup function
+        return () => {
+            remoteStream.removeEventListener('removetrack', handleRemoveTrack)
+            remoteStream.removeEventListener('addtrack', handleAddTrack)
+            if (cleanup) cleanup()
         }
     }, [])
 
@@ -184,6 +478,7 @@ const CallClient = () => {
         })
 
         peer.on('open', (id: string) => {
+            console.log('Peer connection opened with ID:', id)
             peerInstance.current = peer
 
             switch (subType) {
@@ -198,10 +493,12 @@ const CallClient = () => {
 
         if (subType === 'callee') {
             peer.on('call', async (call: any) => {
+                console.log('Received incoming call')
                 currentCallRef.current = call
 
                 let streamToAnswer = localStreamRef.current
                 if (!streamToAnswer) {
+                    console.log('Getting user media for callee')
                     streamToAnswer = await getUserMedia()
                 }
 
@@ -211,12 +508,28 @@ const CallClient = () => {
                 setPeerConnection(call.peerConnection)
 
                 call.on('stream', (remoteStream: MediaStream) => {
+                    console.log('Received remote stream from callee side')
                     setupRemoteStreamMonitoring(remoteStream)
+                })
+
+                // Set call status to in_call when connection is established
+                call.peerConnection.addEventListener('connectionstatechange', () => {
+                    console.log('Connection state changed:', call.peerConnection.connectionState)
+                    if (call.peerConnection.connectionState === 'connected') {
+                        setCallStatus('in_call')
+                    }
                 })
             })
         }
 
+        // Handle peer errors
+        peer.on('error', (error) => {
+            console.error('Peer error:', error)
+            setCallStatus('failed')
+        })
+
         return () => {
+            console.log('Cleaning up peer connection')
             peer.destroy()
         }
     }, [
@@ -238,6 +551,7 @@ const CallClient = () => {
 
     useEffect(() => {
         const socketHandler = (data: { peer_id: string }) => {
+            console.log('Call accepted, connecting to peer:', data.peer_id)
             setCallStatus('accepted')
 
             if (localStreamRef.current) {
@@ -251,7 +565,16 @@ const CallClient = () => {
                     setPeerConnection(call.peerConnection)
 
                     call.on('stream', (stream: MediaStream) => {
+                        console.log('Received remote stream from caller side')
                         setupRemoteStreamMonitoring(stream)
+                    })
+
+                    // Set call status to in_call when connection is established
+                    call.peerConnection.addEventListener('connectionstatechange', () => {
+                        console.log('Connection state changed:', call.peerConnection.connectionState)
+                        if (call.peerConnection.connectionState === 'connected') {
+                            setCallStatus('in_call')
+                        }
                     })
                 }
             }
@@ -266,6 +589,7 @@ const CallClient = () => {
 
     useEffect(() => {
         const init = async () => {
+            console.log('Initializing user media')
             const stream = await getUserMedia()
 
             if (localVideoRef.current && stream) {
@@ -276,6 +600,7 @@ const CallClient = () => {
     }, [getUserMedia])
 
     const handleEndCall = useCallback(() => {
+        console.log('Ending call')
         // Cập nhật trạng thái cuộc gọi
         setCallStatus('ended')
 
@@ -301,11 +626,17 @@ const CallClient = () => {
         if (currentCallRef.current) {
             currentCallRef.current.close()
         }
-    }, [currentUser.data.id, localStreamRef, member?.data.id, stopStream, subType])
+
+        // Redirect back to chat after a delay
+        setTimeout(() => {
+            router.push('/chat')
+        }, 3000)
+    }, [currentUser?.data.id, localStreamRef, member?.data.id, stopStream, subType, router])
 
     // Xử lý khi nhận được sự kiện kết thúc cuộc gọi từ người đối diện
     useEffect(() => {
         const handleRemoteEndCall = () => {
+            console.log('Remote user ended the call')
             // Hiển thị thông báo
             setCallStatus('ended')
 
@@ -322,6 +653,11 @@ const CallClient = () => {
             if (currentCallRef.current) {
                 currentCallRef.current.close()
             }
+
+            // Redirect back to chat after a delay
+            setTimeout(() => {
+                router.push('/chat')
+            }, 3000)
         }
 
         socket.on(SocketEvent.END_CALL, handleRemoteEndCall)
@@ -419,7 +755,7 @@ const CallClient = () => {
                     className={`flex h-16 w-16 items-center justify-center rounded-full transition-all duration-200 ${
                         !isCameraOn ? 'bg-red-500 hover:bg-red-600' : 'bg-gray-700 bg-opacity-80 hover:bg-gray-600'
                     }`}
-                    onClick={toggleCamera}
+                    onClick={handleToggleCamera}
                 >
                     <FontAwesomeIcon icon={isCameraOn ? faVideo : faVideoSlash} className="text-2xl text-white" />
                 </button>
