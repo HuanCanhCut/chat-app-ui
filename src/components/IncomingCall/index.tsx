@@ -47,6 +47,20 @@ const IncomingCall = ({ children }: { children: React.ReactNode }) => {
         }
     }, [currentUser?.data.id, setCaller, setIncomingCall])
 
+    useEffect(() => {
+        const socketHandler = ({ caller_id }: { caller_id: number }) => {
+            if (caller_id === caller?.id) {
+                setIncomingCall(false)
+            }
+        }
+
+        socket.on(SocketEvent.CANCEL_INCOMING_CALL, socketHandler)
+
+        return () => {
+            socket.off(SocketEvent.CANCEL_INCOMING_CALL, socketHandler)
+        }
+    }, [caller?.id])
+
     const handleRejectCall = () => {
         setIncomingCall(false)
 

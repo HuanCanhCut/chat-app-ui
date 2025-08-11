@@ -37,6 +37,7 @@ export enum SocketEvent {
 
     // ------------------------------- Call -------------------------------
     INITIATE_CALL = 'call:initiate',
+    CANCEL_INCOMING_CALL = 'call:cancel_incoming',
     ACCEPTED_CALL = 'call:accepted',
     END_CALL = 'call:end',
     REJECT_CALL = 'call:reject',

@@ -79,9 +79,10 @@ const CallClient = () => {
             socket.emit(SocketEvent.ACCEPTED_CALL, {
                 caller_id: member?.data.id,
                 peer_id: peerId,
+                callee_id: currentUser?.data.id,
             })
         },
-        [member?.data.id],
+        [currentUser?.data.id, member?.data.id],
     )
 
     // IMPROVED: Cleanup function - remove sender thay vì chỉ remove track
@@ -145,7 +146,7 @@ const CallClient = () => {
 
     // Callback khi video track được thay thế
     useEffect(() => {
-        setOnTrackReplaced((newTrack: MediaStreamTrack, oldTrack: MediaStreamTrack) => {
+        setOnTrackReplaced(() => {
             if (localVideoRef.current && localStreamRef.current) {
                 localVideoRef.current.srcObject = localStreamRef.current
             }
