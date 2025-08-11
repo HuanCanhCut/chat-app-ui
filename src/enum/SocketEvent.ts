@@ -39,7 +39,7 @@ export enum SocketEvent {
     INITIATE_CALL = 'call:initiate',
     ACCEPTED_CALL = 'call:accepted',
     END_CALL = 'call:end',
-
+    REJECT_CALL = 'call:reject',
     RENEGOTIATION_ANSWER = 'call:renegotiation_answer',
     RENEGOTIATION_OFFER = 'call:renegotiation_offer',
 }

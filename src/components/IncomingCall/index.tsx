@@ -47,6 +47,14 @@ const IncomingCall = ({ children }: { children: React.ReactNode }) => {
         }
     }, [currentUser?.data.id, setCaller, setIncomingCall])
 
+    const handleRejectCall = () => {
+        setIncomingCall(false)
+
+        socket.emit(SocketEvent.REJECT_CALL, {
+            caller_id: caller?.id,
+        })
+    }
+
     return (
         <div>
             {incomingCall && (
@@ -60,7 +68,7 @@ const IncomingCall = ({ children }: { children: React.ReactNode }) => {
                         <UserAvatar src={caller?.avatar} size={80} />
                         <h3 className="text-center text-lg font-semibold">{caller?.full_name} đang gọi cho bạn</h3>
                         <div className="flex gap-10">
-                            <div className="flex flex-col items-center">
+                            <div className="flex flex-col items-center" onClick={handleRejectCall}>
                                 <button className="h-10 w-10 rounded-full bg-red-500 p-2 text-white">
                                     <FontAwesomeIcon icon={faXmark} className="text-xl" />
                                 </button>

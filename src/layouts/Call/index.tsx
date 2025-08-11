@@ -490,6 +490,18 @@ const CallClient = () => {
     }, [localStreamRef, setPeerConnection, setupRemoteStreamMonitoring])
 
     useEffect(() => {
+        const socketHandler = () => {
+            setCallStatus('rejected')
+        }
+
+        socket.on(SocketEvent.REJECT_CALL, socketHandler)
+
+        return () => {
+            socket.off(SocketEvent.REJECT_CALL, socketHandler)
+        }
+    }, [])
+
+    useEffect(() => {
         const init = async () => {
             const stream = await getUserMedia()
 
@@ -526,12 +538,7 @@ const CallClient = () => {
         if (currentCallRef.current) {
             currentCallRef.current.close()
         }
-
-        // Redirect back to chat after a delay
-        setTimeout(() => {
-            router.push('/chat')
-        }, 3000)
-    }, [currentUser?.data.id, localStreamRef, member?.data.id, stopStream, subType, router])
+    }, [currentUser?.data.id, localStreamRef, member?.data.id, stopStream, subType])
 
     // Xử lý khi nhận được sự kiện kết thúc cuộc gọi từ người đối diện
     useEffect(() => {
@@ -552,11 +559,6 @@ const CallClient = () => {
             if (currentCallRef.current) {
                 currentCallRef.current.close()
             }
-
-            // Redirect back to chat after a delay
-            setTimeout(() => {
-                router.push('/chat')
-            }, 3000)
         }
 
         socket.on(SocketEvent.END_CALL, handleRemoteEndCall)
@@ -577,11 +579,11 @@ const CallClient = () => {
             case 'in_call':
                 return 'Đang trong cuộc gọi'
             case 'rejected':
-                return 'Cuộc gọi bị từ chối'
+                return 'Không trả lời.'
             case 'ended':
                 return 'Cuộc gọi đã kết thúc'
             case 'failed':
-                return 'Cuộc gọi thất bại'
+                return 'Cuộc gọi thất bại.'
             default:
                 return ''
         }
