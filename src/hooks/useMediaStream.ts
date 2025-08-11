@@ -44,16 +44,11 @@ const useMediaStream = (initialVideo: boolean, initialAudio: boolean = true) => 
     }, [])
 
     const toggleCamera = useCallback(async () => {
-        if (!localStreamRef.current || !peerConnectionRef.current) return
-
-        console.log('=== TOGGLE CAMERA START (useMediaStream) ===')
-        console.log('Current camera state:', isCameraOn)
-        console.log('Current video sender:', videoSenderRef.current)
+        if (!localStreamRef.current) return
 
         if (isCameraOn) {
             // TẮT CAMERA
             const videoTracks = localStreamRef.current.getVideoTracks()
-            console.log('Stopping video tracks:', videoTracks.length)
 
             videoTracks.forEach((track: MediaStreamTrack) => {
                 track.stop()
@@ -64,7 +59,6 @@ const useMediaStream = (initialVideo: boolean, initialAudio: boolean = true) => 
             if (videoSenderRef.current && videoSenderRef.current.track) {
                 try {
                     await videoSenderRef.current.replaceTrack(null)
-                    console.log('Video track replaced with null successfully')
                 } catch (error) {
                     console.error('Error replacing video track with null:', error)
                 }
@@ -85,7 +79,6 @@ const useMediaStream = (initialVideo: boolean, initialAudio: boolean = true) => 
                     return
                 }
 
-                console.log('Got new video track:', newVideoTrack.id)
                 localStreamRef.current.addTrack(newVideoTrack)
 
                 // Kiểm tra xem đã có video sender chưa
@@ -93,20 +86,20 @@ const useMediaStream = (initialVideo: boolean, initialAudio: boolean = true) => 
                     // Đã có video sender, chỉ cần replace track
                     try {
                         await videoSenderRef.current.replaceTrack(newVideoTrack)
-                        console.log('Video track replaced successfully with existing sender')
                     } catch (error) {
                         console.error('Error replacing video track:', error)
                         // Fallback: remove sender cũ và tạo mới
                         try {
-                            peerConnectionRef.current.removeTrack(videoSenderRef.current)
-                            videoSenderRef.current = peerConnectionRef.current.addTrack(
-                                newVideoTrack,
-                                localStreamRef.current,
-                            )
-                            console.log('Created new video sender after replace failure')
+                            if (peerConnectionRef.current) {
+                                peerConnectionRef?.current?.removeTrack(videoSenderRef.current)
+                                videoSenderRef.current = peerConnectionRef?.current?.addTrack(
+                                    newVideoTrack,
+                                    localStreamRef.current,
+                                )
 
-                            if (onNeedRenegotiation.current) {
-                                await onNeedRenegotiation.current()
+                                if (onNeedRenegotiation.current) {
+                                    await onNeedRenegotiation.current()
+                                }
                             }
                         } catch (removeError) {
                             console.error('Error in fallback sender creation:', removeError)
@@ -114,12 +107,15 @@ const useMediaStream = (initialVideo: boolean, initialAudio: boolean = true) => 
                     }
                 } else {
                     // Chưa có video sender, tạo mới
-                    console.log('Creating new video sender')
-                    videoSenderRef.current = peerConnectionRef.current.addTrack(newVideoTrack, localStreamRef.current)
+                    if (peerConnectionRef.current) {
+                        videoSenderRef.current = peerConnectionRef?.current?.addTrack(
+                            newVideoTrack,
+                            localStreamRef.current,
+                        )
+                    }
 
                     // LUÔN trigger renegotiation khi thêm sender mới
                     if (onNeedRenegotiation.current) {
-                        console.log('Triggering renegotiation for new video sender')
                         await onNeedRenegotiation.current()
                     }
                 }
@@ -134,8 +130,6 @@ const useMediaStream = (initialVideo: boolean, initialAudio: boolean = true) => 
                 console.error('Error restarting camera:', error)
             }
         }
-
-        console.log('=== TOGGLE CAMERA END (useMediaStream) ===')
     }, [isCameraOn])
 
     const stopStream = useCallback(() => {
@@ -157,7 +151,6 @@ const useMediaStream = (initialVideo: boolean, initialAudio: boolean = true) => 
             const existingSenders = peerConnection.getSenders()
             const existingVideoSender = existingSenders.find((sender) => sender.track && sender.track.kind === 'video')
             videoSenderRef.current = existingVideoSender || null
-            console.log('Set peer connection, existing video sender:', !!existingVideoSender)
         } else {
             videoSenderRef.current = null
         }

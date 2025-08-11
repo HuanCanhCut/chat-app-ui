@@ -17,6 +17,7 @@ import {
     faXmark,
 } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import Tippy from '@tippyjs/react'
 import UserAvatar from '~/components/UserAvatar'
 import { SocketEvent } from '~/enum/SocketEvent'
 import SWRKey from '~/enum/SWRKey'
@@ -796,43 +797,59 @@ const CallClient = () => {
 
             {/* Control buttons */}
             <div className="absolute bottom-10 left-1/2 z-20 flex -translate-x-1/2 items-center gap-8">
-                <button
-                    className={`flex h-10 w-10 items-center justify-center rounded-full transition-all duration-200 ${
-                        !isMicOn ? 'bg-white text-dark' : 'bg-white/30 hover:bg-white/40'
-                    }`}
-                    onClick={toggleMic}
-                >
-                    {isMicOn ? (
-                        <FontAwesomeIcon icon={faMicrophone} className="text-base text-white" width={16} height={16} />
-                    ) : (
-                        <FontAwesomeIcon
-                            icon={faMicrophoneSlash}
-                            className="text-base text-black"
-                            width={16}
-                            height={16}
-                        />
-                    )}
-                </button>
+                <Tippy content={`${isMicOn ? 'Tắt mic' : 'Bật mic'}`} placement="top">
+                    <button
+                        className={`flex h-10 w-10 items-center justify-center rounded-full transition-all duration-200 ${
+                            !isMicOn ? 'bg-white text-dark' : 'bg-white/30 hover:bg-white/40'
+                        }`}
+                        onClick={toggleMic}
+                    >
+                        {isMicOn ? (
+                            <FontAwesomeIcon
+                                icon={faMicrophone}
+                                className="text-base text-white"
+                                width={16}
+                                height={16}
+                            />
+                        ) : (
+                            <FontAwesomeIcon
+                                icon={faMicrophoneSlash}
+                                className="text-base text-black"
+                                width={16}
+                                height={16}
+                            />
+                        )}
+                    </button>
+                </Tippy>
 
-                <button
-                    className={`flex h-10 w-10 items-center justify-center rounded-full transition-all duration-200 ${
-                        !isCameraOn ? 'bg-white text-dark' : 'bg-white/30 hover:bg-white/40'
-                    }`}
-                    onClick={handleToggleCamera}
-                >
-                    {isCameraOn ? (
-                        <FontAwesomeIcon icon={faVideo} className="text-base text-white" width={16} height={16} />
-                    ) : (
-                        <FontAwesomeIcon icon={faVideoSlash} className="text-base text-black" width={16} height={16} />
-                    )}
-                </button>
+                <Tippy content={`${isCameraOn ? 'Tắt camera' : 'Bật camera'}`} placement="top">
+                    <button
+                        className={`flex h-10 w-10 items-center justify-center rounded-full transition-all duration-200 ${
+                            !isCameraOn ? 'bg-white text-dark' : 'bg-white/30 hover:bg-white/40'
+                        }`}
+                        onClick={handleToggleCamera}
+                    >
+                        {isCameraOn ? (
+                            <FontAwesomeIcon icon={faVideo} className="text-base text-white" width={16} height={16} />
+                        ) : (
+                            <FontAwesomeIcon
+                                icon={faVideoSlash}
+                                className="text-base text-black"
+                                width={16}
+                                height={16}
+                            />
+                        )}
+                    </button>
+                </Tippy>
 
-                <button
-                    className="flex h-10 w-10 items-center justify-center rounded-full bg-red-500 transition-colors duration-200 hover:bg-red-600"
-                    onClick={handleEndCall}
-                >
-                    <FontAwesomeIcon icon={faPhoneSlash} className="text-base text-white" width={16} height={16} />
-                </button>
+                <Tippy content="Kết thúc cuộc gọi" placement="top">
+                    <button
+                        className="flex h-10 w-10 items-center justify-center rounded-full bg-red-500 transition-colors duration-200 hover:bg-red-600"
+                        onClick={handleEndCall}
+                    >
+                        <FontAwesomeIcon icon={faPhoneSlash} className="text-base text-white" width={16} height={16} />
+                    </button>
+                </Tippy>
             </div>
 
             {/* Local video preview */}
