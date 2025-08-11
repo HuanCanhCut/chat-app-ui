@@ -686,6 +686,20 @@ const CallClient = () => {
         }
     }, [clearCallTimeout])
 
+    // Xử lý khi đóng tab cuộc gọi
+    useEffect(() => {
+        const handleTabClose = () => {
+            // Gọi handleEndCall khi tab đóng
+            handleEndCall()
+        }
+
+        window.addEventListener('beforeunload', handleTabClose)
+
+        return () => {
+            window.removeEventListener('beforeunload', handleTabClose)
+        }
+    }, [handleEndCall])
+
     return (
         <div className="relative h-dvh max-h-dvh w-full max-w-full overflow-hidden">
             <audio src="/static/audio/ringbacktone.mp3" ref={audioRef} />
