@@ -7,7 +7,6 @@ import Peer from 'peerjs'
 import useSWR from 'swr'
 
 import {
-    faChevronLeft,
     faChevronRight,
     faMicrophone,
     faMicrophoneSlash,
@@ -16,7 +15,6 @@ import {
     faVideoSlash,
 } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import Button from '~/components/Button'
 import UserAvatar from '~/components/UserAvatar'
 import { SocketEvent } from '~/enum/SocketEvent'
 import SWRKey from '~/enum/SWRKey'
@@ -47,6 +45,7 @@ const CallClient = () => {
     const previewRef = useRef<HTMLDivElement>(null)
     const localVideoRef = useRef<HTMLVideoElement>(null)
     const remoteVideoRef = useRef<HTMLVideoElement>(null)
+    const previewButtonRef = useRef<HTMLButtonElement>(null)
 
     const [callStatus, setCallStatus] = useState<CallStatus>('connecting')
     const [previewOpen, setPreviewOpen] = useState(true)
@@ -136,9 +135,11 @@ const CallClient = () => {
         if (!previewRef.current) return
 
         if (!previewOpen) {
-            previewRef.current.style.transform = 'translateX(calc(100% - 20px))'
+            previewRef.current.style.transform = 'translateX(calc(100% + 20px))'
+            previewButtonRef.current?.classList.add('rotate-180', 'translate-x-[-50px]')
         } else {
             previewRef.current.style.transform = 'translateX(0)'
+            previewButtonRef.current?.classList.remove('rotate-180', 'translate-x-[-50px]')
         }
     }, [previewOpen])
 
@@ -615,18 +616,24 @@ const CallClient = () => {
             <div className="absolute bottom-0 left-0 right-0 top-0 h-full w-full">
                 {/* Fallback when remote video is off */}
                 {!isRemoteVideoVisible && (
-                    <div className="z-5 absolute inset-0 flex items-center justify-center bg-gray-900">
-                        <div className="text-center">
+                    <div
+                        className="z-5 absolute inset-0 flex items-center justify-center"
+                        style={{
+                            backgroundImage: `url(${member?.data.avatar})`,
+                            backgroundSize: 'cover',
+                            backgroundPosition: 'center',
+                        }}
+                    >
+                        <div className="flex-center h-full w-full flex-col text-center backdrop-blur-xl backdrop-brightness-[65%]">
                             <UserAvatar src={member?.data.avatar} className="mx-auto mb-4 h-32 w-32" />
                             <div className="text-xl font-semibold text-white">{member?.data.nickname}</div>
-                            <div className="mt-2 text-sm text-gray-400">Camera đã tắt</div>
                         </div>
                     </div>
                 )}
 
                 <video
                     ref={remoteVideoRef}
-                    className="h-full w-full object-cover"
+                    className="h-full w-full object-contain"
                     autoPlay
                     playsInline
                     style={{
@@ -638,54 +645,71 @@ const CallClient = () => {
             {/* Control buttons */}
             <div className="absolute bottom-10 left-1/2 z-20 flex -translate-x-1/2 items-center gap-8">
                 <button
-                    className={`flex h-16 w-16 items-center justify-center rounded-full transition-all duration-200 ${
-                        !isMicOn ? 'bg-red-500 hover:bg-red-600' : 'bg-gray-700 bg-opacity-80 hover:bg-gray-600'
+                    className={`flex h-10 w-10 items-center justify-center rounded-full transition-all duration-200 ${
+                        !isMicOn ? 'bg-white text-dark' : 'bg-white/30 hover:bg-white/40'
                     }`}
                     onClick={toggleMic}
                 >
-                    <FontAwesomeIcon
-                        icon={isMicOn ? faMicrophone : faMicrophoneSlash}
-                        className="text-2xl text-white"
-                    />
+                    {isMicOn ? (
+                        <FontAwesomeIcon icon={faMicrophone} className="text-md text-white" width={16} height={16} />
+                    ) : (
+                        <FontAwesomeIcon
+                            icon={faMicrophoneSlash}
+                            className="text-md text-black"
+                            width={16}
+                            height={16}
+                        />
+                    )}
                 </button>
 
                 <button
-                    className={`flex h-16 w-16 items-center justify-center rounded-full transition-all duration-200 ${
-                        !isCameraOn ? 'bg-red-500 hover:bg-red-600' : 'bg-gray-700 bg-opacity-80 hover:bg-gray-600'
+                    className={`flex h-10 w-10 items-center justify-center rounded-full transition-all duration-200 ${
+                        !isCameraOn ? 'bg-white text-dark' : 'bg-white/30 hover:bg-white/40'
                     }`}
                     onClick={handleToggleCamera}
                 >
-                    <FontAwesomeIcon icon={isCameraOn ? faVideo : faVideoSlash} className="text-2xl text-white" />
+                    {isCameraOn ? (
+                        <FontAwesomeIcon icon={faVideo} className="text-md text-white" width={16} height={16} />
+                    ) : (
+                        <FontAwesomeIcon icon={faVideoSlash} className="text-md text-black" width={16} height={16} />
+                    )}
                 </button>
 
                 <button
-                    className="flex h-16 w-16 items-center justify-center rounded-full bg-red-500 transition-colors duration-200 hover:bg-red-600"
+                    className="flex h-10 w-10 items-center justify-center rounded-full bg-red-500 transition-colors duration-200 hover:bg-red-600"
                     onClick={handleEndCall}
                 >
-                    <FontAwesomeIcon icon={faPhoneSlash} className="text-2xl text-white" />
+                    <FontAwesomeIcon icon={faPhoneSlash} className="text-md text-white" width={16} height={16} />
                 </button>
             </div>
 
             {/* Local video preview */}
             <div
                 ref={previewRef}
-                className="absolute bottom-auto right-[20px] top-[20px] z-10 aspect-video w-[300px] max-w-[calc(100dvw-40px)] overflow-hidden rounded-xl bg-gray-900 transition-all duration-300 ease-in-out md:!top-auto md:bottom-[20px] lg:w-[350px]"
+                className="absolute bottom-auto right-[20px] top-[20px] z-10 h-[30%] max-w-[calc(100dvw-40px)] rounded-xl transition-all duration-300 ease-in-out [aspect-ratio:10/16] md:!top-auto md:bottom-[20px] md:aspect-video md:w-[300px] lg:w-[350px]"
+                style={{
+                    backgroundImage: `url(${currentUser?.data.avatar})`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                }}
             >
-                <Button
-                    buttonType="icon"
-                    className="absolute left-2 top-1/2 z-10 -translate-y-1/2 !cursor-pointer rounded-full bg-black bg-opacity-50 p-2 hover:bg-opacity-70 dark:bg-black dark:bg-opacity-50 dark:hover:bg-opacity-70"
+                <button
+                    ref={previewButtonRef}
+                    className="flex-center absolute left-2 top-4 z-10 h-7 w-7 transform !cursor-pointer rounded-full bg-opacity-50 p-2 transition duration-200 ease-in-out hover:bg-opacity-70 xxs:h-9 xxs:w-9 md:top-1/2 md:h-10 md:w-10 md:-translate-y-1/2"
                     onClick={() => setPreviewOpen(!previewOpen)}
                 >
                     <FontAwesomeIcon
-                        icon={previewOpen ? faChevronRight : faChevronLeft}
-                        className="text-lg text-white"
+                        icon={faChevronRight}
+                        className="text-xl text-white md:text-3xl"
+                        width={20}
+                        height={20}
                     />
-                </Button>
+                </button>
 
                 {/* Always show video element but conditionally show placeholder */}
                 <video
                     ref={localVideoRef}
-                    className="h-full w-full object-cover"
+                    className="h-full w-full rounded-xl object-cover"
                     autoPlay
                     muted
                     playsInline
@@ -695,8 +719,15 @@ const CallClient = () => {
                 />
 
                 {!isCameraOn && (
-                    <div className="absolute inset-0 flex h-full w-full items-center justify-center bg-gray-800">
-                        <div className="text-center">
+                    <div
+                        className="absolute inset-0 flex h-full w-full items-center justify-center rounded-xl"
+                        style={{
+                            backgroundImage: `url(${currentUser?.data.avatar})`,
+                            backgroundSize: 'cover',
+                            backgroundPosition: 'center',
+                        }}
+                    >
+                        <div className="flex-center h-full w-full flex-col rounded-xl text-center backdrop-blur-xl backdrop-brightness-[65%]">
                             <UserAvatar src={currentUser?.data.avatar} className="mx-auto mb-2 h-16 w-16" />
                             <div className="text-sm text-white">Camera tắt</div>
                         </div>
