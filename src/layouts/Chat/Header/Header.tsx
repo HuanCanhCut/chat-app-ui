@@ -113,29 +113,25 @@ const Header: React.FC<HeaderProps> = ({ className = '', isInfoOpen, conversatio
     }
 
     const handleVoiceCall = () => {
-        // window.open(
-        //     `/call?member_nickname=${conversationMember?.user.nickname}&initialize_video=false&sub_type=caller`,
-        //     'Voice Call',
-        //     `
-        //     width=${window.screen.width},
-        //     height=${window.screen.height}
-        //     `,
-        // )
-
-        router.push(`/call?member_nickname=${conversationMember?.user.nickname}&initialize_video=false&sub_type=caller`)
+        window.open(
+            `/call?member_nickname=${conversationMember?.user.nickname}&initialize_video=false&sub_type=caller`,
+            'Voice Call',
+            `
+            width=${window.screen.width},
+            height=${window.screen.height}
+            `,
+        )
     }
 
     const handleVideoCall = () => {
-        // window.open(
-        //     `/call?member_nickname=${conversationMember?.user.nickname}&initialize_video=true&sub_type=caller`,
-        //     'Video Call',
-        //     `
-        //     width=${window.screen.width},
-        //     height=${window.screen.height}
-        //     `,
-        // )
-
-        router.push(`/call?member_nickname=${conversationMember?.user.nickname}&initialize_video=true&sub_type=caller`)
+        window.open(
+            `/call?member_nickname=${conversationMember?.user.nickname}&initialize_video=true&sub_type=caller`,
+            'Video Call',
+            `
+            width=${window.screen.width},
+            height=${window.screen.height}
+            `,
+        )
     }
 
     return (

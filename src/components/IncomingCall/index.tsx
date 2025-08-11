@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
 
 import Modal from '../Modal'
 import UserAvatar from '../UserAvatar'
@@ -15,7 +14,6 @@ import { UserModel } from '~/type/type'
 
 const IncomingCall = ({ children }: { children: React.ReactNode }) => {
     const currentUser = useAppSelector(getCurrentUser)
-    const router = useRouter()
 
     const [incomingCall, setIncomingCall] = useState(false)
     const [caller, setCaller] = useState<UserModel | null>(null)
@@ -24,8 +22,17 @@ const IncomingCall = ({ children }: { children: React.ReactNode }) => {
     const handleAcceptCall = () => {
         setIncomingCall(false)
 
-        router.push(
+        // router.push(
+        //     `/call?member_nickname=${caller?.nickname}&initialize_video=${type === 'video' ? 'true' : 'false'}&sub_type=callee`,
+        // )
+
+        window.open(
             `/call?member_nickname=${caller?.nickname}&initialize_video=${type === 'video' ? 'true' : 'false'}&sub_type=callee`,
+            `${type === 'video' ? 'Video' : 'Voice'} Call`,
+            `
+            width=${window.screen.width},
+            height=${window.screen.height}
+            `,
         )
     }
 
