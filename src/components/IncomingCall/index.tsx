@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import Modal from '../Modal'
 import UserAvatar from '../UserAvatar'
@@ -15,16 +15,14 @@ import { UserModel } from '~/type/type'
 const IncomingCall = ({ children }: { children: React.ReactNode }) => {
     const currentUser = useAppSelector(getCurrentUser)
 
+    const audioRef = useRef<HTMLAudioElement>(null)
+
     const [incomingCall, setIncomingCall] = useState(false)
     const [caller, setCaller] = useState<UserModel | null>(null)
     const [type, setType] = useState<'video' | 'voice'>('video')
 
     const handleAcceptCall = () => {
         setIncomingCall(false)
-
-        // router.push(
-        //     `/call?member_nickname=${caller?.nickname}&initialize_video=${type === 'video' ? 'true' : 'false'}&sub_type=callee`,
-        // )
 
         window.open(
             `/call?member_nickname=${caller?.nickname}&initialize_video=${type === 'video' ? 'true' : 'false'}&sub_type=callee`,
@@ -75,6 +73,16 @@ const IncomingCall = ({ children }: { children: React.ReactNode }) => {
         })
     }
 
+    const handleAfterOpen = async () => {
+        try {
+            await audioRef.current?.play()
+        } catch (error) {}
+    }
+
+    const handleAfterClose = () => {
+        audioRef.current?.pause()
+    }
+
     return (
         <div>
             {incomingCall && (
@@ -83,7 +91,10 @@ const IncomingCall = ({ children }: { children: React.ReactNode }) => {
                     popperClassName="w-[400px] max-w-[calc(100dvw-2rem)]"
                     isOpen={incomingCall}
                     onClose={() => setIncomingCall(false)}
+                    handleAfterClose={handleAfterClose}
+                    handleAfterOpen={handleAfterOpen}
                 >
+                    <audio src="/static/audio/ringtone.mp3" ref={audioRef} />
                     <div className="mt-4 flex flex-col items-center gap-4">
                         <UserAvatar src={caller?.avatar} size={80} />
                         <h3 className="text-center text-lg font-semibold">{caller?.full_name} đang gọi cho bạn</h3>

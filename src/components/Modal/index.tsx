@@ -13,6 +13,8 @@ interface ModalProps {
     className?: string
     title?: string
     popperClassName?: string
+    handleAfterClose?: () => void
+    handleAfterOpen?: () => void
 }
 
 const Modal = ({
@@ -23,6 +25,8 @@ const Modal = ({
     className = 'modal',
     title,
     popperClassName,
+    handleAfterClose,
+    handleAfterOpen,
 }: ModalProps) => {
     return (
         <ReactModal
@@ -32,6 +36,8 @@ const Modal = ({
             closeTimeoutMS={200}
             onRequestClose={onClose}
             className={className}
+            onAfterClose={handleAfterClose}
+            onAfterOpen={handleAfterOpen}
         >
             <PopperWrapper className={`p-0 ${popperClassName}`}>
                 <header className="relative flex justify-center border-b border-gray-300 p-4 dark:border-zinc-700">

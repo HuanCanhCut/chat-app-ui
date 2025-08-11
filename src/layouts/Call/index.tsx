@@ -31,6 +31,7 @@ const CALL_TIMEOUT_DURATION = 15000 // 15 seconds
 const CallClient = () => {
     const router = useRouter()
     const currentUser = useAppSelector(getCurrentUser)
+    const audioRef = useRef<HTMLAudioElement>(null)
 
     const searchParams = useSearchParams()
 
@@ -70,6 +71,8 @@ const CallClient = () => {
 
     // Clear timeout helper
     const clearCallTimeout = useCallback(() => {
+        audioRef.current?.pause()
+
         if (callTimeoutRef.current) {
             clearTimeout(callTimeoutRef.current)
             callTimeoutRef.current = null
@@ -77,8 +80,12 @@ const CallClient = () => {
     }, [])
 
     // Start timeout for caller
-    const startCallTimeout = useCallback(() => {
+    const startCallTimeout = useCallback(async () => {
         if (subType === 'caller') {
+            try {
+                await audioRef.current?.play()
+            } catch (error) {}
+
             callTimeoutRef.current = setTimeout(() => {
                 setCallStatus('timeout')
 
@@ -681,6 +688,7 @@ const CallClient = () => {
 
     return (
         <div className="relative h-dvh max-h-dvh w-full max-w-full overflow-hidden">
+            <audio src="/static/audio/ringbacktone.mp3" ref={audioRef} />
             {subType === 'caller' && !isCalling ? (
                 <div className="blur-10 flex-center absolute bottom-0 left-0 right-0 top-0 z-10 backdrop-blur">
                     <div className="flex flex-col items-center gap-2">
