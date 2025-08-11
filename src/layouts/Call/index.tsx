@@ -10,9 +10,11 @@ import {
     faChevronRight,
     faMicrophone,
     faMicrophoneSlash,
+    faPhone,
     faPhoneSlash,
     faVideo,
     faVideoSlash,
+    faXmark,
 } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import UserAvatar from '~/components/UserAvatar'
@@ -113,6 +115,8 @@ const CallClient = () => {
 
     // Các hàm khởi tạo và chấp nhận cuộc gọi - đặt ở đây để tránh lỗi "used before declaration"
     const handleInitiateCall = useCallback(() => {
+        if (callStatus !== 'connecting') return
+
         socket.emit(SocketEvent.INITIATE_CALL, {
             caller_id: currentUser?.data.id,
             callee_id: member?.data.id,
@@ -121,6 +125,8 @@ const CallClient = () => {
 
         // Start timeout after initiating call
         startCallTimeout()
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [currentUser?.data.id, initializeVideo, member?.data.id, startCallTimeout])
 
     const handleAcceptCall = useCallback(
@@ -724,7 +730,36 @@ const CallClient = () => {
                             <FontAwesomeIcon icon={faPhoneSlash} className="text-3xl" />
                         </div>
                         <div className="text-2xl font-bold">{getStatusMessage()}</div>
-                        <div className="text-sm text-gray-300">Đang chuyển hướng về ứng dụng chat...</div>
+                    </div>
+                    <div className="absolute bottom-8 left-1/2 flex -translate-x-1/2 justify-center gap-8">
+                        <div className="flex flex-col items-center">
+                            <button
+                                className="flex h-12 w-12 items-center justify-center rounded-full bg-green-500"
+                                onClick={() => {
+                                    window.history.replaceState(
+                                        {},
+                                        '',
+                                        `/call?member_nickname=${memberNickname}&initialize_video=false&sub_type=${subType === 'caller' ? 'callee' : 'caller'}`,
+                                    )
+
+                                    window.location.reload()
+                                }}
+                            >
+                                <FontAwesomeIcon icon={faPhone} className="text-lg" width={20} height={20} />
+                            </button>
+                            <p>Gọi lại</p>
+                        </div>
+                        <div className="flex flex-col items-center">
+                            <button
+                                className="flex h-12 w-12 items-center justify-center rounded-full bg-zinc-500"
+                                onClick={() => {
+                                    window.close()
+                                }}
+                            >
+                                <FontAwesomeIcon icon={faXmark} className="text-lg" width={20} height={20} />
+                            </button>
+                            <p>Đóng</p>
+                        </div>
                     </div>
                 </div>
             )}
@@ -768,11 +803,11 @@ const CallClient = () => {
                     onClick={toggleMic}
                 >
                     {isMicOn ? (
-                        <FontAwesomeIcon icon={faMicrophone} className="text-md text-white" width={16} height={16} />
+                        <FontAwesomeIcon icon={faMicrophone} className="text-base text-white" width={16} height={16} />
                     ) : (
                         <FontAwesomeIcon
                             icon={faMicrophoneSlash}
-                            className="text-md text-black"
+                            className="text-base text-black"
                             width={16}
                             height={16}
                         />
@@ -786,9 +821,9 @@ const CallClient = () => {
                     onClick={handleToggleCamera}
                 >
                     {isCameraOn ? (
-                        <FontAwesomeIcon icon={faVideo} className="text-md text-white" width={16} height={16} />
+                        <FontAwesomeIcon icon={faVideo} className="text-base text-white" width={16} height={16} />
                     ) : (
-                        <FontAwesomeIcon icon={faVideoSlash} className="text-md text-black" width={16} height={16} />
+                        <FontAwesomeIcon icon={faVideoSlash} className="text-base text-black" width={16} height={16} />
                     )}
                 </button>
 
@@ -796,7 +831,7 @@ const CallClient = () => {
                     className="flex h-10 w-10 items-center justify-center rounded-full bg-red-500 transition-colors duration-200 hover:bg-red-600"
                     onClick={handleEndCall}
                 >
-                    <FontAwesomeIcon icon={faPhoneSlash} className="text-md text-white" width={16} height={16} />
+                    <FontAwesomeIcon icon={faPhoneSlash} className="text-base text-white" width={16} height={16} />
                 </button>
             </div>
 
