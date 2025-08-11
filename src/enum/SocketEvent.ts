@@ -41,6 +41,7 @@ export enum SocketEvent {
     ACCEPTED_CALL = 'call:accepted',
     END_CALL = 'call:end',
     REJECT_CALL = 'call:reject',
+    CALL_BUSY = 'call:busy',
     RENEGOTIATION_ANSWER = 'call:renegotiation_answer',
     RENEGOTIATION_OFFER = 'call:renegotiation_offer',
 }

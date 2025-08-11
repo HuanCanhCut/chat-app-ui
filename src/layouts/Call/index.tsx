@@ -27,7 +27,16 @@ import { useAppSelector } from '~/redux'
 import { getCurrentUser } from '~/redux/selector'
 import * as userService from '~/services/userService'
 
-type CallStatus = 'connecting' | 'calling' | 'accepted' | 'in_call' | 'rejected' | 'ended' | 'failed' | 'timeout'
+type CallStatus =
+    | 'connecting'
+    | 'calling'
+    | 'accepted'
+    | 'in_call'
+    | 'rejected'
+    | 'ended'
+    | 'failed'
+    | 'timeout'
+    | 'busy'
 
 const CALL_TIMEOUT_DURATION = 15000 // 15 seconds
 
@@ -58,6 +67,7 @@ const CallClient = () => {
     const [previewOpen, setPreviewOpen] = useState(true)
     const [isCalling, setIsCalling] = useState(false)
     const [isRemoteVideoVisible, setIsRemoteVideoVisible] = useState(true)
+    const [memberBusy, setMemberBusy] = useState(false)
 
     const {
         isMicOn,
@@ -551,6 +561,41 @@ const CallClient = () => {
         }
     }, [localStreamRef, setPeerConnection, setupRemoteStreamMonitoring, clearCallTimeout])
 
+    const handleEndCall = useCallback(
+        // chỉ end cuộc gọi với người gọi nếu oneway = true
+        (oneWay: boolean = false) => {
+            // Clear timeout
+            clearCallTimeout()
+
+            // Cập nhật trạng thái cuộc gọi
+            setCallStatus('ended')
+
+            // Thông báo cho người đối diện về việc kết thúc cuộc gọi
+            if (currentUser?.data.id && member?.data.id) {
+                socket.emit(SocketEvent.END_CALL, {
+                    caller_id: subType === 'caller' ? currentUser.data.id : member.data.id,
+                    callee_id: oneWay ? Math.random() : subType === 'callee' ? currentUser.data.id : member.data.id,
+                })
+            }
+
+            // Dừng tất cả các track
+            if (localStreamRef.current) {
+                stopStream()
+            }
+
+            // Đóng kết nối peer
+            if (peerInstance.current) {
+                peerInstance.current.destroy()
+            }
+
+            // Đóng cuộc gọi hiện tại
+            if (currentCallRef.current) {
+                currentCallRef.current.close()
+            }
+        },
+        [currentUser?.data.id, localStreamRef, member?.data.id, stopStream, subType, clearCallTimeout],
+    )
+
     useEffect(() => {
         const socketHandler = () => {
             clearCallTimeout()
@@ -563,6 +608,24 @@ const CallClient = () => {
             socket.off(SocketEvent.REJECT_CALL, socketHandler)
         }
     }, [clearCallTimeout])
+
+    useEffect(() => {
+        const socketHandler = () => {
+            setMemberBusy(true)
+            setCallStatus('busy')
+            audioRef.current?.pause()
+
+            setTimeout(() => {
+                handleEndCall(true)
+            }, 3000)
+        }
+
+        socket.on(SocketEvent.CALL_BUSY, socketHandler)
+
+        return () => {
+            socket.off(SocketEvent.CALL_BUSY, socketHandler)
+        }
+    }, [handleEndCall])
 
     // Handle cancel incoming call event
     useEffect(() => {
@@ -600,37 +663,6 @@ const CallClient = () => {
         }
         init()
     }, [getUserMedia])
-
-    const handleEndCall = useCallback(() => {
-        // Clear timeout
-        clearCallTimeout()
-
-        // Cập nhật trạng thái cuộc gọi
-        setCallStatus('ended')
-
-        // Thông báo cho người đối diện về việc kết thúc cuộc gọi
-        if (currentUser?.data.id && member?.data.id) {
-            socket.emit(SocketEvent.END_CALL, {
-                caller_id: subType === 'caller' ? currentUser.data.id : member.data.id,
-                callee_id: subType === 'callee' ? currentUser.data.id : member.data.id,
-            })
-        }
-
-        // Dừng tất cả các track
-        if (localStreamRef.current) {
-            stopStream()
-        }
-
-        // Đóng kết nối peer
-        if (peerInstance.current) {
-            peerInstance.current.destroy()
-        }
-
-        // Đóng cuộc gọi hiện tại
-        if (currentCallRef.current) {
-            currentCallRef.current.close()
-        }
-    }, [currentUser?.data.id, localStreamRef, member?.data.id, stopStream, subType, clearCallTimeout])
 
     // Xử lý khi nhận được sự kiện kết thúc cuộc gọi từ người đối diện
     useEffect(() => {
@@ -681,6 +713,8 @@ const CallClient = () => {
                 return 'Cuộc gọi thất bại.'
             case 'timeout':
                 return 'Không có phản hồi. Cuộc gọi đã bị hủy.'
+            case 'busy':
+                return 'Người dùng đang bận.'
             default:
                 return ''
         }
@@ -697,7 +731,7 @@ const CallClient = () => {
     useEffect(() => {
         const handleTabClose = () => {
             // Gọi handleEndCall khi tab đóng
-            handleEndCall()
+            handleEndCall(memberBusy)
         }
 
         window.addEventListener('beforeunload', handleTabClose)
@@ -705,7 +739,7 @@ const CallClient = () => {
         return () => {
             window.removeEventListener('beforeunload', handleTabClose)
         }
-    }, [handleEndCall])
+    }, [handleEndCall, memberBusy])
 
     return (
         <div className="relative h-dvh max-h-dvh w-full max-w-full overflow-hidden">
@@ -845,7 +879,9 @@ const CallClient = () => {
                 <Tippy content="Kết thúc cuộc gọi" placement="top">
                     <button
                         className="flex h-10 w-10 items-center justify-center rounded-full bg-red-500 transition-colors duration-200 hover:bg-red-600"
-                        onClick={handleEndCall}
+                        onClick={() => {
+                            handleEndCall(memberBusy)
+                        }}
                     >
                         <FontAwesomeIcon icon={faPhoneSlash} className="text-base text-white" width={16} height={16} />
                     </button>
