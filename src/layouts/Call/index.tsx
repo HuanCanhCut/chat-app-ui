@@ -24,7 +24,9 @@ import { useAppSelector } from '~/redux'
 import { getCurrentUser } from '~/redux/selector'
 import * as userService from '~/services/userService'
 
-type CallStatus = 'connecting' | 'calling' | 'accepted' | 'in_call' | 'rejected' | 'ended' | 'failed'
+type CallStatus = 'connecting' | 'calling' | 'accepted' | 'in_call' | 'rejected' | 'ended' | 'failed' | 'timeout'
+
+const CALL_TIMEOUT_DURATION = 15000 // 15 seconds
 
 const CallClient = () => {
     const router = useRouter()
@@ -46,6 +48,7 @@ const CallClient = () => {
     const localVideoRef = useRef<HTMLVideoElement>(null)
     const remoteVideoRef = useRef<HTMLVideoElement>(null)
     const previewButtonRef = useRef<HTMLButtonElement>(null)
+    const callTimeoutRef = useRef<NodeJS.Timeout | null>(null) // Timeout reference
 
     const [callStatus, setCallStatus] = useState<CallStatus>('connecting')
     const [previewOpen, setPreviewOpen] = useState(true)
@@ -65,6 +68,42 @@ const CallClient = () => {
         stopStream,
     } = useMediaStream(initializeVideo === 'true')
 
+    // Clear timeout helper
+    const clearCallTimeout = useCallback(() => {
+        if (callTimeoutRef.current) {
+            clearTimeout(callTimeoutRef.current)
+            callTimeoutRef.current = null
+        }
+    }, [])
+
+    // Start timeout for caller
+    const startCallTimeout = useCallback(() => {
+        if (subType === 'caller') {
+            callTimeoutRef.current = setTimeout(() => {
+                setCallStatus('timeout')
+
+                // Emit cancel event to server
+                socket.emit(SocketEvent.END_CALL, {
+                    caller_id: currentUser?.data.id,
+                    callee_id: member?.data.id,
+                })
+
+                // Clean up resources
+                if (localStreamRef.current) {
+                    stopStream()
+                }
+
+                if (peerInstance.current) {
+                    peerInstance.current.destroy()
+                }
+
+                if (currentCallRef.current) {
+                    currentCallRef.current.close()
+                }
+            }, CALL_TIMEOUT_DURATION)
+        }
+    }, [subType, currentUser?.data.id, member?.data.id, localStreamRef, stopStream])
+
     // Các hàm khởi tạo và chấp nhận cuộc gọi - đặt ở đây để tránh lỗi "used before declaration"
     const handleInitiateCall = useCallback(() => {
         socket.emit(SocketEvent.INITIATE_CALL, {
@@ -72,7 +111,10 @@ const CallClient = () => {
             callee_id: member?.data.id,
             type: initializeVideo === 'true' ? 'video' : 'voice',
         })
-    }, [currentUser?.data.id, initializeVideo, member?.data.id])
+
+        // Start timeout after initiating call
+        startCallTimeout()
+    }, [currentUser?.data.id, initializeVideo, member?.data.id, startCallTimeout])
 
     const handleAcceptCall = useCallback(
         (peerId: string) => {
@@ -433,9 +475,11 @@ const CallClient = () => {
         // Handle peer errors
         peer.on('error', (error) => {
             setCallStatus('failed')
+            clearCallTimeout()
         })
 
         return () => {
+            clearCallTimeout()
             peer.destroy()
         }
     }, [
@@ -446,6 +490,7 @@ const CallClient = () => {
         subType,
         setPeerConnection,
         setupRemoteStreamMonitoring,
+        clearCallTimeout,
     ])
 
     // Update local video element when stream changes
@@ -457,6 +502,8 @@ const CallClient = () => {
 
     useEffect(() => {
         const socketHandler = (data: { peer_id: string }) => {
+            // Clear timeout when call is accepted
+            clearCallTimeout()
             setCallStatus('accepted')
 
             if (localStreamRef.current) {
@@ -488,10 +535,11 @@ const CallClient = () => {
         return () => {
             socket.off(SocketEvent.ACCEPTED_CALL, socketHandler)
         }
-    }, [localStreamRef, setPeerConnection, setupRemoteStreamMonitoring])
+    }, [localStreamRef, setPeerConnection, setupRemoteStreamMonitoring, clearCallTimeout])
 
     useEffect(() => {
         const socketHandler = () => {
+            clearCallTimeout()
             setCallStatus('rejected')
         }
 
@@ -500,7 +548,33 @@ const CallClient = () => {
         return () => {
             socket.off(SocketEvent.REJECT_CALL, socketHandler)
         }
-    }, [])
+    }, [clearCallTimeout])
+
+    // Handle cancel incoming call event
+    useEffect(() => {
+        const handleCancelIncomingCall = () => {
+            setCallStatus('timeout')
+
+            // Clean up resources
+            if (localStreamRef.current) {
+                stopStream()
+            }
+
+            if (peerInstance.current) {
+                peerInstance.current.destroy()
+            }
+
+            if (currentCallRef.current) {
+                currentCallRef.current.close()
+            }
+        }
+
+        socket.on(SocketEvent.CANCEL_INCOMING_CALL, handleCancelIncomingCall)
+
+        return () => {
+            socket.off(SocketEvent.CANCEL_INCOMING_CALL, handleCancelIncomingCall)
+        }
+    }, [localStreamRef, stopStream])
 
     useEffect(() => {
         const init = async () => {
@@ -514,6 +588,9 @@ const CallClient = () => {
     }, [getUserMedia])
 
     const handleEndCall = useCallback(() => {
+        // Clear timeout
+        clearCallTimeout()
+
         // Cập nhật trạng thái cuộc gọi
         setCallStatus('ended')
 
@@ -539,11 +616,14 @@ const CallClient = () => {
         if (currentCallRef.current) {
             currentCallRef.current.close()
         }
-    }, [currentUser?.data.id, localStreamRef, member?.data.id, stopStream, subType])
+    }, [currentUser?.data.id, localStreamRef, member?.data.id, stopStream, subType, clearCallTimeout])
 
     // Xử lý khi nhận được sự kiện kết thúc cuộc gọi từ người đối diện
     useEffect(() => {
         const handleRemoteEndCall = () => {
+            // Clear timeout
+            clearCallTimeout()
+
             // Hiển thị thông báo
             setCallStatus('ended')
 
@@ -567,7 +647,7 @@ const CallClient = () => {
         return () => {
             socket.off(SocketEvent.END_CALL, handleRemoteEndCall)
         }
-    }, [localStreamRef, router, stopStream])
+    }, [localStreamRef, router, stopStream, clearCallTimeout])
 
     const getStatusMessage = () => {
         switch (callStatus) {
@@ -585,10 +665,19 @@ const CallClient = () => {
                 return 'Cuộc gọi đã kết thúc'
             case 'failed':
                 return 'Cuộc gọi thất bại.'
+            case 'timeout':
+                return 'Không có phản hồi. Cuộc gọi đã bị hủy.'
             default:
                 return ''
         }
     }
+
+    // Cleanup timeout on unmount
+    useEffect(() => {
+        return () => {
+            clearCallTimeout()
+        }
+    }, [clearCallTimeout])
 
     return (
         <div className="relative h-dvh max-h-dvh w-full max-w-full overflow-hidden">
@@ -603,7 +692,10 @@ const CallClient = () => {
             ) : null}
 
             {/* Overlay khi cuộc gọi kết thúc */}
-            {(callStatus === 'ended' || callStatus === 'failed' || callStatus === 'rejected') && (
+            {(callStatus === 'ended' ||
+                callStatus === 'failed' ||
+                callStatus === 'rejected' ||
+                callStatus === 'timeout') && (
                 <div className="blur-10 flex-center absolute bottom-0 left-0 right-0 top-0 z-50 bg-black bg-opacity-80 backdrop-blur">
                     <div className="flex flex-col items-center gap-4 text-white">
                         <div className="flex h-20 w-20 items-center justify-center rounded-full bg-red-500">
