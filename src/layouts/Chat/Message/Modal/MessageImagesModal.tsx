@@ -304,7 +304,7 @@ const MessageImagesModel = ({ onClose, imageUrl }: MessageImagesModelProps) => {
                                     width={100}
                                     height={100}
                                     key={index}
-                                    className={`mb-1 h-10 w-10 cursor-pointer select-none rounded-md object-cover ${
+                                    className={`mb-1 !h-10 !w-10 !flex-shrink-0 cursor-pointer select-none rounded-md object-cover ${
                                         selectedImageIndex === index
                                             ? 'opacity-100 brightness-100'
                                             : 'opacity-80 brightness-50'
