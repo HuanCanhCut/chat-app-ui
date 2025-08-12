@@ -300,6 +300,8 @@ const MessageItem = ({ message, messageIndex, messages, currentUser, messageRef 
                                 handleOpenReactionModal={handleOpenReactionModal}
                                 messages={messages}
                                 diffTime={diffTime}
+                                handleFormatTime={handleFormatTime}
+                                conversation={conversation?.data}
                             />
                         </Tippy>
                     </div>

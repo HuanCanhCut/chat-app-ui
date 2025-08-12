@@ -1,11 +1,15 @@
 import { forwardRef, LegacyRef, useEffect, useState } from 'react'
 import Link from 'next/link'
+import { useParams } from 'next/navigation'
 
 import Reaction from './Reaction'
+import Button from '~/components/Button'
 import EmojiMessageStyle from '~/components/EmojiMessageStyle'
+import { IncomingCallIcon, OutgoingCallIcon, TimeoutCallIcon } from '~/components/Icons/Icons'
 import CustomImage from '~/components/Image/Image'
 import * as messageServices from '~/services/messageService'
-import { LinkPreviewModel, MessageModel, MessageResponse, UserModel } from '~/type/type'
+import { ConversationModel, LinkPreviewModel, MessageModel, MessageResponse, UserModel } from '~/type/type'
+import openWindowCall from '~/utils/openWindowCall'
 
 interface MessageContentProps {
     message: MessageModel
@@ -20,6 +24,8 @@ interface MessageContentProps {
     messages: MessageResponse
     // eslint-disable-next-line no-unused-vars
     diffTime: (message: MessageModel, targetMessage: MessageModel) => number
+    handleFormatTime: (time: Date) => string
+    conversation?: ConversationModel
 }
 
 const BETWEEN_TIME_MESSAGE = 7 // minute
@@ -36,9 +42,13 @@ const MessageContent = (
         handleOpenImageModal,
         messages,
         diffTime,
+        handleFormatTime,
+        conversation,
     }: MessageContentProps,
     ref: LegacyRef<HTMLDivElement>,
 ) => {
+    const { uuid } = useParams()
+
     const [linkPreview, setLinkPreview] = useState<LinkPreviewModel | null>(null)
 
     const combinedRef = (el: HTMLDivElement) => {
@@ -168,6 +178,21 @@ const MessageContent = (
         )
     }
 
+    const handleCallAgain = () => {
+        const otherMember = conversation?.members.find((member) => member.user_id !== currentUser?.id)
+
+        if (!otherMember) {
+            return
+        }
+
+        openWindowCall({
+            memberNickname: otherMember.user.nickname,
+            type: 'voice',
+            conversationUuid: uuid as string,
+            subType: 'caller',
+        })
+    }
+
     switch (message.type) {
         case 'text':
             return (
@@ -241,6 +266,52 @@ const MessageContent = (
                     <Reaction message={message} handleOpenReactionModal={handleOpenReactionModal} />
                 </div>
             )
+        case 'call_ended':
+        case 'call_timeout':
+            return (
+                <div
+                    ref={combinedRef}
+                    className={
+                        'w-[200px] rounded-2xl bg-[var(--reply-message-light-background-color)] p-3 dark:bg-[var(--reply-message-dark-background-color)]'
+                    }
+                >
+                    <div className="flex items-center gap-2">
+                        <Button
+                            buttonType="icon"
+                            className={`flex-shrink-0 ${message.type === 'call_timeout' ? '!bg-error dark:!bg-error' : ''}`}
+                        >
+                            {(() => {
+                                switch (message.type) {
+                                    case 'call_ended':
+                                        return message.sender_id === currentUser?.id ? (
+                                            <OutgoingCallIcon />
+                                        ) : (
+                                            <IncomingCallIcon />
+                                        )
+                                    case 'call_timeout':
+                                        return <TimeoutCallIcon />
+                                }
+                            })()}
+                        </Button>
+                        <div className="flex flex-col">
+                            <p className="font-medium">
+                                {message.type === 'call_ended'
+                                    ? `Cuộc gọi ${message.sender_id === currentUser?.id ? 'đi' : 'đến'}`
+                                    : 'Đã bỏ lỡ cuộc gọi'}
+                            </p>
+                            <span className="text-xs text-systemMessageLight dark:text-systemMessageDark">
+                                {message.type === 'call_ended'
+                                    ? message.content
+                                    : handleFormatTime(new Date(message.created_at))}
+                            </span>
+                        </div>
+                    </div>
+                    <Button buttonType="rounded" className="mt-3 w-full" onClick={handleCallAgain}>
+                        Gọi lại
+                    </Button>
+                </div>
+            )
+
         case 'icon':
             return (
                 <div

@@ -11,6 +11,7 @@ import socket from '~/helpers/socket'
 import { useAppSelector } from '~/redux'
 import { getCurrentUser } from '~/redux/selector'
 import { UserModel } from '~/type/type'
+import openWindowCall from '~/utils/openWindowCall'
 
 const IncomingCall = ({ children }: { children: React.ReactNode }) => {
     const currentUser = useAppSelector(getCurrentUser)
@@ -20,22 +21,21 @@ const IncomingCall = ({ children }: { children: React.ReactNode }) => {
     const [incomingCall, setIncomingCall] = useState(false)
     const [caller, setCaller] = useState<UserModel | null>(null)
     const [type, setType] = useState<'video' | 'voice'>('video')
+    const [uuid, setUuid] = useState<string>('')
 
     const handleAcceptCall = () => {
         setIncomingCall(false)
 
-        window.open(
-            `/call?member_nickname=${caller?.nickname}&initialize_video=${type === 'video' ? 'true' : 'false'}&sub_type=callee`,
-            `${type === 'video' ? 'Video' : 'Voice'} Call`,
-            `
-            width=${window.screen.width},
-            height=${window.screen.height}
-            `,
-        )
+        openWindowCall({
+            memberNickname: caller?.nickname,
+            type,
+            conversationUuid: uuid,
+            subType: 'callee',
+        })
     }
 
     useEffect(() => {
-        const socketHandler = (data: { caller: UserModel; type: 'video' | 'voice' }) => {
+        const socketHandler = (data: { caller: UserModel; type: 'video' | 'voice'; uuid: string }) => {
             if (data.caller.id === currentUser?.data.id) {
                 return
             }
@@ -43,6 +43,7 @@ const IncomingCall = ({ children }: { children: React.ReactNode }) => {
             setIncomingCall(true)
             setCaller(data.caller)
             setType(data.type)
+            setUuid(data.uuid)
         }
 
         socket.on(SocketEvent.INITIATE_CALL, socketHandler)

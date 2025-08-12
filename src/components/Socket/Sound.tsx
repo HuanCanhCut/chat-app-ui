@@ -17,6 +17,10 @@ const Sound = ({ children }: { children: React.ReactNode }) => {
         const socketHandler = async () => {
             try {
                 if (!audioRef.current) return
+
+                // if tab is window opener, then no need to play sound
+                if (window.opener) return
+
                 audioRef.current.src = '/static/audio/notify.mp3'
                 await audioRef.current?.play()
             } catch (error) {}
@@ -31,6 +35,9 @@ const Sound = ({ children }: { children: React.ReactNode }) => {
         const socketHandler = async (data: SocketMessage) => {
             try {
                 if (!audioRef.current) return
+
+                // if tab is window opener, then no need to play sound
+                if (window.opener) return
 
                 if (data.conversation.last_message.sender_id === currentUser?.data.id) return
 
@@ -48,7 +55,7 @@ const Sound = ({ children }: { children: React.ReactNode }) => {
 
     return (
         <>
-            <audio ref={audioRef} src="" id="notification-sound" />
+            <audio ref={audioRef} src="" />
             {children}
         </>
     )

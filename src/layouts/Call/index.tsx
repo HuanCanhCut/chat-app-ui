@@ -50,6 +50,7 @@ const CallClient = () => {
     const subType: 'caller' | 'callee' = searchParams.get('sub_type') as 'caller' | 'callee'
     const memberNickname = searchParams.get('member_nickname')
     const initializeVideo = searchParams.get('initialize_video')
+    const uuid = searchParams.get('uuid')
 
     const { data: member } = useSWR(SWRKey.GET_AN_USER, () => {
         return userService.getAnUser(memberNickname as string)
@@ -106,6 +107,7 @@ const CallClient = () => {
                 socket.emit(SocketEvent.END_CALL, {
                     caller_id: currentUser?.data.id,
                     callee_id: member?.data.id,
+                    uuid,
                 })
 
                 // Clean up resources
@@ -122,7 +124,7 @@ const CallClient = () => {
                 }
             }, CALL_TIMEOUT_DURATION)
         }
-    }, [subType, currentUser?.data.id, member?.data.id, localStreamRef, stopStream])
+    }, [subType, currentUser?.data.id, member?.data.id, uuid, localStreamRef, stopStream])
 
     // Các hàm khởi tạo và chấp nhận cuộc gọi - đặt ở đây để tránh lỗi "used before declaration"
     const handleInitiateCall = useCallback(() => {
@@ -132,6 +134,7 @@ const CallClient = () => {
             caller_id: currentUser?.data.id,
             callee_id: member?.data.id,
             type: initializeVideo === 'true' ? 'video' : 'voice',
+            uuid,
         })
 
         // Start timeout after initiating call
@@ -146,9 +149,10 @@ const CallClient = () => {
                 caller_id: member?.data.id,
                 peer_id: peerId,
                 callee_id: currentUser?.data.id,
+                uuid,
             })
         },
-        [currentUser?.data.id, member?.data.id],
+        [currentUser?.data.id, member?.data.id, uuid],
     )
 
     // IMPROVED: Cleanup function - remove sender thay vì chỉ remove track
@@ -575,6 +579,7 @@ const CallClient = () => {
                 socket.emit(SocketEvent.END_CALL, {
                     caller_id: subType === 'caller' ? currentUser.data.id : member.data.id,
                     callee_id: oneWay ? Math.random() : subType === 'callee' ? currentUser.data.id : member.data.id,
+                    uuid,
                 })
             }
 
@@ -593,7 +598,7 @@ const CallClient = () => {
                 currentCallRef.current.close()
             }
         },
-        [currentUser?.data.id, localStreamRef, member?.data.id, stopStream, subType, clearCallTimeout],
+        [clearCallTimeout, currentUser?.data.id, member?.data.id, localStreamRef, subType, uuid, stopStream],
     )
 
     useEffect(() => {
@@ -731,7 +736,9 @@ const CallClient = () => {
     useEffect(() => {
         const handleTabClose = () => {
             // Gọi handleEndCall khi tab đóng
-            handleEndCall(memberBusy)
+            if (callStatus === 'in_call') {
+                handleEndCall(memberBusy)
+            }
         }
 
         window.addEventListener('beforeunload', handleTabClose)
@@ -739,7 +746,7 @@ const CallClient = () => {
         return () => {
             window.removeEventListener('beforeunload', handleTabClose)
         }
-    }, [handleEndCall, memberBusy])
+    }, [callStatus, handleEndCall, memberBusy])
 
     return (
         <div className="relative h-dvh max-h-dvh w-full max-w-full overflow-hidden">
