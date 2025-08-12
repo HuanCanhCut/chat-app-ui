@@ -151,7 +151,7 @@ const MessagePage = () => {
             </div>
             {!conversation?.data?.is_temp && (
                 <Info
-                    className={`${infoOpen ? 'block w-full sm:max-w-[280px] md:max-w-[300px] lg:max-w-[320px] xl:max-w-[380px]' : 'hidden !w-0 !p-0'} `}
+                    className={`${infoOpen ? 'block w-full min-w-[250px] sm:max-w-[280px] md:max-w-[300px] lg:max-w-[320px] xl:max-w-[380px]' : 'hidden !w-0 !p-0'} `}
                     isOpen={infoOpen}
                 />
             )}
