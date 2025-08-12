@@ -199,7 +199,7 @@ const MessageContent = (
                 <div className={`relative ${linkPreview?.image ? 'w-full max-w-[300px]' : 'w-fit max-w-[80%]'} `}>
                     <div
                         ref={combinedRef}
-                        className={`whitespace-pre-wrap rounded-3xl px-4 py-1.5 font-normal [word-break:break-word] ${
+                        className={`whitespace-pre-wrap rounded-3xl px-4 py-1.5 font-normal [word-break:break-word] ${linkPreview && 'rounded-bl-none rounded-br-none'} ${
                             message.sender_id === currentUser?.id
                                 ? 'bg-[var(--sender-light-background-color)] text-[var(--sender-light-text-color)] dark:bg-[var(--sender-dark-background-color)] dark:text-[var(--sender-dark-text-color)]'
                                 : 'bg-[var(--receiver-light-background-color)] text-[var(--receiver-light-text-color)] dark:bg-[var(--receiver-dark-background-color)] dark:text-[var(--receiver-dark-text-color)]'
@@ -213,7 +213,7 @@ const MessageContent = (
                         <Link
                             href={linkPreview.url}
                             target="_blank"
-                            className="block bg-[var(--receiver-light-background-color)] dark:bg-[var(--receiver-dark-background-color)]"
+                            className="block rounded-bl-3xl rounded-br-3xl bg-[var(--receiver-light-background-color)] dark:bg-[var(--receiver-dark-background-color)]"
                         >
                             {linkPreview?.image && (
                                 // eslint-disable-next-line @next/next/no-img-element
