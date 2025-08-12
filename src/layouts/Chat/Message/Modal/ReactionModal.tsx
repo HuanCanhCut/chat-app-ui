@@ -46,7 +46,7 @@ const ReactionModal: React.FC<Props> = ({ isOpen, onClose, messageId }) => {
     )
 
     const { data: reactions, mutate: mutateReactions } = useSWR(
-        currentTab ? [SWRKey.GET_REACTIONS, currentTab] : null,
+        currentTab ? [SWRKey.GET_REACTIONS, currentTab, isOpen, messageId] : null,
         () => {
             return messageServices.getReactions({ messageId, type: currentTab, page, per_page: PER_PAGE })
         },
