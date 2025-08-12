@@ -15,9 +15,10 @@ import { handleAcceptFriend, handleRejectFriendRequest } from '~/utils/friendEve
 interface FriendButtonProps {
     user: UserModel
     className?: string
+    handleAfterAcceptFriend?: () => void
 }
 
-const FriendButton = ({ user, className = '' }: FriendButtonProps) => {
+const FriendButton = ({ user, className = '', handleAfterAcceptFriend }: FriendButtonProps) => {
     const [modalIsOpen, setModalIsOpen] = useState(false)
 
     const handleAddFriend = useCallback(async () => {
@@ -95,7 +96,11 @@ const FriendButton = ({ user, className = '' }: FriendButtonProps) => {
                     <Button
                         buttonType="primary"
                         onClick={() => {
-                            handleAcceptFriend(user.id)
+                            handleAcceptFriend(user.id, user.nickname)
+
+                            if (handleAfterAcceptFriend) {
+                                handleAfterAcceptFriend()
+                            }
                         }}
                     >
                         Chấp nhận

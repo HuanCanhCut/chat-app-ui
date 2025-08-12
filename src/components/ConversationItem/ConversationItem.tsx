@@ -110,6 +110,16 @@ const ConversationItem: React.FC<Props> = ({ conversation, className = '' }) => 
                                     className={`[&_p]:line-clamp-1 [&_p]:w-full [&_p]:truncate [&_p]:text-ellipsis`}
                                     hiddenQuickAction={true}
                                 />
+                            ) : conversation.last_message.type.startsWith('call') ? (
+                                <p>
+                                    {conversation.last_message.sender_id === currentUser?.data.id
+                                        ? 'Bạn'
+                                        : `${conversation.last_message.sender.full_name}`}{' '}
+                                    đã gọi cho{' '}
+                                    {conversation.last_message.sender_id === currentUser?.data.id
+                                        ? userMember?.user.full_name
+                                        : 'bạn'}
+                                </p>
                             ) : (
                                 <EmojiMessageStyle
                                     text={content(conversation.last_message)}

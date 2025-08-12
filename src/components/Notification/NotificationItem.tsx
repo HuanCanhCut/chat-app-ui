@@ -34,7 +34,7 @@ const NotificationItem = ({
     }
 
     const handleAccept = async () => {
-        const response = await handleAcceptFriend(notification.sender_id)
+        const response = await handleAcceptFriend(notification.sender_id, notification.sender_user.nickname)
         if (response) {
             setIsAccept(true)
         }

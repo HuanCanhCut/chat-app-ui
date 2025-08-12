@@ -25,9 +25,10 @@ import { FriendsResponse, FriendsShip, UserModel, UserResponse } from '~/type/ty
 interface UserProps {
     currentUser: UserResponse
     user: UserResponse
+    handleAfterAcceptFriend?: () => void
 }
 
-export default function User({ currentUser, user }: UserProps) {
+export default function User({ currentUser, user, handleAfterAcceptFriend }: UserProps) {
     const router = useRouter()
 
     const [isOpen, setIsOpen] = useState(false)
@@ -155,7 +156,7 @@ export default function User({ currentUser, user }: UserProps) {
                     </Button>
                 ) : (
                     <>
-                        <FriendButton user={user.data} />
+                        <FriendButton user={user.data} handleAfterAcceptFriend={handleAfterAcceptFriend} />
 
                         <Button buttonType="rounded" leftIcon={<MessageIcon />} onClick={handleSendMessage}>
                             Nhắn tin

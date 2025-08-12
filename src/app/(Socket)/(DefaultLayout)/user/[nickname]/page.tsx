@@ -150,7 +150,9 @@ export default function UserPage() {
                             className="aspect-[12/5] h-auto w-[1100px] rounded-lg object-cover"
                             style={{ width: '100%', height: 'auto' }}
                         />
-                        {user && currentUser && <User currentUser={currentUser} user={user} />}
+                        {user && currentUser && (
+                            <User currentUser={currentUser} user={user} handleAfterAcceptFriend={() => mutate()} />
+                        )}
                         <div className="mt-0 w-full border-t border-gray-300 px-4 dark:border-zinc-700 sm:mt-10">
                             {TABS.map((tab) => (
                                 <button
