@@ -196,18 +196,14 @@ const MessageContent = (
     switch (message.type) {
         case 'text':
             return (
-                <div
-                    className={`relative overflow-hidden rounded-3xl ${
-                        linkPreview?.image ? 'w-full max-w-[300px]' : 'w-fit max-w-[80%]'
-                    } ${consecutiveMessageStyle()}`}
-                >
+                <div className={`relative ${linkPreview?.image ? 'w-full max-w-[300px]' : 'w-fit max-w-[80%]'} `}>
                     <div
                         ref={combinedRef}
-                        className={`whitespace-pre-wrap px-4 py-1.5 font-normal [word-break:break-word] ${
+                        className={`whitespace-pre-wrap rounded-3xl px-4 py-1.5 font-normal [word-break:break-word] ${
                             message.sender_id === currentUser?.id
                                 ? 'bg-[var(--sender-light-background-color)] text-[var(--sender-light-text-color)] dark:bg-[var(--sender-dark-background-color)] dark:text-[var(--sender-dark-text-color)]'
                                 : 'bg-[var(--receiver-light-background-color)] text-[var(--receiver-light-text-color)] dark:bg-[var(--receiver-dark-background-color)] dark:text-[var(--receiver-dark-text-color)]'
-                        }`}
+                        } ${consecutiveMessageStyle()}`}
                     >
                         <span className="max-w-fit break-words">
                             <EmojiMessageStyle text={message.content} showLink={true} />
