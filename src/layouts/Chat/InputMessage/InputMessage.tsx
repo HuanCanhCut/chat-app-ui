@@ -146,18 +146,23 @@ const InputMessage: React.FC<InputMessageProps> = () => {
                 ),
             )
 
-            mutate(
-                [SWRKey.GET_MESSAGES, uuid as string],
-                (prev: any) => {
-                    if (!prev) return prev
-                    return {
-                        data: [message as unknown as MessageModel, ...prev.data],
-                        meta: prev.meta,
-                    }
+            setTimeout(
+                () => {
+                    mutate(
+                        [SWRKey.GET_MESSAGES, uuid as string],
+                        (prev: any) => {
+                            if (!prev) return prev
+                            return {
+                                data: [message as unknown as MessageModel, ...prev.data],
+                                meta: prev.meta,
+                            }
+                        },
+                        {
+                            revalidate: false,
+                        },
+                    )
                 },
-                {
-                    revalidate: false,
-                },
+                messageValue.trim().length ? 500 : 0,
             )
 
             setImages([])
@@ -185,6 +190,7 @@ const InputMessage: React.FC<InputMessageProps> = () => {
 
         setMessageValue('')
         setReplyMessage(null)
+
         // Reset chiều cao và rows của textarea về mặc định
         if (textareaRef.current) {
             textareaRef.current.style.height = 'auto'
