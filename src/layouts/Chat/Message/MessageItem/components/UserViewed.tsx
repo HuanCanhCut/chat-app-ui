@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useRef } from 'react'
 
 import Tippy from '@tippyjs/react'
 import UserAvatar from '~/components/UserAvatar'
@@ -13,14 +13,22 @@ interface UserViewedProp {
 }
 
 const UserViewed: React.FC<UserViewedProp> = ({ message, currentUser, messageIndex, handleFormatTime }) => {
+    const userViewCountRef = useRef<number>(0)
+
     return (
         <div className={`flex justify-end pr-2`}>
-            {message.message_status.slice(0, 6).map((status: MessageStatus, index: number) => {
+            {message.message_status.map((status: MessageStatus, index: number) => {
                 if (
                     status.receiver.last_read_message_id === message.id &&
                     status.receiver_id !== currentUser?.id &&
                     status.status === 'read'
                 ) {
+                    userViewCountRef.current++
+
+                    if (userViewCountRef.current > 6) {
+                        return null
+                    }
+
                     return (
                         <React.Fragment key={index}>
                             <Tippy
