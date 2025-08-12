@@ -1,5 +1,6 @@
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import ReactModal from 'react-modal'
+import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import moment from 'moment-timezone'
 import useSWR from 'swr'
@@ -256,13 +257,32 @@ const MessageItem = ({ message, messageIndex, messages, currentUser, messageRef 
             <RevokeModal isOpen={openRevokeModal} message={message} onClose={handleCloseRevokeModal} />
 
             <div ref={groupMessageRef} className={`group relative flex w-full items-end gap-3`}>
-                {message.sender_id !== currentUser?.id && (
-                    <UserAvatar
-                        className={`${!isLastMessageInConsecutiveGroup() ? 'invisible' : 'visible'}`}
-                        src={message.sender.avatar}
-                        size={28}
-                    />
-                )}
+                {message.sender_id !== currentUser?.id &&
+                    (isLastMessageInConsecutiveGroup() ? (
+                        <Tippy
+                            content={
+                                isLastMessageInConsecutiveGroup()
+                                    ? memberMap[message.sender_id]?.nickname ||
+                                      memberMap[message.sender_id]?.user.full_name
+                                    : null
+                            }
+                            placement="top"
+                        >
+                            <Link href={`/user/@${message.sender.nickname}`}>
+                                <UserAvatar
+                                    className={`${!isLastMessageInConsecutiveGroup() ? 'invisible' : 'visible'}`}
+                                    src={message.sender.avatar}
+                                    size={28}
+                                />
+                            </Link>
+                        </Tippy>
+                    ) : (
+                        <UserAvatar
+                            className={`${!isLastMessageInConsecutiveGroup() ? 'invisible' : 'visible'}`}
+                            src={message.sender.avatar}
+                            size={28}
+                        />
+                    ))}
                 <div className="flex w-full flex-col text-[15px]">
                     {message.sender_id !== currentUser.id &&
                         isFirstMessageInConsecutiveGroup() &&
