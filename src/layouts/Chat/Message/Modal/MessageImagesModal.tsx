@@ -297,23 +297,27 @@ const MessageImagesModel = ({ onClose, imageUrl }: MessageImagesModelProps) => {
                     >
                         {images?.data?.map((image, index) => {
                             return (
-                                <Image
+                                // eslint-disable-next-line @next/next/no-img-element
+                                <img
                                     src={image}
                                     alt="image"
                                     width={100}
                                     height={100}
                                     key={index}
-                                    className={`mb-1 h-10 w-10 cursor-pointer select-none rounded-md ${
+                                    className={`mb-1 h-10 w-10 cursor-pointer select-none rounded-md object-cover ${
                                         selectedImageIndex === index
                                             ? 'opacity-100 brightness-100'
                                             : 'opacity-80 brightness-50'
                                     }`}
-                                    priority
-                                    quality={100}
                                     ref={(el) => {
                                         imageRefs.current[index] = el
                                     }}
                                     onClick={() => handleChooseImage(image, index)}
+                                    onError={(e) => {
+                                        console.error('Image load error:', image)
+                                        e.currentTarget.style.display = 'none'
+                                    }}
+                                    loading="lazy"
                                 />
                             )
                         })}
