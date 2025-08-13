@@ -62,6 +62,7 @@ const Header: React.FC<HeaderProps> = ({ className = '', isInfoOpen, conversatio
                         last_online_at: new Date(conversationMember?.user.last_online_at || new Date()),
                     },
                 })
+
                 offlineTimerSocket.current = setInterval(() => {
                     setLastOnlineTime(new Date(data.last_online_at || new Date()))
                 }, 1000 * 30) // 30 seconds
@@ -155,7 +156,9 @@ const Header: React.FC<HeaderProps> = ({ className = '', isInfoOpen, conversatio
                         <UserAvatar
                             src={conversation.is_group ? conversation.avatar : conversationMember?.user?.avatar}
                             size={40}
-                            isOnline={conversationMember?.user?.is_online}
+                            isOnline={conversation.members.some(
+                                (member) => member.user.is_online && member.user.id !== currentUser?.data.id,
+                            )}
                         />
                     </div>
                     <div className="flex flex-col">
@@ -164,13 +167,13 @@ const Header: React.FC<HeaderProps> = ({ className = '', isInfoOpen, conversatio
                                 ? conversation.name
                                 : conversationMember?.nickname || conversationMember?.user?.full_name}
                         </h4>
-                        {!conversation.is_group && (
-                            <span className="text-xs font-normal text-zinc-700 dark:text-gray-400">
-                                {conversationMember?.user?.is_online
+                        <span className="text-xs font-normal text-zinc-700 dark:text-gray-400">
+                            {!conversation.is_group
+                                ? conversationMember?.user?.is_online
                                     ? 'Đang hoạt động'
-                                    : lastOnlineTime && `Hoạt động ${momentTimezone(lastOnlineTime)} trước`}
-                            </span>
-                        )}
+                                    : lastOnlineTime && `Hoạt động ${momentTimezone(lastOnlineTime)} trước`
+                                : `${conversation.members.filter((member) => member.user.is_online && member.user.id !== currentUser?.data.id).length} người đang hoạt động`}
+                        </span>
                     </div>
                 </div>
             </div>

@@ -44,19 +44,20 @@ const MessagePage = () => {
                 return
             }
 
-            if (conversation.data.is_group) {
-                return
-            }
-
             mutateConversation(
                 {
                     ...conversation,
                     data: {
                         ...conversation.data,
-                        members: conversation.data.members.map((member) => ({
-                            ...member,
-                            user: { ...member.user, is_online: data.is_online },
-                        })),
+                        members: conversation.data.members.map((member) => {
+                            if (member.user_id === data.user_id) {
+                                return {
+                                    ...member,
+                                    user: { ...member.user, is_online: data.is_online },
+                                }
+                            }
+                            return member
+                        }),
                     },
                 },
                 {
