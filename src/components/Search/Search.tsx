@@ -118,7 +118,7 @@ const Search: React.FC<SearchProps> = ({ placeholder = 'Tìm kiếm', className 
     }
 
     return (
-        <div>
+        <div className={className}>
             <Tippy
                 interactive
                 onClickOutside={handleHideTippy}
@@ -129,8 +129,9 @@ const Search: React.FC<SearchProps> = ({ placeholder = 'Tìm kiếm', className 
                 render={renderResult}
                 placement="bottom-start"
             >
-                <div className={`relative rounded-3xl bg-lightGray pl-3 dark:bg-[#313233] sm:pl-10 ${className}`}>
+                <div className={`relative rounded-3xl bg-lightGray pl-3 dark:bg-[#313233] sm:pl-10`}>
                     <input
+                        name="search"
                         type="text"
                         placeholder={placeholder}
                         className="w-full rounded-3xl bg-transparent py-[8px] pl-[1px] pr-11 caret-primary outline-none placeholder:text-sm dark:bg-[#313233]"
