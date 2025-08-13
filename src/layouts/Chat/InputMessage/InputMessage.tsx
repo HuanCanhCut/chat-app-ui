@@ -91,6 +91,8 @@ const InputMessage: React.FC<InputMessageProps> = () => {
                             receiver: conversation.user,
                         }
                     }),
+                    parent_id: replyMessage?.id,
+                    parent: replyMessage,
                 },
             }
         }
@@ -181,6 +183,7 @@ const InputMessage: React.FC<InputMessageProps> = () => {
                 conversation_uuid,
                 message: JSON.stringify(payload.map((item) => item.secure_url)),
                 type: 'image',
+                parent_id: replyMessage?.id,
             })
 
             sendEvent({
