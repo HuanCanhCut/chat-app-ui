@@ -206,7 +206,11 @@ const MessageContent = (
                         } ${consecutiveMessageStyle()}`}
                     >
                         <span className="max-w-fit break-words">
-                            <EmojiMessageStyle text={message.content} showLink={true} />
+                            <EmojiMessageStyle
+                                text={message.content}
+                                showLink={true}
+                                className="[&>#emoji-message]:inline-flex [&>#emoji-message]:align-middle"
+                            />
                         </span>
                     </div>
                     {linkPreview && (
@@ -314,8 +318,13 @@ const MessageContent = (
                     ref={combinedRef}
                     className={`relative w-fit max-w-[80%] whitespace-pre-wrap rounded-3xl py-[2px] font-normal [word-break:break-word]`}
                 >
-                    <span className="max-w-fit break-words text-3xl">
-                        <EmojiMessageStyle text={message.content} size={32} showLink={true} />
+                    <span className="max-w-fit gap-3 break-words text-3xl">
+                        <EmojiMessageStyle
+                            text={message.content}
+                            size={32}
+                            showLink={true}
+                            className="[&>#emoji-message]:inline-flex [&>#emoji-message]:align-middle"
+                        />
                     </span>
 
                     <Reaction message={message} handleOpenReactionModal={handleOpenReactionModal} />

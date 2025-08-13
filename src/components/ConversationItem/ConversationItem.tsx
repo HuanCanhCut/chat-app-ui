@@ -123,7 +123,7 @@ const ConversationItem: React.FC<Props> = ({ conversation, className = '' }) => 
                             ) : (
                                 <EmojiMessageStyle
                                     text={content(conversation.last_message)}
-                                    className="ml-1"
+                                    className="flex items-center"
                                     textClassName="truncate line-clamp-1 text-ellipsis flex-1 w-full"
                                 />
                             )}

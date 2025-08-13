@@ -32,23 +32,24 @@ const EmojiMessageStyle: React.FC<EmojiMessageStyleProps> = ({
             const emoji = match[0]
             const matchIndex = match.index || 0
 
-            jsx.push(<span key={`text-${matchIndex}`}>{text.slice(lastIndex, matchIndex)}</span>)
-
             const codePoint = emoji.codePointAt(0)
             const unified = codePoint?.toString(16).toUpperCase()
 
-            if (unified) {
-                jsx.push(
-                    <span key={`emoji-container-${matchIndex}`} className={className}>
-                        <Emoji
-                            key={`emoji-${matchIndex}`}
-                            unified={`${unified.toLowerCase()}`}
-                            size={size}
-                            emojiStyle={type}
-                        />
-                    </span>,
-                )
-            }
+            jsx.push(
+                <span key={`text-${matchIndex}`} className={`${className}`}>
+                    {text.slice(lastIndex, matchIndex)}
+                    {unified && (
+                        <span key={`emoji-container-${matchIndex}`} id="emoji-message">
+                            <Emoji
+                                key={`emoji-${matchIndex}`}
+                                unified={`${unified.toLowerCase()}`}
+                                size={size}
+                                emojiStyle={type}
+                            />
+                        </span>
+                    )}
+                </span>,
+            )
 
             lastIndex = matchIndex + emoji.length
         }
@@ -64,7 +65,7 @@ const EmojiMessageStyle: React.FC<EmojiMessageStyleProps> = ({
     }
 
     return (
-        <p className="flex w-fit items-center">
+        <p className="flex w-fit gap-1">
             {showLink ? <LinkHighlight className="underline">{highlight(text)}</LinkHighlight> : highlight(text)}
         </p>
     )
