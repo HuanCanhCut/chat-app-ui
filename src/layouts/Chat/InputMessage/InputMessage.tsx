@@ -318,6 +318,28 @@ const InputMessage: React.FC<InputMessageProps> = () => {
         return remove
     }, [])
 
+    const handlePaste = (e: ClipboardEvent) => {
+        if (!e.clipboardData) return
+
+        for (const item of e.clipboardData.items) {
+            if (item.kind === 'file' && item.type.startsWith('image/')) {
+                const file = item.getAsFile() as IFile
+                if (file) {
+                    file.preview = URL.createObjectURL(file)
+                    setImages((prev) => [...prev, file])
+                }
+            }
+        }
+    }
+
+    useEffect(() => {
+        document.addEventListener('paste', handlePaste)
+
+        return () => {
+            document.removeEventListener('paste', handlePaste)
+        }
+    }, [])
+
     return (
         <div
             onKeyDown={handleEnterMessage}
