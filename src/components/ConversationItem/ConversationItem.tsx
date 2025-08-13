@@ -91,7 +91,9 @@ const ConversationItem: React.FC<Props> = ({ conversation, className = '' }) => 
                         src={conversation.is_group ? conversation.avatar : userMember?.user.avatar}
                         size={56}
                         className="h-[48px] w-[48px] lg:h-[56px] lg:w-[56px]"
-                        isOnline={!conversation.is_group && userMember?.user.is_online}
+                        isOnline={conversation.members.some(
+                            (member) => member.user.is_online && member.user.id !== currentUser?.data.id,
+                        )}
                         onlineClassName="h-4 w-4"
                     />
                 </div>
