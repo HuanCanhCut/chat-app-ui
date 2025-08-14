@@ -166,7 +166,7 @@ const CreateConversationModal = ({ onClose }: { onClose: () => void }) => {
                 </label>
             )}
 
-            <div className="flex w-full flex-col overflow-hidden p-4">
+            <div className="flex w-full flex-col overflow-hidden p-2 sm:p-4">
                 <div className="mt-4">
                     <input
                         type="file"
