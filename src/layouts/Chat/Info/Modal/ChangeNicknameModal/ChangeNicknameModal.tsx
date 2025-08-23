@@ -58,7 +58,7 @@ const ChangeNicknameModal: React.FC = () => {
     }
 
     return (
-        <main className="flex w-[550px] max-w-full flex-col gap-7 px-5 py-8">
+        <main className="flex w-[550px] max-w-full flex-col gap-7 px-5 py-8 [overflow-y:overlay]">
             {conversation?.data.members.map((member, index) => {
                 return (
                     <div
