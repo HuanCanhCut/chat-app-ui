@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'react-toastify'
 import Link from 'next/link'
+import { useParams } from 'next/navigation'
 import { AxiosError } from 'axios'
 
 import { faArrowLeft, faSearch } from '@fortawesome/free-solid-svg-icons'
@@ -21,6 +22,7 @@ interface Props {
 }
 
 const Search: React.FC<Props> = ({ setSearchMode, searchMode }) => {
+    const { uuid } = useParams()
     const currentUser = useAppSelector(getCurrentUser)
 
     const [searchResult, setSearchResult] = useState<ConversationModel[]>([])
@@ -50,7 +52,7 @@ const Search: React.FC<Props> = ({ setSearchMode, searchMode }) => {
     const renderResult = () => {
         return (
             // 20px: padding left and right
-            <div className="h-[calc(100dvh-210px)] w-[calc(100vw-20px)] [overflow:overlay] dark:bg-dark sm:h-[calc(100dvh-180px)] md:w-[calc(var(--sidebar-width-tablet)-20px)] lg:w-[calc(var(--sidebar-width)-20px)]">
+            <div className="h-[calc(100dvh-210px)] w-[calc(100vw-20px)] [overflow:overlay] dark:bg-dark sm:h-[calc(100dvh-180px)] bp900:w-[calc(var(--sidebar-width-tablet)-20px)] lg:w-[calc(var(--sidebar-width)-20px)]">
                 {searchResult.map((conversation) => {
                     let conversationMember = conversation.members.find(
                         (member) => member.user_id !== currentUser?.data.id,
@@ -80,9 +82,27 @@ const Search: React.FC<Props> = ({ setSearchMode, searchMode }) => {
         )
     }
 
+    const handleClickOutside = useCallback(() => {
+        setSearchMode(false)
+        setSearchValue('')
+        setSearchResult([])
+    }, [setSearchMode, setSearchResult, setSearchValue])
+
+    useEffect(() => {
+        if (uuid) {
+            handleClickOutside()
+        }
+    }, [handleClickOutside, uuid])
+
     return (
         <div>
-            <Tippy interactive visible={searchMode} placement="bottom-start" render={renderResult}>
+            <Tippy
+                interactive
+                visible={searchMode}
+                placement="bottom-start"
+                render={renderResult}
+                onClickOutside={handleClickOutside}
+            >
                 <div className="mt-3 flex items-center gap-2">
                     {searchMode && (
                         <FontAwesomeIcon
@@ -103,13 +123,6 @@ const Search: React.FC<Props> = ({ setSearchMode, searchMode }) => {
                             value={searchValue}
                             onChange={(e) => setSearchValue(e.target.value)}
                             onFocus={() => setSearchMode(true)}
-                            onBlur={() => {
-                                setTimeout(() => {
-                                    setSearchMode(false)
-                                    setSearchValue('')
-                                    setSearchResult([])
-                                }, 100)
-                            }}
                         />
                     </div>
                 </div>
