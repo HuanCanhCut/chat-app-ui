@@ -63,9 +63,6 @@ const MessageAction: React.FC<MessageActionProps> = ({
                         {/* if message is not revoked and sender is current user, show "Thu hồi", else show "Gỡ" */}
                         {message.content !== null && message.sender_id === currentUser?.id ? 'Thu hồi' : 'Gỡ'}
                     </button>
-                    <button className="rounded-md p-2 text-left hover:bg-gray-100 dark:hover:bg-[#353738]">
-                        Chuyển tiếp
-                    </button>
                 </div>
             </PopperWrapper>
         )
@@ -113,7 +110,7 @@ const MessageAction: React.FC<MessageActionProps> = ({
 
     return (
         <div
-            className={`z-10 flex items-center gap-[2px] sm:gap-2 ${!isOpenReaction.reactionWrapperOpen && !isOpenMoreAction ? 'opacity-0' : 'opacity-100'} group-hover:opacity-100 ${message.sender_id === currentUser?.id ? 'order-first mr-2' : 'order-last ml-2 flex-row-reverse'}`}
+            className={`flex items-center gap-[2px] sm:gap-2 ${!isOpenReaction.reactionWrapperOpen && !isOpenMoreAction ? 'opacity-0' : 'opacity-100'} group-hover:opacity-100 ${message.sender_id === currentUser?.id ? 'order-first mr-2' : 'order-last ml-2 flex-row-reverse'}`}
         >
             <CustomTippy renderItem={renderMoreAction} onShow={tippyShow} placement="top" offsetY={6}>
                 <Tippy content="Xem thêm">

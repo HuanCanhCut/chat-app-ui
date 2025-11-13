@@ -238,6 +238,8 @@ const InputMessage: React.FC<InputMessageProps> = () => {
 
         // allow user to upload multiple images same name
         e.target.value = ''
+
+        textareaRef.current?.focus()
     }
 
     useEffect(() => {
