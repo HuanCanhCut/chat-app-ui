@@ -633,27 +633,25 @@ const Message: React.FC<MessageProps> = ({ conversation }) => {
                     setOffsetRange={setOffsetRange}
                 />
 
-                {/* Show conversation avatar when no more message */}
-                {messages &&
-                    messages.meta.pagination.offset / PER_PAGE + 1 >= messages.meta.pagination.total / PER_PAGE && (
-                        <div className="flex flex-col items-center pt-8 text-center text-lg font-medium">
-                            <UserAvatar
-                                src={conversation.is_group ? conversation.avatar : member?.user.avatar}
-                                size={60}
-                                className="mx-auto h-[60px] w-[60px]"
-                            />
-                            {conversation.is_group ? (
-                                <p>{conversation.is_group ? conversation.name : member?.user.full_name || ''}</p>
-                            ) : (
-                                <Link
-                                    className="hover:underline"
-                                    href={`${config.routes.user}/@${member?.user.nickname}`}
-                                >
-                                    {conversation.is_group ? conversation.name : member?.user.full_name || ''}
-                                </Link>
-                            )}
-                        </div>
-                    )}
+                {/* Show conversation avatar when no more message or temp conversation */}
+                {((messages?.meta.pagination.offset || 0) / PER_PAGE + 1 >=
+                    (messages?.meta.pagination.total || 0) / PER_PAGE ||
+                    conversation.is_temp) && (
+                    <div className="flex flex-col items-center pt-8 text-center text-lg font-medium">
+                        <UserAvatar
+                            src={conversation.is_group ? conversation.avatar : member?.user.avatar}
+                            size={60}
+                            className="mx-auto h-[60px] w-[60px]"
+                        />
+                        {conversation.is_group ? (
+                            <p>{conversation.name}</p>
+                        ) : (
+                            <Link className="hover:underline" href={`${config.routes.user}/@${member?.user.nickname}`}>
+                                {member?.user.full_name || ''}
+                            </Link>
+                        )}
+                    </div>
+                )}
             </div>
         </div>
     )
