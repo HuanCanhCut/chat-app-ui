@@ -248,11 +248,13 @@ const MessageItem = ({ message, messageIndex, messages, currentUser, messageRef 
                 </ReactModal>
             )}
 
-            <ReactionModal
-                isOpen={openReactionModal.isOpen}
-                onClose={handleCloseReactionModal}
-                messageId={openReactionModal.messageId}
-            />
+            {openReactionModal.isOpen && (
+                <ReactionModal
+                    isOpen={openReactionModal.isOpen}
+                    onClose={handleCloseReactionModal}
+                    messageId={openReactionModal.messageId}
+                />
+            )}
 
             <RevokeModal isOpen={openRevokeModal} message={message} onClose={handleCloseRevokeModal} />
 

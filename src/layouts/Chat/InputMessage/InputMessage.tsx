@@ -450,8 +450,12 @@ const InputMessage: React.FC<InputMessageProps> = () => {
                         </span>
                     )}
                     <HeadlessTippy
-                        render={(...attrs) => {
-                            return <Emoji {...attrs} onEmojiClick={handleEmojiClick} isOpen={isOpenEmoji.emojiOpen} />
+                        render={() => {
+                            return (
+                                <div tabIndex={-1}>
+                                    <Emoji onEmojiClick={handleEmojiClick} isOpen={isOpenEmoji.emojiOpen} />
+                                </div>
+                            )
                         }}
                         onClickOutside={() =>
                             setIsOpenEmoji((prev) => ({ ...prev, emojiOpen: true, emojiWrapperOpen: false }))

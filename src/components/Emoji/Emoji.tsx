@@ -1,7 +1,7 @@
 'use client'
 
 import { memo } from 'react'
-import { Categories, EmojiClickData, EmojiStyle } from 'emoji-picker-react'
+import { Categories, EmojiStyle, PickerProps } from 'emoji-picker-react'
 import { Theme } from 'emoji-picker-react'
 
 import './Emoji.css'
@@ -9,20 +9,19 @@ import Picker from '~/helpers/picker'
 import { useAppSelector } from '~/redux'
 import { getCurrentTheme } from '~/redux/selector'
 
-interface EmojiProps {
+interface EmojiProps extends Omit<PickerProps, 'isReaction' | 'isOpen' | 'className'> {
     placeholder?: string
-    onEmojiClick: (emojiData: EmojiClickData, event: MouseEvent) => void
     isReaction?: boolean
     isOpen?: boolean
     className?: string
 }
 
 const Emoji: React.FC<EmojiProps> = ({
-    onEmojiClick,
     placeholder = 'Tìm kiếm biểu tượng cảm xúc',
     isReaction = false,
     isOpen = false,
     className = '',
+    ...passProps
 }) => {
     const theme = useAppSelector(getCurrentTheme)
 
@@ -67,7 +66,6 @@ const Emoji: React.FC<EmojiProps> = ({
                 className={`bg-transparent ${className}`}
                 open={isOpen}
                 theme={theme === 'light' ? Theme.LIGHT : Theme.DARK}
-                onEmojiClick={onEmojiClick}
                 emojiStyle={EmojiStyle.FACEBOOK}
                 searchPlaceHolder={placeholder}
                 skinTonesDisabled
@@ -77,6 +75,7 @@ const Emoji: React.FC<EmojiProps> = ({
                 width={Math.min(380, Number(window.innerWidth - 40))}
                 lazyLoadEmojis
                 reactionsDefaultOpen={isReaction}
+                {...passProps}
             />
         </div>
     )

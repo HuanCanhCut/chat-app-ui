@@ -129,20 +129,20 @@ const MessageAction: React.FC<MessageActionProps> = ({
             </Tippy>
 
             <HeadlessTippy
-                render={(...attrs) => {
+                render={() => {
                     return (
                         <Emoji
-                            {...attrs}
                             onEmojiClick={handleChooseReaction}
                             isOpen={isOpenReaction.reactionOpen}
                             isReaction={true}
+                            reactions={['2764-fe0f', '1f606', '1f62e', '1f622', '1f621', '1f44d']}
                         />
                     )
                 }}
                 onClickOutside={() =>
                     setIsOpenReaction((prev) => ({
                         ...prev,
-                        reactionOpen: true,
+                        reactionOpen: false,
                         reactionWrapperOpen: false,
                     }))
                 }
