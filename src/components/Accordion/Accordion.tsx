@@ -20,10 +20,9 @@ interface AccordionItem {
 interface AccordionProps {
     data: AccordionItem
     onChose: (type: string) => void
-    level?: number
 }
 
-const Accordion = ({ data, onChose, level = 0 }: AccordionProps) => {
+const Accordion = ({ data, onChose }: AccordionProps) => {
     const router = useRouter()
     const [isOpen, setIsOpen] = useState(false)
 
