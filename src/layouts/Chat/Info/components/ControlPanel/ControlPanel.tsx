@@ -281,7 +281,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ onChose }) => {
         })
     }, [])
 
-    const handleChose = useCallback(
+    const handleChoose = useCallback(
         (type: string) => {
             switch (type) {
                 case 'rename_conversation':
@@ -342,6 +342,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ onChose }) => {
                         component: <BlockUser member={member} handleCloseModal={handleCloseModal} />,
                         title: 'Chặn',
                     })
+                    break
                 case 'leave_group':
                     setModalState({
                         isOpen: true,
@@ -359,13 +360,13 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ onChose }) => {
             eventName: 'conversation:leave-choose',
             handler: ({ detail }: { detail: { type: string } }) => {
                 if (detail.type === 'leave_group') {
-                    handleChose('leave_group')
+                    handleChoose('leave_group')
                 }
             },
         })
 
         return remove
-    }, [handleChose])
+    }, [handleChoose])
 
     const handleChangeAvatar = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0]
@@ -487,7 +488,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ onChose }) => {
 
             <div className="mt-6">
                 {ACCORDION_DATA.map((item) => {
-                    return <Accordion key={item.title} data={item} onChose={handleChose} />
+                    return <Accordion key={item.title} data={item} onChose={handleChoose} />
                 })}
             </div>
         </>

@@ -14,15 +14,11 @@ import openWindowCall from '~/utils/openWindowCall'
 interface MessageContentProps {
     message: MessageModel
     messageIndex: number
-    // eslint-disable-next-line no-unused-vars
     messageRef: (el: HTMLDivElement) => void
     currentUser: UserModel
-    // eslint-disable-next-line no-unused-vars
     handleOpenReactionModal: (messageId: number) => void
-    // eslint-disable-next-line no-unused-vars
     handleOpenImageModal: (url: string, messageId: number) => void
     messages: MessageResponse
-    // eslint-disable-next-line no-unused-vars
     diffTime: (message: MessageModel, targetMessage: MessageModel) => number
     handleFormatTime: (time: Date) => string
     conversation?: ConversationModel

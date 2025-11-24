@@ -8,6 +8,7 @@
                 "groups": [["^react", "^next", "^\\w"], ["^"]]
             }
         ],
-        "simple-import-sort/exports": "warn"
+        "simple-import-sort/exports": "warn",
+        "no-fallthrough": "warn" // Warn when switch cases fall through without a break
     }
 }
