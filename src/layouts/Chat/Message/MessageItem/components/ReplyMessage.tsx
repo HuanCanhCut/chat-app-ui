@@ -31,7 +31,7 @@ const ReplyMessage = ({ message, currentUser, memberMap }: ReplyMessageProps, re
                         className={`absolute bottom-[calc(100%-20px)] w-fit max-w-[85%] cursor-pointer ${message.sender_id === currentUser?.id ? 'flex flex-col items-end' : 'flex flex-col items-start'}`}
                         ref={ref}
                     >
-                        <p className="mb-1 flex w-fit items-center gap-2 text-right text-xs text-systemMessageLight dark:text-systemMessageDark">
+                        <p className="mb-1 flex w-fit items-center gap-2 text-right text-xs text-system-message-light dark:text-system-message-dark">
                             <FontAwesomeIcon icon={faReply} />
                             {'  '}
                             {message.sender_id === currentUser?.id
@@ -39,7 +39,7 @@ const ReplyMessage = ({ message, currentUser, memberMap }: ReplyMessageProps, re
                                 : `${memberMap[message.sender_id]?.nickname || memberMap[message.sender_id]?.user.full_name} đã trả lời ${message.parent.sender_id === currentUser?.id ? 'bạn' : message.sender_id === message.parent.sender_id ? 'chính mình' : memberMap[message.parent.sender_id]?.nickname || memberMap[message.parent.sender_id]?.user.full_name}`}
                         </p>
                         <span
-                            className={`line-clamp-1 max-w-[85%] overflow-hidden text-ellipsis whitespace-nowrap rounded-2xl ${message.sender_id === currentUser?.id ? 'rounded-br-none' : 'rounded-bl-none'} bg-[var(--reply-message-light-background-color)] px-3 py-1.5 pb-6 text-[13px] font-normal text-systemMessageLight dark:bg-[var(--reply-message-dark-background-color)] dark:text-systemMessageDark`}
+                            className={`line-clamp-1 max-w-[85%] overflow-hidden text-ellipsis whitespace-nowrap rounded-2xl ${message.sender_id === currentUser?.id ? 'rounded-br-none' : 'rounded-bl-none'} bg-(--reply-message-light-background-color) px-3 py-1.5 pb-6 text-[13px] font-normal text-system-message-light dark:bg-(--reply-message-dark-background-color) dark:text-system-message-dark`}
                             onClick={() => {
                                 handleScrollToMessage(message.parent as MessageModel)
                             }}
@@ -56,7 +56,7 @@ const ReplyMessage = ({ message, currentUser, memberMap }: ReplyMessageProps, re
                         className={`absolute bottom-[calc(100%-20px)] cursor-pointer ${message.sender_id === currentUser?.id ? 'flex flex-col items-end' : 'flex flex-col items-start'}`}
                         ref={ref}
                     >
-                        <p className="mb-1 flex w-fit items-center gap-2 text-right text-xs text-systemMessageLight dark:text-systemMessageDark">
+                        <p className="mb-1 flex w-fit items-center gap-2 text-right text-xs text-system-message-light dark:text-system-message-dark">
                             <FontAwesomeIcon icon={faReply} />
                             {'  '}
                             {message.sender_id === currentUser?.id
@@ -84,7 +84,7 @@ const ReplyMessage = ({ message, currentUser, memberMap }: ReplyMessageProps, re
                             } catch (e) {
                                 return (
                                     <span
-                                        className={`line-clamp-1 max-w-[85%] overflow-hidden text-ellipsis whitespace-nowrap rounded-2xl ${message.sender_id === currentUser?.id ? 'rounded-br-none' : 'rounded-bl-none'} bg-[var(--reply-message-light-background-color)] px-3 py-1.5 pb-6 text-[13px] font-normal text-systemMessageLight dark:bg-[var(--reply-message-dark-background-color)] dark:text-systemMessageDark`}
+                                        className={`line-clamp-1 max-w-[85%] overflow-hidden text-ellipsis whitespace-nowrap rounded-2xl ${message.sender_id === currentUser?.id ? 'rounded-br-none' : 'rounded-bl-none'} bg-(--reply-message-light-background-color) px-3 py-1.5 pb-6 text-[13px] font-normal text-system-message-light dark:bg-(--reply-message-dark-background-color) dark:text-system-message-dark`}
                                         onClick={() => {
                                             handleScrollToMessage(message.parent as MessageModel)
                                         }}

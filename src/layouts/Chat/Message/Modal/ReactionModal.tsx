@@ -177,7 +177,7 @@ const ReactionModal: React.FC<Props> = ({ isOpen, onClose, messageId }) => {
             isOpen={isOpen}
             onClose={onClose}
             title="Cảm xúc về tin nhắn"
-            popperClassName="w-[548px] max-w-[calc(100vw-40px)] !p-0"
+            popperClassName="w-[548px] max-w-[calc(100vw-40px)] p-0!"
         >
             <main className="p-4">
                 <div>
@@ -206,7 +206,7 @@ const ReactionModal: React.FC<Props> = ({ isOpen, onClose, messageId }) => {
                         next={() => {
                             setPage(page + 1)
                         }}
-                        className="!overflow-hidden"
+                        className="overflow-hidden!"
                         hasMore={
                             reactions &&
                             reactions?.meta.pagination.current_page < reactions?.meta.pagination.total_pages
@@ -229,7 +229,7 @@ const ReactionModal: React.FC<Props> = ({ isOpen, onClose, messageId }) => {
                                     onClick={() => handleChooseReaction(reaction)}
                                 >
                                     <UserAvatar size={40} src={reaction.user_reaction.avatar} />
-                                    <div className="ml-2 flex-grow">
+                                    <div className="ml-2 grow">
                                         <p className="font-medium">{reaction.user_reaction.full_name}</p>
                                         <p className="text-xs font-normal text-zinc-600 dark:text-zinc-400">
                                             {reaction.user_id === currentUser?.data.id

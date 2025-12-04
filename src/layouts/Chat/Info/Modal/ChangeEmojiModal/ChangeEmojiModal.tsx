@@ -50,7 +50,7 @@ const ChangeEmojiModal: React.FC<ChangeEmojiModalProps> = ({ onClose, currentEmo
                 <Button
                     buttonType="rounded"
                     leftIcon={<FontAwesomeIcon icon={faXmark} />}
-                    className="[&_[data-left-icon]]:text-xl"
+                    className="**:data-left-icon:text-xl"
                     onClick={handleRemoveEmoji}
                 >
                     Gỡ
@@ -58,7 +58,7 @@ const ChangeEmojiModal: React.FC<ChangeEmojiModalProps> = ({ onClose, currentEmo
             </div>
 
             <Emoji
-                className="!border-none !bg-[#252728] [&_.epr-emoji-category-label]:top-[-1px] [&_.epr-emoji-category-label]:bg-[#252728]"
+                className="border-none! bg-[#252728]! [&_.epr-emoji-category-label]:-top-px [&_.epr-emoji-category-label]:bg-[#252728]"
                 onEmojiClick={handleSetEmoji}
                 isOpen={true}
             />

@@ -22,7 +22,7 @@ const SearchResult: React.FC<SearchResultProps> = ({ message, searchWords }) => 
 
     return (
         <div
-            className="flex cursor-pointer items-center gap-2 rounded-md px-1 py-3 hover:bg-gray-100 dark:hover:bg-darkGray"
+            className="flex cursor-pointer items-center gap-2 rounded-md px-1 py-3 hover:bg-gray-100 dark:hover:bg-dark-gray"
             onClick={handleScrollToMessage}
         >
             <UserAvatar src={message.sender.avatar} size={32} />

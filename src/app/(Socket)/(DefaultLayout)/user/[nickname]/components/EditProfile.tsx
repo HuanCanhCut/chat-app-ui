@@ -198,7 +198,7 @@ const EditProfile = ({ closeModal }: EditProfileProps) => {
                                 <CustomImage
                                     src={coverPhoto?.preview || currentUser?.data.cover_photo}
                                     fallback={defaultCoverPhoto}
-                                    className="mx-auto aspect-[12/5] w-[80%] cursor-pointer rounded-lg object-cover"
+                                    className="mx-auto aspect-12/5 w-[80%] cursor-pointer rounded-lg object-cover"
                                 />
                             </label>
                         )}

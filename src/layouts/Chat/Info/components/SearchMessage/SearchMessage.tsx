@@ -80,7 +80,7 @@ const SearchMessage: React.FC<SearchMessageProps> = ({ onBack }) => {
                 <input
                     ref={inputRef}
                     type="text"
-                    className="w-full select-none overflow-hidden truncate text-ellipsis bg-transparent px-3 py-[6px] pl-6 text-sm font-normal outline-none"
+                    className="w-full select-none overflow-hidden truncate text-ellipsis bg-transparent px-3 py-[6px] pl-6 text-sm font-normal outline-hidden"
                     placeholder="Tìm kiếm trong cuộc trò chuyện"
                     value={searchValue}
                     onChange={(e) => setSearchValue(e.target.value)}
@@ -92,7 +92,7 @@ const SearchMessage: React.FC<SearchMessageProps> = ({ onBack }) => {
                         </span>
                         <Button
                             buttonType="icon"
-                            className="!h-8 !w-8 bg-[#E2E5E9] dark:bg-[#FFFFFF1A]"
+                            className="h-8! w-8! bg-[#E2E5E9] dark:bg-[#FFFFFF1A]"
                             onClick={handleClearSearch}
                         >
                             <FontAwesomeIcon icon={faXmark} width={24} height={24} />
@@ -129,7 +129,7 @@ const SearchMessage: React.FC<SearchMessageProps> = ({ onBack }) => {
                             handleApiError(error)
                         }
                     }}
-                    className="!overflow-hidden"
+                    className="overflow-hidden!"
                     hasMore={
                         searchResult
                             ? searchResult.meta.pagination.current_page < searchResult.meta.pagination.total_pages

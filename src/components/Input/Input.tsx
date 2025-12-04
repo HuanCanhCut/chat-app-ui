@@ -47,7 +47,7 @@ const Input = forwardRef<HTMLInputElement, Props>(
                         <>
                             <div className="relative">
                                 <input
-                                    className={`w-full rounded-lg border border-gray-300 bg-gray-100 p-2 outline-none dark:border-zinc-700 dark:bg-darkGray`}
+                                    className={`w-full rounded-lg border border-gray-300 bg-gray-100 p-2 outline-hidden dark:border-zinc-700 dark:bg-dark-gray`}
                                     placeholder={placeholder}
                                     {...field}
                                     type={type}

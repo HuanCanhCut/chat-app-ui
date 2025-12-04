@@ -6,7 +6,7 @@ export default function DefaultLayout({ children }: { children: React.ReactNode 
         <div>
             <IncomingCall>
                 <Header />
-                <main className="mt-[var(--header-height-mobile)] min-h-[calc(100dvh-var(--header-height-mobile))] overflow-hidden dark:bg-dark sm:mt-[var(--header-height)] sm:min-h-[calc(100dvh-var(--header-height))]">
+                <main className="mt-(--header-height-mobile) min-h-[calc(100dvh-var(--header-height-mobile))] overflow-hidden dark:bg-dark sm:mt-(--header-height) sm:min-h-[calc(100dvh-var(--header-height))]">
                     {children}
                 </main>
             </IncomingCall>

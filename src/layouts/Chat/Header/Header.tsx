@@ -134,16 +134,16 @@ const Header: React.FC<HeaderProps> = ({ className = '', isInfoOpen, conversatio
 
     return (
         <div
-            className={`${className} z-10 flex items-center justify-between bg-[var(--background-theme-light-header-color)] px-2 py-1 shadow-sm [box-shadow:1px_0px_8px_rgba(0,0,0,0.1)] dark:bg-[var(--background-theme-dark-header-color)] dark:[box-shadow:1px_0px_8px_rgba(0,0,0,0.2)]`}
+            className={`${className} z-10 flex items-center justify-between bg-(--background-theme-light-header-color) px-2 py-1 shadow-xs [box-shadow:1px_0px_8px_rgba(0,0,0,0.1)] dark:bg-(--background-theme-dark-header-color) dark:[box-shadow:1px_0px_8px_rgba(0,0,0,0.2)]`}
         >
             <div className="flex items-center">
                 <div
-                    className="flex-center cursor-pointer rounded-lg px-1 py-1 hover:!bg-[#99999926] dark:hover:!bg-[#383b3b25] bp900:hidden"
+                    className="flex-center cursor-pointer rounded-lg px-1 py-1 hover:bg-[#99999926]! dark:hover:bg-[#383b3b25]! bp900:hidden"
                     onClick={() => router.push('/message')}
                 >
                     <FontAwesomeIcon
                         icon={faChevronLeft}
-                        className="text-xl text-[var(--sender-light-background-color)] dark:text-[var(--sender-dark-background-color)]"
+                        className="text-xl text-(--sender-light-background-color) dark:text-(--sender-dark-background-color)"
                         width={22}
                         height={22}
                     />
@@ -152,7 +152,7 @@ const Header: React.FC<HeaderProps> = ({ className = '', isInfoOpen, conversatio
                     className="flex h-full cursor-pointer items-center gap-3 rounded-lg p-2 pr-4 hover:bg-[#99999926] dark:bg-transparent dark:hover:bg-[#383b3b25]"
                     onClick={handleNavigate}
                 >
-                    <div className="relative flex-shrink-0">
+                    <div className="relative shrink-0">
                         <UserAvatar
                             src={conversation.is_group ? conversation.avatar : conversationMember?.user?.avatar}
                             size={40}
@@ -183,27 +183,27 @@ const Header: React.FC<HeaderProps> = ({ className = '', isInfoOpen, conversatio
                         <>
                             <Button
                                 buttonType="icon"
-                                className="bg-transparent hover:!bg-[#99999926] dark:bg-transparent dark:hover:!bg-[#383b3b25]"
+                                className="bg-transparent hover:bg-[#99999926]! dark:bg-transparent dark:hover:bg-[#383b3b25]!"
                                 onClick={handleVoiceCall}
                             >
                                 <FontAwesomeIcon
                                     icon={faPhone}
                                     width={20}
                                     height={20}
-                                    className="cursor-pointer text-xl text-[var(--sender-light-background-color)] dark:text-[var(--sender-dark-background-color)]"
+                                    className="cursor-pointer text-xl text-(--sender-light-background-color) dark:text-(--sender-dark-background-color)"
                                 />
                             </Button>
 
                             <Button
                                 buttonType="icon"
-                                className="bg-transparent hover:!bg-[#99999926] dark:bg-transparent dark:hover:!bg-[#383b3b25]"
+                                className="bg-transparent hover:bg-[#99999926]! dark:bg-transparent dark:hover:bg-[#383b3b25]!"
                                 onClick={handleVideoCall}
                             >
                                 <FontAwesomeIcon
                                     icon={faVideo}
                                     width={20}
                                     height={20}
-                                    className="cursor-pointer text-xl text-[var(--sender-light-background-color)] dark:text-[var(--sender-dark-background-color)]"
+                                    className="cursor-pointer text-xl text-(--sender-light-background-color) dark:text-(--sender-dark-background-color)"
                                 />
                             </Button>
                         </>
@@ -211,14 +211,14 @@ const Header: React.FC<HeaderProps> = ({ className = '', isInfoOpen, conversatio
 
                     <Button
                         buttonType="icon"
-                        className="bg-transparent hover:!bg-[#99999926] dark:bg-transparent dark:hover:!bg-[#383b3b25]"
+                        className="bg-transparent hover:bg-[#99999926]! dark:bg-transparent dark:hover:bg-[#383b3b25]!"
                         onClick={handleToggleInfo}
                     >
                         <FontAwesomeIcon
                             icon={faCircleInfo}
                             width={20}
                             height={20}
-                            className="cursor-pointer text-xl text-[var(--sender-light-background-color)] dark:text-[var(--sender-dark-background-color)]"
+                            className="cursor-pointer text-xl text-(--sender-light-background-color) dark:text-(--sender-dark-background-color)"
                         />
                     </Button>
                 </div>

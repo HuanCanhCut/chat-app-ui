@@ -101,11 +101,11 @@ const AddMemberPreview = forwardRef<ImperativeHandle, AddMemberPreviewProps>(({ 
                                     <div key={user.id} className="relative">
                                         <button
                                             onClick={() => handleRemovePreview(user)}
-                                            className="flex-center absolute right-0 top-0 z-10 h-5 w-5 -translate-y-1 translate-x-2 rounded-full bg-white p-1 shadow-lg shadow-gray-400 hover:bg-zinc-100 dark:bg-darkGray dark:shadow-md dark:shadow-zinc-800 dark:hover:bg-zinc-700"
+                                            className="flex-center absolute right-0 top-0 z-10 h-5 w-5 -translate-y-1 translate-x-2 rounded-full bg-white p-1 shadow-lg shadow-gray-400 hover:bg-zinc-100 dark:bg-dark-gray dark:shadow-md dark:shadow-zinc-800 dark:hover:bg-zinc-700"
                                         >
                                             <FontAwesomeIcon
                                                 icon={faXmark}
-                                                className="text-systemMessageLight dark:text-systemMessageDark"
+                                                className="text-system-message-light dark:text-system-message-dark"
                                                 width={12}
                                                 height={12}
                                             />
@@ -117,7 +117,7 @@ const AddMemberPreview = forwardRef<ImperativeHandle, AddMemberPreviewProps>(({ 
                         </div>
                     ) : (
                         <div className="text-center">
-                            <p className="text-sm text-systemMessageLight dark:text-systemMessageDark">
+                            <p className="text-sm text-system-message-light dark:text-system-message-dark">
                                 Chưa chọn người dùng nào
                             </p>
                         </div>
@@ -128,7 +128,7 @@ const AddMemberPreview = forwardRef<ImperativeHandle, AddMemberPreviewProps>(({ 
                     <InfiniteScroll
                         dataLength={searchResult.length || friends?.data.length || 0}
                         next={handleLoadMoreFriend}
-                        className="!overflow-hidden"
+                        className="overflow-hidden!"
                         hasMore={
                             friends
                                 ? friends?.meta.pagination.current_page < friends?.meta.pagination.total_pages

@@ -66,7 +66,7 @@ const Typing = () => {
                 translate={4}
                 className={`h-7 w-${memberTyping.length * 7} [&>img]:h-7 [&>img]:w-7`}
             />
-            <div className="inline-block rounded-3xl bg-[var(--receiver-light-background-color)] px-3 py-2 dark:bg-[var(--receiver-dark-background-color)]">
+            <div className="inline-block rounded-3xl bg-(--receiver-light-background-color) px-3 py-2 dark:bg-(--receiver-dark-background-color)">
                 <div className="typing">
                     <div className="dot"></div>
                     <div className="dot"></div>

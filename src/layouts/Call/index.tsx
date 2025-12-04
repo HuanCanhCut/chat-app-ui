@@ -752,7 +752,7 @@ const CallClient = () => {
         <div className="relative h-dvh max-h-dvh w-full max-w-full overflow-hidden">
             <audio src="/static/audio/ringbacktone.mp3" ref={audioRef} />
             {subType === 'caller' && !isCalling ? (
-                <div className="blur-10 flex-center absolute bottom-0 left-0 right-0 top-0 z-10 backdrop-blur">
+                <div className="blur-10 flex-center absolute bottom-0 left-0 right-0 top-0 z-10 backdrop-blur-sm">
                     <div className="flex flex-col items-center gap-2">
                         <UserAvatar src={member?.data.avatar} className="h-20 w-20" />
                         <div className="text-2xl font-bold">{member?.data.nickname}</div>
@@ -766,7 +766,7 @@ const CallClient = () => {
                 callStatus === 'failed' ||
                 callStatus === 'rejected' ||
                 callStatus === 'timeout') && (
-                <div className="blur-10 flex-center absolute bottom-0 left-0 right-0 top-0 z-50 bg-black bg-opacity-80 backdrop-blur">
+                <div className="blur-10 flex-center absolute bottom-0 left-0 right-0 top-0 z-50 bg-black bg-opacity-80 backdrop-blur-sm">
                     <div className="flex flex-col items-center gap-4 text-white">
                         <div className="flex h-20 w-20 items-center justify-center rounded-full bg-red-500">
                             <FontAwesomeIcon icon={faPhoneSlash} className="text-3xl" />
@@ -818,7 +818,7 @@ const CallClient = () => {
                             backgroundPosition: 'center',
                         }}
                     >
-                        <div className="flex-center h-full w-full flex-col text-center backdrop-blur-xl backdrop-brightness-[65%]">
+                        <div className="flex-center h-full w-full flex-col text-center backdrop-blur-xl backdrop-brightness-65">
                             <UserAvatar src={member?.data.avatar} className="mx-auto mb-4 h-32 w-32" />
                             <div className="text-xl font-semibold text-white">{member?.data.nickname}</div>
                         </div>
@@ -898,7 +898,7 @@ const CallClient = () => {
             {/* Local video preview */}
             <div
                 ref={previewRef}
-                className="absolute bottom-auto right-[20px] top-[20px] z-10 h-[30%] max-w-[calc(100dvw-40px)] rounded-xl transition-all duration-300 ease-in-out [aspect-ratio:10/16] md:!top-auto md:bottom-[20px] md:aspect-video md:w-[300px] lg:w-[350px]"
+                className="absolute bottom-auto right-[20px] top-[20px] z-10 h-[30%] max-w-[calc(100dvw-40px)] rounded-xl transition-all duration-300 ease-in-out aspect-10/16 md:top-auto! md:bottom-[20px] md:aspect-video md:w-[300px] lg:w-[350px]"
                 style={{
                     backgroundImage: `url(${currentUser?.data.avatar})`,
                     backgroundSize: 'cover',
@@ -907,7 +907,7 @@ const CallClient = () => {
             >
                 <button
                     ref={previewButtonRef}
-                    className="flex-center absolute left-2 top-4 z-10 h-7 w-7 transform !cursor-pointer rounded-full bg-opacity-50 p-2 transition duration-200 ease-in-out hover:bg-opacity-70 xxs:h-9 xxs:w-9 md:top-1/2 md:h-10 md:w-10 md:-translate-y-1/2"
+                    className="flex-center absolute left-2 top-4 z-10 h-7 w-7 transform cursor-pointer! rounded-full bg-opacity-50 p-2 transition duration-200 ease-in-out hover:bg-opacity-70 xxs:h-9 xxs:w-9 md:top-1/2 md:h-10 md:w-10 md:-translate-y-1/2"
                     onClick={() => setPreviewOpen(!previewOpen)}
                 >
                     <FontAwesomeIcon
@@ -939,7 +939,7 @@ const CallClient = () => {
                             backgroundPosition: 'center',
                         }}
                     >
-                        <div className="flex-center h-full w-full flex-col rounded-xl text-center backdrop-blur-xl backdrop-brightness-[65%]">
+                        <div className="flex-center h-full w-full flex-col rounded-xl text-center backdrop-blur-xl backdrop-brightness-65">
                             <UserAvatar src={currentUser?.data.avatar} className="mx-auto mb-2 h-16 w-16" />
                             <div className="text-sm text-white">Camera tắt</div>
                         </div>

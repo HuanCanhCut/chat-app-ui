@@ -75,7 +75,7 @@ const SystemMessage = (
             jsx.push(
                 <span key={`quick-action`}>
                     <span
-                        className="cursor-pointer select-none font-medium text-[var(--sender-light-background-color)] hover:underline dark:text-[var(--sender-dark-background-color)]"
+                        className="cursor-pointer select-none font-medium text-(--sender-light-background-color) hover:underline dark:text-(--sender-dark-background-color)"
                         onClick={() => {
                             handleQuickAction(message.type)
                         }}
@@ -92,7 +92,7 @@ const SystemMessage = (
 
     return (
         <div className={`${className}`} ref={messageIndex === 0 ? ref : null}>
-            <p className={`text-center text-xs text-systemMessageLight dark:text-systemMessageDark`}>
+            <p className={`text-center text-xs text-system-message-light dark:text-system-message-dark`}>
                 {handleReplaceJson(message.content || '')}
             </p>
         </div>

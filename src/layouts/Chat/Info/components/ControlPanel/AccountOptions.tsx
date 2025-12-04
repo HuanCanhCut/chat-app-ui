@@ -168,7 +168,7 @@ const AccountOptions: React.FC<AccountOptionsProps> = ({ member, isAdmin }) => {
                     return (
                         <div
                             key={index}
-                            className="flex cursor-pointer items-center gap-2 rounded-md px-4 py-2 hover:bg-gray-100 dark:hover:bg-darkGray"
+                            className="flex cursor-pointer items-center gap-2 rounded-md px-4 py-2 hover:bg-gray-100 dark:hover:bg-dark-gray"
                             onClick={(e) => {
                                 e.stopPropagation()
                                 e.preventDefault()

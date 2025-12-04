@@ -1,8 +1,31 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
 
-:root {
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
+  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
+  }
+}
+
+@utility flex-center {
+  @apply flex items-center justify-center;
+}
+
+@layer utilities {
+  :root {
     --header-height: 60px;
     --header-height-mobile: 90px;
     --sidebar-width: 330px;
@@ -26,6 +49,7 @@
     --background-theme-dark-footer-color: #212223;
     --reply-message-light-background-color: #f6f6f6;
     --reply-message-dark-background-color: #8383838d;
+  }
 }
 
 @layer base {
@@ -39,12 +63,6 @@
 
     h3 {
         @apply text-xl;
-    }
-}
-
-@layer utilities {
-    .flex-center {
-        @apply flex items-center justify-center;
     }
 }
 
@@ -169,3 +187,32 @@ body.ReactModal__Body--open {
 .ReactModal__Overlay--before-close {
     opacity: 0;
 }
+
+@theme {
+    --breakpoint-xxs: 340px;
+    --breakpoint-xs: 480px;
+    --breakpoint-bp900: 900px;
+  
+    --color-primary: #0866ff;
+    --color-error: #ff453a;
+    --color-dark: #18191a;
+    --color-dark-gray: #252728;
+    --color-system-message-light: #65686C;
+    --color-system-message-dark: #A1A4A9;
+  
+    --border-color-dark: #212223;
+    --border-color-light: #65686C;
+    --border-color-dark-gray: #313233;
+  
+    --outline-none: none;
+  
+    --background-color-dark: #212223;
+    --background-color-lightGray: #f0f2f5;
+    --background-color-dark-gray: #313233;
+  
+    --text-color-dark: #ffffffe6;
+  
+    --shadow-light: 3px 5px 15px rgba(0, 0, 0, 0.3);
+    --shadow-dark: 3px 5px 15px rgba(255, 255, 255, 0.3);
+  }
+  

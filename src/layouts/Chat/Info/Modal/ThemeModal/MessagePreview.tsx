@@ -15,10 +15,10 @@ const MessagePreview: React.FC<MessagePreviewProps> = ({ content, index, current
 
     return (
         <div
-            className={`mt-[1px] max-w-[80%] ${type === 'system' ? 'flex-center max-w-full' : type === 'receiver' ? '!mt-2' : 'self-end'}`}
+            className={`mt-px max-w-[80%] ${type === 'system' ? 'flex-center max-w-full' : type === 'receiver' ? 'mt-2!' : 'self-end'}`}
         >
             <p
-                className={`rounded-2xl p-2 text-[15px] ${type === 'system' ? 'text-xs font-medium text-systemMessageLight dark:text-systemMessageDark' : ''} ${index === 0 ? '!rounded-br-[4px]' : index === 1 ? '!rounded-tr-[4px]' : ''}`}
+                className={`rounded-2xl p-2 text-[15px] ${type === 'system' ? 'text-xs font-medium text-system-message-light dark:text-system-message-dark' : ''} ${index === 0 ? 'rounded-br-[4px]!' : index === 1 ? 'rounded-tr-[4px]!' : ''}`}
                 style={{
                     backgroundColor:
                         type !== 'system' ? currentTheme.theme_config[type][theme].background_color : 'transparent',

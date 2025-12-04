@@ -115,7 +115,7 @@ const RevokeModal = ({ isOpen, message, onClose }: RevokeModalProps) => {
             isOpen={isOpen}
             onClose={onClose}
             title={revokeType === 'for-me' ? 'Gỡ đối với bạn?' : 'Bạn muốn tin nhắn này thu hồi ở phía ai?'}
-            popperClassName={`!max-w-[calc(100vw-30px)] !border-none !p-0 ${revokeType === 'for-me' ? '!w-[550px]' : '!w-[700px]'}`}
+            popperClassName={`max-w-[calc(100vw-30px)]! border-none! p-0! ${revokeType === 'for-me' ? 'w-[550px]!' : 'w-[700px]!'}`}
         >
             <main className="px-5 py-3">
                 {revokeType === 'for-me' ? (

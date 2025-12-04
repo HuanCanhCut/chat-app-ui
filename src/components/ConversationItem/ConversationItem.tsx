@@ -83,10 +83,10 @@ const ConversationItem: React.FC<Props> = ({ conversation, className = '' }) => 
 
     return (
         <div
-            className={`group relative rounded-lg ${!isActive ? 'hover:bg-lightGray hover:dark:bg-darkGray' : ''} ${className} ${isActive ? 'bg-[#ebf5ff] dark:bg-[#222e39bd]' : ''}`}
+            className={`group relative rounded-lg ${!isActive ? 'hover:bg-lightGray hover:dark:bg-dark-gray' : ''} ${className} ${isActive ? 'bg-[#ebf5ff] dark:bg-[#222e39bd]' : ''}`}
         >
             <Link href={`/message/${conversation.uuid}`} className={`flex items-center p-2 pr-5`}>
-                <div className="relative flex-shrink-0">
+                <div className="relative shrink-0">
                     <UserAvatar
                         src={conversation.is_group ? conversation.avatar : userMember?.user.avatar}
                         size={56}
@@ -102,7 +102,7 @@ const ConversationItem: React.FC<Props> = ({ conversation, className = '' }) => 
                         {conversation.name || userMember?.nickname || userMember?.user.full_name}
                     </p>
                     <div
-                        className={`flex items-center text-[13px] font-normal [&_*]:text-[13px] ${isRead || isMessageBlocked() ? '[&_*]:text-gray-600 dark:[&_*]:text-gray-400' : '[&_*]:text-black dark:[&_*]:text-gray-200'}`}
+                        className={`flex items-center text-[13px] font-normal **:text-[13px] ${isRead || isMessageBlocked() ? '**:text-gray-600 dark:**:text-gray-400' : '**:text-black dark:**:text-gray-200'}`}
                     >
                         <span className={`truncate pr-1 [&>p]:w-auto`}>
                             {conversation.last_message.type.startsWith('system') ? (
@@ -130,7 +130,7 @@ const ConversationItem: React.FC<Props> = ({ conversation, className = '' }) => 
                                 />
                             )}
                         </span>
-                        <span className="flex-shrink-0 text-[13px]">
+                        <span className="shrink-0 text-[13px]">
                             · {momentTimezone(conversation.last_message?.created_at)}
                         </span>
                     </div>

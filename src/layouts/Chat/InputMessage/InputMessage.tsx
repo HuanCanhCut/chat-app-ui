@@ -345,7 +345,7 @@ const InputMessage: React.FC<InputMessageProps> = () => {
     return (
         <div
             onKeyDown={handleEnterMessage}
-            className="bg-[var(--background-theme-light-footer-color)] dark:bg-[var(--background-theme-dark-footer-color)]"
+            className="bg-(--background-theme-light-footer-color) dark:bg-(--background-theme-dark-footer-color)"
         >
             {replyMessage && (
                 <div className="flex items-center justify-between border-t border-zinc-300 px-4 py-2 pt-1 dark:border-zinc-700">
@@ -390,13 +390,13 @@ const InputMessage: React.FC<InputMessageProps> = () => {
                         </div>
                     </Tippy>
                 </div>
-                <div className="relative flex flex-grow">
+                <div className="relative flex grow">
                     <div className="flex w-full flex-col justify-center">
                         {images.length > 0 && (
                             <div className="flex w-full max-w-full items-center gap-3 overflow-x-auto rounded-t-2xl bg-lightGray p-3 dark:bg-[#333334]">
                                 <Tippy content="Tải lên hình ảnh khác" delay={[200, 0]}>
                                     <button
-                                        className="flex-center aspect-square h-12 w-12 cursor-pointer rounded-lg bg-zinc-300 hover:bg-transparent dark:bg-darkGray dark:hover:bg-transparent"
+                                        className="flex-center aspect-square h-12 w-12 cursor-pointer rounded-lg bg-zinc-300 hover:bg-transparent dark:bg-dark-gray dark:hover:bg-transparent"
                                         onClick={handleOpenUploadImage}
                                     >
                                         <FontAwesomeIcon
@@ -408,7 +408,7 @@ const InputMessage: React.FC<InputMessageProps> = () => {
                                 </Tippy>
                                 {images.map((image, index) => {
                                     return (
-                                        <div key={index} className="relative flex-shrink-0">
+                                        <div key={index} className="relative shrink-0">
                                             <CustomImage
                                                 src={image.preview}
                                                 alt="image"
@@ -433,7 +433,7 @@ const InputMessage: React.FC<InputMessageProps> = () => {
                             </div>
                         )}
                         <textarea
-                            className={`max-h-[140px] min-h-[36px] w-full resize-none rounded-3xl bg-lightGray px-4 py-1 pr-12 pt-[6px] outline-none dark:bg-[#333334] ${images.length && 'rounded-t-none'}`}
+                            className={`max-h-[140px] min-h-[36px] w-full resize-none rounded-3xl bg-lightGray px-4 py-1 pr-12 pt-[6px] outline-hidden dark:bg-[#333334] ${images.length && 'rounded-t-none'}`}
                             value={messageValue}
                             autoFocus
                             onChange={handleInputChange}
@@ -467,7 +467,7 @@ const InputMessage: React.FC<InputMessageProps> = () => {
                     >
                         <Tippy content="Chọn biểu tượng cảm xúc">
                             <button
-                                className="absolute bottom-1 right-1 rounded-full p-1 leading-[1px] hover:bg-gray-300 dark:hover:bg-darkGray"
+                                className="absolute bottom-1 right-1 rounded-full p-1 leading-px hover:bg-gray-300 dark:hover:bg-dark-gray"
                                 onClick={handleToggleEmoji}
                             >
                                 <FontAwesomeIcon icon={faSmile} className="text-xl" />
@@ -481,14 +481,14 @@ const InputMessage: React.FC<InputMessageProps> = () => {
                 >
                     {messageValue.length || images.length > 0 ? (
                         <button
-                            className="rounded-full p-2 hover:bg-lightGray dark:hover:bg-darkGray"
+                            className="rounded-full p-2 hover:bg-lightGray dark:hover:bg-dark-gray"
                             onClick={() => handleEmitMessage(uuid as string)}
                         >
                             <SendHorizontalIcon />
                         </button>
                     ) : (
                         <button
-                            className="flex-shrink-0 overflow-hidden text-xl"
+                            className="shrink-0 overflow-hidden text-xl"
                             onClick={() => {
                                 const unified = conversation?.data.emoji
                                 if (unified) {

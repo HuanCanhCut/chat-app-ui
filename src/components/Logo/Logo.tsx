@@ -16,7 +16,7 @@ export default function Logo({ className = '' }: { className?: string }) {
                 <Image
                     src={theme === 'dark' ? '/static/media/dark-logo.png' : '/static/media/light-logo.png'}
                     sizes="1000px"
-                    className="h-auto w-[35px] min-w-[35px] flex-shrink-0 cursor-pointer sm:w-[40px]"
+                    className="h-auto w-[35px] min-w-[35px] shrink-0 cursor-pointer sm:w-[40px]"
                     alt="logo"
                     width="0"
                     height="0"

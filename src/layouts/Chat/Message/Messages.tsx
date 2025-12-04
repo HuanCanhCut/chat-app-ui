@@ -420,7 +420,7 @@ const Message: React.FC<MessageProps> = ({ conversation }) => {
                         }
 
                         ref.classList.remove(
-                            'border-[2px]',
+                            'border-2',
                             'border-white',
                             'dark:border-zinc-800',
                             'shadow-[0_0_0_1px_#222]',
@@ -442,7 +442,7 @@ const Message: React.FC<MessageProps> = ({ conversation }) => {
                             ([entry]) => {
                                 if (entry.isIntersecting) {
                                     messageElement.classList.add(
-                                        'border-[2px]',
+                                        'border-2',
                                         'border-white',
                                         'dark:border-zinc-800',
                                         'shadow-[0_0_0_1px_#222]',
@@ -544,7 +544,7 @@ const Message: React.FC<MessageProps> = ({ conversation }) => {
 
     return (
         <div
-            className={`relative flex-grow !overflow-hidden`}
+            className={`relative grow overflow-hidden!`}
             onKeyDown={handleEnterMessage}
             style={{
                 backgroundImage: `var(--background-theme-${theme}-background)`,
@@ -594,7 +594,7 @@ const Message: React.FC<MessageProps> = ({ conversation }) => {
                             toast('Có lỗi khi tải tin nhắn, vui lòng thử lại sau', 'error')
                         }
                     }}
-                    className="flex flex-col-reverse gap-[2.5px] !overflow-hidden px-2 py-3"
+                    className="flex flex-col-reverse gap-[2.5px] overflow-hidden! px-2 py-3"
                     hasMore={
                         messages
                             ? messages.meta.pagination.offset / PER_PAGE + 1 < messages.meta.pagination.total / PER_PAGE

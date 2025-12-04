@@ -119,7 +119,7 @@ const Search: React.FC<Props> = ({ setSearchMode, searchMode }) => {
                         <input
                             type="text"
                             placeholder="Tìm kiếm đoạn chat"
-                            className="w-full bg-transparent px-3 py-2 outline-none"
+                            className="w-full bg-transparent px-3 py-2 outline-hidden"
                             value={searchValue}
                             onChange={(e) => setSearchValue(e.target.value)}
                             onFocus={() => setSearchMode(true)}

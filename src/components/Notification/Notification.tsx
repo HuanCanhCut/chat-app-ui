@@ -287,7 +287,7 @@ const Notification = () => {
                             <Button
                                 key={index}
                                 buttonType={tab.value === currentTab ? 'primary' : 'rounded'}
-                                className="!rounded-full py-[6px]"
+                                className="rounded-full! py-[6px]"
                                 onClick={() => setCurrentTab(tab.value)}
                             >
                                 {tab.name}

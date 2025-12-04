@@ -113,7 +113,7 @@ export default function UserPage() {
     const Loading = () => {
         return (
             <div className="w-1100px mx-auto max-w-[1100px]">
-                <Skeleton className="aspect-[12/5] h-auto w-[1100px] rounded-lg object-cover" />
+                <Skeleton className="aspect-12/5 h-auto w-[1100px] rounded-lg object-cover" />
                 <div className="relative w-full px-6 py-4 sm:flex sm:items-center">
                     <Skeleton
                         circle
@@ -147,7 +147,7 @@ export default function UserPage() {
                             }
                             fallback="/static/media/login-form.jpg"
                             alt="user"
-                            className="aspect-[12/5] h-auto w-[1100px] rounded-lg object-cover"
+                            className="aspect-12/5 h-auto w-[1100px] rounded-lg object-cover"
                             style={{ width: '100%', height: 'auto' }}
                         />
                         {user && currentUser && (

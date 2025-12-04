@@ -125,7 +125,7 @@ const ConversationOptions: React.FC<Props> = ({ conversation, tippyInstanceRef }
             <Modal
                 isOpen={modalState.isOpen}
                 onClose={handleCloseModal}
-                popperClassName={`!p-0 !overflow-hidden flex flex-col`}
+                popperClassName={`p-0! overflow-hidden! flex flex-col`}
                 title={modalState.title}
             >
                 {modalState.component}
@@ -136,7 +136,7 @@ const ConversationOptions: React.FC<Props> = ({ conversation, tippyInstanceRef }
                     <Button
                         key={option.label}
                         buttonType="rounded"
-                        className="w-full !justify-start bg-transparent dark:bg-transparent"
+                        className="w-full justify-start! bg-transparent dark:bg-transparent"
                         leftIcon={<FontAwesomeIcon icon={option.icon} />}
                         onClick={option.onClick}
                     >

@@ -54,7 +54,7 @@ const MessageAction: React.FC<MessageActionProps> = ({
 
     const renderMoreAction = () => {
         return (
-            <PopperWrapper className="!border-none !p-2">
+            <PopperWrapper className="border-none! p-2!">
                 <div className="flex w-32 flex-col text-sm font-medium">
                     <button
                         className="rounded-md p-2 text-left hover:bg-gray-100 dark:hover:bg-[#353738]"
@@ -114,7 +114,7 @@ const MessageAction: React.FC<MessageActionProps> = ({
         >
             <CustomTippy renderItem={renderMoreAction} onShow={tippyShow} placement="top" offsetY={6}>
                 <Tippy content="Xem thêm">
-                    <button className="flex-center z-10 h-7 w-7 rounded-full bg-[var(--reply-message-light-background-color)] text-black dark:bg-[var(--reply-message-dark-background-color)] dark:text-white">
+                    <button className="flex-center z-10 h-7 w-7 rounded-full bg-(--reply-message-light-background-color) text-black dark:bg-(--reply-message-dark-background-color) dark:text-white">
                         <FontAwesomeIcon icon={faEllipsisVertical} />
                     </button>
                 </Tippy>
@@ -122,7 +122,7 @@ const MessageAction: React.FC<MessageActionProps> = ({
             <Tippy content="Trả lời">
                 <button
                     onClick={handleReply}
-                    className="flex-center z-10 h-7 w-7 rounded-full bg-[var(--reply-message-light-background-color)] text-black dark:bg-[var(--reply-message-dark-background-color)] dark:text-white"
+                    className="flex-center z-10 h-7 w-7 rounded-full bg-(--reply-message-light-background-color) text-black dark:bg-(--reply-message-dark-background-color) dark:text-white"
                 >
                     <FontAwesomeIcon icon={faReply} />
                 </button>
@@ -153,7 +153,7 @@ const MessageAction: React.FC<MessageActionProps> = ({
             >
                 <Tippy content="Bày tỏ cảm xúc">
                     <button
-                        className="flex-center z-10 h-7 w-7 rounded-full bg-[var(--reply-message-light-background-color)] text-black dark:bg-[var(--reply-message-dark-background-color)] dark:text-white"
+                        className="flex-center z-10 h-7 w-7 rounded-full bg-(--reply-message-light-background-color) text-black dark:bg-(--reply-message-dark-background-color) dark:text-white"
                         onClick={handleOpenReaction}
                     >
                         <FontAwesomeIcon icon={faSmile} />

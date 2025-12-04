@@ -145,7 +145,7 @@ const CreateConversationModal = ({ onClose }: { onClose: () => void }) => {
         <div className="flex h-full max-h-full flex-col items-center overflow-hidden">
             {fields.avatar && fields.avatar.preview ? (
                 <div className="relative">
-                    <UserAvatar src={fields.avatar.preview} className="mt-4 !cursor-default" size={96} />
+                    <UserAvatar src={fields.avatar.preview} className="mt-4 cursor-default!" size={96} />
                     <label
                         htmlFor="create-conversation-avatar-input"
                         className="absolute bottom-0 right-0 flex aspect-square h-7 cursor-pointer items-center justify-center rounded-full border border-dashed border-zinc-700 dark:border-zinc-300"
@@ -180,7 +180,7 @@ const CreateConversationModal = ({ onClose }: { onClose: () => void }) => {
                     <input
                         type="text"
                         name="group_name"
-                        className="w-full rounded-lg border border-gray-300 bg-gray-100 p-2 outline-none dark:border-zinc-700 dark:bg-darkGray"
+                        className="w-full rounded-lg border border-gray-300 bg-gray-100 p-2 outline-hidden dark:border-zinc-700 dark:bg-dark-gray"
                         placeholder="Nhập tên nhóm"
                         value={fields.group_name}
                         onChange={setFieldsValue}

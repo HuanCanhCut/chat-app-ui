@@ -139,7 +139,7 @@ const MessagePage = () => {
         <div className="flex h-full max-w-full">
             {/* Don't change the 'invisible' below to hidden to avoid uncontrolled scrolling in the message component */}
             <div
-                className={`flex max-w-full flex-grow flex-col border-r dark:border-zinc-700 ${infoOpen && 'border-r'} border-gray-200 dark:border-zinc-700 ${infoOpen ? 'invisible w-0 sm:visible sm:flex sm:w-auto' : 'flex'}`}
+                className={`flex max-w-full grow flex-col border-r dark:border-zinc-700 ${infoOpen && 'border-r'} border-gray-200 dark:border-zinc-700 ${infoOpen ? 'invisible w-0 sm:visible sm:flex sm:w-auto' : 'flex'}`}
             >
                 {conversation?.data && (
                     <>
@@ -152,7 +152,7 @@ const MessagePage = () => {
             </div>
             {!conversation?.data?.is_temp && (
                 <Info
-                    className={`${infoOpen ? 'block w-full min-w-[250px] sm:max-w-[280px] md:max-w-[300px] lg:max-w-[320px] xl:max-w-[380px]' : 'hidden !w-0 !p-0'} `}
+                    className={`${infoOpen ? 'block w-full min-w-[250px] sm:max-w-[280px] md:max-w-[300px] lg:max-w-[320px] xl:max-w-[380px]' : 'hidden w-0! p-0!'} `}
                     isOpen={infoOpen}
                 />
             )}

@@ -40,7 +40,7 @@ export default function Header() {
     return (
         <header
             id="header"
-            className={`${headerStyle} flex h-[var(--header-height-mobile)] flex-col sm:h-[var(--header-height)] sm:flex-row sm:items-center`}
+            className={`${headerStyle} flex h-(--header-height-mobile) flex-col sm:h-(--header-height) sm:flex-row sm:items-center`}
         >
             <SearchModal isOpen={isOpen} closeModal={closeModal} />
 

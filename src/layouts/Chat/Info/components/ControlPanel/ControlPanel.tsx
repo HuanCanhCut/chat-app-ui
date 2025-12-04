@@ -436,7 +436,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ onChose }) => {
             <Modal
                 isOpen={modalState.isOpen}
                 onClose={handleCloseModal}
-                popperClassName={`!p-0 !overflow-hidden flex flex-col`}
+                popperClassName={`p-0! overflow-hidden! flex flex-col`}
                 title={modalState.title}
             >
                 {modalState.component}

@@ -143,7 +143,7 @@ const MediaAndLink: React.FC<MediaAndLinkProps> = ({ onBack, defaultActiveTab })
                             <div key={index} className="w-full">
                                 <Button
                                     buttonType="rounded"
-                                    className={`w-full whitespace-nowrap bg-transparent !py-3 text-center dark:bg-transparent ${tab.type === activeTab.type ? 'text-[#0064D1] hover:bg-transparent dark:text-[#5AA7FF] dark:hover:bg-transparent' : 'text-systemMessageLight dark:text-systemMessageDark'}`}
+                                    className={`w-full whitespace-nowrap bg-transparent py-3! text-center dark:bg-transparent ${tab.type === activeTab.type ? 'text-[#0064D1] hover:bg-transparent dark:text-[#5AA7FF] dark:hover:bg-transparent' : 'text-system-message-light dark:text-system-message-dark'}`}
                                     onClick={() => setActiveTab(tab)}
                                 >
                                     {tab.title}
@@ -207,7 +207,7 @@ const MediaAndLink: React.FC<MediaAndLinkProps> = ({ onBack, defaultActiveTab })
                                     handleApiError(error)
                                 }
                             }}
-                            className="!overflow-hidden pr-2"
+                            className="overflow-hidden! pr-2"
                             hasMore={
                                 media ? media.meta.pagination.current_page < media.meta.pagination.total_pages : false
                             }
@@ -297,7 +297,7 @@ const MediaAndLink: React.FC<MediaAndLinkProps> = ({ onBack, defaultActiveTab })
                                     handleApiError(error)
                                 }
                             }}
-                            className="!overflow-hidden pr-2"
+                            className="overflow-hidden! pr-2"
                             hasMore={
                                 links?.meta
                                     ? links.meta.pagination.current_page < links.meta.pagination.total_pages

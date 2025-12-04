@@ -49,7 +49,7 @@ const Block: React.FC<BlockProps> = ({ currentMember }) => {
 
     if (currentMember?.deleted_at || !currentMember) {
         return (
-            <div className="flex flex-col gap-1 border-t border-light px-4 py-2 text-center text-black/90 dark:border-darkGray dark:text-gray-300">
+            <div className="flex flex-col gap-1 border-t border-light px-4 py-2 text-center text-black/90 dark:border-dark-gray dark:text-gray-300">
                 <p className="font-medium text-gray-700 dark:text-gray-300">Bạn không thể nhắn tin cho nhóm này</p>
                 <p className="text-xs text-[#b2b5b8]">
                     Bạn không thể nhắn tin cho nhóm này. Bạn không còn trong nhóm này và không thể gửi hoặc nhận cuộc
@@ -73,7 +73,7 @@ const Block: React.FC<BlockProps> = ({ currentMember }) => {
                         description={`Tài khoản HuanCanhCut của bạn sẽ bắt đầu nhận được tin nhắn hoặc cuộc gọi từ tài khoản HuanCanhCut của ${otherMember?.user.full_name}.`}
                         confirmText="Bỏ chặn"
                     />
-                    <div className="flex flex-col gap-1 border-t border-light px-4 py-2 pb-4 text-center text-black/90 dark:border-darkGray dark:text-[#e2e5e9]">
+                    <div className="flex flex-col gap-1 border-t border-light px-4 py-2 pb-4 text-center text-black/90 dark:border-dark-gray dark:text-[#e2e5e9]">
                         <div className="flex flex-col gap-1 pb-1">
                             <p className="text-center text-[13px] font-medium">
                                 Bạn đã chặn tin nhắn của {otherMember?.user.full_name}

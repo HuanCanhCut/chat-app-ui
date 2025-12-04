@@ -70,7 +70,7 @@ const ChangeNicknameModal: React.FC = () => {
                         <div className="flex flex-1 cursor-pointer">
                             <UserAvatar size={50} src={member.user.avatar} />
 
-                            <div className="ml-3 flex w-full flex-col justify-center gap-1 [&_*]:text-gray-900 [&_*]:dark:text-gray-200">
+                            <div className="ml-3 flex w-full flex-col justify-center gap-1 **:text-gray-900 dark:**:text-gray-200">
                                 {member.id === currentChange?.id ? (
                                     <input
                                         ref={inputRef}

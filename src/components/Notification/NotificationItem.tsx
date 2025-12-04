@@ -78,7 +78,7 @@ const NotificationItem = ({
 
     const RenderMoreOptions = () => {
         const buttonStyle =
-            'w-full !justify-start bg-transparent !py-2 !text-black hover:!bg-[rgba(0,0,0,0.1)] dark:!text-dark dark:hover:!bg-[rgba(255,255,255,0.1)]'
+            'w-full justify-start! bg-transparent py-2! text-black! hover:bg-[rgba(0,0,0,0.1)]! dark:!text-dark dark:hover:bg-[rgba(255,255,255,0.1)]!'
 
         const handleToggleReadStatus = async (type: 'read' | 'unread') => {
             switch (type) {

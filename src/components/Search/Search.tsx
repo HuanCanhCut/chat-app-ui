@@ -134,7 +134,7 @@ const Search: React.FC<SearchProps> = ({ placeholder = 'Tìm kiếm', className 
                         name="search"
                         type="text"
                         placeholder={placeholder}
-                        className="w-full rounded-3xl bg-transparent py-[8px] pl-[1px] pr-11 caret-primary outline-none placeholder:text-sm dark:bg-[#313233]"
+                        className="w-full rounded-3xl bg-transparent py-[8px] pl-px pr-11 caret-primary outline-hidden placeholder:text-sm dark:bg-[#313233]"
                         value={searchValue}
                         onChange={(e) => setSearchValue(e.target.value)}
                         onFocus={() => setShowResult(true)}

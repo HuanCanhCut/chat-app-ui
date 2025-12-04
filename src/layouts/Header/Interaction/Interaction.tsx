@@ -141,7 +141,7 @@ const Interaction = () => {
                             )}
                             <Button
                                 buttonType="icon"
-                                className="flex-shrink-0"
+                                className="shrink-0"
                                 href={`${config.routes.user}/@${currentUser?.data?.nickname}`}
                             >
                                 <FontAwesomeIcon icon={faPen} className="text-sm" />
@@ -174,7 +174,7 @@ const Interaction = () => {
                 timeDelayOpen={50}
                 timeDelayClose={250}
             >
-                <div className="flex-shrink-0">
+                <div className="shrink-0">
                     <UserAvatar src={currentUser?.data?.avatar} className="w-[32px] sm:w-[36px]" />
                 </div>
             </CustomTippy>

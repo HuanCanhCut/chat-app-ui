@@ -476,7 +476,7 @@ const Conversations = () => {
                             handleApiError(error)
                         }
                     }}
-                    className="!overflow-hidden"
+                    className="overflow-hidden!"
                     hasMore={
                         conversations.meta
                             ? conversations.meta.pagination.current_page < conversations.meta.pagination.total_pages

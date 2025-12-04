@@ -289,7 +289,7 @@ const MessageItem = ({ message, messageIndex, messages, currentUser, messageRef 
                     {message.sender_id !== currentUser.id &&
                         isFirstMessageInConsecutiveGroup() &&
                         conversation?.data.is_group && (
-                            <p className="mb-1 ml-2 flex w-fit items-center gap-2 text-right text-xs text-systemMessageLight dark:text-systemMessageDark">
+                            <p className="mb-1 ml-2 flex w-fit items-center gap-2 text-right text-xs text-system-message-light dark:text-system-message-dark">
                                 {memberMap[message.sender_id]?.nickname || memberMap[message.sender_id]?.user.full_name}
                             </p>
                         )}

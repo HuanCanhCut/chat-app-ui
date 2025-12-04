@@ -42,7 +42,7 @@ const Accordion = ({ data, onChose }: AccordionProps) => {
         <div className={`mt-1`}>
             <Button
                 buttonType="rounded"
-                className={`w-full ${data.children ? '!justify-between' : '!justify-start'} rounded-md bg-transparent !py-2 text-left dark:bg-transparent ${data.className}`}
+                className={`w-full ${data.children ? 'justify-between!' : 'justify-start!'} rounded-md bg-transparent py-2! text-left dark:bg-transparent ${data.className}`}
                 rightIcon={
                     data.children ? (
                         <FontAwesomeIcon icon={isOpen ? faChevronUp : faChevronDown} width={12} height={12} />

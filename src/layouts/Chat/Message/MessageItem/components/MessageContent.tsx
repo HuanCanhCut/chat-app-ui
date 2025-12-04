@@ -164,8 +164,8 @@ const MessageContent = (
                 ref={combinedRef}
                 className={`relative w-fit max-w-[80%] rounded-3xl px-4 py-1.5 italic opacity-85 [word-break:break-word] ${
                     message.sender_id === currentUser?.id
-                        ? 'bg-[var(--sender-light-background-color)] text-[var(--sender-light-text-color)] dark:bg-[var(--sender-dark-background-color)] dark:text-[var(--sender-dark-text-color)]'
-                        : 'bg-[var(--receiver-light-background-color)] text-[var(--receiver-light-text-color)] dark:bg-[var(--receiver-dark-background-color)] dark:text-[var(--receiver-dark-text-color)]'
+                        ? 'bg-(--sender-light-background-color) text-(--sender-light-text-color) dark:bg-(--sender-dark-background-color) dark:text-(--sender-dark-text-color)'
+                        : 'bg-(--receiver-light-background-color) text-(--receiver-light-text-color) dark:bg-(--receiver-dark-background-color) dark:text-(--receiver-dark-text-color)'
                 } ${consecutiveMessageStyle()}`}
             >
                 {message.sender.id === currentUser?.id ? 'Bạn ' : `${message.sender.full_name} `}
@@ -197,11 +197,11 @@ const MessageContent = (
                         ref={combinedRef}
                         className={`whitespace-pre-wrap rounded-3xl px-4 py-1.5 font-normal [word-break:break-word] ${linkPreview && 'rounded-bl-none rounded-br-none'} ${
                             message.sender_id === currentUser?.id
-                                ? 'bg-[var(--sender-light-background-color)] text-[var(--sender-light-text-color)] dark:bg-[var(--sender-dark-background-color)] dark:text-[var(--sender-dark-text-color)]'
-                                : 'bg-[var(--receiver-light-background-color)] text-[var(--receiver-light-text-color)] dark:bg-[var(--receiver-dark-background-color)] dark:text-[var(--receiver-dark-text-color)]'
+                                ? 'bg-(--sender-light-background-color) text-(--sender-light-text-color) dark:bg-(--sender-dark-background-color) dark:text-(--sender-dark-text-color)'
+                                : 'bg-(--receiver-light-background-color) text-(--receiver-light-text-color) dark:bg-(--receiver-dark-background-color) dark:text-(--receiver-dark-text-color)'
                         } ${consecutiveMessageStyle()}`}
                     >
-                        <span className="max-w-fit break-words">
+                        <span className="max-w-fit wrap-break-word">
                             <EmojiMessageStyle
                                 text={message.content}
                                 showLink={true}
@@ -213,7 +213,7 @@ const MessageContent = (
                         <Link
                             href={linkPreview.url}
                             target="_blank"
-                            className="block rounded-bl-3xl rounded-br-3xl bg-[var(--receiver-light-background-color)] dark:bg-[var(--receiver-dark-background-color)]"
+                            className="block rounded-bl-3xl rounded-br-3xl bg-(--receiver-light-background-color) dark:bg-(--receiver-dark-background-color)"
                         >
                             {linkPreview?.image && (
                                 // eslint-disable-next-line @next/next/no-img-element
@@ -251,7 +251,7 @@ const MessageContent = (
                                 <CustomImage
                                     src={url}
                                     alt="message"
-                                    className={`max-h-[260px] sm:min-w-[100px] ${JSON.parse(message.content as string).length === 1 ? 'min-w-[180px]' : 'aspect-square'} h-full w-full min-w-[160px] !max-w-full cursor-pointer rounded-md object-cover object-center`}
+                                    className={`max-h-[260px] sm:min-w-[100px] ${JSON.parse(message.content as string).length === 1 ? 'min-w-[180px]' : 'aspect-square'} h-full w-full min-w-[160px] max-w-full! cursor-pointer rounded-md object-cover object-center`}
                                     priority
                                     quality={100}
                                     onClick={() => handleOpenImageModal(url, message.id)}
@@ -268,13 +268,13 @@ const MessageContent = (
                 <div
                     ref={combinedRef}
                     className={
-                        'w-[200px] rounded-2xl bg-[var(--reply-message-light-background-color)] p-3 dark:bg-[var(--reply-message-dark-background-color)]'
+                        'w-[200px] rounded-2xl bg-(--reply-message-light-background-color) p-3 dark:bg-(--reply-message-dark-background-color)'
                     }
                 >
                     <div className="flex items-center gap-2">
                         <Button
                             buttonType="icon"
-                            className={`flex-shrink-0 ${message.type === 'call_timeout' ? '!bg-error dark:!bg-error' : ''}`}
+                            className={`shrink-0 ${message.type === 'call_timeout' ? '!bg-error dark:!bg-error' : ''}`}
                         >
                             {(() => {
                                 switch (message.type) {
@@ -295,7 +295,7 @@ const MessageContent = (
                                     ? `Cuộc gọi ${message.sender_id === currentUser?.id ? 'đi' : 'đến'}`
                                     : 'Đã bỏ lỡ cuộc gọi'}
                             </p>
-                            <span className="text-xs text-systemMessageLight dark:text-systemMessageDark">
+                            <span className="text-xs text-system-message-light dark:text-system-message-dark">
                                 {message.type === 'call_ended'
                                     ? message.content
                                     : handleFormatTime(new Date(message.created_at))}
@@ -314,7 +314,7 @@ const MessageContent = (
                     ref={combinedRef}
                     className={`relative w-fit max-w-[80%] whitespace-pre-wrap rounded-3xl py-[2px] font-normal [word-break:break-word]`}
                 >
-                    <span className="max-w-fit gap-3 break-words text-3xl">
+                    <span className="max-w-fit gap-3 wrap-break-word text-3xl">
                         <EmojiMessageStyle
                             text={message.content}
                             size={32}
