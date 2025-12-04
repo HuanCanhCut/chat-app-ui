@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { usePathname } from 'next/navigation'
 
-import Tippy from '~/vendor/tippy'
+import Tippy from '@vendor/tippy'
 import { HomeIcon, UserGroupIcon } from '~/components/Icons'
 import NavLink from '~/components/NavLink'
 import config from '~/config'

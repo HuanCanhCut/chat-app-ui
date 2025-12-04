@@ -1,0 +1,12 @@
+{
+    "name": "tippy-react-headless",
+    "private": true,
+    "version": "0.1.0",
+    "description": "Headless rendering for Tippy.js React",
+    "types": "../index.d.ts",
+    "main": "./headless.js",
+    "module": "./headless.js",
+    "sideEffects": false,
+    "author": "atomiks",
+    "license": "MIT"
+}

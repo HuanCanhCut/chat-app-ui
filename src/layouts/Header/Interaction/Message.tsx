@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import useSWR from 'swr'
 
-import Tippy from '~/vendor/tippy'
+import Tippy from '@vendor/tippy'
 import Button from '~/components/Button'
 import { MessageIcon } from '~/components/Icons'
 import config from '~/config'

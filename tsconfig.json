@@ -18,7 +18,8 @@
         "incremental": true,
         "baseUrl": "./",
         "paths": {
-            "~/*": ["src/*"]
+            "~/*": ["src/*"],
+            "@vendor/*": ["src/vendor/*"]
         },
         "plugins": [
             {

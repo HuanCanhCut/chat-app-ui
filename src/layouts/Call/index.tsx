@@ -17,7 +17,7 @@ import {
     faXmark,
 } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import Tippy from '~/vendor/tippy'
+import Tippy from '@vendor/tippy'
 import UserAvatar from '~/components/UserAvatar'
 import { SocketEvent } from '~/enum/SocketEvent'
 import SWRKey from '~/enum/SWRKey'

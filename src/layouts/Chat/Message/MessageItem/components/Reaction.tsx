@@ -3,7 +3,7 @@ import { useParams } from 'next/navigation'
 import { Emoji, EmojiStyle } from 'emoji-picker-react'
 import { mutate } from 'swr'
 
-import Tippy from '~/vendor/tippy'
+import Tippy from '@vendor/tippy'
 import { SocketEvent } from '~/enum/SocketEvent'
 import SWRKey from '~/enum/SWRKey'
 import socket from '~/helpers/socket'
