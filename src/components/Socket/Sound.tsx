@@ -55,7 +55,7 @@ const Sound = ({ children }: { children: React.ReactNode }) => {
 
     return (
         <>
-            <audio ref={audioRef} src="" />
+            <audio ref={audioRef} />
             {children}
         </>
     )

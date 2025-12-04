@@ -3,8 +3,8 @@
     "version": "0.1.0",
     "private": true,
     "scripts": {
-        "dev": "next dev",
-        "build": "next build",
+        "dev": "next dev --turbopack",
+        "build": "next build --turbopack",
         "start": "next start",
         "lint": "next lint --fix"
     },
@@ -15,7 +15,6 @@
         "@fortawesome/free-solid-svg-icons": "^6.6.0",
         "@fortawesome/react-fontawesome": "^0.2.2",
         "@reduxjs/toolkit": "^2.3.0",
-        "@tippyjs/react": "^4.2.6",
         "axios": "^1.7.7",
         "emoji-picker-react": "^4.12.0",
         "emoji-regex": "^10.4.0",
@@ -24,10 +23,10 @@
         "firebase": "^10.13.1",
         "framer-motion": "^11.5.6",
         "moment-timezone": "^0.5.46",
-        "next": "14.2.7",
+        "next": "15.4.7",
         "peerjs": "^1.5.5",
-        "react": "^18",
-        "react-dom": "^18",
+        "react": "^19.2.1",
+        "react-dom": "^19.2.1",
         "react-highlight-words": "^0.21.0",
         "react-hook-form": "^7.53.0",
         "react-infinite-scroll-component": "^6.1.0",
@@ -40,7 +39,8 @@
         "redux-toolkit": "^1.1.2",
         "sharp": "^0.33.5",
         "socket.io-client": "^4.8.1",
-        "swr": "^2.2.5"
+        "swr": "^2.2.5",
+        "tippy.js": "^6.3.1"
     },
     "devDependencies": {
         "@eslint/js": "^9.23.0",
@@ -49,7 +49,7 @@
         "@types/react-dom": "^18",
         "@types/redux-persist": "^4.0.0",
         "eslint": "8.56.0",
-        "eslint-config-next": "14.2.7",
+        "eslint-config-next": "^16.0.7",
         "eslint-plugin-react": "^7.37.4",
         "eslint-plugin-simple-import-sort": "^12.1.1",
         "globals": "^16.0.0",

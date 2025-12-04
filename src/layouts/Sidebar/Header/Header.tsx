@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation'
 import CreateConversationModal from './CreateConversationModal'
 import { faUserGroup } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import Tippy from '@tippyjs/react'
+import Tippy from '~/vendor/tippy'
 import Modal from '~/components/Modal'
 import UserAvatar from '~/components/UserAvatar/UserAvatar'
 import config from '~/config'
@@ -45,7 +45,7 @@ const Header: React.FC = () => {
             <div className="flex w-full items-center justify-between">
                 <>
                     <UserAvatar src={currentUser?.data?.avatar} onClick={handleNavigateToProfile} />
-                    <h3 className="text-xl font-semibold dark:text-dark">Huấn cánh cụt</h3>
+                    <h3 className="text-xl font-semibold dark:text-dark">Huấn Cánh Cụt</h3>
 
                     <Tippy content="Tạo nhóm" hideOnClick={true} placement="bottom-start">
                         <button

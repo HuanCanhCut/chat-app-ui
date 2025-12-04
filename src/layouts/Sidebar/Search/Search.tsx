@@ -6,7 +6,7 @@ import { AxiosError } from 'axios'
 
 import { faArrowLeft, faSearch } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import Tippy from '@tippyjs/react/headless'
+import Tippy from '~/vendor/tippy/headless'
 import UserAvatar from '~/components/UserAvatar'
 import config from '~/config'
 import useDebounce from '~/hooks/useDebounce'

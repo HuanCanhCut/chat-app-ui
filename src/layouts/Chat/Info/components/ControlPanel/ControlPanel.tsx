@@ -22,7 +22,7 @@ import {
     faUserPlus,
 } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import Tippy from '@tippyjs/react'
+import Tippy from '~/vendor/tippy'
 import Accordion from '~/components/Accordion'
 import Button from '~/components/Button'
 import CustomTippy from '~/components/CustomTippy'

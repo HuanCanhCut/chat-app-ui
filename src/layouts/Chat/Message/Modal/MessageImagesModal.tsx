@@ -5,7 +5,7 @@ import useSWR from 'swr'
 
 import { faChevronLeft, faChevronRight, faDownload, faXmark } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import Tippy from '@tippyjs/react'
+import Tippy from '~/vendor/tippy'
 import SWRKey from '~/enum/SWRKey'
 import * as messageServices from '~/services/messageService'
 import { MessageModel, MetaPagination } from '~/type/type'
