@@ -1,7 +1,8 @@
 import React, { cloneElement, forwardRef } from 'react'
+
 import { preserveRef } from './utils'
 
-export default (Tippy, defaultProps) =>
+const createTippyWrapper = (Tippy, defaultProps) =>
     forwardRef(function TippyWrapper({ children, ...props }, ref) {
         return (
             // If I spread them separately here, Babel adds the _extends ponyfill for
@@ -18,3 +19,5 @@ export default (Tippy, defaultProps) =>
             </Tippy>
         )
     })
+
+export default createTippyWrapper

@@ -101,7 +101,7 @@ export default function User({ currentUser, user, handleAfterAcceptFriend }: Use
             >
                 <EditProfile closeModal={closeModal} />
             </ReactModal>
-            <div className="absolute top-[-100px] w-[130px] rounded-full border-4 border-white dark:border-dark sm:top-[-30px] sm:w-[168px]">
+            <div className="dark:border-dark absolute top-[-100px] w-[130px] rounded-full border-4 border-white sm:top-[-30px] sm:w-[168px]">
                 <UserAvatar
                     src={currentUser?.data.id === user.data.id ? currentUser?.data.avatar : user.data.avatar}
                     size={168}
@@ -109,8 +109,8 @@ export default function User({ currentUser, user, handleAfterAcceptFriend }: Use
                     onlineClassName="w-7 h-7 right-1 sm:right-2 sm:bottom-2 border-4"
                 />
             </div>
-            <div className="mt-4 flex flex-col gap-2 overflow-hidden pr-4 sm:ml-[180px] sm:mt-0 sm:flex-1">
-                <h1 className="m-0 mt-2 line-clamp-2 overflow-hidden text-ellipsis font-bold leading-tight">
+            <div className="mt-4 flex flex-col gap-2 overflow-hidden pr-4 sm:mt-0 sm:ml-[180px] sm:flex-1">
+                <h1 className="m-0 mt-2 line-clamp-2 overflow-hidden leading-tight font-bold text-ellipsis">
                     {currentUser?.data.id === user.data.id ? currentUser?.data.full_name : user.data.full_name || 'ㅤ'}
                 </h1>
                 <p className="text-gr ay-700 text-base dark:text-gray-400">{user?.data.friends_count} người bạn</p>
@@ -132,7 +132,7 @@ export default function User({ currentUser, user, handleAfterAcceptFriend }: Use
                                             src={friend.user.avatar}
                                             size={36}
                                             key={index}
-                                            className="border-2 border-white dark:border-dark"
+                                            className="dark:border-dark border-2 border-white"
                                             style={{
                                                 transform: translateValue,
                                             }}

@@ -1,7 +1,8 @@
-import { useMutableBox, useIsomorphicLayoutEffect } from './util-hooks'
-import { deepPreserveProps } from './utils'
-import { classNamePlugin } from './className-plugin'
 import { useMemo, useState } from 'react'
+
+import { classNamePlugin } from './className-plugin'
+import { useIsomorphicLayoutEffect, useMutableBox } from './util-hooks'
+import { deepPreserveProps } from './utils'
 
 export default function useSingletonGenerator(createSingleton) {
     return function useSingleton({ disabled = false, overrides = [] } = {}) {

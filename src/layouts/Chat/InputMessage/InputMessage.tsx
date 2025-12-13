@@ -7,7 +7,6 @@ import { faImage, faSmile } from '@fortawesome/free-regular-svg-icons'
 import { faFolderPlus, faXmark } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Tippy from '@vendor/tippy'
-import HeadlessTippy from '~/vendor/tippy/headless'
 import Emoji from '~/components/Emoji'
 import { SendHorizontalIcon } from '~/components/Icons'
 import CustomImage from '~/components/Image/Image'
@@ -19,6 +18,7 @@ import { useAppSelector } from '~/redux'
 import { getCurrentUser } from '~/redux/selector'
 import * as conversationServices from '~/services/conversationService'
 import { ConversationMember, MessageModel } from '~/type/type'
+import HeadlessTippy from '~/vendor/tippy/headless'
 
 interface InputMessageProps {
     className?: string
@@ -357,7 +357,7 @@ const InputMessage: React.FC<InputMessageProps> = () => {
                                 : (memberMap && memberMap[replyMessage.sender_id]?.nickname) ||
                                   (memberMap && memberMap[replyMessage.sender_id]?.user.full_name)}
                         </span>
-                        <p className="mt-1 line-clamp-2 w-[80%] overflow-hidden text-ellipsis text-xs text-zinc-600 dark:text-zinc-400 sm:line-clamp-1">
+                        <p className="mt-1 line-clamp-2 w-[80%] overflow-hidden text-xs text-ellipsis text-zinc-600 sm:line-clamp-1 dark:text-zinc-400">
                             {replyMessage.type === 'text' ? replyMessage.content : 'Hình ảnh'}
                         </p>
                     </div>
@@ -393,10 +393,10 @@ const InputMessage: React.FC<InputMessageProps> = () => {
                 <div className="relative flex grow">
                     <div className="flex w-full flex-col justify-center">
                         {images.length > 0 && (
-                            <div className="flex w-full max-w-full items-center gap-3 overflow-x-auto rounded-t-2xl bg-lightGray p-3 dark:bg-[#333334]">
+                            <div className="bg-lightGray flex w-full max-w-full items-center gap-3 overflow-x-auto rounded-t-2xl p-3 dark:bg-[#333334]">
                                 <Tippy content="Tải lên hình ảnh khác" delay={[200, 0]}>
                                     <button
-                                        className="flex-center aspect-square h-12 w-12 cursor-pointer rounded-lg bg-zinc-300 hover:bg-transparent dark:bg-dark-gray dark:hover:bg-transparent"
+                                        className="flex-center dark:bg-dark-gray aspect-square h-12 w-12 cursor-pointer rounded-lg bg-zinc-300 hover:bg-transparent dark:hover:bg-transparent"
                                         onClick={handleOpenUploadImage}
                                     >
                                         <FontAwesomeIcon
@@ -423,7 +423,7 @@ const InputMessage: React.FC<InputMessageProps> = () => {
                                                 onClick={() => {
                                                     handleRemoveImage(index)
                                                 }}
-                                                className="flex-center absolute right-[-8px] top-[-8px] h-6 w-6 rounded-full border border-black border-opacity-20 bg-lightGray p-1 hover:bg-[#e2e4e8] dark:bg-[#333334] dark:hover:bg-[#3c3c3d]"
+                                                className="flex-center border-opacity-20 bg-lightGray absolute top-[-8px] right-[-8px] h-6 w-6 rounded-full border border-black p-1 hover:bg-[#e2e4e8] dark:bg-[#333334] dark:hover:bg-[#3c3c3d]"
                                             >
                                                 <FontAwesomeIcon icon={faXmark} />
                                             </button>
@@ -433,7 +433,7 @@ const InputMessage: React.FC<InputMessageProps> = () => {
                             </div>
                         )}
                         <textarea
-                            className={`max-h-[140px] min-h-[36px] w-full resize-none rounded-3xl bg-lightGray px-4 py-1 pr-12 pt-[6px] outline-hidden dark:bg-[#333334] ${images.length && 'rounded-t-none'}`}
+                            className={`bg-lightGray max-h-[140px] min-h-[36px] w-full resize-none rounded-3xl px-4 py-1 pt-[6px] pr-12 outline-hidden dark:bg-[#333334] ${images.length && 'rounded-t-none'}`}
                             value={messageValue}
                             autoFocus
                             onChange={handleInputChange}
@@ -467,7 +467,7 @@ const InputMessage: React.FC<InputMessageProps> = () => {
                     >
                         <Tippy content="Chọn biểu tượng cảm xúc">
                             <button
-                                className="absolute bottom-1 right-1 rounded-full p-1 leading-px hover:bg-gray-300 dark:hover:bg-dark-gray"
+                                className="dark:hover:bg-dark-gray absolute right-1 bottom-1 rounded-full p-1 leading-px hover:bg-gray-300"
                                 onClick={handleToggleEmoji}
                             >
                                 <FontAwesomeIcon icon={faSmile} className="text-xl" />
@@ -481,7 +481,7 @@ const InputMessage: React.FC<InputMessageProps> = () => {
                 >
                     {messageValue.length || images.length > 0 ? (
                         <button
-                            className="rounded-full p-2 hover:bg-lightGray dark:hover:bg-dark-gray"
+                            className="hover:bg-lightGray dark:hover:bg-dark-gray rounded-full p-2"
                             onClick={() => handleEmitMessage(uuid as string)}
                         >
                             <SendHorizontalIcon />

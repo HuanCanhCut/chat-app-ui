@@ -17,10 +17,8 @@ const nextConfig = {
             },
         ],
     },
-    typedRoutes: {
-        experimental: {
-            typedRoutes: true,
-        },
+    experimental: {
+        reactCompiler: true,
     },
 }
 

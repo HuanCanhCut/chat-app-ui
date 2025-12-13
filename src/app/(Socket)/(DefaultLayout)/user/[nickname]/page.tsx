@@ -38,7 +38,7 @@ export default function UserPage() {
     } = useSWR<UserResponse | undefined>(
         nickname ? [SWRKey.GET_AN_USER, nickname] : SWRKey.GET_AN_USER,
         () => {
-            return userService.getAnUser(nickname.slice(3) as string)
+            return userService.getAnUser(nickname?.slice(3) as string)
         },
         {
             revalidateOnMount: true,
@@ -119,7 +119,7 @@ export default function UserPage() {
                         circle
                         width={130}
                         height={130}
-                        className="absolute top-[-100px] w-[130px] border-4 border-white dark:border-[#242526] sm:top-[-30px]"
+                        className="absolute top-[-100px] w-[130px] border-4 border-white sm:top-[-30px] dark:border-[#242526]"
                     />
                     <div className="top-[50px] flex-1">
                         {Array.from({ length: 3 }).map((_, index) => (
@@ -136,7 +136,7 @@ export default function UserPage() {
 
     return (
         <div className="min-h-dvh bg-gray-100 pb-4 dark:bg-[#1c1c1d]">
-            <header className="bg-white [box-shadow:1px_2px_4px_rgba(0,0,0,0.1)] dark:bg-dark">
+            <header className="dark:bg-dark bg-white [box-shadow:1px_2px_4px_rgba(0,0,0,0.1)]">
                 {user && currentUser ? (
                     <div className="w-1100px mx-auto max-w-[1100px]">
                         <CustomImage
@@ -153,11 +153,11 @@ export default function UserPage() {
                         {user && currentUser && (
                             <User currentUser={currentUser} user={user} handleAfterAcceptFriend={() => mutate()} />
                         )}
-                        <div className="mt-0 w-full border-t border-gray-300 px-4 dark:border-zinc-700 sm:mt-10">
+                        <div className="mt-0 w-full border-t border-gray-300 px-4 sm:mt-10 dark:border-zinc-700">
                             {TABS.map((tab) => (
                                 <button
                                     key={tab.value}
-                                    className={`px-4 py-4 ${currentTab === tab.value ? 'border-b-[3px] border-primary' : ''}`}
+                                    className={`px-4 py-4 ${currentTab === tab.value ? 'border-primary border-b-[3px]' : ''}`}
                                     onClick={() => setCurrentTab(tab.value)}
                                 >
                                     {tab.label}
@@ -172,7 +172,7 @@ export default function UserPage() {
                 )}
             </header>
             {user ? (
-                <div className="mx-auto mt-4 max-w-[1100px] rounded-md bg-white p-4 [box-shadow:1px_2px_4px_rgba(0,0,0,0.1)] dark:bg-dark">
+                <div className="dark:bg-dark mx-auto mt-4 max-w-[1100px] rounded-md bg-white p-4 [box-shadow:1px_2px_4px_rgba(0,0,0,0.1)]">
                     <div className="mt-8 grid grid-cols-1 gap-2 sm:grid-cols-2">
                         {currentTab === 'friend' ? <FriendList user={user} /> : <FriendInvitationList />}
                     </div>

@@ -1,8 +1,9 @@
 import React, { cloneElement, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { preserveRef, ssrSafeCreateDiv, toDataAttributes, deepPreserveProps } from './utils'
-import { useMutableBox, useIsomorphicLayoutEffect } from './util-hooks'
+
 import { classNamePlugin } from './className-plugin'
+import { useIsomorphicLayoutEffect, useMutableBox } from './util-hooks'
+import { deepPreserveProps, preserveRef, ssrSafeCreateDiv, toDataAttributes } from './utils'
 
 export default function TippyGenerator(tippy) {
     function Tippy({

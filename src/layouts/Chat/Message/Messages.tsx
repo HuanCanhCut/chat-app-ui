@@ -30,6 +30,7 @@ const PER_PAGE = 20
 interface MessageProps {
     conversation: ConversationModel
 }
+
 const Message: React.FC<MessageProps> = ({ conversation }) => {
     const { uuid } = useParams()
 

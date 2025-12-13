@@ -6,7 +6,6 @@ import { faSmile } from '@fortawesome/free-regular-svg-icons'
 import { faEllipsisVertical, faReply } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Tippy from '@vendor/tippy'
-import HeadlessTippy from '~/vendor/tippy/headless'
 import CustomTippy from '~/components/CustomTippy'
 import Emoji from '~/components/Emoji'
 import PopperWrapper from '~/components/PopperWrapper'
@@ -15,6 +14,7 @@ import { listenEvent } from '~/helpers/events'
 import { sendEvent } from '~/helpers/events'
 import socket from '~/helpers/socket'
 import { MessageModel, MessageResponse, UserModel } from '~/type/type'
+import HeadlessTippy from '~/vendor/tippy/headless'
 
 interface MessageActionProps {
     message: MessageModel
