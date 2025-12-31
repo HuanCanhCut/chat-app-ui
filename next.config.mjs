@@ -16,10 +16,12 @@ const nextConfig = {
                 pathname: '/**',
             },
         ],
+        qualities: [30, 50, 70, 80, 100],
     },
     experimental: {
         reactCompiler: true,
     },
+    allowedDevOrigins: ['chatapp.local'],
 }
 
 export default nextConfig
