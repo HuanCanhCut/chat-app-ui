@@ -88,23 +88,20 @@ export default function UserPage() {
     }, [mutate, user])
 
     useEffect(() => {
-        const remove = listenEvent({
-            eventName: 'friend:change-friend-status',
-            handler: ({ detail }: { detail: { send_friend_request: boolean } }) => {
-                if (!user?.data) {
-                    return
-                }
+        const remove = listenEvent('FRIEND:CHANGE-FRIEND-STATUS', (detail) => {
+            if (!user?.data) {
+                return
+            }
 
-                const newData: UserResponse = {
-                    ...user,
-                    data: {
-                        ...user.data,
-                        ...detail,
-                    },
-                }
+            const newData: UserResponse = {
+                ...user,
+                data: {
+                    ...user.data,
+                    ...detail,
+                },
+            }
 
-                mutate(newData, { revalidate: false })
-            },
+            mutate(newData, { revalidate: false })
         })
 
         return remove

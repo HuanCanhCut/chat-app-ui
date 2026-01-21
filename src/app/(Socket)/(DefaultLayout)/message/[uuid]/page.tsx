@@ -74,11 +74,8 @@ const MessagePage = () => {
     }, [conversation, conversation?.data, mutateConversation])
 
     useEffect(() => {
-        const remove = listenEvent({
-            eventName: 'info:toggle',
-            handler: ({ detail: { isOpen } }: { detail: { isOpen: boolean } }) => {
-                setInfoOpen(isOpen)
-            },
+        const remove = listenEvent('INFO:TOGGLE', ({ isOpen }) => {
+            setInfoOpen(isOpen)
         })
 
         return remove
@@ -133,7 +130,7 @@ const MessagePage = () => {
         return () => {
             socket.off(SocketEvent.NEW_MESSAGE, socketHandler)
         }
-    }, [conversation?.data?.is_temp, mutateConversation, uuid])
+    }, [conversation?.data.is_temp, mutateConversation, uuid])
 
     return (
         <div className="flex h-full max-w-full">

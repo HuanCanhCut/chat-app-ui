@@ -67,7 +67,7 @@ const UserAvatar = ({
             />
             {isOnline && currentUser?.data?.active_status && (
                 <div
-                    className={`absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-white bg-green-500 dark:border-dark ${onlineClassName}`}
+                    className={`dark:border-dark absolute right-0 bottom-0 h-3 w-3 rounded-full border-2 border-white bg-green-500 ${onlineClassName}`}
                 ></div>
             )}
         </div>

@@ -130,7 +130,7 @@ const MessageItem = ({ message, messageIndex, messages, currentUser, messageRef 
                         conversation_uuid: uuid as string,
                         message_id: message.id,
                     })
-                    sendEvent({ eventName: 'message:read-message', detail: uuid as string })
+                    sendEvent('MESSAGE:READ-MESSAGE', { conversationUuid: uuid as string })
                 }
             }
         }
@@ -242,7 +242,7 @@ const MessageItem = ({ message, messageIndex, messages, currentUser, messageRef 
                     overlayClassName="overlay"
                     closeTimeoutMS={200}
                     onRequestClose={handleCloseImageModal}
-                    className="fixed bottom-0 left-0 right-0 top-0"
+                    className="fixed top-0 right-0 bottom-0 left-0"
                 >
                     <MessageImagesModel onClose={handleCloseImageModal} imageUrl={openImageModal.image} />
                 </ReactModal>
@@ -289,7 +289,7 @@ const MessageItem = ({ message, messageIndex, messages, currentUser, messageRef 
                     {message.sender_id !== currentUser.id &&
                         isFirstMessageInConsecutiveGroup() &&
                         conversation?.data.is_group && (
-                            <p className="mb-1 ml-2 flex w-fit items-center gap-2 text-right text-xs text-system-message-light dark:text-system-message-dark">
+                            <p className="text-system-message-light dark:text-system-message-dark mb-1 ml-2 flex w-fit items-center gap-2 text-right text-xs">
                                 {memberMap[message.sender_id]?.nickname || memberMap[message.sender_id]?.user.full_name}
                             </p>
                         )}

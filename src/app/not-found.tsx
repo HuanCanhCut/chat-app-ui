@@ -21,7 +21,7 @@ const NotFound = () => {
                         <Button buttonType="primary" className="mt-4" onClick={() => router.push('/message')}>
                             Đi đến trang chủ
                         </Button>
-                        <p className="mt-4 cursor-pointer text-primary hover:underline" onClick={() => router.back()}>
+                        <p className="text-primary mt-4 cursor-pointer hover:underline" onClick={() => router.back()}>
                             Back zề
                         </p>
                     </div>

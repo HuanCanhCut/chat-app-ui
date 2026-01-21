@@ -154,7 +154,7 @@ const EditProfile = ({ closeModal }: EditProfileProps) => {
         <PopperWrapper className="w-[700px] max-w-[90vw] overflow-y-auto">
             <header className="relative border-b border-gray-200 p-4 pb-4 dark:border-gray-800">
                 <h2 className="text-center font-bold">Chỉnh sửa hồ sơ</h2>
-                <Button buttonType="icon" onClick={closeModal} className="absolute right-4 top-1/2 -translate-y-1/2">
+                <Button buttonType="icon" onClick={closeModal} className="absolute top-1/2 right-4 -translate-y-1/2">
                     <FontAwesomeIcon icon={faXmark} />
                 </Button>
             </header>
@@ -168,13 +168,13 @@ const EditProfile = ({ closeModal }: EditProfileProps) => {
                                     src={avatar?.preview || currentUser?.data.avatar}
                                     alt="avatar"
                                     size={130}
-                                    className="mx-auto aspect-square w-[130px] cursor-pointer rounded-full border-2 border-gray-200 object-cover p-1 dark:border-gray-600 sm:w-[168px]"
+                                    className="mx-auto aspect-square w-[130px] cursor-pointer rounded-full border-2 border-gray-200 object-cover p-1 sm:w-[168px] dark:border-gray-600"
                                 />
                             </label>
                         )}
                         <label
                             htmlFor="avatar"
-                            className="flex-center absolute bottom-1 right-1 h-9 w-9 cursor-pointer rounded-full border-2 border-white bg-gray-100 dark:border-[#242526] dark:bg-[#313233]"
+                            className="flex-center dark:bg-dark-gray absolute right-1 bottom-1 h-9 w-9 cursor-pointer rounded-full border-2 border-white bg-gray-100 dark:border-[#242526]"
                         >
                             <FontAwesomeIcon icon={faCamera} />
                         </label>
@@ -204,7 +204,7 @@ const EditProfile = ({ closeModal }: EditProfileProps) => {
                         )}
                         <label
                             htmlFor="cover_photo"
-                            className="flex-center absolute bottom-1 right-1 h-9 w-9 cursor-pointer rounded-full border-2 border-white bg-gray-100 dark:border-[#242526] dark:bg-[#313233]"
+                            className="flex-center dark:bg-dark-gray absolute right-1 bottom-1 h-9 w-9 cursor-pointer rounded-full border-2 border-white bg-gray-100 dark:border-[#242526]"
                         >
                             <FontAwesomeIcon icon={faCamera} />
                         </label>

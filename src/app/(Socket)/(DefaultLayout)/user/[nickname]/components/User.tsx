@@ -45,22 +45,19 @@ export default function User({ currentUser, user, handleAfterAcceptFriend }: Use
 
     useEffect(() => {
         // Remove friend from friends list when unfriend
-        const remove = listenEvent({
-            eventName: 'friend:get-new-friends',
-            handler: ({ detail: userId }) => {
-                if (!friends) {
-                    return
-                }
+        const remove = listenEvent('FRIEND:GET-NEW-FRIENDS', ({ userId }) => {
+            if (!friends) {
+                return
+            }
 
-                const newFriends: FriendsResponse = {
-                    ...friends,
-                    data: friends?.data.filter((friend) => friend.user.id !== userId),
-                }
+            const newFriends: FriendsResponse = {
+                ...friends,
+                data: friends?.data.filter((friend) => friend.user.id !== userId),
+            }
 
-                mutateFriends(newFriends, {
-                    revalidate: false,
-                })
-            },
+            mutateFriends(newFriends, {
+                revalidate: false,
+            })
         })
 
         return remove

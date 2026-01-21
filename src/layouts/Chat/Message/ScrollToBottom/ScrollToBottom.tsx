@@ -114,13 +114,10 @@ const ScrollToBottom = ({ offsetRange, scrollableRef, messageRefs, PER_PAGE, set
     )
 
     useEffect(() => {
-        const remove = listenEvent({
-            eventName: 'message:send',
-            handler: () => {
-                if (offsetRange.start !== 0) {
-                    handleScrollToBottom('start')
-                }
-            },
+        const remove = listenEvent('MESSAGE:SEND', () => {
+            if (offsetRange.start !== 0) {
+                handleScrollToBottom('start')
+            }
         })
 
         return remove

@@ -23,10 +23,7 @@ const FriendButton = ({ user, className = '', handleAfterAcceptFriend }: FriendB
 
     const handleAddFriend = useCallback(async () => {
         try {
-            sendEvent({
-                eventName: 'friend:change-friend-status',
-                detail: { sent_friend_request: true },
-            })
+            sendEvent('FRIEND:CHANGE-FRIEND-STATUS', { sent_friend_request: true })
 
             return await friendService.addFriend(user.id)
         } catch (error: any) {
@@ -36,10 +33,7 @@ const FriendButton = ({ user, className = '', handleAfterAcceptFriend }: FriendB
 
     const handleCancelFriendRequest = useCallback(async () => {
         try {
-            sendEvent({
-                eventName: 'friend:change-friend-status',
-                detail: { sent_friend_request: false },
-            })
+            sendEvent('FRIEND:CHANGE-FRIEND-STATUS', { sent_friend_request: false })
             return await friendService.cancelFriendRequest(user.id)
         } catch (error: any) {
             handleApiError(error)
@@ -62,11 +56,8 @@ const FriendButton = ({ user, className = '', handleAfterAcceptFriend }: FriendB
         try {
             await friendService.unfriend(user.id)
 
-            sendEvent({ eventName: 'friend:get-new-friends', detail: user.id })
-            sendEvent({
-                eventName: 'friend:change-friend-status',
-                detail: { is_friend: false, friend_request: false },
-            })
+            sendEvent('FRIEND:GET-NEW-FRIENDS', { userId: user.id })
+            sendEvent('FRIEND:CHANGE-FRIEND-STATUS', { is_friend: false, friend_request: false })
             closeModal()
         } catch (error: any) {
             handleApiError(error)

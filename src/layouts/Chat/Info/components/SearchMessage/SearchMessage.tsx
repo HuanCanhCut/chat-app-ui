@@ -43,6 +43,8 @@ const SearchMessage: React.FC<SearchMessageProps> = ({ onBack }) => {
                     conversation_uuid: uuid as string,
                 })
 
+                console.log(response)
+
                 setSearchResult(response)
             } catch (error) {
                 handleApiError(error)
@@ -69,10 +71,10 @@ const SearchMessage: React.FC<SearchMessageProps> = ({ onBack }) => {
                 </Button>
                 <span className="font-medium">Tìm kiếm</span>
             </div>
-            <div className="relative mt-4 flex items-center rounded-3xl bg-lightGray pl-3 dark:bg-[#313233]">
+            <div className="bg-lightGray dark:bg-dark-gray relative mt-4 flex items-center rounded-3xl pl-3">
                 <FontAwesomeIcon
                     icon={faSearch}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"
+                    className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-500"
                     onClick={() => {
                         inputRef.current?.focus()
                     }}
@@ -80,14 +82,14 @@ const SearchMessage: React.FC<SearchMessageProps> = ({ onBack }) => {
                 <input
                     ref={inputRef}
                     type="text"
-                    className="w-full select-none overflow-hidden truncate text-ellipsis bg-transparent px-3 py-[6px] pl-6 text-sm font-normal outline-hidden"
+                    className="w-full truncate overflow-hidden bg-transparent px-3 py-[6px] pl-6 text-sm font-normal text-ellipsis outline-hidden select-none"
                     placeholder="Tìm kiếm trong cuộc trò chuyện"
                     value={searchValue}
                     onChange={(e) => setSearchValue(e.target.value)}
                 />
                 {searchResult && (
                     <div className="flex items-center gap-2">
-                        <span className="whitespace-nowrap text-sm leading-none text-gray-500 dark:text-gray-400">
+                        <span className="text-sm leading-none whitespace-nowrap text-gray-500 dark:text-gray-400">
                             {searchResult.meta.pagination.total} kết quả
                         </span>
                         <Button

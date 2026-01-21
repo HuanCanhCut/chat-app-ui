@@ -155,7 +155,7 @@ const ConversationItem: React.FC<Props> = ({ conversation, className = '' }) => 
                                         avatars={avatars.slice(0, 2)}
                                         size={16}
                                         translate={3}
-                                        className="flex h-5 items-center gap-2 [&>img]:h-5 [&>img]:w-5 [&>img]:border-2 [&>img]:border-white [&>img]:dark:border-dark"
+                                        className="[&>img]:dark:border-dark flex h-5 items-center gap-2 [&>img]:h-5 [&>img]:w-5 [&>img]:border-2 [&>img]:border-white"
                                         style={{
                                             width: `${16 * avatars.slice(0, 2).length}px`,
                                         }}
@@ -168,7 +168,7 @@ const ConversationItem: React.FC<Props> = ({ conversation, className = '' }) => 
                     </div>
                 }
             </Link>
-            <div className="absolute right-5 top-1/2 hidden -translate-y-1/2 group-hover:block">
+            <div className="absolute top-1/2 right-5 hidden -translate-y-1/2 group-hover:block">
                 <CustomTippy
                     renderItem={() => (
                         <ConversationOptions conversation={conversation} tippyInstanceRef={tippyInstanceRef} />

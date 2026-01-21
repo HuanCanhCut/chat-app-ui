@@ -186,7 +186,7 @@ const ReactionModal: React.FC<Props> = ({ isOpen, onClose, messageId }) => {
                             key={tab.type}
                             className={`h-[60px] px-4 font-medium [&>img]:inline-flex ${tab.type !== 'all' ? 'text-xl' : ''} ${
                                 currentTab === tab.type
-                                    ? 'border-b-[3px] border-primary text-primary'
+                                    ? 'border-primary text-primary border-b-[3px]'
                                     : 'rounded-lg border-b-[3px] border-transparent text-zinc-800 hover:bg-[#99999936] dark:text-zinc-400 dark:hover:bg-[#3e4141]'
                             }`}
                             onClick={() => handleChangeReaction(tab.type)}

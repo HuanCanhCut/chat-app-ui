@@ -148,7 +148,7 @@ const ConversationTheme: React.FC<ConversationThemeProps> = ({ onClose, currentT
                     ref={themeContainerRef}
                     className="flex h-full w-[200%] flex-1 overflow-hidden py-4 pr-0 transition-all duration-100 ease-linear md:w-full md:translate-x-0 md:p-5"
                 >
-                    <div className="w-full pr-1 [overflow-y:overlay] md:w-1/2" id="theme-scrollable">
+                    <div className="w-full [overflow-y:overlay] pr-1 md:w-1/2" id="theme-scrollable">
                         <div className="border border-b border-[#D0D3D7] pb-3 dark:border-[#65686C]">
                             <ThemeItem
                                 theme={currentTheme}
@@ -199,13 +199,13 @@ const ConversationTheme: React.FC<ConversationThemeProps> = ({ onClose, currentT
                     <div className="flex w-full flex-col pl-2 md:w-1/2">
                         <Button
                             buttonType="rounded"
-                            className="mb-2 block w-fit bg-transparent dark:bg-transparent md:hidden"
+                            className="mb-2 block w-fit bg-transparent md:hidden dark:bg-transparent"
                             onClick={handleClosePreview}
                         >
                             <FontAwesomeIcon icon={faArrowLeft} />
                         </Button>
                         <div
-                            className="flex min-h-[450px] flex-1 flex-col rounded-xl border border-[#D0D3D7] px-3 pt-3 dark:border-[#65686C] md:ml-5"
+                            className="flex min-h-[450px] flex-1 flex-col rounded-xl border border-[#D0D3D7] px-3 pt-3 md:ml-5 dark:border-[#65686C]"
                             style={{
                                 backgroundImage: `url(${activeTheme.theme_config.background_theme[theme].background})`,
                                 backgroundSize: 'cover',

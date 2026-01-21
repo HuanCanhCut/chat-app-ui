@@ -42,11 +42,8 @@ const MessageAction: React.FC<MessageActionProps> = ({
     const [isOpenMoreAction, setIsOpenMoreAction] = useState(false)
 
     useEffect(() => {
-        const remove = listenEvent({
-            eventName: 'tippy:tippy-hidden',
-            handler: () => {
-                setIsOpenMoreAction(false)
-            },
+        const remove = listenEvent('TIPPY:HIDE', () => {
+            setIsOpenMoreAction(false)
         })
 
         return remove
@@ -74,7 +71,7 @@ const MessageAction: React.FC<MessageActionProps> = ({
     }
 
     const handleReply = () => {
-        sendEvent({ eventName: 'message:reply', detail: messages.data[messageIndex] })
+        sendEvent('MESSAGE:REPLY', { message: messages.data[messageIndex] })
     }
 
     const handleOpenRevokeModal = () => {

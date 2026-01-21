@@ -23,10 +23,7 @@ const SystemMessage = (
     const handleQuickAction = (type: string) => {
         switch (type) {
             case 'system_change_theme':
-                sendEvent({
-                    eventName: 'conversation:open-modal',
-                    detail: 'theme',
-                })
+                sendEvent('CONVERSATION:OPEN-MODAL', { type: 'theme' })
                 break
 
             default:
@@ -75,7 +72,7 @@ const SystemMessage = (
             jsx.push(
                 <span key={`quick-action`}>
                     <span
-                        className="cursor-pointer select-none font-medium text-(--sender-light-background-color) hover:underline dark:text-(--sender-dark-background-color)"
+                        className="cursor-pointer font-medium text-(--sender-light-background-color) select-none hover:underline dark:text-(--sender-dark-background-color)"
                         onClick={() => {
                             handleQuickAction(message.type)
                         }}
@@ -92,7 +89,7 @@ const SystemMessage = (
 
     return (
         <div className={`${className}`} ref={messageIndex === 0 ? ref : null}>
-            <p className={`text-center text-xs text-system-message-light dark:text-system-message-dark`}>
+            <p className={`text-system-message-light dark:text-system-message-dark text-center text-xs`}>
                 {handleReplaceJson(message.content || '')}
             </p>
         </div>

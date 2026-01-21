@@ -1,1 +1,1 @@
-export { default } from '../../../../../components/AddMemberPreview/AddMemberPreview'
+export { default } from '~/components/AddMemberPreview/AddMemberPreview'

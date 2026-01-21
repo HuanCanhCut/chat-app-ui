@@ -52,13 +52,13 @@ const RenameConversationModal: React.FC<RenameConversationModalProps> = ({ onClo
                     <input
                         type="text"
                         placeholder="Tên đoạn chat"
-                        className="w-full rounded-lg border border-gray-300 bg-transparent px-4 py-4 text-sm focus:border-primary focus:outline-hidden dark:border-zinc-500 dark:text-white dark:focus:border-primary"
+                        className="focus:border-primary dark:focus:border-primary w-full rounded-lg border border-gray-300 bg-transparent px-4 py-4 text-sm focus:outline-hidden dark:border-zinc-500 dark:text-white"
                         maxLength={MAX_LENGTH}
                         value={name}
                         onChange={handleChangeName}
                         spellCheck={false}
                     />
-                    <span className="absolute right-3 top-2 text-xs">
+                    <span className="absolute top-2 right-3 text-xs">
                         {name.length}/{MAX_LENGTH}
                     </span>
                 </div>
@@ -68,7 +68,7 @@ const RenameConversationModal: React.FC<RenameConversationModalProps> = ({ onClo
                     </Button>
                     <Button
                         buttonType="rounded"
-                        className="w-fit !bg-primary text-white! dark:hover:!bg-primary/85"
+                        className="bg-primary! dark:hover:bg-primary/85! w-fit text-white!"
                         onClick={handleRename}
                     >
                         Lưu

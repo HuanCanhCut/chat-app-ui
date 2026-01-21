@@ -52,7 +52,7 @@ const Search: React.FC<Props> = ({ setSearchMode, searchMode }) => {
     const renderResult = () => {
         return (
             // 20px: padding left and right
-            <div className="h-[calc(100dvh-210px)] w-[calc(100vw-20px)] [overflow:overlay] dark:bg-dark sm:h-[calc(100dvh-180px)] bp900:w-[calc(var(--sidebar-width-tablet)-20px)] lg:w-[calc(var(--sidebar-width)-20px)]">
+            <div className="dark:bg-dark bp900:w-[calc(var(--sidebar-width-tablet)-20px)] h-[calc(100dvh-210px)] w-[calc(100vw-20px)] [overflow:overlay] sm:h-[calc(100dvh-180px)] lg:w-[calc(var(--sidebar-width)-20px)]">
                 {searchResult.map((conversation) => {
                     let conversationMember = conversation.members.find(
                         (member) => member.user_id !== currentUser?.data.id,
@@ -114,7 +114,7 @@ const Search: React.FC<Props> = ({ setSearchMode, searchMode }) => {
                         />
                     )}
 
-                    <div className="mr-2 flex flex-1 items-center rounded-3xl bg-lightGray px-4 pl-3 dark:bg-[#313233]">
+                    <div className="bg-lightGray dark:bg-dark-gray mr-2 flex flex-1 items-center rounded-3xl px-4 pl-3">
                         <FontAwesomeIcon icon={faSearch} width={16} height={16} />
                         <input
                             type="text"

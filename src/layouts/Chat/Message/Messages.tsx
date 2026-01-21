@@ -108,7 +108,7 @@ const Message: React.FC<MessageProps> = ({ conversation }) => {
 
     const handleEnterMessage = (e: React.KeyboardEvent<HTMLDivElement>) => {
         if (e.key === 'Enter') {
-            sendEvent({ eventName: 'message:enter-message', detail: { roomUuid: uuid } })
+            sendEvent('MESSAGE:ENTER-MESSAGE', { conversationUuid: uuid as string })
         }
     }
 
@@ -406,138 +406,130 @@ const Message: React.FC<MessageProps> = ({ conversation }) => {
     }
 
     useEffect(() => {
-        interface Detail {
-            parentMessage: MessageModel
-            type: string
-        }
+        const remove = listenEvent('MESSAGE:SCROLL-TO-MESSAGE', async ({ parentMessage, type }) => {
+            const handleAnimate = (messageElement: HTMLDivElement) => {
+                Object.values(messageRefs.current).forEach((ref) => {
+                    if (!ref) {
+                        return
+                    }
 
-        const remove = listenEvent({
-            eventName: 'message:scroll-to-message',
-            handler: async ({ detail: { parentMessage, type } }: { detail: Detail }) => {
-                const handleAnimate = (messageElement: HTMLDivElement) => {
-                    Object.values(messageRefs.current).forEach((ref) => {
-                        if (!ref) {
+                    ref.classList.remove(
+                        'border-2',
+                        'border-white',
+                        'dark:border-zinc-800',
+                        'shadow-[0_0_0_1px_#222]',
+                        'dark:shadow-[0_0_0_1px_#fff]',
+                        'animate-scale-up',
+                    )
+                })
+
+                if (messageElement) {
+                    messageElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+
+                    isJumpingToMessage.current = true
+
+                    setTimeout(() => {
+                        isJumpingToMessage.current = false
+                    }, 1000)
+
+                    const observer = new IntersectionObserver(
+                        ([entry]) => {
+                            if (entry.isIntersecting) {
+                                messageElement.classList.add(
+                                    'border-2',
+                                    'border-white',
+                                    'dark:border-zinc-800',
+                                    'shadow-[0_0_0_1px_#222]',
+                                    'dark:shadow-[0_0_0_1px_#fff]',
+                                )
+                                setTimeout(() => {
+                                    messageElement.classList.add('animate-scale-up')
+                                }, 250)
+
+                                observer.disconnect()
+                            }
+                        },
+                        {
+                            threshold: 0.5,
+                        },
+                    )
+                    observer.observe(messageElement)
+                }
+            }
+
+            const messageElement = messageRefs.current[parentMessage.id]
+            // if reply message is loaded
+            if (messageElement) {
+                handleAnimate(messageElement)
+            } else {
+                const aroundMessage = await messageServices.getAroundMessages({
+                    conversationUuid: uuid as string,
+                    messageId: parentMessage.id,
+                    limit: PER_PAGE,
+                })
+
+                if (aroundMessage) {
+                    // if around message is the next range of the current range
+                    if (aroundMessage?.meta.pagination.offset <= offsetRange.end && type === 'reply') {
+                        const diffOffset = offsetRange.end - aroundMessage?.meta.pagination.offset
+                        aroundMessage.data.splice(0, diffOffset)
+
+                        if (!messages?.data) {
                             return
                         }
 
-                        ref.classList.remove(
-                            'border-2',
-                            'border-white',
-                            'dark:border-zinc-800',
-                            'shadow-[0_0_0_1px_#222]',
-                            'dark:shadow-[0_0_0_1px_#fff]',
-                            'animate-scale-up',
-                        )
-                    })
+                        const newMessages = [...messages.data, ...aroundMessage.data]
+                        const messageItem = newMessages.find((message) => message.id === parentMessage.id)
 
-                    if (messageElement) {
-                        messageElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+                        if (messageItem) {
+                            requestIdleCallback(() => {
+                                handleAnimate(messageRefs.current[messageItem.id])
+                            })
+                        }
 
-                        isJumpingToMessage.current = true
-
-                        setTimeout(() => {
-                            isJumpingToMessage.current = false
-                        }, 1000)
-
-                        const observer = new IntersectionObserver(
-                            ([entry]) => {
-                                if (entry.isIntersecting) {
-                                    messageElement.classList.add(
-                                        'border-2',
-                                        'border-white',
-                                        'dark:border-zinc-800',
-                                        'shadow-[0_0_0_1px_#222]',
-                                        'dark:shadow-[0_0_0_1px_#fff]',
-                                    )
-                                    setTimeout(() => {
-                                        messageElement.classList.add('animate-scale-up')
-                                    }, 250)
-
-                                    observer.disconnect()
-                                }
+                        mutateMessages(
+                            {
+                                data: newMessages,
+                                meta: aroundMessage.meta,
                             },
                             {
-                                threshold: 0.5,
+                                revalidate: false,
                             },
                         )
-                        observer.observe(messageElement)
-                    }
-                }
 
-                const messageElement = messageRefs.current[parentMessage.id]
-                // if reply message is loaded
-                if (messageElement) {
-                    handleAnimate(messageElement)
-                } else {
-                    const aroundMessage = await messageServices.getAroundMessages({
-                        conversationUuid: uuid as string,
-                        messageId: parentMessage.id,
-                        limit: PER_PAGE,
-                    })
-
-                    if (aroundMessage) {
-                        // if around message is the next range of the current range
-                        if (aroundMessage?.meta.pagination.offset <= offsetRange.end && type === 'reply') {
-                            const diffOffset = offsetRange.end - aroundMessage?.meta.pagination.offset
-                            aroundMessage.data.splice(0, diffOffset)
-
-                            if (!messages?.data) {
-                                return
+                        setOffsetRange((prev) => {
+                            return {
+                                ...prev,
+                                end: prev.end + aroundMessage.meta.pagination.offset,
                             }
+                        })
+                    } else {
+                        setOffsetRange({
+                            start: aroundMessage.meta.pagination.offset,
+                            end: aroundMessage.meta.pagination.offset + aroundMessage.data.length,
+                        })
 
-                            const newMessages = [...messages.data, ...aroundMessage.data]
-                            const messageItem = newMessages.find((message) => message.id === parentMessage.id)
+                        mutateMessages(
+                            {
+                                data: aroundMessage.data,
+                                meta: aroundMessage.meta,
+                            },
+                            { revalidate: false },
+                        )
 
-                            if (messageItem) {
-                                requestIdleCallback(() => {
-                                    handleAnimate(messageRefs.current[messageItem.id])
-                                })
-                            }
+                        const messageItem = aroundMessage.data.find((message) => message.id === parentMessage.id)
+                        if (messageItem) {
+                            requestIdleCallback(() => {
+                                const messageElement = messageRefs.current[messageItem.id]
 
-                            mutateMessages(
-                                {
-                                    data: newMessages,
-                                    meta: aroundMessage.meta,
-                                },
-                                {
-                                    revalidate: false,
-                                },
-                            )
-
-                            setOffsetRange((prev) => {
-                                return {
-                                    ...prev,
-                                    end: prev.end + aroundMessage.meta.pagination.offset,
+                                if (messageElement) {
+                                    handleAnimate(messageElement)
                                 }
                             })
-                        } else {
-                            setOffsetRange({
-                                start: aroundMessage.meta.pagination.offset,
-                                end: aroundMessage.meta.pagination.offset + aroundMessage.data.length,
-                            })
-
-                            mutateMessages(
-                                {
-                                    data: aroundMessage.data,
-                                    meta: aroundMessage.meta,
-                                },
-                                { revalidate: false },
-                            )
-
-                            const messageItem = aroundMessage.data.find((message) => message.id === parentMessage.id)
-                            if (messageItem) {
-                                requestIdleCallback(() => {
-                                    const messageElement = messageRefs.current[messageItem.id]
-
-                                    if (messageElement) {
-                                        handleAnimate(messageElement)
-                                    }
-                                })
-                            }
                         }
                     }
                 }
-            },
+            }
         })
 
         return remove

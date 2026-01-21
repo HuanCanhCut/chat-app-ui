@@ -36,11 +36,11 @@ const SearchFriend: React.FC<SearchFriendProps> = ({ placeholder = 'Tìm kiếm'
 
     return (
         <div className={`relative w-full ${className}`}>
-            <FontAwesomeIcon icon={faSearch} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <FontAwesomeIcon icon={faSearch} className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-400" />
 
             <input
                 type="text"
-                className="w-full rounded-full bg-lightGray px-8 py-2 outline-hidden dark:bg-dark-gray"
+                className="bg-lightGray dark:bg-dark-gray w-full rounded-full px-8 py-2 outline-hidden"
                 placeholder={placeholder}
                 value={searchValue}
                 onChange={(e) => setSearchValue(e.target.value)}

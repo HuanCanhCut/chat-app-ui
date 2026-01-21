@@ -47,7 +47,7 @@ const Input = forwardRef<HTMLInputElement, Props>(
                         <>
                             <div className="relative">
                                 <input
-                                    className={`w-full rounded-lg border border-gray-300 bg-gray-100 p-2 outline-hidden dark:border-zinc-700 dark:bg-dark-gray`}
+                                    className={`dark:bg-dark-gray w-full rounded-lg border border-gray-300 bg-gray-100 p-2 outline-hidden dark:border-zinc-700`}
                                     placeholder={placeholder}
                                     {...field}
                                     type={type}
@@ -60,14 +60,14 @@ const Input = forwardRef<HTMLInputElement, Props>(
                                 />
                                 {showIcon && (
                                     <div
-                                        className={`cursor-pointer select-none dark:text-dark ${IconClass}`}
+                                        className={`dark:text-dark cursor-pointer select-none ${IconClass}`}
                                         onClick={setShowIcon}
                                     >
                                         {Icon}
                                     </div>
                                 )}
                             </div>
-                            {error && <span className="mt-1 text-sm text-error">{error.message}</span>}
+                            {error && <span className="text-error mt-1 text-sm">{error.message}</span>}
                         </>
                     )}
                     {...props}

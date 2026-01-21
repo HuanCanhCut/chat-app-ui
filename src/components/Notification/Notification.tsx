@@ -169,70 +169,61 @@ const Notification = () => {
     }, [mutateNotifications, notifications])
 
     useEffect(() => {
-        const remove = listenEvent({
-            eventName: 'notification:update-read-status',
-            handler: ({ detail: { notificationId, type } }: { detail: { notificationId: number; type: string } }) => {
-                if (!notifications) {
-                    return
-                }
+        const remove = listenEvent('NOTIFICATION:UPDATE-READ-STATUS', ({ notificationId, type }) => {
+            if (!notifications) {
+                return
+            }
 
-                const newNotifications = {
-                    data: notifications?.data.map((notification: NotificationData) => ({
-                        ...notification,
-                        is_read: notification.id === notificationId ? type === 'read' : notification.is_read,
-                    })),
-                    meta: {
-                        ...notifications?.meta,
-                    },
-                }
+            const newNotifications = {
+                data: notifications?.data.map((notification: NotificationData) => ({
+                    ...notification,
+                    is_read: notification.id === notificationId ? type === 'read' : notification.is_read,
+                })),
+                meta: {
+                    ...notifications?.meta,
+                },
+            }
 
-                mutateNotifications(newNotifications, { revalidate: false })
+            mutateNotifications(newNotifications, { revalidate: false })
 
-                tippyInstanceRef.current?.hide()
-            },
+            tippyInstanceRef.current?.hide()
         })
 
         return remove
     }, [mutateNotifications, notifications])
 
     useEffect(() => {
-        const remove = listenEvent({
-            eventName: 'notification:delete-notification',
-            handler: ({ detail: notificationId }) => {
-                const newNotifications = notifications?.data.filter(
-                    (notification: NotificationData) => notification.id !== notificationId,
-                )
+        const remove = listenEvent('NOTIFICATION:DELETE-NOTIFICATION', ({ notificationId }) => {
+            const newNotifications = notifications?.data.filter(
+                (notification: NotificationData) => notification.id !== notificationId,
+            )
 
-                if (notifications) {
-                    mutateNotifications(
-                        {
-                            data: newNotifications || [],
-                            meta: {
-                                pagination: {
-                                    ...notifications?.meta.pagination,
-                                    total: notifications.meta.pagination.total - 1,
-                                    count: notifications.meta.pagination.count - 1,
-                                },
+            if (notifications) {
+                mutateNotifications(
+                    {
+                        data: newNotifications || [],
+                        meta: {
+                            pagination: {
+                                ...notifications?.meta.pagination,
+                                total: notifications.meta.pagination.total - 1,
+                                count: notifications.meta.pagination.count - 1,
                             },
                         },
-                        {
-                            revalidate: false,
-                        },
-                    )
-                }
-            },
+                    },
+                    {
+                        revalidate: false,
+                    },
+                )
+            }
         })
 
         return remove
     }, [mutateNotifications, notifications])
 
     useEffect(() => {
-        const remove = listenEvent({
-            eventName: 'tippy:hide',
-            handler: () => {
-                // Hide tippy when click on notification item
-                tippyInstanceRef.current?.hide()
-            },
+        const remove = listenEvent('TIPPY:HIDE', () => {
+            // Hide tippy when click on notification item
+            tippyInstanceRef.current?.hide()
         })
 
         return remove
@@ -279,7 +270,7 @@ const Notification = () => {
 
     const renderNotification = () => {
         return (
-            <PopperWrapper className="w-[400px] px-3 py-4 [overflow:overlay]">
+            <PopperWrapper className="w-[400px] [overflow:overlay] px-3 py-4">
                 <header>
                     <h2 className="text-xl font-semibold">Thông báo</h2>
                     <div className="mt-4 flex items-center gap-2">
@@ -340,7 +331,7 @@ const Notification = () => {
                     <FontAwesomeIcon icon={faBell} className="text-lg sm:text-xl" width={20} height={20} />
                 </Button>
                 {notifications && notificationUnSeenCount !== 0 && (
-                    <span className="flex-center absolute right-[-3px] top-[-3px] h-4 w-4 rounded-full bg-red-500 text-xs text-white">
+                    <span className="flex-center absolute top-[-3px] right-[-3px] h-4 w-4 rounded-full bg-red-500 text-xs text-white">
                         {notificationUnSeenCount}
                     </span>
                 )}

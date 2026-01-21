@@ -129,13 +129,10 @@ const CreateConversationModal = ({ onClose }: { onClose: () => void }) => {
     }, [fields, onClose])
 
     useEffect(() => {
-        const remove = listenEvent({
-            eventName: 'add_member:preview',
-            handler: ({ detail }: { detail: { previewMember: UserModel[] } }) => {
-                if (detail.previewMember.length && errorMessage) {
-                    setErrorMessage('')
-                }
-            },
+        const remove = listenEvent('ADD_MEMBER:PREVIEW', ({ previewMember }) => {
+            if (previewMember.length && errorMessage) {
+                setErrorMessage('')
+            }
         })
 
         return remove
@@ -148,7 +145,7 @@ const CreateConversationModal = ({ onClose }: { onClose: () => void }) => {
                     <UserAvatar src={fields.avatar.preview} className="mt-4 cursor-default!" size={96} />
                     <label
                         htmlFor="create-conversation-avatar-input"
-                        className="absolute bottom-0 right-0 flex aspect-square h-7 cursor-pointer items-center justify-center rounded-full border border-dashed border-zinc-700 dark:border-zinc-300"
+                        className="absolute right-0 bottom-0 flex aspect-square h-7 cursor-pointer items-center justify-center rounded-full border border-dashed border-zinc-700 dark:border-zinc-300"
                     >
                         <FontAwesomeIcon icon={faCamera} className="text-2xl" width={16} height={16} />
                     </label>
@@ -159,7 +156,7 @@ const CreateConversationModal = ({ onClose }: { onClose: () => void }) => {
                     htmlFor="create-conversation-avatar-input"
                 >
                     <FontAwesomeIcon icon={faFileUpload} className="mb-2 text-2xl" width={40} height={40} />
-                    <span className="flex select-none flex-col items-center text-sm">
+                    <span className="flex flex-col items-center text-sm select-none">
                         <span>Tải ảnh lên</span>
                         <span className="text-xs">(Max: 5MB)</span>
                     </span>
@@ -180,7 +177,7 @@ const CreateConversationModal = ({ onClose }: { onClose: () => void }) => {
                     <input
                         type="text"
                         name="group_name"
-                        className="w-full rounded-lg border border-gray-300 bg-gray-100 p-2 outline-hidden dark:border-zinc-700 dark:bg-dark-gray"
+                        className="dark:bg-dark-gray w-full rounded-lg border border-gray-300 bg-gray-100 p-2 outline-hidden dark:border-zinc-700"
                         placeholder="Nhập tên nhóm"
                         value={fields.group_name}
                         onChange={setFieldsValue}
@@ -189,7 +186,7 @@ const CreateConversationModal = ({ onClose }: { onClose: () => void }) => {
 
                 <AddMemberPreview className="flex-auto" ref={addMemberPreviewRef} />
 
-                {errorMessage && <span className="mt-1 whitespace-pre-wrap text-sm text-error">{errorMessage}</span>}
+                {errorMessage && <span className="text-error mt-1 text-sm whitespace-pre-wrap">{errorMessage}</span>}
 
                 <div className="mt-4">
                     <Button buttonType="primary" className="w-full" type="button" onClick={handleCreateConversation}>

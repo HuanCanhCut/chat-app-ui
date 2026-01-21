@@ -45,11 +45,11 @@ const Header: React.FC = () => {
             <div className="flex w-full items-center justify-between">
                 <>
                     <UserAvatar src={currentUser?.data?.avatar} onClick={handleNavigateToProfile} />
-                    <h3 className="text-xl font-semibold dark:text-dark">Huấn Cánh Cụt</h3>
+                    <h3 className="dark:text-dark text-xl font-semibold">Huấn Cánh Cụt</h3>
 
                     <Tippy content="Tạo nhóm" hideOnClick={true} placement="bottom-start">
                         <button
-                            className="flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-dark-gray dark:text-dark dark:hover:opacity-90"
+                            className="dark:bg-dark-gray dark:text-dark flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 dark:hover:opacity-90"
                             onClick={handleCreateConversation}
                         >
                             <FontAwesomeIcon icon={faUserGroup} className="text-xl" width={20} height={20} />

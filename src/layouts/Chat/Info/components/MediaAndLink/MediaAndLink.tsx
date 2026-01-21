@@ -124,7 +124,7 @@ const MediaAndLink: React.FC<MediaAndLinkProps> = ({ onBack, defaultActiveTab })
                 overlayClassName="overlay"
                 closeTimeoutMS={200}
                 onRequestClose={handleCloseImageModal}
-                className="fixed bottom-0 left-0 right-0 top-0"
+                className="fixed top-0 right-0 bottom-0 left-0"
             >
                 <MessageImagesModel onClose={handleCloseImageModal} imageUrl={openImageModal.image} />
             </ReactModal>
@@ -143,13 +143,13 @@ const MediaAndLink: React.FC<MediaAndLinkProps> = ({ onBack, defaultActiveTab })
                             <div key={index} className="w-full">
                                 <Button
                                     buttonType="rounded"
-                                    className={`w-full whitespace-nowrap bg-transparent py-3! text-center dark:bg-transparent ${tab.type === activeTab.type ? 'text-[#0064D1] hover:bg-transparent dark:text-[#5AA7FF] dark:hover:bg-transparent' : 'text-system-message-light dark:text-system-message-dark'}`}
+                                    className={`w-full bg-transparent py-3! text-center whitespace-nowrap dark:bg-transparent ${tab.type === activeTab.type ? 'text-[#0064D1] hover:bg-transparent dark:text-[#5AA7FF] dark:hover:bg-transparent' : 'text-system-message-light dark:text-system-message-dark'}`}
                                     onClick={() => setActiveTab(tab)}
                                 >
                                     {tab.title}
                                 </Button>
 
-                                {tab.type === activeTab.type && <div className="h-[3px] w-full bg-primary" />}
+                                {tab.type === activeTab.type && <div className="bg-primary h-[3px] w-full" />}
                             </div>
                         )
                     })}
@@ -222,7 +222,7 @@ const MediaAndLink: React.FC<MediaAndLinkProps> = ({ onBack, defaultActiveTab })
                                 {Object.keys(media.data).map((title, index) => {
                                     return (
                                         <div key={index}>
-                                            <span className="text-lg font-semibold leading-5 dark:text-[#E2E5E9]">
+                                            <span className="text-lg leading-5 font-semibold dark:text-[#E2E5E9]">
                                                 {title}
                                             </span>
 

@@ -121,14 +121,11 @@ const AccountOptions: React.FC<AccountOptionsProps> = ({ member, isAdmin }) => {
                 })
                 break
             case 'leave_group':
-                sendEvent({
-                    eventName: 'conversation:leave-choose',
-                    detail: { type: 'leave_group' },
-                })
+                sendEvent('CONVERSATION:LEAVE-CHOOSE', { type: 'leave_group' })
                 break
         }
 
-        sendEvent({ eventName: 'tippy:hide' })
+        sendEvent('TIPPY:HIDE', null)
     }
 
     const ADMIN_OPTIONS: Option[] = [
@@ -168,7 +165,7 @@ const AccountOptions: React.FC<AccountOptionsProps> = ({ member, isAdmin }) => {
                     return (
                         <div
                             key={index}
-                            className="flex cursor-pointer items-center gap-2 rounded-md px-4 py-2 hover:bg-gray-100 dark:hover:bg-dark-gray"
+                            className="dark:hover:bg-dark-gray flex cursor-pointer items-center gap-2 rounded-md px-4 py-2 hover:bg-gray-100"
                             onClick={(e) => {
                                 e.stopPropagation()
                                 e.preventDefault()

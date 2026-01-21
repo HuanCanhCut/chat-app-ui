@@ -79,7 +79,7 @@ export default memo(function CustomTippy({
         scale.set(initialScale)
         opacity.set(0)
 
-        sendEvent({ eventName: 'tippy:tippy-hidden', detail: true })
+        sendEvent('TIPPY:TIPPY-HIDDEN', { detail: true })
     }
 
     return (

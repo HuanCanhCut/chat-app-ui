@@ -112,9 +112,7 @@ const InputMessage: React.FC<InputMessageProps> = () => {
                 parent_id: replyMessage?.id,
             })
 
-            sendEvent({
-                eventName: 'message:send',
-            })
+            sendEvent('MESSAGE:SEND', null)
         }
 
         // handle image message
@@ -186,9 +184,7 @@ const InputMessage: React.FC<InputMessageProps> = () => {
                 parent_id: replyMessage?.id,
             })
 
-            sendEvent({
-                eventName: 'message:send',
-            })
+            sendEvent('MESSAGE:SEND', null)
         }
 
         setMessageValue('')
@@ -215,11 +211,8 @@ const InputMessage: React.FC<InputMessageProps> = () => {
     }, [])
 
     useEffect(() => {
-        const remove = listenEvent({
-            eventName: 'message:enter-message',
-            handler: ({ detail }: { detail: { conversationUuid: string } }) => {
-                handleEmitMessage(detail.conversationUuid)
-            },
+        const remove = listenEvent('MESSAGE:ENTER-MESSAGE', ({ conversationUuid }) => {
+            handleEmitMessage(conversationUuid)
         })
 
         return remove
@@ -309,12 +302,9 @@ const InputMessage: React.FC<InputMessageProps> = () => {
     }
 
     useEffect(() => {
-        const remove = listenEvent({
-            eventName: 'message:reply',
-            handler: ({ detail }: { detail: MessageModel }) => {
-                setReplyMessage(detail)
-                textareaRef.current?.focus()
-            },
+        const remove = listenEvent('MESSAGE:REPLY', ({ message }) => {
+            setReplyMessage(message)
+            textareaRef.current?.focus()
         })
 
         return remove
@@ -501,9 +491,7 @@ const InputMessage: React.FC<InputMessageProps> = () => {
                                         parent_id: replyMessage?.id,
                                     })
 
-                                    sendEvent({
-                                        eventName: 'message:send',
-                                    })
+                                    sendEvent('MESSAGE:SEND', null)
                                 }
                             }}
                         >

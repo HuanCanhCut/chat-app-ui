@@ -127,6 +127,6 @@ export default function useSingletonGenerator(createSingleton) {
             }
 
             return [source, target]
-        }, [])
+        }, [mutableBox])
     }
 }

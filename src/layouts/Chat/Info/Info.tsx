@@ -316,7 +316,7 @@ const Info: React.FC<InfoProps> = ({ className = '', isOpen }) => {
     return (
         <div
             id="info-container"
-            className={`${className} min-h-[calc(100dvh-var(--header-height-mobile))] px-2 py-3 [overflow:overlay] sm:min-h-[calc(100dvh-var(--header-height))]`}
+            className={`${className} min-h-[calc(100dvh-var(--header-height-mobile))] [overflow:overlay] px-2 py-3 sm:min-h-[calc(100dvh-var(--header-height))]`}
         >
             {current.data.map((item, index) => {
                 return <React.Fragment key={index}>{item.component}</React.Fragment>

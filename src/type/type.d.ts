@@ -174,13 +174,8 @@ export interface MessageStatus extends BaseModel {
     read_at: Date
 }
 
-export interface SearchMessageModel extends MessageModel {
-    top_reactions?: never
-    parent?: never
-}
-
 export interface SearchMessageResponse extends MetaPagination {
-    data: SearchMessageModel[]
+    data: MessageModel[]
 }
 
 // ========================================== Link preview model ==========================================

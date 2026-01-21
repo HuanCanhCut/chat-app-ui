@@ -81,7 +81,7 @@ const Interaction = () => {
     const handleChoose = (type: MenuItemType['type']) => {
         switch (type) {
             case 'logout':
-                sendEvent({ eventName: 'tippy:hide' })
+                sendEvent('TIPPY:HIDE', null)
                 authService.logout()
 
                 router.push(config.routes.auth)
@@ -124,12 +124,12 @@ const Interaction = () => {
 
     const renderTooltip = () => {
         return (
-            <PopperWrapper className="min-w-[320px] max-w-[320px] text-sm">
+            <PopperWrapper className="max-w-[320px] min-w-[320px] text-sm">
                 <header className="p-2">
                     <h4 className="text-center font-semibold">Tùy chọn</h4>
                 </header>
                 <section>
-                    <div className="border-b border-t border-gray-300 px-5 py-2 dark:border-zinc-700">
+                    <div className="border-t border-b border-gray-300 px-5 py-2 dark:border-zinc-700">
                         <label className="text-base font-semibold">Tài khoản</label>
                         <div className="flex max-w-full items-center justify-between gap-2 overflow-hidden">
                             {currentUser && (

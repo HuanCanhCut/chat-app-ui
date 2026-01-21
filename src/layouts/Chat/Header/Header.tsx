@@ -54,13 +54,10 @@ const Header: React.FC<HeaderProps> = ({ className = '', isInfoOpen, conversatio
             }
 
             if (data.user_id === conversationMember?.user.id && !data.is_online) {
-                sendEvent({
-                    eventName: 'user:status',
-                    detail: {
-                        user_id: conversationMember?.user.id,
-                        is_online: false,
-                        last_online_at: new Date(conversationMember?.user.last_online_at || new Date()),
-                    },
+                sendEvent('USER:STATUS', {
+                    user_id: conversationMember?.user.id,
+                    is_online: false,
+                    last_online_at: new Date(conversationMember?.user.last_online_at || new Date()),
                 })
 
                 offlineTimerSocket.current = setInterval(() => {
@@ -83,13 +80,10 @@ const Header: React.FC<HeaderProps> = ({ className = '', isInfoOpen, conversatio
     useEffect(() => {
         if (!conversationMember?.user.is_online) {
             if (conversationMember?.user.last_online_at) {
-                sendEvent({
-                    eventName: 'user:status',
-                    detail: {
-                        user_id: conversationMember?.user.id,
-                        is_online: false,
-                        last_online_at: new Date(conversationMember?.user.last_online_at),
-                    },
+                sendEvent('USER:STATUS', {
+                    user_id: conversationMember?.user.id,
+                    is_online: false,
+                    last_online_at: new Date(conversationMember?.user.last_online_at),
                 })
 
                 offlineTimer.current = setInterval(() => {
@@ -106,12 +100,7 @@ const Header: React.FC<HeaderProps> = ({ className = '', isInfoOpen, conversatio
     }, [conversationMember?.user.id, conversationMember?.user.is_online, conversationMember?.user.last_online_at])
 
     const handleToggleInfo = () => {
-        sendEvent({
-            eventName: 'info:toggle',
-            detail: {
-                isOpen: !isInfoOpen,
-            },
-        })
+        sendEvent('INFO:TOGGLE', { isOpen: !isInfoOpen })
     }
 
     const handleVoiceCall = () => {
@@ -138,7 +127,7 @@ const Header: React.FC<HeaderProps> = ({ className = '', isInfoOpen, conversatio
         >
             <div className="flex items-center">
                 <div
-                    className="flex-center cursor-pointer rounded-lg px-1 py-1 hover:bg-[#99999926]! dark:hover:bg-[#383b3b25]! bp900:hidden"
+                    className="flex-center bp900:hidden cursor-pointer rounded-lg px-1 py-1 hover:bg-[#99999926]! dark:hover:bg-[#383b3b25]!"
                     onClick={() => router.push('/message')}
                 >
                     <FontAwesomeIcon
@@ -162,7 +151,7 @@ const Header: React.FC<HeaderProps> = ({ className = '', isInfoOpen, conversatio
                         />
                     </div>
                     <div className="flex flex-col">
-                        <h4 className="max-w-[150px] truncate whitespace-nowrap font-semibold xs:max-w-[200px] sm:max-w-[250px] md:max-w-[350px]">
+                        <h4 className="xs:max-w-[200px] max-w-[150px] truncate font-semibold whitespace-nowrap sm:max-w-[250px] md:max-w-[350px]">
                             {conversation.is_group
                                 ? conversation.name
                                 : conversationMember?.nickname || conversationMember?.user?.full_name}

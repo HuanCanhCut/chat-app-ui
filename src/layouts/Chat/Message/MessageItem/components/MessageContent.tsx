@@ -162,7 +162,7 @@ const MessageContent = (
         return (
             <p
                 ref={combinedRef}
-                className={`relative w-fit max-w-[80%] rounded-3xl px-4 py-1.5 italic opacity-85 [word-break:break-word] ${
+                className={`relative w-fit max-w-[80%] rounded-3xl px-4 py-1.5 [word-break:break-word] italic opacity-85 ${
                     message.sender_id === currentUser?.id
                         ? 'bg-(--sender-light-background-color) text-(--sender-light-text-color) dark:bg-(--sender-dark-background-color) dark:text-(--sender-dark-text-color)'
                         : 'bg-(--receiver-light-background-color) text-(--receiver-light-text-color) dark:bg-(--receiver-dark-background-color) dark:text-(--receiver-dark-text-color)'
@@ -195,7 +195,7 @@ const MessageContent = (
                 <div className={`relative ${linkPreview?.image ? 'w-full max-w-[300px]' : 'w-fit max-w-[80%]'} `}>
                     <div
                         ref={combinedRef}
-                        className={`whitespace-pre-wrap rounded-3xl px-4 py-1.5 font-normal [word-break:break-word] ${linkPreview && 'rounded-bl-none rounded-br-none'} ${
+                        className={`rounded-3xl px-4 py-1.5 font-normal [word-break:break-word] whitespace-pre-wrap ${linkPreview && 'rounded-br-none rounded-bl-none'} ${
                             message.sender_id === currentUser?.id
                                 ? 'bg-(--sender-light-background-color) text-(--sender-light-text-color) dark:bg-(--sender-dark-background-color) dark:text-(--sender-dark-text-color)'
                                 : 'bg-(--receiver-light-background-color) text-(--receiver-light-text-color) dark:bg-(--receiver-dark-background-color) dark:text-(--receiver-dark-text-color)'
@@ -213,7 +213,7 @@ const MessageContent = (
                         <Link
                             href={linkPreview.url}
                             target="_blank"
-                            className="block rounded-bl-3xl rounded-br-3xl bg-(--receiver-light-background-color) dark:bg-(--receiver-dark-background-color)"
+                            className="block rounded-br-3xl rounded-bl-3xl bg-(--receiver-light-background-color) dark:bg-(--receiver-dark-background-color)"
                         >
                             {linkPreview?.image && (
                                 // eslint-disable-next-line @next/next/no-img-element
@@ -224,7 +224,7 @@ const MessageContent = (
                                 />
                             )}
                             <div className="flex flex-col px-4 py-2">
-                                <p className="line-clamp-3 overflow-hidden text-ellipsis font-medium">
+                                <p className="line-clamp-3 overflow-hidden font-medium text-ellipsis">
                                     {linkPreview?.title}
                                 </p>
                             </div>
@@ -251,7 +251,7 @@ const MessageContent = (
                                 <CustomImage
                                     src={url}
                                     alt="message"
-                                    className={`max-h-[260px] sm:min-w-[100px] ${JSON.parse(message.content as string).length === 1 ? 'min-w-[180px]' : 'aspect-square'} h-full w-full min-w-[160px] max-w-full! cursor-pointer rounded-md object-cover object-center`}
+                                    className={`max-h-[260px] sm:min-w-[100px] ${JSON.parse(message.content as string).length === 1 ? 'min-w-[180px]' : 'aspect-square'} h-full w-full max-w-full! min-w-[160px] cursor-pointer rounded-md object-cover object-center`}
                                     priority
                                     quality={100}
                                     onClick={() => handleOpenImageModal(url, message.id)}
@@ -274,7 +274,7 @@ const MessageContent = (
                     <div className="flex items-center gap-2">
                         <Button
                             buttonType="icon"
-                            className={`shrink-0 ${message.type === 'call_timeout' ? '!bg-error dark:!bg-error' : ''}`}
+                            className={`shrink-0 ${message.type === 'call_timeout' ? 'bg-error! dark:bg-error!' : ''}`}
                         >
                             {(() => {
                                 switch (message.type) {
@@ -295,7 +295,7 @@ const MessageContent = (
                                     ? `Cuộc gọi ${message.sender_id === currentUser?.id ? 'đi' : 'đến'}`
                                     : 'Đã bỏ lỡ cuộc gọi'}
                             </p>
-                            <span className="text-xs text-system-message-light dark:text-system-message-dark">
+                            <span className="text-system-message-light dark:text-system-message-dark text-xs">
                                 {message.type === 'call_ended'
                                     ? message.content
                                     : handleFormatTime(new Date(message.created_at))}
@@ -312,9 +312,9 @@ const MessageContent = (
             return (
                 <div
                     ref={combinedRef}
-                    className={`relative w-fit max-w-[80%] whitespace-pre-wrap rounded-3xl py-[2px] font-normal [word-break:break-word]`}
+                    className={`relative w-fit max-w-[80%] rounded-3xl py-[2px] font-normal [word-break:break-word] whitespace-pre-wrap`}
                 >
-                    <span className="max-w-fit gap-3 wrap-break-word text-3xl">
+                    <span className="max-w-fit gap-3 text-3xl wrap-break-word">
                         <EmojiMessageStyle
                             text={message.content}
                             size={32}

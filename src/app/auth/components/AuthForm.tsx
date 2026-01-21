@@ -254,7 +254,7 @@ const AuthForm = () => {
                     </>
                 )}
 
-                {errorMessage && <span className="text-sm text-error">{errorMessage}</span>}
+                {errorMessage && <span className="text-error text-sm">{errorMessage}</span>}
 
                 {type === 'login' && (
                     <span
@@ -268,14 +268,14 @@ const AuthForm = () => {
                 )}
             </div>
 
-            <button className="w-full rounded-lg bg-primary p-2 text-white" type="submit">
+            <button className="bg-primary w-full rounded-lg p-2 text-white" type="submit">
                 {type === 'login' ? 'Đăng nhập' : type === 'register' ? 'Đăng kí' : 'Thay đổi mật khẩu'}
             </button>
 
             <span className="text-center text-sm text-gray-500 dark:text-gray-400">
                 Bạn không có tài khoản?{' '}
                 <span
-                    className="cursor-pointer font-semibold text-primary"
+                    className="text-primary cursor-pointer font-semibold"
                     onClick={() => setType(type === 'login' ? 'register' : 'login')}
                 >
                     {type === 'login' ? 'Đăng kí' : 'Đăng nhập'}

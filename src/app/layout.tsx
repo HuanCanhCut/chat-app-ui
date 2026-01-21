@@ -17,7 +17,7 @@ function RootLayout({
 }>) {
     return (
         <html lang="en">
-            <body className={`${inter.className} text-black dark:text-dark`}>
+            <body className={`${inter.className} dark:text-dark text-black`}>
                 <GlobalSWRConfig>
                     <ReduxProvider>{children}</ReduxProvider>
                     <ToastContainer />

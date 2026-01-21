@@ -68,7 +68,7 @@ const SendVerifyCode: React.FC<Props> = ({ emailRef }) => {
     return (
         <button
             type="button"
-            className="absolute right-0 top-0 h-full min-w-16 rounded-br-lg rounded-tr-lg bg-primary px-2 text-sm font-medium text-white"
+            className="bg-primary absolute top-0 right-0 h-full min-w-16 rounded-tr-lg rounded-br-lg px-2 text-sm font-medium text-white"
             onClick={handleSendCode}
         >
             {sendSuccess ? (

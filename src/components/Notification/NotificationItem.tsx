@@ -41,24 +41,18 @@ const NotificationItem = ({
     }
 
     useEffect(() => {
-        const remove = listenEvent({
-            eventName: 'tippy:tippy-hidden',
-            handler: () => {
-                // If user accept friend request and tippy is hidden, delete notification
-                if (isAccept) {
-                    sendEvent({ eventName: 'notification:delete-notification', detail: notification.id })
-                }
-            },
+        const remove = listenEvent('TIPPY:TIPPY-HIDDEN', () => {
+            // If user accept friend request and tippy is hidden, delete notification
+            if (isAccept) {
+                sendEvent('NOTIFICATION:DELETE-NOTIFICATION', { notificationId: notification.id })
+            }
         })
 
         return remove
     }, [isAccept, notification.id])
 
     const handleReadNotification = async () => {
-        sendEvent({
-            eventName: 'notification:update-read-status',
-            detail: { notificationId: notification.id, type: 'read' },
-        })
+        sendEvent('NOTIFICATION:UPDATE-READ-STATUS', { notificationId: notification.id, type: 'read' })
 
         if (notification.is_read) {
             return
@@ -70,7 +64,7 @@ const NotificationItem = ({
     }
 
     const handleDeleteNotification = async () => {
-        sendEvent({ eventName: 'notification:delete-notification', detail: notification.id })
+        sendEvent('NOTIFICATION:DELETE-NOTIFICATION', { notificationId: notification.id })
         setIsOpenConfirmModel(false)
         await NotificationServices.deleteNotification(notification.id)
         toast('Xóa thành công', 'success')
@@ -90,10 +84,7 @@ const NotificationItem = ({
                     break
             }
 
-            sendEvent({
-                eventName: 'notification:update-read-status',
-                detail: { notificationId: notification.id, type },
-            })
+            sendEvent('NOTIFICATION:UPDATE-READ-STATUS', { notificationId: notification.id, type })
 
             tippyInstance.current.hide()
         }
@@ -142,7 +133,7 @@ const NotificationItem = ({
             />
             <div className="group relative mt-3 flex items-center gap-2">
                 <CustomTippy renderItem={RenderMoreOptions} onShow={tippyShow}>
-                    <div className="absolute right-4 top-1/2 mt-2 -translate-y-1/2 opacity-0 group-hover:opacity-100">
+                    <div className="absolute top-1/2 right-4 mt-2 -translate-y-1/2 opacity-0 group-hover:opacity-100">
                         <Button buttonType="icon">
                             <FontAwesomeIcon icon={faEllipsis} />
                         </Button>
@@ -159,7 +150,7 @@ const NotificationItem = ({
                             size={56}
                             className="aspect-square min-w-[56px]"
                         />
-                        <div className="flex-center absolute bottom-[-3px] right-0 gap-2">
+                        <div className="flex-center absolute right-0 bottom-[-3px] gap-2">
                             <div
                                 className="flex-center h-7 w-7 rounded-full text-white"
                                 style={{
@@ -190,7 +181,7 @@ const NotificationItem = ({
                     </div>
                 </Link>
                 {!notification.is_read && (
-                    <button className="ml-auto mt-4 h-3 min-w-3 rounded-full bg-primary"></button>
+                    <button className="bg-primary mt-4 ml-auto h-3 min-w-3 rounded-full"></button>
                 )}
             </div>
 

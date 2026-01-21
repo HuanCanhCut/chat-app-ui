@@ -83,13 +83,10 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ onChose }) => {
     const [lastOnlineTime, setLastOnlineTime] = useState<Date | null>(member?.user.last_online_at || null)
 
     useEffect(() => {
-        const remove = listenEvent({
-            eventName: 'tippy:hide',
-            handler: () => {
-                if (accountOptionsTippyRef.current) {
-                    accountOptionsTippyRef.current.hide()
-                }
-            },
+        const remove = listenEvent('TIPPY:HIDE', () => {
+            if (accountOptionsTippyRef.current) {
+                accountOptionsTippyRef.current.hide()
+            }
         })
 
         return remove
@@ -107,12 +104,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ onChose }) => {
     }, [conversation])
 
     const handleToggleInfo = useCallback(() => {
-        sendEvent({
-            eventName: 'info:toggle',
-            detail: {
-                isOpen: false,
-            },
-        })
+        sendEvent('INFO:TOGGLE', { isOpen: false })
     }, [])
 
     // if current user is admin or leader in conversation
@@ -356,13 +348,10 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ onChose }) => {
     )
 
     useEffect(() => {
-        const remove = listenEvent({
-            eventName: 'conversation:leave-choose',
-            handler: ({ detail }: { detail: { type: string } }) => {
-                if (detail.type === 'leave_group') {
-                    handleChoose('leave_group')
-                }
-            },
+        const remove = listenEvent('CONVERSATION:LEAVE-CHOOSE', ({ type }) => {
+            if (type === 'leave_group') {
+                handleChoose('leave_group')
+            }
         })
 
         return remove
@@ -387,38 +376,24 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ onChose }) => {
     }
 
     useEffect(() => {
-        interface UserStatus {
-            user_id: number
-            is_online: boolean
-            last_online_at: Date
-        }
-
-        const remove = listenEvent<UserStatus>({
-            eventName: 'user:status',
-            handler: ({ detail }) => {
-                if (detail.user_id === member?.user.id) {
-                    setLastOnlineTime(detail.last_online_at)
-                }
-            },
+        const remove = listenEvent('USER:STATUS', ({ user_id, last_online_at }) => {
+            if (user_id === member?.user.id) {
+                setLastOnlineTime(last_online_at)
+            }
         })
 
         return remove
     }, [member?.user.id])
 
     useEffect(() => {
-        const remove = listenEvent({
-            eventName: 'conversation:open-modal',
-            handler: ({ detail: type }) => {
-                if (type === 'theme') {
-                    setModalState({
-                        isOpen: true,
-                        component: (
-                            <ConversationTheme onClose={handleCloseModal} currentTheme={conversation!.data.theme} />
-                        ),
-                        title: 'Xem trước và chọn chủ đề',
-                    })
-                }
-            },
+        const remove = listenEvent('CONVERSATION:OPEN-MODAL', ({ type }) => {
+            if (type === 'theme') {
+                setModalState({
+                    isOpen: true,
+                    component: <ConversationTheme onClose={handleCloseModal} currentTheme={conversation!.data.theme} />,
+                    title: 'Xem trước và chọn chủ đề',
+                })
+            }
         })
 
         return remove
@@ -427,7 +402,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ onChose }) => {
         <>
             <Button
                 buttonType="icon"
-                className="block bg-transparent dark:bg-transparent sm:hidden"
+                className="block bg-transparent sm:hidden dark:bg-transparent"
                 onClick={handleToggleInfo}
             >
                 <FontAwesomeIcon icon={faArrowLeft} />
@@ -453,7 +428,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ onChose }) => {
                 />
 
                 <Link href={`${config.routes.user}/@${member?.user.nickname}`} className="mt-2 hover:underline">
-                    <p className="line-clamp-2 w-full text-ellipsis text-center font-medium">
+                    <p className="line-clamp-2 w-full text-center font-medium text-ellipsis">
                         {conversation?.data.is_group
                             ? conversation.data.name
                             : member?.nickname || member?.user.full_name}

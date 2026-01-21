@@ -123,20 +123,20 @@ const Reaction = ({ message, handleOpenReactionModal }: ReactionProps) => {
                 <div>
                     {message?.top_reactions?.map((reaction, index) => {
                         return (
-                            <p className="font-normal leading-5" key={index}>
+                            <p className="leading-5 font-normal" key={index}>
                                 {reaction.user_reaction.full_name}
                             </p>
                         )
                     })}
 
                     {message?.total_reactions > 2 && (
-                        <p className="font-normal leading-5">và {message?.total_reactions - 2} người khác...</p>
+                        <p className="leading-5 font-normal">và {message?.total_reactions - 2} người khác...</p>
                     )}
                 </div>
             }
         >
             <div
-                className="absolute bottom-[-11px] right-1 flex cursor-pointer items-center rounded-full bg-white py-[2px] shadow-xs shadow-zinc-300 dark:bg-zinc-800 dark:shadow-zinc-700"
+                className="absolute right-1 bottom-[-11px] flex cursor-pointer items-center rounded-full bg-white py-[2px] shadow-xs shadow-zinc-300 dark:bg-zinc-800 dark:shadow-zinc-700"
                 onClick={() => {
                     handleOpenReactionModal(message.id)
                 }}

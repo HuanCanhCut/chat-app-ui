@@ -214,32 +214,29 @@ const Conversations = () => {
 
     // update last message is read
     useEffect(() => {
-        const remove = listenEvent({
-            eventName: 'message:read-message',
-            handler: ({ detail: conversationUuid }: { detail: string }) => {
-                if (conversations?.data?.[conversationUuid]) {
-                    const newData = {
-                        ...conversations?.data[conversationUuid],
-                        last_message: {
-                            ...conversations?.data[conversationUuid].last_message,
-                            is_read: true,
-                        },
-                    }
-
-                    mutateConversations(
-                        {
-                            data: {
-                                ...conversations.data,
-                                [conversationUuid]: newData,
-                            },
-                            meta: conversations?.meta,
-                        },
-                        {
-                            revalidate: false,
-                        },
-                    )
+        const remove = listenEvent('MESSAGE:READ-MESSAGE', ({ conversationUuid }) => {
+            if (conversations?.data?.[conversationUuid]) {
+                const newData = {
+                    ...conversations?.data[conversationUuid],
+                    last_message: {
+                        ...conversations?.data[conversationUuid].last_message,
+                        is_read: true,
+                    },
                 }
-            },
+
+                mutateConversations(
+                    {
+                        data: {
+                            ...conversations.data,
+                            [conversationUuid]: newData,
+                        },
+                        meta: conversations?.meta,
+                    },
+                    {
+                        revalidate: false,
+                    },
+                )
+            }
         })
 
         return remove
@@ -397,23 +394,20 @@ const Conversations = () => {
     }, [mutateConversations])
 
     useEffect(() => {
-        const remove = listenEvent({
-            eventName: 'conversation:leave-group',
-            handler: ({ detail }: { detail: { conversation_uuid: string } }) => {
-                const newConversationsData = { ...conversations?.data }
+        const remove = listenEvent('CONVERSATION:LEAVE-GROUP', ({ conversation_uuid }) => {
+            const newConversationsData = { ...conversations?.data }
 
-                delete newConversationsData[detail.conversation_uuid]
+            delete newConversationsData[conversation_uuid]
 
-                mutateConversations(
-                    {
-                        data: newConversationsData,
-                        meta: conversations?.meta,
-                    },
-                    {
-                        revalidate: false,
-                    },
-                )
-            },
+            mutateConversations(
+                {
+                    data: newConversationsData,
+                    meta: conversations?.meta,
+                },
+                {
+                    revalidate: false,
+                },
+            )
         })
 
         return remove

@@ -27,11 +27,8 @@ export default function Header() {
     }, [])
 
     useEffect(() => {
-        const remove = listenEvent({
-            eventName: 'tippy:hide-search-modal',
-            handler: () => {
-                setIsOpen(false)
-            },
+        const remove = listenEvent('TIPPY:HIDE-SEARCH-MODAL', () => {
+            setIsOpen(false)
         })
 
         return remove

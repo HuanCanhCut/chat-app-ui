@@ -28,12 +28,7 @@ const LeaveGroupModal: React.FC<LeaveGroupModalProps> = ({ onClose, conversation
         try {
             await conversationService.leaveConversation({ uuid: uuid as string })
 
-            sendEvent({
-                eventName: 'conversation:leave-group',
-                detail: {
-                    conversation_uuid: uuid as string,
-                },
-            })
+            sendEvent('CONVERSATION:LEAVE-GROUP', { conversation_uuid: uuid as string })
 
             onClose()
         } catch (error) {

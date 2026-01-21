@@ -219,18 +219,18 @@ const MessageImagesModel = ({ onClose, imageUrl }: MessageImagesModelProps) => {
     }, [handleNextImage, handlePreviousImage, onClose])
 
     return (
-        <div className="fixed bottom-0 left-0 right-0 top-0 bg-black">
+        <div className="fixed top-0 right-0 bottom-0 left-0 bg-black">
             {/* Background overlay */}
             {currentUrl && (
                 <Image
                     src={currentUrl}
                     alt="image"
                     fill
-                    className="z-0 select-none object-cover opacity-60 blur-lg"
+                    className="z-0 object-cover opacity-60 blur-lg select-none"
                     priority
                 />
             )}
-            <div className="fixed bottom-0 left-0 right-0 top-0 z-10 flex max-h-dvh flex-col">
+            <div className="fixed top-0 right-0 bottom-0 left-0 z-10 flex max-h-dvh flex-col">
                 <header className="flex items-center justify-end px-4 py-2">
                     <div className="mt-2 flex items-center gap-3 sm:mr-3">
                         {buttons.map((btn, index) => {
@@ -238,7 +238,7 @@ const MessageImagesModel = ({ onClose, imageUrl }: MessageImagesModelProps) => {
                                 <Tippy key={index} content={btn?.label}>
                                     <button
                                         onClick={btn.onclick}
-                                        className="flex-center h-9 w-9 rounded-full bg-[#2b2c2e] bg-opacity-70 hover:bg-[#2d2e2e]"
+                                        className="flex-center bg-opacity-70 h-9 w-9 rounded-full bg-[#2b2c2e] hover:bg-[#2d2e2e]"
                                     >
                                         {btn.icon}
                                     </button>
@@ -247,7 +247,7 @@ const MessageImagesModel = ({ onClose, imageUrl }: MessageImagesModelProps) => {
                                 <button
                                     key={index}
                                     onClick={btn.onclick}
-                                    className="flex-center h-9 w-9 rounded-full bg-[#2b2c2e] bg-opacity-70 hover:bg-[#2d2e2e]"
+                                    className="flex-center bg-opacity-70 h-9 w-9 rounded-full bg-[#2b2c2e] hover:bg-[#2d2e2e]"
                                 >
                                     {btn.icon}
                                 </button>
@@ -257,10 +257,10 @@ const MessageImagesModel = ({ onClose, imageUrl }: MessageImagesModelProps) => {
                 </header>
                 <main className="flex w-full flex-1 items-center justify-between overflow-hidden">
                     <div
-                        className="flex-center group h-full cursor-pointer bg-[rgb(0,0,0)] bg-opacity-10 p-4 transition-all duration-200 hover:-translate-x-1"
+                        className="flex-center group bg-opacity-10 h-full cursor-pointer bg-[rgb(0,0,0)] p-4 transition-all duration-200 hover:-translate-x-1"
                         onClick={handlePreviousImage}
                     >
-                        <button className="flex-center h-10 w-10 rounded-full bg-[#40403f] bg-opacity-70 transition-all duration-200 group-hover:bg-[#595b5b]">
+                        <button className="flex-center bg-opacity-70 h-10 w-10 rounded-full bg-[#40403f] transition-all duration-200 group-hover:bg-[#595b5b]">
                             <FontAwesomeIcon
                                 icon={faChevronLeft}
                                 className="text-lg text-zinc-300 group-hover:text-white"
@@ -278,10 +278,10 @@ const MessageImagesModel = ({ onClose, imageUrl }: MessageImagesModelProps) => {
                         />
                     )}
                     <div
-                        className="flex-center group h-full cursor-pointer bg-[rgb(0,0,0)] bg-opacity-10 p-4 transition-all duration-200 hover:translate-x-1"
+                        className="flex-center group bg-opacity-10 h-full cursor-pointer bg-[rgb(0,0,0)] p-4 transition-all duration-200 hover:translate-x-1"
                         onClick={handleNextImage}
                     >
-                        <button className="flex-center h-10 w-10 rounded-full bg-[#40403f] bg-opacity-70 transition-all duration-200 group-hover:bg-[#595b5b]">
+                        <button className="flex-center bg-opacity-70 h-10 w-10 rounded-full bg-[#40403f] transition-all duration-200 group-hover:bg-[#595b5b]">
                             <FontAwesomeIcon
                                 icon={faChevronRight}
                                 className="text-lg text-zinc-300 group-hover:text-white"
@@ -304,7 +304,7 @@ const MessageImagesModel = ({ onClose, imageUrl }: MessageImagesModelProps) => {
                                     width={100}
                                     height={100}
                                     key={index}
-                                    className={`mb-1 h-10! w-10! shrink-0! cursor-pointer select-none rounded-md object-cover ${
+                                    className={`mb-1 h-10! w-10! shrink-0! cursor-pointer rounded-md object-cover select-none ${
                                         selectedImageIndex === index
                                             ? 'opacity-100 brightness-100'
                                             : 'opacity-80 brightness-50'

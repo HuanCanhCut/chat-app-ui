@@ -15,7 +15,7 @@ function SwitchButton({ isOn = true, onClick, className, ...props }: Props) {
 
     return (
         <span
-            className={`m-px flex h-[24px] w-[44px] cursor-pointer items-center rounded-[100px] pl-[3.5px] pr-[2px] hover:opacity-90 ${className} ${
+            className={`m-px flex h-[24px] w-[44px] cursor-pointer items-center rounded-[100px] pr-[2px] pl-[3.5px] hover:opacity-90 ${className} ${
                 isOn ? 'justify-end bg-[#0be09b]' : 'justify-start bg-[#fe2c55]'
             }`}
             onClick={onClick}

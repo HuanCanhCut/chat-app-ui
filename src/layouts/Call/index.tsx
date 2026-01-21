@@ -752,7 +752,7 @@ const CallClient = () => {
         <div className="relative h-dvh max-h-dvh w-full max-w-full overflow-hidden">
             <audio src="/static/audio/ringbacktone.mp3" ref={audioRef} />
             {subType === 'caller' && !isCalling ? (
-                <div className="blur-10 flex-center absolute bottom-0 left-0 right-0 top-0 z-10 backdrop-blur-sm">
+                <div className="blur-10 flex-center absolute top-0 right-0 bottom-0 left-0 z-10 backdrop-blur-sm">
                     <div className="flex flex-col items-center gap-2">
                         <UserAvatar src={member?.data.avatar} className="h-20 w-20" />
                         <div className="text-2xl font-bold">{member?.data.nickname}</div>
@@ -766,7 +766,7 @@ const CallClient = () => {
                 callStatus === 'failed' ||
                 callStatus === 'rejected' ||
                 callStatus === 'timeout') && (
-                <div className="blur-10 flex-center absolute bottom-0 left-0 right-0 top-0 z-50 bg-black bg-opacity-80 backdrop-blur-sm">
+                <div className="blur-10 flex-center bg-opacity-80 absolute top-0 right-0 bottom-0 left-0 z-50 bg-black backdrop-blur-sm">
                     <div className="flex flex-col items-center gap-4 text-white">
                         <div className="flex h-20 w-20 items-center justify-center rounded-full bg-red-500">
                             <FontAwesomeIcon icon={faPhoneSlash} className="text-3xl" />
@@ -807,11 +807,11 @@ const CallClient = () => {
             )}
 
             {/* Remote video container */}
-            <div className="absolute bottom-0 left-0 right-0 top-0 h-full w-full">
+            <div className="absolute top-0 right-0 bottom-0 left-0 h-full w-full">
                 {/* Fallback when remote video is off */}
                 {!isRemoteVideoVisible && (
                     <div
-                        className="z-5 absolute inset-0 flex items-center justify-center"
+                        className="absolute inset-0 z-5 flex items-center justify-center"
                         style={{
                             backgroundImage: `url(${member?.data.avatar})`,
                             backgroundSize: 'cover',
@@ -841,7 +841,7 @@ const CallClient = () => {
                 <Tippy content={`${isMicOn ? 'Tắt mic' : 'Bật mic'}`} placement="top">
                     <button
                         className={`flex h-10 w-10 items-center justify-center rounded-full transition-all duration-200 ${
-                            !isMicOn ? 'bg-white text-dark' : 'bg-white/30 hover:bg-white/40'
+                            !isMicOn ? 'text-dark bg-white' : 'bg-white/30 hover:bg-white/40'
                         }`}
                         onClick={toggleMic}
                     >
@@ -866,7 +866,7 @@ const CallClient = () => {
                 <Tippy content={`${isCameraOn ? 'Tắt camera' : 'Bật camera'}`} placement="top">
                     <button
                         className={`flex h-10 w-10 items-center justify-center rounded-full transition-all duration-200 ${
-                            !isCameraOn ? 'bg-white text-dark' : 'bg-white/30 hover:bg-white/40'
+                            !isCameraOn ? 'text-dark bg-white' : 'bg-white/30 hover:bg-white/40'
                         }`}
                         onClick={handleToggleCamera}
                     >
@@ -898,7 +898,7 @@ const CallClient = () => {
             {/* Local video preview */}
             <div
                 ref={previewRef}
-                className="absolute bottom-auto right-[20px] top-[20px] z-10 h-[30%] max-w-[calc(100dvw-40px)] rounded-xl transition-all duration-300 ease-in-out aspect-10/16 md:top-auto! md:bottom-[20px] md:aspect-video md:w-[300px] lg:w-[350px]"
+                className="absolute top-[20px] right-[20px] bottom-auto z-10 aspect-10/16 h-[30%] max-w-[calc(100dvw-40px)] rounded-xl transition-all duration-300 ease-in-out md:top-auto! md:bottom-[20px] md:aspect-video md:w-[300px] lg:w-[350px]"
                 style={{
                     backgroundImage: `url(${currentUser?.data.avatar})`,
                     backgroundSize: 'cover',
@@ -907,7 +907,7 @@ const CallClient = () => {
             >
                 <button
                     ref={previewButtonRef}
-                    className="flex-center absolute left-2 top-4 z-10 h-7 w-7 transform cursor-pointer! rounded-full bg-opacity-50 p-2 transition duration-200 ease-in-out hover:bg-opacity-70 xxs:h-9 xxs:w-9 md:top-1/2 md:h-10 md:w-10 md:-translate-y-1/2"
+                    className="flex-center bg-opacity-50 hover:bg-opacity-70 xxs:h-9 xxs:w-9 absolute top-4 left-2 z-10 h-7 w-7 transform cursor-pointer! rounded-full p-2 transition duration-200 ease-in-out md:top-1/2 md:h-10 md:w-10 md:-translate-y-1/2"
                     onClick={() => setPreviewOpen(!previewOpen)}
                 >
                     <FontAwesomeIcon
