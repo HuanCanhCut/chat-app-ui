@@ -9,7 +9,6 @@ import Button from '~/components/Button/Button'
 import CustomTippy from '~/components/CustomTippy/CustomTippy'
 import { SendIcon } from '~/components/Icons/Icons'
 import PopperWrapper from '~/components/PopperWrapper'
-import { SocketEvent } from '~/enum/SocketEvent'
 import SWRKey from '~/enum/SWRKey'
 import { listenEvent } from '~/helpers/events'
 import socket from '~/helpers/socket'
@@ -128,15 +127,15 @@ const Notification = () => {
             )
         }
 
-        socket.on(SocketEvent.NEW_NOTIFICATION, socketHandler)
+        socket.on('NEW_NOTIFICATION', socketHandler)
 
         return () => {
-            socket.off(SocketEvent.NEW_NOTIFICATION, socketHandler)
+            socket.off('NEW_NOTIFICATION', socketHandler)
         }
     }, [mutateNotifications, notifications])
 
     useEffect(() => {
-        const socketHandler = ({ notification_id }: { notification_id: number }) => {
+        const socketHandler = ({ notification_id }: { notification_id?: number }) => {
             if (!notifications) {
                 return
             }
@@ -161,10 +160,10 @@ const Notification = () => {
             )
         }
 
-        socket.on(SocketEvent.REMOVE_NOTIFICATION, socketHandler)
+        socket.on('REMOVE_NOTIFICATION', socketHandler)
 
         return () => {
-            socket.off(SocketEvent.REMOVE_NOTIFICATION, socketHandler)
+            socket.off('REMOVE_NOTIFICATION', socketHandler)
         }
     }, [mutateNotifications, notifications])
 

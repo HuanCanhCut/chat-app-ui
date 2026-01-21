@@ -2,7 +2,6 @@
 
 import { useEffect } from 'react'
 
-import { SocketEvent } from '~/enum/SocketEvent'
 import socket from '~/helpers/socket'
 
 const Socket = ({ children }: { children: React.ReactNode }) => {
@@ -12,11 +11,11 @@ const Socket = ({ children }: { children: React.ReactNode }) => {
         // handle document visibility change
         document.addEventListener('visibilitychange', () => {
             if (document.visibilityState === 'hidden') {
-                socket.emit(SocketEvent.VISIBILITY_CHANGE, {
+                socket.emit('VISIBILITY_CHANGE', {
                     is_visible: false,
                 })
             } else {
-                socket.emit(SocketEvent.VISIBILITY_CHANGE, {
+                socket.emit('VISIBILITY_CHANGE', {
                     is_visible: true,
                 })
             }

@@ -9,7 +9,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Modal from '~/components/Modal'
 import UserAvatar from '~/components/UserAvatar'
 import config from '~/config'
-import { SocketEvent } from '~/enum/SocketEvent'
 import SWRKey from '~/enum/SWRKey'
 import socket from '~/helpers/socket'
 import { useAppSelector } from '~/redux'
@@ -79,10 +78,10 @@ const ReactionModal: React.FC<Props> = ({ isOpen, onClose, messageId }) => {
 
     const handleChooseReaction = (reaction: MessageReactionModel) => {
         if (reaction.user_id === currentUser?.data.id) {
-            socket.emit(SocketEvent.REMOVE_REACTION, {
+            socket.emit('REMOVE_REACTION', {
                 message_id: messageId,
                 user_reaction_id: currentUser?.data.id,
-                conversation_uuid: uuid,
+                conversation_uuid: uuid as string,
                 react: reaction.react,
             })
         } else {
@@ -165,10 +164,10 @@ const ReactionModal: React.FC<Props> = ({ isOpen, onClose, messageId }) => {
             }
         }
 
-        socket.on(SocketEvent.REMOVE_REACTION, socketHandler)
+        socket.on('REMOVE_REACTION', socketHandler)
 
         return () => {
-            socket.off(SocketEvent.REMOVE_REACTION, socketHandler)
+            socket.off('REMOVE_REACTION', socketHandler)
         }
     }, [currentUser?.data.id, messageId, mutateReactionTypes, mutateReactions, reactionTypes, reactions])
 

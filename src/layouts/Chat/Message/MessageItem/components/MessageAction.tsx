@@ -9,9 +9,7 @@ import Tippy from '@vendor/tippy'
 import CustomTippy from '~/components/CustomTippy'
 import Emoji from '~/components/Emoji'
 import PopperWrapper from '~/components/PopperWrapper'
-import { SocketEvent } from '~/enum/SocketEvent'
-import { listenEvent } from '~/helpers/events'
-import { sendEvent } from '~/helpers/events'
+import { listenEvent, sendEvent } from '~/helpers/events'
 import socket from '~/helpers/socket'
 import { MessageModel, MessageResponse, UserModel } from '~/type/type'
 import HeadlessTippy from '~/vendor/tippy/headless'
@@ -95,7 +93,7 @@ const MessageAction: React.FC<MessageActionProps> = ({
                 reactionWrapperOpen: false,
             }))
 
-            socket.emit(SocketEvent.REACT_MESSAGE, {
+            socket.emit('REACT_MESSAGE', {
                 conversation_uuid: uuid as string,
                 message_id: message.id,
                 react: EmojiClickData.unified,

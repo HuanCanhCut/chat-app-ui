@@ -4,7 +4,6 @@ import { Emoji, EmojiStyle } from 'emoji-picker-react'
 import { mutate } from 'swr'
 
 import Tippy from '@vendor/tippy'
-import { SocketEvent } from '~/enum/SocketEvent'
 import SWRKey from '~/enum/SWRKey'
 import socket from '~/helpers/socket'
 import { MessageModel, MessageReactionModel, MessageResponse, TopReaction } from '~/type/type'
@@ -18,13 +17,16 @@ const Reaction = ({ message, handleOpenReactionModal }: ReactionProps) => {
     const { uuid } = useParams()
 
     useEffect(() => {
-        interface ReactionMessage {
-            reaction: MessageReactionModel
+        const socketHandler = ({
+            reaction,
+            total_reactions,
+            top_reactions,
+        }: {
+            reaction: MessageReactionModel | null
             total_reactions: number
             top_reactions: TopReaction[]
-        }
-        const socketHandler = (data: ReactionMessage) => {
-            if (message.id !== data.reaction.message_id) {
+        }) => {
+            if (message.id !== reaction?.message_id) {
                 return
             }
 
@@ -40,11 +42,11 @@ const Reaction = ({ message, handleOpenReactionModal }: ReactionProps) => {
                     }
 
                     const newMessages = prev.data.map((message) => {
-                        if (message.id === data.reaction.message_id) {
+                        if (message.id === reaction.message_id) {
                             return {
                                 ...message,
-                                top_reactions: data.top_reactions,
-                                total_reactions: data.total_reactions,
+                                top_reactions: top_reactions,
+                                total_reactions: total_reactions,
                             }
                         }
 
@@ -62,10 +64,10 @@ const Reaction = ({ message, handleOpenReactionModal }: ReactionProps) => {
             )
         }
 
-        socket.on(SocketEvent.REACT_MESSAGE, socketHandler)
+        socket.on('REACT_MESSAGE', socketHandler)
 
         return () => {
-            socket.off(SocketEvent.REACT_MESSAGE, socketHandler)
+            socket.off('REACT_MESSAGE', socketHandler)
         }
     }, [message.id, uuid])
 
@@ -110,10 +112,10 @@ const Reaction = ({ message, handleOpenReactionModal }: ReactionProps) => {
             )
         }
 
-        socket.on(SocketEvent.REMOVE_REACTION, socketHandler)
+        socket.on('REMOVE_REACTION', socketHandler)
 
         return () => {
-            socket.off(SocketEvent.REMOVE_REACTION, socketHandler)
+            socket.off('REMOVE_REACTION', socketHandler)
         }
     }, [message.id, uuid])
 

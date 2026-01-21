@@ -8,12 +8,11 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Button from '~/components/Button'
 import UserAvatar from '~/components/UserAvatar'
 import config from '~/config'
-import { SocketEvent } from '~/enum/SocketEvent'
 import { sendEvent } from '~/helpers/events'
 import socket from '~/helpers/socket'
 import { useAppSelector } from '~/redux'
 import { getCurrentUser } from '~/redux/selector'
-import { ConversationModel, UserStatus } from '~/type/type'
+import { ConversationModel } from '~/type/type'
 import { momentTimezone } from '~/utils/moment'
 import openWindowCall from '~/utils/openWindowCall'
 interface HeaderProps {
@@ -48,12 +47,20 @@ const Header: React.FC<HeaderProps> = ({ className = '', isInfoOpen, conversatio
     }, [conversationMember])
 
     useEffect(() => {
-        const socketHandler = (data: UserStatus) => {
+        const socketHandler = ({
+            user_id,
+            is_online,
+            last_online_at,
+        }: {
+            user_id: number
+            is_online: boolean
+            last_online_at: string | null
+        }) => {
             if (offlineTimer.current) {
                 clearTimeout(offlineTimer.current)
             }
 
-            if (data.user_id === conversationMember?.user.id && !data.is_online) {
+            if (user_id === conversationMember?.user.id && !is_online) {
                 sendEvent('USER:STATUS', {
                     user_id: conversationMember?.user.id,
                     is_online: false,
@@ -61,15 +68,15 @@ const Header: React.FC<HeaderProps> = ({ className = '', isInfoOpen, conversatio
                 })
 
                 offlineTimerSocket.current = setInterval(() => {
-                    setLastOnlineTime(new Date(data.last_online_at || new Date()))
+                    setLastOnlineTime(new Date(last_online_at || new Date()))
                 }, 1000 * 30) // 30 seconds
             }
         }
 
-        socket.on(SocketEvent.USER_STATUS, socketHandler)
+        socket.on('USER_STATUS', socketHandler)
 
         return () => {
-            socket.off(SocketEvent.USER_STATUS, socketHandler)
+            socket.off('USER_STATUS', socketHandler)
 
             if (offlineTimerSocket.current) {
                 clearTimeout(offlineTimerSocket.current)

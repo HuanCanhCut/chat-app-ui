@@ -5,7 +5,6 @@ import Tippy from '@vendor/tippy'
 import Button from '~/components/Button'
 import { MessageIcon } from '~/components/Icons'
 import config from '~/config'
-import { SocketEvent } from '~/enum/SocketEvent'
 import SWRKey from '~/enum/SWRKey'
 import socket from '~/helpers/socket'
 import { useAppSelector } from '~/redux'
@@ -33,10 +32,10 @@ const Message = () => {
             }
         }
 
-        socket.on(SocketEvent.NEW_MESSAGE, socketHandler)
+        socket.on('NEW_MESSAGE', socketHandler)
 
         return () => {
-            socket.off(SocketEvent.NEW_MESSAGE, socketHandler)
+            socket.off('NEW_MESSAGE', socketHandler)
         }
     }, [currentUser?.data?.id, mutate, unseenCount])
 

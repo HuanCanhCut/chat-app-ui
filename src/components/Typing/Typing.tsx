@@ -4,7 +4,6 @@ import useSWR from 'swr'
 
 import './Typing.css'
 import AvatarGroup from '~/components/AvatarGroup'
-import { SocketEvent } from '~/enum/SocketEvent'
 import SWRKey from '~/enum/SWRKey'
 import socket from '~/helpers/socket'
 import * as conversationServices from '~/services/conversationService'
@@ -51,10 +50,10 @@ const Typing = () => {
             }
         }
 
-        socket.on(SocketEvent.MESSAGE_TYPING, socketHandler)
+        socket.on('MESSAGE_TYPING', socketHandler)
 
         return () => {
-            socket.off(SocketEvent.MESSAGE_TYPING)
+            socket.off('MESSAGE_TYPING')
         }
     }, [conversation?.data.members, uuid])
 

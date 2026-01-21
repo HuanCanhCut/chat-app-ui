@@ -10,7 +10,6 @@ import Tippy from '@vendor/tippy'
 import Emoji from '~/components/Emoji'
 import { SendHorizontalIcon } from '~/components/Icons'
 import CustomImage from '~/components/Image/Image'
-import { SocketEvent } from '~/enum/SocketEvent'
 import SWRKey from '~/enum/SWRKey'
 import { listenEvent, sendEvent } from '~/helpers/events'
 import socket from '~/helpers/socket'
@@ -105,7 +104,7 @@ const InputMessage: React.FC<InputMessageProps> = () => {
                 messageValue.trim() as string,
             )
 
-            socket.emit(SocketEvent.NEW_MESSAGE, {
+            socket.emit('NEW_MESSAGE', {
                 conversation_uuid: conversationUuid,
                 message: messageValue,
                 type: onlyIcon ? 'icon' : 'text',
@@ -177,7 +176,7 @@ const InputMessage: React.FC<InputMessageProps> = () => {
                 ),
             )
 
-            socket.emit(SocketEvent.NEW_MESSAGE, {
+            socket.emit('NEW_MESSAGE', {
                 conversation_uuid,
                 message: JSON.stringify(payload.map((item) => item.secure_url)),
                 type: 'image',
@@ -251,7 +250,7 @@ const InputMessage: React.FC<InputMessageProps> = () => {
 
         // Only send when user enters the first letter, the following letters will not be sent.
         if (messageValue.trim().length === 0 && e.target.value.trim().length > 0) {
-            socket.emit(SocketEvent.MESSAGE_TYPING, {
+            socket.emit('MESSAGE_TYPING', {
                 conversation_uuid: uuid as string,
                 user_id: currentUser?.data.id,
                 is_typing: true,
@@ -260,7 +259,7 @@ const InputMessage: React.FC<InputMessageProps> = () => {
 
         // Only send when user deletes all letters
         if (e.target.value.trim().length === 0) {
-            socket.emit(SocketEvent.MESSAGE_TYPING, {
+            socket.emit('MESSAGE_TYPING', {
                 conversation_uuid: uuid as string,
                 user_id: currentUser?.data.id,
                 is_typing: false,
@@ -484,8 +483,8 @@ const InputMessage: React.FC<InputMessageProps> = () => {
                                 if (unified) {
                                     const emoji = String.fromCodePoint(parseInt(unified, 16))
 
-                                    socket.emit(SocketEvent.NEW_MESSAGE, {
-                                        conversation_uuid: uuid,
+                                    socket.emit('NEW_MESSAGE', {
+                                        conversation_uuid: uuid as string,
                                         message: emoji,
                                         type: 'icon',
                                         parent_id: replyMessage?.id,

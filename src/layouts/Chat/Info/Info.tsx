@@ -5,7 +5,6 @@ import { mutate } from 'swr'
 import ControlPanel from './components/ControlPanel'
 import MediaAndLink from './components/MediaAndLink'
 import SearchMessage from './components/SearchMessage'
-import { SocketEvent } from '~/enum/SocketEvent'
 import SWRKey from '~/enum/SWRKey'
 import socket from '~/helpers/socket'
 import { useAppSelector } from '~/redux'
@@ -18,18 +17,15 @@ interface InfoProps {
 }
 
 const sharedSocketEvents = [
-    SocketEvent.CONVERSATION_RENAMED,
-    SocketEvent.CONVERSATION_AVATAR_CHANGED,
-    SocketEvent.CONVERSATION_THEME_CHANGED,
-    SocketEvent.CONVERSATION_EMOJI_CHANGED,
-    SocketEvent.CONVERSATION_BLOCKED,
-    SocketEvent.CONVERSATION_UNBLOCKED,
-]
+    'CONVERSATION_RENAMED',
+    'CONVERSATION_AVATAR_CHANGED',
+    'CONVERSATION_THEME_CHANGED',
+    'CONVERSATION_EMOJI_CHANGED',
+    'CONVERSATION_BLOCKED',
+    'CONVERSATION_UNBLOCKED',
+] as const
 
-const sharedSocketEventMemberHandlers = [
-    SocketEvent.CONVERSATION_MEMBER_NICKNAME_CHANGED,
-    SocketEvent.CONVERSATION_LEADER_CHANGED,
-]
+const sharedSocketEventMemberHandlers = ['CONVERSATION_MEMBER_NICKNAME_CHANGED', 'CONVERSATION_LEADER_CHANGED'] as const
 
 interface InfoHierarchyItem {
     type: string
@@ -145,13 +141,13 @@ const Info: React.FC<InfoProps> = ({ className = '', isOpen }) => {
             }
         }
 
-        sharedSocketEvents.forEach((event) => {
-            socket.on(event, socketHandler)
+        sharedSocketEvents.forEach((event: (typeof sharedSocketEvents)[number]) => {
+            socket.on(event, socketHandler as any)
         })
 
         return () => {
             sharedSocketEvents.forEach((event) => {
-                socket.off(event, socketHandler)
+                socket.off(event, socketHandler as any)
             })
         }
     }, [uuid])
@@ -212,7 +208,7 @@ const Info: React.FC<InfoProps> = ({ className = '', isOpen }) => {
     }, [uuid])
 
     useEffect(() => {
-        const socketHandler = ({ conversation_uuid, member_id }: { conversation_uuid: string; member_id: number }) => {
+        const socketHandler = ({ conversation_uuid, member_id }: { conversation_uuid: string; member_id?: number }) => {
             if (uuid === conversation_uuid) {
                 mutate(
                     [SWRKey.GET_CONVERSATION_BY_UUID, uuid],
@@ -242,7 +238,7 @@ const Info: React.FC<InfoProps> = ({ className = '', isOpen }) => {
                         }
 
                         // leave conversation
-                        socket.emit(SocketEvent.LEAVE_ROOM, {
+                        socket.emit('LEAVE_ROOM', {
                             conversation_uuid: uuid,
                             user_id: prev.data.members.find((member) => member.id === member_id)?.user.id,
                         })
@@ -262,12 +258,12 @@ const Info: React.FC<InfoProps> = ({ className = '', isOpen }) => {
             }
         }
 
-        socket.on(SocketEvent.CONVERSATION_MEMBER_REMOVED, socketHandler)
-        socket.on(SocketEvent.CONVERSATION_MEMBER_LEAVED, socketHandler)
+        socket.on('CONVERSATION_MEMBER_REMOVED', socketHandler)
+        socket.on('CONVERSATION_MEMBER_LEAVED', socketHandler)
 
         return () => {
-            socket.off(SocketEvent.CONVERSATION_MEMBER_REMOVED, socketHandler)
-            socket.off(SocketEvent.CONVERSATION_MEMBER_LEAVED, socketHandler)
+            socket.off('CONVERSATION_MEMBER_REMOVED', socketHandler)
+            socket.off('CONVERSATION_MEMBER_LEAVED', socketHandler)
         }
     }, [currentUser?.data.id, uuid])
 
@@ -306,10 +302,10 @@ const Info: React.FC<InfoProps> = ({ className = '', isOpen }) => {
             }
         }
 
-        socket.on(SocketEvent.CONVERSATION_MEMBER_ADDED, socketHandler)
+        socket.on('CONVERSATION_MEMBER_ADDED', socketHandler)
 
         return () => {
-            socket.off(SocketEvent.CONVERSATION_MEMBER_ADDED, socketHandler)
+            socket.off('CONVERSATION_MEMBER_ADDED', socketHandler)
         }
     }, [currentUser?.data.id, uuid])
 

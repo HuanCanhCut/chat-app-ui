@@ -19,7 +19,6 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Tippy from '@vendor/tippy'
 import UserAvatar from '~/components/UserAvatar'
-import { SocketEvent } from '~/enum/SocketEvent'
 import SWRKey from '~/enum/SWRKey'
 import socket from '~/helpers/socket'
 import useMediaStream from '~/hooks/useMediaStream'
@@ -104,7 +103,7 @@ const CallClient = () => {
                 setCallStatus('timeout')
 
                 // Emit cancel event to server
-                socket.emit(SocketEvent.END_CALL, {
+                socket.emit('END_CALL', {
                     caller_id: currentUser?.data.id,
                     callee_id: member?.data.id,
                     uuid,
@@ -130,7 +129,7 @@ const CallClient = () => {
     const handleInitiateCall = useCallback(() => {
         if (callStatus !== 'connecting') return
 
-        socket.emit(SocketEvent.INITIATE_CALL, {
+        socket.emit('INITIATE_CALL', {
             caller_id: currentUser?.data.id,
             callee_id: member?.data.id,
             type: initializeVideo === 'true' ? 'video' : 'voice',
@@ -145,7 +144,7 @@ const CallClient = () => {
 
     const handleAcceptCall = useCallback(
         (peerId: string) => {
-            socket.emit(SocketEvent.ACCEPTED_CALL, {
+            socket.emit('ACCEPTED_CALL', {
                 caller_id: member?.data.id,
                 peer_id: peerId,
                 callee_id: currentUser?.data.id,
@@ -265,7 +264,7 @@ const CallClient = () => {
 
                     // TODO: Gửi offer mới cho remote peer
                     // Gửi offer mới cho remote peer
-                    socket.emit(SocketEvent.RENEGOTIATION_OFFER, {
+                    socket.emit('RENEGOTIATION_OFFER', {
                         from_user_id: currentUser?.data.id,
                         to_user_id: member?.data.id,
                         caller_id: subType === 'caller' ? currentUser?.data.id : member?.data.id,
@@ -314,7 +313,7 @@ const CallClient = () => {
                     await pc.setLocalDescription(answer)
 
                     // TODO: Gửi answer mới cho remote peer
-                    socket.emit(SocketEvent.RENEGOTIATION_ANSWER, {
+                    socket.emit('RENEGOTIATION_ANSWER', {
                         from_user_id: currentUser?.data.id,
                         to_user_id: data.from_user_id,
                         caller_id: data.caller_id,
@@ -347,12 +346,12 @@ const CallClient = () => {
             }
         }
 
-        socket.on(SocketEvent.RENEGOTIATION_OFFER, handleRenegotiationOffer)
-        socket.on(SocketEvent.RENEGOTIATION_ANSWER, handleRenegotiationAnswer)
+        socket.on('RENEGOTIATION_OFFER', handleRenegotiationOffer)
+        socket.on('RENEGOTIATION_ANSWER', handleRenegotiationAnswer)
 
         return () => {
-            socket.off(SocketEvent.RENEGOTIATION_OFFER, handleRenegotiationOffer)
-            socket.off(SocketEvent.RENEGOTIATION_ANSWER, handleRenegotiationAnswer)
+            socket.off('RENEGOTIATION_OFFER', handleRenegotiationOffer)
+            socket.off('RENEGOTIATION_ANSWER', handleRenegotiationAnswer)
         }
     }, [currentUser?.data.id])
 
@@ -558,10 +557,10 @@ const CallClient = () => {
             }
         }
 
-        socket.on(SocketEvent.ACCEPTED_CALL, socketHandler)
+        socket.on('ACCEPTED_CALL', socketHandler)
 
         return () => {
-            socket.off(SocketEvent.ACCEPTED_CALL, socketHandler)
+            socket.off('ACCEPTED_CALL', socketHandler)
         }
     }, [localStreamRef, setPeerConnection, setupRemoteStreamMonitoring, clearCallTimeout])
 
@@ -576,7 +575,7 @@ const CallClient = () => {
 
             // Thông báo cho người đối diện về việc kết thúc cuộc gọi
             if (currentUser?.data.id && member?.data.id) {
-                socket.emit(SocketEvent.END_CALL, {
+                socket.emit('END_CALL', {
                     caller_id: subType === 'caller' ? currentUser.data.id : member.data.id,
                     callee_id: oneWay ? Math.random() : subType === 'callee' ? currentUser.data.id : member.data.id,
                     uuid,
@@ -607,10 +606,10 @@ const CallClient = () => {
             setCallStatus('rejected')
         }
 
-        socket.on(SocketEvent.REJECT_CALL, socketHandler)
+        socket.on('REJECT_CALL', socketHandler)
 
         return () => {
-            socket.off(SocketEvent.REJECT_CALL, socketHandler)
+            socket.off('REJECT_CALL', socketHandler)
         }
     }, [clearCallTimeout])
 
@@ -625,10 +624,10 @@ const CallClient = () => {
             }, 3000)
         }
 
-        socket.on(SocketEvent.CALL_BUSY, socketHandler)
+        socket.on('CALL_BUSY', socketHandler)
 
         return () => {
-            socket.off(SocketEvent.CALL_BUSY, socketHandler)
+            socket.off('CALL_BUSY', socketHandler)
         }
     }, [handleEndCall])
 
@@ -651,10 +650,10 @@ const CallClient = () => {
             }
         }
 
-        socket.on(SocketEvent.CANCEL_INCOMING_CALL, handleCancelIncomingCall)
+        socket.on('CANCEL_INCOMING_CALL', handleCancelIncomingCall)
 
         return () => {
-            socket.off(SocketEvent.CANCEL_INCOMING_CALL, handleCancelIncomingCall)
+            socket.off('CANCEL_INCOMING_CALL', handleCancelIncomingCall)
         }
     }, [localStreamRef, stopStream])
 
@@ -693,10 +692,10 @@ const CallClient = () => {
             }
         }
 
-        socket.on(SocketEvent.END_CALL, handleRemoteEndCall)
+        socket.on('END_CALL', handleRemoteEndCall)
 
         return () => {
-            socket.off(SocketEvent.END_CALL, handleRemoteEndCall)
+            socket.off('END_CALL', handleRemoteEndCall)
         }
     }, [localStreamRef, router, stopStream, clearCallTimeout])
 

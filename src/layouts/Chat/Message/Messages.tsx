@@ -11,7 +11,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Typing from '~/components/Typing'
 import UserAvatar from '~/components/UserAvatar'
 import config from '~/config'
-import { SocketEvent } from '~/enum/SocketEvent'
 import SWRKey from '~/enum/SWRKey'
 import { listenEvent, sendEvent } from '~/helpers/events'
 import socket from '~/helpers/socket'
@@ -99,7 +98,7 @@ const Message: React.FC<MessageProps> = ({ conversation }) => {
                 }, delayRetry)
             } else {
                 retryCount = 0
-                socket.emit(SocketEvent.JOIN_ROOM, uuid)
+                socket.emit('JOIN_ROOM', uuid as string)
             }
         }
 
@@ -195,10 +194,10 @@ const Message: React.FC<MessageProps> = ({ conversation }) => {
             }
         }
 
-        socket.on(SocketEvent.NEW_MESSAGE, socketHandler)
+        socket.on('NEW_MESSAGE', socketHandler)
 
         return () => {
-            socket.off(SocketEvent.NEW_MESSAGE, socketHandler)
+            socket.off('NEW_MESSAGE', socketHandler)
         }
     }, [messages, mutateMessages, offsetRange.start, uuid])
 
@@ -281,10 +280,10 @@ const Message: React.FC<MessageProps> = ({ conversation }) => {
             )
         }
 
-        socket.on(SocketEvent.UPDATE_READ_MESSAGE, socketHandler)
+        socket.on('UPDATE_READ_MESSAGE', socketHandler)
 
         return () => {
-            socket.off(SocketEvent.UPDATE_READ_MESSAGE, socketHandler)
+            socket.off('UPDATE_READ_MESSAGE', socketHandler)
         }
     }, [currentUser?.data?.id, messages?.data, messages?.meta, mutateMessages, uuid])
 
@@ -334,10 +333,10 @@ const Message: React.FC<MessageProps> = ({ conversation }) => {
             }
         }
 
-        socket.on(SocketEvent.MESSAGE_REVOKE, socketHandler)
+        socket.on('MESSAGE_REVOKE', socketHandler)
 
         return () => {
-            socket.off(SocketEvent.MESSAGE_REVOKE, socketHandler)
+            socket.off('MESSAGE_REVOKE', socketHandler)
         }
     }, [currentUser?.data?.id, messages?.data, messages?.meta, mutateMessages, uuid])
 

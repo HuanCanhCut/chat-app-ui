@@ -4,7 +4,6 @@ import { useEffect, useMemo, useState } from 'react'
 import { useParams } from 'next/navigation'
 import useSWR from 'swr'
 
-import { SocketEvent } from '~/enum/SocketEvent'
 import SWRKey from '~/enum/SWRKey'
 import { listenEvent } from '~/helpers/events'
 import socket from '~/helpers/socket'
@@ -16,7 +15,7 @@ import Message from '~/layouts/Chat/Message'
 import { useAppSelector } from '~/redux'
 import { getCurrentUser } from '~/redux/selector'
 import * as conversationServices from '~/services/conversationService'
-import { SocketMessage, UserStatus } from '~/type/type'
+import { SocketMessage } from '~/type/type'
 
 const MessagePage = () => {
     const { uuid } = useParams()
@@ -39,7 +38,7 @@ const MessagePage = () => {
     const isBlocked = currentMember?.deleted_at || !currentMember || conversation?.data.block_conversation
 
     useEffect(() => {
-        const socketHandler = (data: UserStatus) => {
+        const socketHandler = (data: { user_id: number; is_online: boolean; last_online_at: string | null }) => {
             if (!conversation?.data) {
                 return
             }
@@ -66,10 +65,10 @@ const MessagePage = () => {
             )
         }
 
-        socket.on(SocketEvent.USER_STATUS, socketHandler)
+        socket.on('USER_STATUS', socketHandler)
 
         return () => {
-            socket.off(SocketEvent.USER_STATUS, socketHandler)
+            socket.off('USER_STATUS', socketHandler)
         }
     }, [conversation, conversation?.data, mutateConversation])
 
@@ -125,10 +124,10 @@ const MessagePage = () => {
             }
         }
 
-        socket.on(SocketEvent.NEW_MESSAGE, socketHandler)
+        socket.on('NEW_MESSAGE', socketHandler)
 
         return () => {
-            socket.off(SocketEvent.NEW_MESSAGE, socketHandler)
+            socket.off('NEW_MESSAGE', socketHandler)
         }
     }, [conversation?.data.is_temp, mutateConversation, uuid])
 

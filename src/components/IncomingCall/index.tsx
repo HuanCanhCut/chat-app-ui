@@ -6,7 +6,6 @@ import Modal from '../Modal'
 import UserAvatar from '../UserAvatar'
 import { faPhone, faXmark } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { SocketEvent } from '~/enum/SocketEvent'
 import socket from '~/helpers/socket'
 import { useAppSelector } from '~/redux'
 import { getCurrentUser } from '~/redux/selector'
@@ -46,10 +45,10 @@ const IncomingCall = ({ children }: { children: React.ReactNode }) => {
             setUuid(data.uuid)
         }
 
-        socket.on(SocketEvent.INITIATE_CALL, socketHandler)
+        socket.on('INITIATE_CALL', socketHandler)
 
         return () => {
-            socket.off(SocketEvent.INITIATE_CALL, socketHandler)
+            socket.off('INITIATE_CALL', socketHandler)
         }
     }, [currentUser?.data.id, setCaller, setIncomingCall])
 
@@ -58,18 +57,18 @@ const IncomingCall = ({ children }: { children: React.ReactNode }) => {
             setIncomingCall(false)
         }
 
-        socket.on(SocketEvent.CANCEL_INCOMING_CALL, socketHandler)
-        socket.on(SocketEvent.END_CALL, socketHandler)
+        socket.on('CANCEL_INCOMING_CALL', socketHandler)
+        socket.on('END_CALL', socketHandler)
 
         return () => {
-            socket.off(SocketEvent.CANCEL_INCOMING_CALL, socketHandler)
+            socket.off('CANCEL_INCOMING_CALL', socketHandler)
         }
     }, [caller?.id])
 
     const handleRejectCall = () => {
         setIncomingCall(false)
 
-        socket.emit(SocketEvent.REJECT_CALL, {
+        socket.emit('REJECT_CALL', {
             caller_id: caller?.id,
         })
     }

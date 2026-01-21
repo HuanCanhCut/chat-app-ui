@@ -250,14 +250,17 @@ export interface MetaPagination {
 
 // ========================================== Notification model ==========================================
 
-export interface NotificationData extends BaseModel {
-    recipient_id: number
-    is_read: boolean
-    is_seen: boolean
-    message: string
+export interface NotificationData {
     sender_id: number
     sender_user: UserModel
+    id?: number
     type: 'friend_request' | 'accept_friend_request' | 'message'
+    recipient_id: number
+    message: string
+    is_read?: boolean
+    is_seen?: boolean
+    created_at?: Date
+    updated_at?: Date
 }
 
 export interface NotificationResponse extends MetaPagination {

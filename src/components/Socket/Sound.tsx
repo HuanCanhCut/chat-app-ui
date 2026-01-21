@@ -2,7 +2,6 @@
 
 import { useEffect, useRef } from 'react'
 
-import { SocketEvent } from '~/enum/SocketEvent'
 import socket from '~/helpers/socket'
 import { useAppSelector } from '~/redux'
 import { getCurrentUser } from '~/redux/selector'
@@ -26,7 +25,7 @@ const Sound = ({ children }: { children: React.ReactNode }) => {
             } catch (error) {}
         }
 
-        socket.on(SocketEvent.NEW_NOTIFICATION, socketHandler)
+        socket.on('NEW_NOTIFICATION', socketHandler)
     }, [])
 
     // listen new message event
@@ -46,10 +45,10 @@ const Sound = ({ children }: { children: React.ReactNode }) => {
             } catch (error) {}
         }
 
-        socket.on(SocketEvent.NEW_MESSAGE, socketHandler)
+        socket.on('NEW_MESSAGE', socketHandler)
 
         return () => {
-            socket.off(SocketEvent.NEW_MESSAGE, socketHandler)
+            socket.off('NEW_MESSAGE', socketHandler)
         }
     }, [currentUser])
 

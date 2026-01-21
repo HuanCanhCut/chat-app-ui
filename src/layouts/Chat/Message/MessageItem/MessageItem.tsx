@@ -12,7 +12,6 @@ import ReplyMessage from './components/ReplyMessage'
 import UserViewed from './components/UserViewed'
 import Tippy from '@vendor/tippy'
 import UserAvatar from '~/components/UserAvatar'
-import { SocketEvent } from '~/enum/SocketEvent'
 import SWRKey from '~/enum/SWRKey'
 import { sendEvent } from '~/helpers/events'
 import socket from '~/helpers/socket'
@@ -126,7 +125,7 @@ const MessageItem = ({ message, messageIndex, messages, currentUser, messageRef 
                         return
                     }
 
-                    socket.emit(SocketEvent.READ_MESSAGE, {
+                    socket.emit('READ_MESSAGE', {
                         conversation_uuid: uuid as string,
                         message_id: message.id,
                     })

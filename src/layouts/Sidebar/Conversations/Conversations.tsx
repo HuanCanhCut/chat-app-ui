@@ -9,7 +9,6 @@ import useSWR from 'swr'
 import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import ConversationItem from '~/components/ConversationItem'
-import { SocketEvent } from '~/enum/SocketEvent'
 import SWRKey from '~/enum/SWRKey'
 import { listenEvent } from '~/helpers/events'
 import handleApiError from '~/helpers/handleApiError'
@@ -17,14 +16,7 @@ import socket from '~/helpers/socket'
 import { useAppSelector } from '~/redux'
 import { getCurrentTheme } from '~/redux/selector'
 import * as conversationService from '~/services/conversationService'
-import {
-    ConversationMember,
-    ConversationModel,
-    ConversationThemeModel,
-    MessageModel,
-    SocketMessage,
-    UserStatus,
-} from '~/type/type'
+import { ConversationMember, ConversationModel, ConversationThemeModel, MessageModel, SocketMessage } from '~/type/type'
 
 interface Conversation<T> {
     [key: string]: T
@@ -121,22 +113,30 @@ const Conversations = () => {
             })
         }
 
-        socket.on(SocketEvent.NEW_MESSAGE, socketHandler)
+        socket.on('NEW_MESSAGE', socketHandler)
 
         return () => {
-            socket.off(SocketEvent.NEW_MESSAGE, socketHandler)
+            socket.off('NEW_MESSAGE', socketHandler)
         }
     }, [conversations, mutateConversations])
 
     useEffect(() => {
-        const socketHandler = (data: UserStatus) => {
-            if (conversationUserMap[data.user_id]) {
+        const socketHandler = ({
+            user_id,
+            is_online,
+            last_online_at,
+        }: {
+            user_id: number
+            is_online: boolean
+            last_online_at: string | null
+        }) => {
+            if (conversationUserMap[user_id]) {
                 if (!conversations?.data) {
                     return
                 }
 
                 // if conversation has been deleted
-                if (!conversations.data[conversationUserMap[data.user_id]]) {
+                if (!conversations.data[conversationUserMap[user_id]]) {
                     return
                 }
 
@@ -144,12 +144,12 @@ const Conversations = () => {
                     {
                         data: {
                             ...conversations.data,
-                            [conversationUserMap[data.user_id]]: {
-                                ...conversations.data[conversationUserMap[data.user_id]],
-                                members: conversations.data[conversationUserMap[data.user_id]].members.map(
+                            [conversationUserMap[user_id]]: {
+                                ...conversations.data[conversationUserMap[user_id]],
+                                members: conversations.data[conversationUserMap[user_id]].members.map(
                                     (member: ConversationMember) => {
-                                        if (member.user_id === data.user_id) {
-                                            return { ...member, user: { ...member.user, is_online: data.is_online } }
+                                        if (member.user_id === user_id) {
+                                            return { ...member, user: { ...member.user, is_online: is_online } }
                                         }
                                         return member
                                     },
@@ -167,7 +167,7 @@ const Conversations = () => {
                     const conversation: ConversationModel = conversations.data[key]
 
                     if (!conversation.is_group) {
-                        const hasUser = conversation.members.find((member) => member.user_id === data.user_id)
+                        const hasUser = conversation.members.find((member) => member.user_id === user_id)
 
                         if (hasUser) {
                             mutateConversations(
@@ -177,12 +177,12 @@ const Conversations = () => {
                                         [key]: {
                                             ...conversation,
                                             members: conversation.members.map((member) => {
-                                                if (member.user_id === data.user_id) {
+                                                if (member.user_id === user_id) {
                                                     return {
                                                         ...member,
                                                         user: {
                                                             ...member.user,
-                                                            is_online: data.is_online,
+                                                            is_online: is_online,
                                                         },
                                                     }
                                                 }
@@ -197,7 +197,7 @@ const Conversations = () => {
 
                             setConversationUserMap((prev) => ({
                                 ...prev,
-                                [data.user_id]: key,
+                                [user_id]: key,
                             }))
                         }
                     }
@@ -205,10 +205,10 @@ const Conversations = () => {
             }
         }
 
-        socket.on(SocketEvent.USER_STATUS, socketHandler)
+        socket.on('USER_STATUS', socketHandler)
 
         return () => {
-            socket.off(SocketEvent.USER_STATUS, socketHandler)
+            socket.off('USER_STATUS', socketHandler)
         }
     }, [conversationUserMap, conversations, mutateConversations])
 
@@ -275,10 +275,10 @@ const Conversations = () => {
             }
         }
 
-        socket.on(SocketEvent.MESSAGE_REVOKE, socketHandler)
+        socket.on('MESSAGE_REVOKE', socketHandler)
 
         return () => {
-            socket.off(SocketEvent.MESSAGE_REVOKE, socketHandler)
+            socket.off('MESSAGE_REVOKE', socketHandler)
         }
     }, [conversations, mutateConversations])
 
@@ -328,21 +328,23 @@ const Conversations = () => {
             }
         }
 
-        socket.on(SocketEvent.UPDATE_READ_MESSAGE, socketHandler)
+        socket.on('UPDATE_READ_MESSAGE', socketHandler)
 
         return () => {
-            socket.off(SocketEvent.UPDATE_READ_MESSAGE, socketHandler)
+            socket.off('UPDATE_READ_MESSAGE', socketHandler)
         }
     }, [conversations, mutateConversations])
 
     useEffect(() => {
-        interface ConversationRenamedPayload {
+        const socketHandler = ({
+            conversation_uuid,
+            value,
+            key,
+        }: {
             conversation_uuid: string
             value: string | ConversationThemeModel
-            key: 'name' | 'avatar' | 'theme' | 'emoji'
-        }
-
-        const socketHandler = ({ conversation_uuid, value, key }: ConversationRenamedPayload) => {
+            key: string
+        }) => {
             mutateConversations(
                 (prev) => {
                     if (!prev) {
@@ -372,12 +374,12 @@ const Conversations = () => {
             )
         }
 
-        socket.on(SocketEvent.CONVERSATION_RENAMED, socketHandler)
-        socket.on(SocketEvent.CONVERSATION_AVATAR_CHANGED, socketHandler)
+        socket.on('CONVERSATION_RENAMED', socketHandler)
+        socket.on('CONVERSATION_AVATAR_CHANGED', socketHandler)
 
         return () => {
-            socket.off(SocketEvent.CONVERSATION_RENAMED, socketHandler)
-            socket.off(SocketEvent.CONVERSATION_AVATAR_CHANGED, socketHandler)
+            socket.off('CONVERSATION_RENAMED', socketHandler)
+            socket.off('CONVERSATION_AVATAR_CHANGED', socketHandler)
         }
     }, [mutateConversations])
 
@@ -386,10 +388,10 @@ const Conversations = () => {
             mutateConversations()
         }
 
-        socket.on(SocketEvent.CONVERSATION_MEMBER_JOINED, socketHandler)
+        socket.on('CONVERSATION_MEMBER_JOINED', socketHandler)
 
         return () => {
-            socket.off(SocketEvent.CONVERSATION_MEMBER_JOINED, socketHandler)
+            socket.off('CONVERSATION_MEMBER_JOINED', socketHandler)
         }
     }, [mutateConversations])
 
@@ -429,10 +431,10 @@ const Conversations = () => {
             )
         }
 
-        socket.on(SocketEvent.NEW_CONVERSATION, socketHandler)
+        socket.on('NEW_CONVERSATION', socketHandler)
 
         return () => {
-            socket.off(SocketEvent.NEW_CONVERSATION, socketHandler)
+            socket.off('NEW_CONVERSATION', socketHandler)
         }
     }, [conversations?.data, conversations?.meta, mutateConversations])
 
