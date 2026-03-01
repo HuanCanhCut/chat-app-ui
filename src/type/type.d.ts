@@ -208,7 +208,8 @@ export interface MessageLinksPreviewResponse extends MetaPagination {
 // ========================================== Message reaction model ==========================================
 
 export interface MessageReactionModel extends BaseModel {
-    message_id: number
+    reactionable_id: number
+    reactionable_type: 'Message' | 'Comment' | 'Post'
     user_id: number
     react: string
     user_reaction: UserModel

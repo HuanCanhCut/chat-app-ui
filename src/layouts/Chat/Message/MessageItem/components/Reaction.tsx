@@ -9,7 +9,6 @@ import socket from '~/helpers/socket'
 import { MessageModel, MessageReactionModel, MessageResponse, TopReaction } from '~/type/type'
 interface ReactionProps {
     message: MessageModel
-    // eslint-disable-next-line no-unused-vars
     handleOpenReactionModal: (messageId: number) => void
 }
 
@@ -26,7 +25,7 @@ const Reaction = ({ message, handleOpenReactionModal }: ReactionProps) => {
             total_reactions: number
             top_reactions: TopReaction[]
         }) => {
-            if (message.id !== reaction?.message_id) {
+            if (message.id !== reaction?.reactionable_id) {
                 return
             }
 
@@ -42,7 +41,7 @@ const Reaction = ({ message, handleOpenReactionModal }: ReactionProps) => {
                     }
 
                     const newMessages = prev.data.map((message) => {
-                        if (message.id === reaction.message_id) {
+                        if (message.id === reaction.reactionable_id) {
                             return {
                                 ...message,
                                 top_reactions: top_reactions,
