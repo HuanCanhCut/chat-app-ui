@@ -1,11 +1,11 @@
 import { memo, useCallback, useEffect, useState } from 'react'
+import Tippy from 'huanpenguin-tippy-react/headless'
 import useSWR from 'swr'
 
 import AccountItem from '../AccountItem'
 import PopperWrapper from '../PopperWrapper'
 import { faSearch, faXmark } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import Tippy from '@vendor/tippy/headless'
 import config from '~/config'
 import SWRKey from '~/enum/SWRKey'
 import { sendEvent } from '~/helpers/events'
@@ -129,12 +129,12 @@ const Search: React.FC<SearchProps> = ({ placeholder = 'Tìm kiếm', className 
                 render={renderResult}
                 placement="bottom-start"
             >
-                <div className={`bg-lightGray relative rounded-3xl pl-3 sm:pl-10 dark:bg-[#313233]`}>
+                <div className={`bg-lightGray dark:bg-dark-gray relative rounded-3xl pl-3 sm:pl-10`}>
                     <input
                         name="search"
                         type="text"
                         placeholder={placeholder}
-                        className="caret-primary w-full rounded-3xl bg-transparent py-[8px] pr-11 pl-px outline-hidden placeholder:text-sm dark:bg-[#313233]"
+                        className="caret-primary dark:bg-dark-gray w-full rounded-3xl bg-transparent py-[8px] pr-11 pl-px outline-hidden placeholder:text-sm"
                         value={searchValue}
                         onChange={(e) => setSearchValue(e.target.value)}
                         onFocus={() => setShowResult(true)}

@@ -1,6 +1,6 @@
 import React, { useRef } from 'react'
+import Tippy from 'huanpenguin-tippy-react'
 
-import Tippy from '@vendor/tippy'
 import UserAvatar from '~/components/UserAvatar'
 import { MessageModel, MessageStatus, UserModel } from '~/type/type'
 

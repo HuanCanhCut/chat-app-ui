@@ -2,11 +2,11 @@
 
 import React, { memo, useCallback, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Tippy from 'huanpenguin-tippy-react'
 
 import CreateConversationModal from './CreateConversationModal'
 import { faUserGroup } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import Tippy from '@vendor/tippy'
 import Modal from '~/components/Modal'
 import UserAvatar from '~/components/UserAvatar/UserAvatar'
 import config from '~/config'

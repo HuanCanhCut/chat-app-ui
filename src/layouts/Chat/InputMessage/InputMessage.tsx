@@ -1,12 +1,13 @@
 import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useParams } from 'next/navigation'
 import { Emoji as EmojiPicker, EmojiClickData, EmojiStyle } from 'emoji-picker-react'
+import Tippy from 'huanpenguin-tippy-react'
+import HeadlessTippy from 'huanpenguin-tippy-react/headless'
 import useSWR, { mutate } from 'swr'
 
 import { faImage, faSmile } from '@fortawesome/free-regular-svg-icons'
 import { faFolderPlus, faXmark } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import Tippy from '@vendor/tippy'
 import Emoji from '~/components/Emoji'
 import { SendHorizontalIcon } from '~/components/Icons'
 import CustomImage from '~/components/Image/Image'
@@ -17,7 +18,6 @@ import { useAppSelector } from '~/redux'
 import { getCurrentUser } from '~/redux/selector'
 import * as conversationServices from '~/services/conversationService'
 import { ConversationMember, MessageModel } from '~/type/type'
-import HeadlessTippy from '~/vendor/tippy/headless'
 
 interface InputMessageProps {
     className?: string

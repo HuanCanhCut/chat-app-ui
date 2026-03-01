@@ -2647,6 +2647,13 @@ http-parser-js@>=0.5.1:
   resolved "https://registry.yarnpkg.com/http-parser-js/-/http-parser-js-0.5.10.tgz#b3277bd6d7ed5588e20ea73bf724fcbe44609075"
   integrity sha512-Pysuw9XpUq5dVc/2SMHpuTY01RFl8fttgcyunjL7eEMhGM3cI4eOmiCycJDVCo/7O7ClfQD3SaI6ftDzqOXYMA==
 
+huanpenguin-tippy-react@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/huanpenguin-tippy-react/-/huanpenguin-tippy-react-1.0.3.tgz#2f956c0e00ca2e31c3a3f092c5488cad8eb52245"
+  integrity sha512-Rtrnb70WQP6M8CR6qL8ZluNx/91zb3VCwvj1dIjvy45LwdI2dwsXvIUy+Il34hkAcvPPQXz2Zv/LTZkH3bgfiQ==
+  dependencies:
+    tippy.js "^6.3.1"
+
 idb@7.1.1:
   version "7.1.1"
   resolved "https://registry.yarnpkg.com/idb/-/idb-7.1.1.tgz#d910ded866d32c7ced9befc5bfdf36f572ced72b"

@@ -1,9 +1,9 @@
 import { useEffect } from 'react'
 import { useParams } from 'next/navigation'
 import { Emoji, EmojiStyle } from 'emoji-picker-react'
+import Tippy from 'huanpenguin-tippy-react'
 import { mutate } from 'swr'
 
-import Tippy from '@vendor/tippy'
 import SWRKey from '~/enum/SWRKey'
 import socket from '~/helpers/socket'
 import { MessageModel, MessageReactionModel, MessageResponse, TopReaction } from '~/type/type'

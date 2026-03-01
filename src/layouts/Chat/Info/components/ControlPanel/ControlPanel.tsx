@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { Emoji, EmojiStyle } from 'emoji-picker-react'
+import Tippy from 'huanpenguin-tippy-react'
 import useSWR from 'swr'
 
 import AddMemberModel from '../../Modal/AddMember/AddMemberModel'
@@ -22,7 +23,6 @@ import {
     faUserPlus,
 } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import Tippy from '@vendor/tippy'
 import Accordion from '~/components/Accordion'
 import Button from '~/components/Button'
 import CustomTippy from '~/components/CustomTippy'

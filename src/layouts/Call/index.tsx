@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { useRouter } from 'next/navigation'
+import Tippy from 'huanpenguin-tippy-react'
 import Peer from 'peerjs'
 import useSWR from 'swr'
 
@@ -17,7 +18,6 @@ import {
     faXmark,
 } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import Tippy from '@vendor/tippy'
 import UserAvatar from '~/components/UserAvatar'
 import SWRKey from '~/enum/SWRKey'
 import socket from '~/helpers/socket'

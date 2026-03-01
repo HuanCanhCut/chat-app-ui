@@ -1,11 +1,11 @@
 import React, { memo, useCallback, useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import { useParams } from 'next/navigation'
+import Tippy from 'huanpenguin-tippy-react'
 import useSWR from 'swr'
 
 import { faChevronLeft, faChevronRight, faDownload, faXmark } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import Tippy from '@vendor/tippy'
 import SWRKey from '~/enum/SWRKey'
 import * as messageServices from '~/services/messageService'
 import { MessageModel, MetaPagination } from '~/type/type'
