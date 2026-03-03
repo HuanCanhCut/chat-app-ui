@@ -24,6 +24,7 @@
     "firebase": "^10.13.1",
     "framer-motion": "^11.5.6",
     "huanpenguin-tippy-react": "^1.0.3",
+    "lucide-react": "^0.576.0",
     "moment-timezone": "^0.5.46",
     "next": "15.5.9",
     "peerjs": "^1.5.5",

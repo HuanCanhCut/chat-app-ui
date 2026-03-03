@@ -137,14 +137,14 @@ const Reaction = ({ message, handleOpenReactionModal }: ReactionProps) => {
             }
         >
             <div
-                className="absolute right-1 bottom-[-11px] flex cursor-pointer items-center rounded-full bg-white py-[2px] shadow-xs shadow-zinc-300 dark:bg-zinc-800 dark:shadow-zinc-700"
+                className="absolute right-1 bottom-[-11px] flex cursor-pointer items-center rounded-full bg-white py-0.5 shadow-xs shadow-zinc-300 dark:bg-zinc-800 dark:shadow-zinc-700"
                 onClick={() => {
                     handleOpenReactionModal(message.id)
                 }}
             >
                 {message?.top_reactions?.map((reaction, index) => {
                     return (
-                        <span className="ml-[2px] text-sm leading-none" key={index}>
+                        <span className="ml-0.5 text-sm leading-none" key={index}>
                             <Emoji unified={reaction.react} size={14} emojiStyle={EmojiStyle.FACEBOOK} />
                         </span>
                     )

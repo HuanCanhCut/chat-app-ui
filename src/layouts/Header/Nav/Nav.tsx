@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import { usePathname } from 'next/navigation'
 import Tippy from 'huanpenguin-tippy-react'
+import { MessageSquare } from 'lucide-react'
 
 import { HomeIcon, UserGroupIcon } from '~/components/Icons'
 import NavLink from '~/components/NavLink'
@@ -21,8 +22,14 @@ const NavBar = ({ className }: NavBarProps) => {
             {
                 type: 'home',
                 icon: <HomeIcon />,
-                href: config.routes.message,
+                href: config.routes.home,
                 tooltip: 'Trang chủ',
+            },
+            {
+                type: 'messages',
+                icon: <MessageSquare size={22} />,
+                href: config.routes.message,
+                tooltip: 'Tin nhắn',
             },
             {
                 type: 'user',
@@ -39,7 +46,7 @@ const NavBar = ({ className }: NavBarProps) => {
                 return (
                     <Tippy content={item.tooltip} key={index} delay={[250, 0]}>
                         <div
-                            className={`aspect-video h-full border-b-2 ${pathname.startsWith(item.href) ? 'border-primary border-b-2' : 'border-transparent'}`}
+                            className={`aspect-video h-full border-b-2 ${item.href === '/' ? (pathname === '/' ? 'border-primary border-b-2' : 'border-transparent') : pathname.slice(1).startsWith(item.href.slice(1)) ? 'border-primary border-b-2' : 'border-transparent'}`}
                         >
                             <NavLink
                                 href={item.href}

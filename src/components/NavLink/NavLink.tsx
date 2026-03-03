@@ -12,7 +12,7 @@ export default function NavLink({ children, href, className = () => '' }: NavLin
     const pathname = usePathname()
 
     const options = {
-        isActive: pathname.startsWith(href),
+        isActive: href === '/' ? pathname === '/' : pathname.slice(1).startsWith(href.slice(1)),
     }
 
     return (
