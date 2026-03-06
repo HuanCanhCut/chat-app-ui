@@ -412,7 +412,7 @@ const InputMessage: React.FC<InputMessageProps> = () => {
                                                 onClick={() => {
                                                     handleRemoveImage(index)
                                                 }}
-                                                className="flex-center border-opacity-20 bg-lightGray absolute top-[-8px] right-[-8px] h-6 w-6 rounded-full border border-black p-1 hover:bg-[#e2e4e8] dark:bg-[#333334] dark:hover:bg-[#3c3c3d]"
+                                                className="flex-center border-opacity-20 bg-lightGray absolute -top-2 -right-2 h-6 w-6 rounded-full border border-black p-1 hover:bg-[#e2e4e8] dark:bg-[#333334] dark:hover:bg-[#3c3c3d]"
                                             >
                                                 <FontAwesomeIcon icon={faXmark} />
                                             </button>
@@ -422,7 +422,7 @@ const InputMessage: React.FC<InputMessageProps> = () => {
                             </div>
                         )}
                         <textarea
-                            className={`bg-lightGray max-h-[140px] min-h-[36px] w-full resize-none rounded-3xl px-4 py-1 pt-[6px] pr-12 outline-hidden dark:bg-[#333334] ${images.length && 'rounded-t-none'}`}
+                            className={`bg-lightGray max-h-[140px] min-h-9 w-full resize-none rounded-3xl px-4 py-1 pt-1.5 pr-12 outline-hidden dark:bg-[#333334] ${images.length && 'rounded-t-none'}`}
                             value={messageValue}
                             autoFocus
                             onChange={handleInputChange}
@@ -434,9 +434,7 @@ const InputMessage: React.FC<InputMessageProps> = () => {
                     </div>
                     {/* show placeholder if messageValue is empty */}
                     {messageValue === '' && textareaRows() === 1 && (
-                        <span className="absolute bottom-[10px] left-4 bg-transparent leading-none text-gray-400">
-                            Aa
-                        </span>
+                        <span className="absolute bottom-2.5 left-4 bg-transparent leading-none text-gray-400">Aa</span>
                     )}
                     <HeadlessTippy
                         render={() => {

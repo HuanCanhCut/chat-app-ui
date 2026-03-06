@@ -9,6 +9,7 @@
     "lint": "next lint --fix"
   },
   "dependencies": {
+    "@base-ui/react": "^1.2.0",
     "@fortawesome/fontawesome-svg-core": "^6.6.0",
     "@fortawesome/free-brands-svg-icons": "^6.6.0",
     "@fortawesome/free-regular-svg-icons": "^6.6.0",
@@ -17,6 +18,8 @@
     "@reduxjs/toolkit": "^2.3.0",
     "axios": "^1.7.7",
     "babel-plugin-react-compiler": "^1.0.0",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
     "emoji-picker-react": "^4.12.0",
     "emoji-regex": "^10.4.0",
     "eslint-config-prettier": "^10.1.1",
@@ -28,6 +31,7 @@
     "moment-timezone": "^0.5.46",
     "next": "15.5.9",
     "peerjs": "^1.5.5",
+    "radix-ui": "^1.4.3",
     "react": "^19.2.1",
     "react-dom": "^19.2.1",
     "react-highlight-words": "^0.21.0",
@@ -40,10 +44,13 @@
     "react-toastify": "^11.0.5",
     "redux": "^5.0.1",
     "redux-toolkit": "^1.1.2",
+    "shadcn": "^3.8.5",
     "sharp": "^0.33.5",
     "socket.io-client": "^4.8.1",
     "swr": "^2.2.5",
-    "tippy.js": "^6.3.1"
+    "tailwind-merge": "^3.5.0",
+    "tippy.js": "^6.3.1",
+    "tw-animate-css": "^1.4.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.23.0",
