@@ -161,6 +161,14 @@ body.ReactModal__Body--open {
     overflow-y: hidden;
 }
 
+[contenteditable='true']:empty:before {
+    content: attr(data-placeholder);
+    color: #c1c1c1;
+    text-align: center;
+    display: block;
+    line-height: normal;
+}
+
 .overlay {
     position: fixed;
     top: 0;
@@ -214,7 +222,7 @@ body.ReactModal__Body--open {
     --outline-none: none;
 
     --background-color-dark: #212223;
-    --background-color-lightGray: #f0f2f5;
+    --background-color-light-gray: #f0f2f5;
     --background-color-dark-gray: #313233;
 
     --text-color-dark: #ffffffe6;

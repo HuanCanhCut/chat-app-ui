@@ -40,7 +40,7 @@ const SearchFriend: React.FC<SearchFriendProps> = ({ placeholder = 'Tìm kiếm'
 
             <input
                 type="text"
-                className="bg-lightGray dark:bg-dark-gray w-full rounded-full px-8 py-2 outline-hidden"
+                className="bg-light-gray dark:bg-dark-gray w-full rounded-full px-8 py-2 outline-hidden"
                 placeholder={placeholder}
                 value={searchValue}
                 onChange={(e) => setSearchValue(e.target.value)}

@@ -83,7 +83,7 @@ const ConversationItem: React.FC<Props> = ({ conversation, className = '' }) => 
 
     return (
         <div
-            className={`group relative rounded-lg ${!isActive ? 'hover:bg-lightGray hover:dark:bg-dark-gray' : ''} ${className} ${isActive ? 'bg-[#ebf5ff] dark:bg-[#222e39bd]' : ''}`}
+            className={`group relative rounded-lg ${!isActive ? 'hover:bg-light-gray hover:dark:bg-dark-gray' : ''} ${className} ${isActive ? 'bg-[#ebf5ff] dark:bg-[#222e39bd]' : ''}`}
         >
             <Link href={`/message/${conversation.uuid}`} className={`flex items-center p-2 pr-5`}>
                 <div className="relative shrink-0">

@@ -71,7 +71,7 @@ const SearchMessage: React.FC<SearchMessageProps> = ({ onBack }) => {
                 </Button>
                 <span className="font-medium">Tìm kiếm</span>
             </div>
-            <div className="bg-lightGray dark:bg-dark-gray relative mt-4 flex items-center rounded-3xl pl-3">
+            <div className="bg-light-gray dark:bg-dark-gray relative mt-4 flex items-center rounded-3xl pl-3">
                 <FontAwesomeIcon
                     icon={faSearch}
                     className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-500"

@@ -114,7 +114,7 @@ const Search: React.FC<Props> = ({ setSearchMode, searchMode }) => {
                         />
                     )}
 
-                    <div className="bg-lightGray dark:bg-dark-gray mr-2 flex flex-1 items-center rounded-3xl px-4 pl-3">
+                    <div className="bg-light-gray dark:bg-dark-gray mr-2 flex flex-1 items-center rounded-3xl px-4 pl-3">
                         <FontAwesomeIcon icon={faSearch} width={16} height={16} />
                         <input
                             type="text"

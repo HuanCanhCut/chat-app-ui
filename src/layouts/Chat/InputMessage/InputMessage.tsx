@@ -382,7 +382,7 @@ const InputMessage: React.FC<InputMessageProps> = () => {
                 <div className="relative flex grow">
                     <div className="flex w-full flex-col justify-center">
                         {images.length > 0 && (
-                            <div className="bg-lightGray flex w-full max-w-full items-center gap-3 overflow-x-auto rounded-t-2xl p-3 dark:bg-[#333334]">
+                            <div className="bg-light-gray flex w-full max-w-full items-center gap-3 overflow-x-auto rounded-t-2xl p-3 dark:bg-[#333334]">
                                 <Tippy content="Tải lên hình ảnh khác" delay={[200, 0]}>
                                     <button
                                         className="flex-center dark:bg-dark-gray aspect-square h-12 w-12 cursor-pointer rounded-lg bg-zinc-300 hover:bg-transparent dark:hover:bg-transparent"
@@ -412,7 +412,7 @@ const InputMessage: React.FC<InputMessageProps> = () => {
                                                 onClick={() => {
                                                     handleRemoveImage(index)
                                                 }}
-                                                className="flex-center border-opacity-20 bg-lightGray absolute -top-2 -right-2 h-6 w-6 rounded-full border border-black p-1 hover:bg-[#e2e4e8] dark:bg-[#333334] dark:hover:bg-[#3c3c3d]"
+                                                className="flex-center border-opacity-20 bg-light-gray absolute -top-2 -right-2 h-6 w-6 rounded-full border border-black p-1 hover:bg-[#e2e4e8] dark:bg-[#333334] dark:hover:bg-[#3c3c3d]"
                                             >
                                                 <FontAwesomeIcon icon={faXmark} />
                                             </button>
@@ -422,7 +422,7 @@ const InputMessage: React.FC<InputMessageProps> = () => {
                             </div>
                         )}
                         <textarea
-                            className={`bg-lightGray max-h-[140px] min-h-9 w-full resize-none rounded-3xl px-4 py-1 pt-1.5 pr-12 outline-hidden dark:bg-[#333334] ${images.length && 'rounded-t-none'}`}
+                            className={`bg-light-gray max-h-[140px] min-h-9 w-full resize-none rounded-3xl px-4 py-1 pt-1.5 pr-12 outline-hidden dark:bg-[#333334] ${images.length && 'rounded-t-none'}`}
                             value={messageValue}
                             autoFocus
                             onChange={handleInputChange}
@@ -468,7 +468,7 @@ const InputMessage: React.FC<InputMessageProps> = () => {
                 >
                     {messageValue.length || images.length > 0 ? (
                         <button
-                            className="hover:bg-lightGray dark:hover:bg-dark-gray rounded-full p-2"
+                            className="hover:bg-light-gray dark:hover:bg-dark-gray rounded-full p-2"
                             onClick={() => handleEmitMessage(uuid as string)}
                         >
                             <SendHorizontalIcon />
