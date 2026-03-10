@@ -1,6 +1,6 @@
 import { memo, useCallback, useState } from 'react'
-import { toast } from 'react-toastify'
 import { useParams } from 'next/navigation'
+import { toast } from 'sonner'
 
 import Button from '~/components/Button'
 import handleApiError from '~/helpers/handleApiError'

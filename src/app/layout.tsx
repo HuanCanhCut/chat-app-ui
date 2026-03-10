@@ -1,8 +1,6 @@
-import { ToastContainer } from 'react-toastify'
 import { Inter } from 'next/font/google'
 
 import 'react-loading-skeleton/dist/skeleton.css'
-import 'react-toastify/dist/ReactToastify.css'
 import 'tippy.js/dist/tippy.css'
 import './globals.css'
 import GlobalSWRConfig from '~/components/GlobalWrapper/GlobalSWRConfig'
@@ -24,7 +22,6 @@ function RootLayout({
                         {children}
                         <Toaster />
                     </ReduxProvider>
-                    <ToastContainer />
                 </GlobalSWRConfig>
             </body>
         </html>

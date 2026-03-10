@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { useParams } from 'next/navigation'
+import { toast } from 'sonner'
 import { mutate } from 'swr'
 
 import Button from '~/components/Button'
@@ -9,7 +10,6 @@ import { useAppSelector } from '~/redux'
 import { getCurrentUser } from '~/redux/selector'
 import * as messageServices from '~/services/messageService'
 import { MessageModel, MessageResponse } from '~/type/type'
-import { toast } from '~/utils/toast'
 interface RevokeModalProps {
     message: MessageModel
     onClose: () => void
@@ -106,7 +106,7 @@ const RevokeModal = ({ isOpen, message, onClose }: RevokeModalProps) => {
                 onClose()
             }
         } catch (error) {
-            toast('Gỡ tin nhắn thất bại, vui lòng thử lại.', 'error')
+            toast.error('Gỡ tin nhắn thất bại, vui lòng thử lại.')
         }
     }
 

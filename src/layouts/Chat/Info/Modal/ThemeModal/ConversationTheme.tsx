@@ -2,6 +2,7 @@ import { memo, useCallback, useEffect, useRef, useState } from 'react'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { useSelector } from 'react-redux'
 import { useParams } from 'next/navigation'
+import { toast } from 'sonner'
 import useSWR from 'swr'
 
 import MessagePreview from './MessagePreview'
@@ -14,7 +15,6 @@ import handleApiError from '~/helpers/handleApiError'
 import { getCurrentTheme } from '~/redux/selector'
 import * as themeService from '~/services/themeService'
 import { ConversationThemeModel, ConversationThemeResponse } from '~/type/type'
-import { toast } from '~/utils/toast'
 
 interface ConversationThemeProps {
     onClose: () => void
@@ -90,7 +90,7 @@ const ConversationTheme: React.FC<ConversationThemeProps> = ({ onClose, currentT
                 }
             }, false)
         } catch (error) {
-            toast('Tải thêm chủ đề thất bại!', 'error')
+            toast.error('Tải thêm chủ đề thất bại!')
         }
     }, [mutate, themes])
 

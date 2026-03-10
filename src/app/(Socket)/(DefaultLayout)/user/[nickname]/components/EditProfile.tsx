@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import { mutate } from 'swr'
 
 import { faCamera, faXmark } from '@fortawesome/free-solid-svg-icons'
@@ -15,7 +16,6 @@ import handleApiError from '~/helpers/handleApiError'
 import { useAppSelector } from '~/redux'
 import { getCurrentUser } from '~/redux/selector'
 import * as meService from '~/services/meService'
-import { toast } from '~/utils/toast'
 
 interface IFile extends File {
     preview: string
@@ -121,7 +121,7 @@ const EditProfile = ({ closeModal }: EditProfileProps) => {
 
             await meService.updateCurrentUser(formData)
 
-            toast('Cập nhật thành công')
+            toast.success('Cập nhật thành công')
             mutate(SWRKey.GET_CURRENT_USER)
 
             // replace state to update url without reloading page

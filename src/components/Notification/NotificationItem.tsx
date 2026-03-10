@@ -1,5 +1,6 @@
 import { memo, useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
+import { toast } from 'sonner'
 
 import 'moment/locale/vi'
 import ConfirmModel from '../ConfirmModal'
@@ -15,7 +16,6 @@ import * as NotificationServices from '~/services/notificationService'
 import { NotificationData } from '~/type/type'
 import { handleAcceptFriend, handleRejectFriendRequest } from '~/utils/friendEvent'
 import { momentTimezone } from '~/utils/moment'
-import { toast } from '~/utils/toast'
 
 const NotificationItem = ({
     notification,
@@ -44,7 +44,7 @@ const NotificationItem = ({
         const remove = listenEvent('TIPPY:TIPPY-HIDDEN', () => {
             // If user accept friend request and tippy is hidden, delete notification
             if (isAccept) {
-                sendEvent('NOTIFICATION:DELETE-NOTIFICATION', { notificationId: notification.id })
+                sendEvent('NOTIFICATION:DELETE-NOTIFICATION', { notificationId: notification.id! })
             }
         })
 
@@ -52,22 +52,22 @@ const NotificationItem = ({
     }, [isAccept, notification.id])
 
     const handleReadNotification = async () => {
-        sendEvent('NOTIFICATION:UPDATE-READ-STATUS', { notificationId: notification.id, type: 'read' })
+        sendEvent('NOTIFICATION:UPDATE-READ-STATUS', { notificationId: notification.id!, type: 'read' })
 
         if (notification.is_read) {
             return
         }
 
-        await NotificationServices.markAsRead(notification.id)
+        await NotificationServices.markAsRead(notification.id!)
 
         tippyInstance.current?.hide()
     }
 
     const handleDeleteNotification = async () => {
-        sendEvent('NOTIFICATION:DELETE-NOTIFICATION', { notificationId: notification.id })
+        sendEvent('NOTIFICATION:DELETE-NOTIFICATION', { notificationId: notification.id! })
         setIsOpenConfirmModel(false)
-        await NotificationServices.deleteNotification(notification.id)
-        toast('Xóa thành công', 'success')
+        await NotificationServices.deleteNotification(notification.id!)
+        toast.success('Xóa thành công')
     }
 
     const RenderMoreOptions = () => {
@@ -77,14 +77,14 @@ const NotificationItem = ({
         const handleToggleReadStatus = async (type: 'read' | 'unread') => {
             switch (type) {
                 case 'read':
-                    await NotificationServices.markAsRead(notification.id)
+                    await NotificationServices.markAsRead(notification.id!)
                     break
                 case 'unread':
-                    await NotificationServices.markAsUnread(notification.id)
+                    await NotificationServices.markAsUnread(notification.id!)
                     break
             }
 
-            sendEvent('NOTIFICATION:UPDATE-READ-STATUS', { notificationId: notification.id, type })
+            sendEvent('NOTIFICATION:UPDATE-READ-STATUS', { notificationId: notification.id!, type })
 
             tippyInstance.current.hide()
         }
@@ -176,7 +176,7 @@ const NotificationItem = ({
                         <small
                             className={`text-xs ${!notification.is_read ? 'text-primary' : 'text-gray-600 dark:text-gray-400'} font-normal`}
                         >
-                            {momentTimezone(notification.created_at)}
+                            {momentTimezone(notification.created_at!)}
                         </small>
                     </div>
                 </Link>

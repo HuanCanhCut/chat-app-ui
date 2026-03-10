@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import Image from 'next/image'
 import { signInWithPopup } from 'firebase/auth'
+import { toast } from 'sonner'
 
 import SendVerifyCode from './SendVerifyCode'
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons'
@@ -11,7 +12,6 @@ import Input from '~/components/Input/Input'
 import config from '~/config'
 import * as authServices from '~/services/authService'
 import { UserModel } from '~/type/type'
-import { toast } from '~/utils/toast'
 
 export interface FieldValue {
     email: string
@@ -85,7 +85,7 @@ const AuthForm = () => {
                 if (error?.response?.data?.message) {
                     setErrorMessage(error.response.data.message)
                 } else {
-                    toast('Đăng kí thất bại, vui lòng thử lại hoặc liên hệ admin để xử lí.', 'error')
+                    toast.error('Đăng kí thất bại, vui lòng thử lại hoặc liên hệ admin để xử lí.')
                 }
             }
         }

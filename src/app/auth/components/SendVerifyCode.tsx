@@ -1,10 +1,10 @@
 'use client'
 
 import { memo, MutableRefObject, useEffect, useRef, useState } from 'react'
+import { toast } from 'sonner'
 
 import handleApiError from '~/helpers/handleApiError'
 import * as authService from '~/services/authService'
-import { toast } from '~/utils/toast'
 
 interface Props {
     emailRef: MutableRefObject<HTMLInputElement | null>
@@ -39,12 +39,12 @@ const SendVerifyCode: React.FC<Props> = ({ emailRef }) => {
             if (sendSuccess) return
 
             if (!emailRef.current?.value) {
-                toast('Email không được bỏ trống', 'error')
+                toast.error('Email không được bỏ trống')
                 return
             }
 
             if (!/^\w+([\\.-]?\w+)*@\w+([\\.-]?\w+)*(\.\w{2,3})+$/.test(emailRef.current?.value)) {
-                toast('Email không đúng định dạng', 'error')
+                toast.error('Email không đúng định dạng')
                 return
             }
 
@@ -53,9 +53,8 @@ const SendVerifyCode: React.FC<Props> = ({ emailRef }) => {
             console.log(response)
 
             if (response) {
-                toast(
+                toast.success(
                     'Mã xác nhận đã được gửi đến email của bạn, nếu không thấy hãy kiểm tra thư rác hoặc spam',
-                    'success',
                 )
 
                 setSendSuccess(true)

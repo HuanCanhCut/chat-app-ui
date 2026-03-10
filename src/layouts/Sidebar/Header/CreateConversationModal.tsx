@@ -1,4 +1,5 @@
 import { memo, useCallback, useEffect, useRef, useState } from 'react'
+import { toast } from 'sonner'
 
 import { faCamera, faFileUpload } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -9,7 +10,6 @@ import { listenEvent } from '~/helpers/events'
 import handleApiError from '~/helpers/handleApiError'
 import * as conversationService from '~/services/conversationService'
 import { UserModel } from '~/type/type'
-import { toast } from '~/utils/toast'
 
 export interface FieldValue {
     group_name: string
@@ -116,13 +116,13 @@ const CreateConversationModal = ({ onClose }: { onClose: () => void }) => {
                 formData.append('user_id[]', user.id.toString())
             })
 
-            toast('Đang tạo nhóm, vui lòng đợi...', 'info')
+            toast.info('Đang tạo nhóm, vui lòng đợi...')
 
             onClose()
 
             await conversationService.createConversation({ formData })
 
-            toast('Tạo nhóm thành công', 'success')
+            toast.success('Tạo nhóm thành công')
         } catch (error) {
             handleApiError(error)
         }

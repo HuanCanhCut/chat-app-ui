@@ -2,6 +2,7 @@ import React, { memo, useEffect, useRef, useState } from 'react'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
+import { toast } from 'sonner'
 import useSWR from 'swr'
 
 import MessageItem from './MessageItem'
@@ -18,7 +19,6 @@ import { useAppSelector } from '~/redux'
 import { getCurrentTheme, getCurrentUser } from '~/redux/selector'
 import * as messageServices from '~/services/messageService'
 import { ConversationModel, MessageModel, MessageResponse, SocketMessage } from '~/type/type'
-import { toast } from '~/utils/toast'
 
 interface MessageRef {
     [key: string]: HTMLDivElement
@@ -583,7 +583,7 @@ const Message: React.FC<MessageProps> = ({ conversation }) => {
                                 })
                             }
                         } catch (error) {
-                            toast('Có lỗi khi tải tin nhắn, vui lòng thử lại sau', 'error')
+                            toast.error('Có lỗi khi tải tin nhắn, vui lòng thử lại sau')
                         }
                     }}
                     className="flex flex-col-reverse gap-[2.5px] overflow-hidden! px-2 py-3"
