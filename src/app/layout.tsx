@@ -7,6 +7,7 @@ import 'tippy.js/dist/tippy.css'
 import './globals.css'
 import GlobalSWRConfig from '~/components/GlobalWrapper/GlobalSWRConfig'
 import ReduxProvider from '~/components/GlobalWrapper/ReduxProvider'
+import { Toaster } from '~/components/ui/sonner'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -19,7 +20,10 @@ function RootLayout({
         <html lang="en">
             <body className={`${inter.className} dark:text-dark text-black`}>
                 <GlobalSWRConfig>
-                    <ReduxProvider>{children}</ReduxProvider>
+                    <ReduxProvider>
+                        {children}
+                        <Toaster />
+                    </ReduxProvider>
                     <ToastContainer />
                 </GlobalSWRConfig>
             </body>

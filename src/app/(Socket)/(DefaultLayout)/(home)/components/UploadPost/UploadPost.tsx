@@ -5,6 +5,7 @@ import { EmojiClickData } from 'emoji-picker-react'
 import Tippy from 'huanpenguin-tippy-react'
 import HeadlessTippy from 'huanpenguin-tippy-react/headless'
 import { Earth, Images, ImagesIcon, Smile, X } from 'lucide-react'
+import { toast } from 'sonner'
 
 import BackgroundSelector from './BackgroundSelector'
 import Emoji from '~/components/Emoji'
@@ -71,9 +72,26 @@ const UploadPost = () => {
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = e.target.files
 
+        const ACCEPTED_TYPES = ['image/', 'video/']
+
         if (files?.length) {
-            Array.from(files).forEach((file: IFile) => {
+            const isValidFile = (file: File) => {
+                if (file.type) {
+                    return ACCEPTED_TYPES.some((type) => file.type.startsWith(type))
+                }
+                return /\.(jpg|jpeg|png|gif|webp|mp4|mov|avi|mkv)$/i.test(file.name)
+            }
+
+            const validFiles = Array.from(files).filter(isValidFile)
+            const invalidFiles = Array.from(files).filter((f) => !isValidFile(f))
+
+            if (invalidFiles.length > 0) {
+                toast.error('Chỉ chấp nhận tải lên ảnh và video')
+            }
+
+            validFiles.forEach((file: IFile) => {
                 file.preview = URL.createObjectURL(file)
+
                 setPostFiles((prev) => [...prev, file])
             })
         }
@@ -199,7 +217,7 @@ const UploadPost = () => {
 
                                         return (
                                             <div
-                                                className={`border-border mt-4 grid gap-1 rounded-md border ${gridClass}`}
+                                                className={`border-border mt-4 grid gap-[2px] rounded-md border ${gridClass}`}
                                             >
                                                 {displayFiles.map((file, index) => {
                                                     const spanClass =
@@ -217,7 +235,7 @@ const UploadPost = () => {
                                                                 )}
 
                                                             <Button
-                                                                className="absolute top-1 right-1"
+                                                                className="absolute top-1 right-1 z-10 cursor-pointer bg-zinc-600! dark:bg-zinc-600!"
                                                                 variant="ghost"
                                                                 size="icon"
                                                                 onClick={() => {
@@ -227,12 +245,21 @@ const UploadPost = () => {
                                                                 <X />
                                                             </Button>
 
-                                                            <CustomImage
-                                                                className={`aspect-square w-full object-cover select-none ${spanClass}`}
-                                                                src={file.preview}
-                                                                alt={file.name}
-                                                                key={index}
-                                                            />
+                                                            {file.type.startsWith('video') ? (
+                                                                <video
+                                                                    className={`aspect-square w-full rounded-md object-cover select-none ${spanClass}`}
+                                                                    src={file.preview}
+                                                                    autoPlay
+                                                                    muted
+                                                                    loop
+                                                                />
+                                                            ) : (
+                                                                <CustomImage
+                                                                    className={`aspect-square w-full rounded-md object-cover select-none ${spanClass}`}
+                                                                    src={file.preview}
+                                                                    alt={file.name}
+                                                                />
+                                                            )}
                                                         </div>
                                                     )
                                                 })}
@@ -263,7 +290,7 @@ const UploadPost = () => {
                                         ref={fileInputRef}
                                         type="file"
                                         hidden
-                                        accept="image/* video/*"
+                                        accept="image/*"
                                         multiple
                                         onChange={handleFileChange}
                                     />
