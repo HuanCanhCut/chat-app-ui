@@ -10,17 +10,9 @@ export async function middleware(request: NextRequest) {
 
     const { pathname } = request.nextUrl
 
-    // if (pathname === '/') {
-    //     if (token) {
-    //         return NextResponse.redirect(new URL('/message', request.url))
-    //     } else {
-    //         return NextResponse.redirect(new URL('/auth', request.url))
-    //     }
-    // }
-
     // Check if the user is on the auth route and has an access token
     if (authRoutes.some((path) => pathname.startsWith(path)) && token) {
-        return NextResponse.redirect(new URL('/message', request.url))
+        return NextResponse.redirect(new URL('/', request.url))
     }
 
     // Check if the user is on the private route and has no access token

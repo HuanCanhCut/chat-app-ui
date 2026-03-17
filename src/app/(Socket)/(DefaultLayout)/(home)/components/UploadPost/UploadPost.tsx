@@ -5,6 +5,7 @@ import { EmojiClickData } from 'emoji-picker-react'
 import Tippy from 'huanpenguin-tippy-react'
 import HeadlessTippy from 'huanpenguin-tippy-react/headless'
 import { Earth, Images, ImagesIcon, Smile, X } from 'lucide-react'
+import pMap from 'p-map'
 import { toast } from 'sonner'
 
 import BackgroundSelector from './BackgroundSelector'
@@ -16,9 +17,13 @@ import { Button } from '~/components/ui/button'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '~/components/ui/dialog'
 import { Textarea } from '~/components/ui/textarea'
 import UserAvatar from '~/components/UserAvatar'
+import handleApiError from '~/helpers/handleApiError'
+import uploadToCloudinary from '~/helpers/uploadToCloudinary'
 import { cn } from '~/lib/utils'
 import { useAppSelector } from '~/redux'
 import { getCurrentUser } from '~/redux/selector'
+import * as cloudinaryService from '~/services/cloudinaryService'
+import * as postService from '~/services/postService'
 
 interface IFile extends File {
     preview?: string
@@ -29,7 +34,9 @@ const UploadPost = () => {
 
     const fileInputRef = useRef<HTMLInputElement>(null)
     const contenteditableRef = useRef<HTMLDivElement | null>(null)
+    const submitButtonRef = useRef<HTMLButtonElement | null>(null)
 
+    const [isOpen, setIsOpen] = useState(false)
     const [isPublic, setIsPublic] = useState(true)
     const [caption, setCaption] = useState('')
     const [emojiOpen, setEmojiOpen] = useState(false)
@@ -60,8 +67,10 @@ const UploadPost = () => {
     }, [])
 
     const handleOpenChange = (open: boolean) => {
+        setIsOpen(open)
         if (!open) {
             setEmojiOpen(false)
+            setCaption('')
 
             handleRevokeBlobs()
 
@@ -124,12 +133,75 @@ const UploadPost = () => {
         })
     }
 
+    const handleUploadPost = async () => {
+        const toastId = toast.loading('Bài viết của bạn đang được tải lên, vui lòng không đóng ứng dụng...')
+
+        setIsOpen(false)
+
+        try {
+            interface PostData {
+                caption: string
+                is_public: boolean
+                media?: Array<{
+                    media_url: string
+                    media_type: 'image' | 'video'
+                }>
+            }
+
+            const postData: PostData = {
+                caption,
+                is_public: isPublic,
+            }
+
+            if (postFiles.length > 0) {
+                const folder = `chat-app-${process.env.NODE_ENV}/posts`
+                const { data: signature } = await cloudinaryService.createCloudinarySignature({
+                    folder,
+                })
+
+                const postMedia = await pMap(
+                    postFiles,
+                    async (file) => {
+                        const [fileType] = file.type.split('/')
+                        return uploadToCloudinary({
+                            file,
+                            signature,
+                            type: fileType,
+                        })
+                    },
+                    { concurrency: 5 },
+                )
+
+                const postMediaUrls = postMedia.map((media) => {
+                    return {
+                        media_url: media.secure_url,
+                        media_type: media.resource_type as 'image' | 'video',
+                    }
+                })
+
+                postData['media'] = postMediaUrls
+            }
+
+            await postService.createPost({ postData })
+
+            toast.success('Đăng bài viết thành công!', {
+                id: toastId,
+            })
+
+            submitButtonRef.current?.setAttribute('disabled', 'true')
+        } catch (error) {
+            handleApiError(error, undefined, toastId.toString())
+        } finally {
+            submitButtonRef.current?.removeAttribute('disabled')
+        }
+    }
+
     return (
         <PopperWrapper className="flex items-center gap-4 rounded-xl border-none p-3 shadow-xs dark:bg-[#27292a]">
             <UserAvatar src={currentUser?.data.avatar} />
 
-            <Dialog onOpenChange={handleOpenChange}>
-                <form className="flex-1">
+            <Dialog open={isOpen} onOpenChange={handleOpenChange}>
+                <div className="flex-1">
                     <DialogTrigger asChild>
                         <div className="flex-1 rounded-lg bg-[#f3f2f5] p-2 text-zinc-600 select-none dark:bg-[#333334] dark:text-zinc-400">
                             {currentUser?.data.last_name} ơi, bạn đang nghĩ gì thế?
@@ -315,12 +387,12 @@ const UploadPost = () => {
                             </div>
                         </div>
                         <DialogFooter>
-                            <Button type="submit" className="w-full py-5">
+                            <Button ref={submitButtonRef} className="w-full py-5" onClick={handleUploadPost}>
                                 Đăng
                             </Button>
                         </DialogFooter>
                     </DialogContent>
-                </form>
+                </div>
             </Dialog>
 
             <div>
