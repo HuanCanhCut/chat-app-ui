@@ -64,14 +64,12 @@ const ReplyMessage = ({ message, currentUser, memberMap, ref }: ReplyMessageProp
 
                         {(() => {
                             try {
-                                const images = JSON.parse(message.parent?.content as string)
-                                const firstImage = images[0] || ''
+                                const images = message.parent.media
+                                const firstImage = images[0]?.media_url
 
                                 return (
                                     <Image
-                                        src={
-                                            message.parent?.content && message.parent.type === 'image' ? firstImage : ''
-                                        }
+                                        src={message.parent?.media && message.parent.type === 'image' ? firstImage : ''}
                                         alt="reply-message"
                                         className="h-24 w-24 rounded-2xl opacity-70"
                                         onClick={() => {

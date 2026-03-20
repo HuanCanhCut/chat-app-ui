@@ -8,7 +8,7 @@ import { faChevronLeft, faChevronRight, faDownload, faXmark } from '@fortawesome
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import SWRKey from '~/enum/SWRKey'
 import * as messageServices from '~/services/messageService'
-import { MessageModel, MetaPagination } from '~/type/type'
+import { MessageMedia, MetaPagination } from '~/type/type'
 
 interface MessageImagesModelProps {
     onClose: () => void
@@ -32,10 +32,10 @@ const MessageImagesModel = ({ onClose, imageUrl }: MessageImagesModelProps) => {
 
     const [page, setPage] = useState(1)
 
-    const formatImagesResponse = (images: MessageModel[]) => {
-        return images.reduce<string[]>((acc, image) => {
-            return acc.concat(JSON.parse(image.content as string))
-        }, [])
+    const formatImagesResponse = (media: MessageMedia[]) => {
+        return media.map((md) => {
+            return md.media_url
+        })
     }
 
     const { data: images, mutate: mutateImages } = useSWR<MessageImagesModelData>(
@@ -238,7 +238,7 @@ const MessageImagesModel = ({ onClose, imageUrl }: MessageImagesModelProps) => {
                                 <Tippy key={index} content={btn?.label}>
                                     <button
                                         onClick={btn.onclick}
-                                        className="flex-center bg-opacity-70 h-9 w-9 rounded-full bg-[#2b2c2e] hover:bg-[#2d2e2e]"
+                                        className="flex-center bg-opacity-70 h-9 w-9 cursor-pointer rounded-full bg-[#2b2c2e] hover:bg-[#2d2e2e]"
                                     >
                                         {btn.icon}
                                     </button>
@@ -247,7 +247,7 @@ const MessageImagesModel = ({ onClose, imageUrl }: MessageImagesModelProps) => {
                                 <button
                                     key={index}
                                     onClick={btn.onclick}
-                                    className="flex-center bg-opacity-70 h-9 w-9 rounded-full bg-[#2b2c2e] hover:bg-[#2d2e2e]"
+                                    className="flex-center bg-opacity-70 h-9 w-9 cursor-pointer rounded-full bg-[#2b2c2e] hover:bg-[#2d2e2e]"
                                 >
                                     {btn.icon}
                                 </button>
@@ -257,7 +257,7 @@ const MessageImagesModel = ({ onClose, imageUrl }: MessageImagesModelProps) => {
                 </header>
                 <main className="flex w-full flex-1 items-center justify-between overflow-hidden">
                     <div
-                        className="flex-center group bg-opacity-10 h-full cursor-pointer bg-[rgb(0,0,0)] p-4 transition-all duration-200 hover:-translate-x-1"
+                        className="flex-center group bg-opacity-10 h-full cursor-pointer bg-[rgba(0,0,0,0.15)] p-4 transition-all duration-200 hover:-translate-x-1"
                         onClick={handlePreviousImage}
                     >
                         <button className="flex-center bg-opacity-70 h-10 w-10 rounded-full bg-[#40403f] transition-all duration-200 group-hover:bg-[#595b5b]">
@@ -278,7 +278,7 @@ const MessageImagesModel = ({ onClose, imageUrl }: MessageImagesModelProps) => {
                         />
                     )}
                     <div
-                        className="flex-center group bg-opacity-10 h-full cursor-pointer bg-[rgb(0,0,0)] p-4 transition-all duration-200 hover:translate-x-1"
+                        className="flex-center group bg-opacity-10 h-full cursor-pointer bg-[rgba(0,0,0,0.15)] p-4 transition-all duration-200 hover:translate-x-1"
                         onClick={handleNextImage}
                     >
                         <button className="flex-center bg-opacity-70 h-10 w-10 rounded-full bg-[#40403f] transition-all duration-200 group-hover:bg-[#595b5b]">

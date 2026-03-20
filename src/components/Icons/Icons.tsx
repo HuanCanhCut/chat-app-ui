@@ -251,7 +251,14 @@ export const IncomingCallIcon = ({ width = 20, height = 20, className }: IconPro
 
 export const TimeoutCallIcon = ({ width = 20, height = 20, className }: IconProps) => {
     return (
-        <svg viewBox="0 0 12 13" width={width} height={height} fill="currentColor" aria-hidden="true">
+        <svg
+            viewBox="0 0 12 13"
+            width={width}
+            height={height}
+            className={className}
+            fill="currentColor"
+            aria-hidden="true"
+        >
             <g fillRule="evenodd" transform="translate(-450 -1073)">
                 <g>
                     <path

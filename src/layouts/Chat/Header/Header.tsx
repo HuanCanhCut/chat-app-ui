@@ -175,7 +175,7 @@ const Header: React.FC<HeaderProps> = ({ className = '', isInfoOpen, conversatio
             </div>
             {!conversation.is_temp && (
                 <div className="flex items-center">
-                    {!conversation.is_group && !conversation.is_temp && (
+                    {/* {!conversation.is_group && !conversation.is_temp && (
                         <>
                             <Button
                                 buttonType="icon"
@@ -203,7 +203,7 @@ const Header: React.FC<HeaderProps> = ({ className = '', isInfoOpen, conversatio
                                 />
                             </Button>
                         </>
-                    )}
+                    )} */}
 
                     <Button
                         buttonType="icon"

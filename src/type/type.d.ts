@@ -134,6 +134,12 @@ export interface TopReaction {
     user_reaction: UserModel
 }
 
+export interface MessageMedia extends BaseModel {
+    message_id: number
+    media_url: string
+    media_type: 'image' | 'video'
+}
+
 export interface MessageModel extends BaseModel {
     conversation_id: number
     content: string | null
@@ -146,6 +152,7 @@ export interface MessageModel extends BaseModel {
     total_reactions: number
     parent_id: number | null
     parent: MessageModel | null
+    media: MessageMedia[]
 }
 
 export interface MessageResponse {
@@ -161,7 +168,7 @@ export interface MessageResponse {
 }
 
 export interface MessageImagesResponse extends MetaPagination {
-    data: MessageModel[]
+    data: MessageMedia[]
 }
 
 export interface MessageStatus extends BaseModel {

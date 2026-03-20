@@ -13,7 +13,7 @@ import SWRKey from '~/enum/SWRKey'
 import handleApiError from '~/helpers/handleApiError'
 import MessageImagesModel from '~/layouts/Chat/Message/Modal/MessageImagesModal'
 import * as messageServices from '~/services/messageService'
-import { MessageModel } from '~/type/type'
+import { MessageMedia } from '~/type/type'
 
 interface MediaAndLinkProps {
     onBack: () => void
@@ -47,9 +47,9 @@ const MediaAndLink: React.FC<MediaAndLinkProps> = ({ onBack, defaultActiveTab })
         image: '',
     })
 
-    const groupedMediaByMonth = (media: MessageModel[]) => {
+    const groupedMediaByMonth = (media: MessageMedia[]) => {
         return media.reduce(
-            (acc: Record<string, MessageModel[]>, cur: MessageModel) => {
+            (acc: Record<string, MessageMedia[]>, cur: MessageMedia) => {
                 const month = new Date(cur.created_at).getMonth()
                 const year = new Date(cur.created_at).getFullYear()
 
@@ -65,12 +65,12 @@ const MediaAndLink: React.FC<MediaAndLinkProps> = ({ onBack, defaultActiveTab })
 
                 return acc
             },
-            {} as Record<string, MessageModel[]>,
+            {} as Record<string, MessageMedia[]>,
         )
     }
 
     const { data: media, mutate: mutateMedia } = useSWR<{
-        data: Record<string, MessageModel[]>
+        data: Record<string, MessageMedia[]>
         meta: { pagination: { current_page: number; total_pages: number } }
     }>(activeTab.type === 'media' ? [SWRKey.GET_MESSAGE_IMAGES, activeTab.type, uuid] : null, async () => {
         const response = await messageServices.getMessageImages({
@@ -81,7 +81,7 @@ const MediaAndLink: React.FC<MediaAndLinkProps> = ({ onBack, defaultActiveTab })
 
         if (!response?.data)
             return {} as {
-                data: Record<string, MessageModel[]>
+                data: Record<string, MessageMedia[]>
                 meta: { pagination: { current_page: number; total_pages: number } }
             }
 
@@ -160,7 +160,7 @@ const MediaAndLink: React.FC<MediaAndLinkProps> = ({ onBack, defaultActiveTab })
                 {activeTab.type === 'media' && media && (
                     <>
                         <InfiniteScroll
-                            dataLength={Object.keys(media).length || 0}
+                            dataLength={Object.values(media.data).reduce((acc, cur) => acc + cur.length, 0)}
                             next={async () => {
                                 try {
                                     const response = await messageServices.getMessageImages({
@@ -175,7 +175,7 @@ const MediaAndLink: React.FC<MediaAndLinkProps> = ({ onBack, defaultActiveTab })
                                         (
                                             prev:
                                                 | {
-                                                      data: Record<string, MessageModel[]>
+                                                      data: Record<string, MessageMedia[]>
                                                       meta: {
                                                           pagination: { current_page: number; total_pages: number }
                                                       }
@@ -186,11 +186,27 @@ const MediaAndLink: React.FC<MediaAndLinkProps> = ({ onBack, defaultActiveTab })
                                                 return prev
                                             }
 
+                                            const mergeGroupedMedia = (
+                                                prev: Record<string, MessageMedia[]>,
+                                                next: Record<string, MessageMedia[]>,
+                                            ): Record<string, MessageMedia[]> => {
+                                                const result = { ...prev }
+
+                                                for (const [key, value] of Object.entries(next)) {
+                                                    if (result[key]) {
+                                                        // Cùng tháng => append vào
+                                                        result[key] = [...result[key], ...value]
+                                                    } else {
+                                                        // Tháng mới => thêm key mới
+                                                        result[key] = value
+                                                    }
+                                                }
+
+                                                return result
+                                            }
+
                                             return {
-                                                data: {
-                                                    ...prev.data,
-                                                    ...groupedMediaByMonth(response.data),
-                                                },
+                                                data: mergeGroupedMedia(prev.data, groupedMediaByMonth(response.data)),
                                                 meta: {
                                                     pagination: {
                                                         ...prev.meta.pagination,
@@ -227,24 +243,17 @@ const MediaAndLink: React.FC<MediaAndLinkProps> = ({ onBack, defaultActiveTab })
                                             </span>
 
                                             <div className="mt-1 grid max-w-full grid-cols-3 gap-[6px]">
-                                                {media.data[title].map((message) => {
+                                                {media.data[title].map((media) => {
                                                     return (
-                                                        <div key={message.id}>
-                                                            {JSON.parse(message.content!).map(
-                                                                (url: string, index: number) => {
-                                                                    return (
-                                                                        <CustomImage
-                                                                            key={index}
-                                                                            src={url}
-                                                                            alt={'ảnh'}
-                                                                            className="aspect-square w-full object-cover"
-                                                                            onClick={() => {
-                                                                                handleOpenImageModal(url)
-                                                                            }}
-                                                                        />
-                                                                    )
-                                                                },
-                                                            )}
+                                                        <div key={media.id}>
+                                                            <CustomImage
+                                                                src={media.media_url || ''}
+                                                                alt={'ảnh'}
+                                                                className="aspect-square w-full object-cover"
+                                                                onClick={() => {
+                                                                    handleOpenImageModal(media.media_url || '')
+                                                                }}
+                                                            />
                                                         </div>
                                                     )
                                                 })}

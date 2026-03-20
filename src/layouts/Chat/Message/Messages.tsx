@@ -24,7 +24,7 @@ interface MessageRef {
     [key: string]: HTMLDivElement
 }
 
-const PER_PAGE = 20
+const PER_PAGE = 25
 
 interface MessageProps {
     conversation: ConversationModel
@@ -152,10 +152,10 @@ const Message: React.FC<MessageProps> = ({ conversation }) => {
 
                 // revoke object url of image
                 for (const message of messages.data) {
-                    if (message.type === 'image' && message.content) {
-                        JSON.parse(message.content).forEach((url: string) => {
-                            if (url.startsWith('blob:')) {
-                                URL.revokeObjectURL(url)
+                    if (message.type === 'image') {
+                        message.media.forEach((media) => {
+                            if (media.media_url && media.media_url.startsWith('blob:')) {
+                                URL.revokeObjectURL(media.media_url)
                             }
                         })
                     }
@@ -571,16 +571,18 @@ const Message: React.FC<MessageProps> = ({ conversation }) => {
                                     meta: response?.meta,
                                 }
 
-                                mutateMessages(newData, {
-                                    revalidate: false,
-                                })
+                                setTimeout(() => {
+                                    mutateMessages(newData, {
+                                        revalidate: false,
+                                    })
 
-                                setOffsetRange((prev) => {
-                                    return {
-                                        ...prev,
-                                        end: response.meta.pagination.offset + response.data.length,
-                                    }
-                                })
+                                    setOffsetRange((prev) => {
+                                        return {
+                                            ...prev,
+                                            end: response.meta.pagination.offset + response.data.length,
+                                        }
+                                    })
+                                }, 200)
                             }
                         } catch (error) {
                             toast.error('Có lỗi khi tải tin nhắn, vui lòng thử lại sau')

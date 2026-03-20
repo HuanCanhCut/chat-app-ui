@@ -8,7 +8,14 @@ import EmojiMessageStyle from '~/components/EmojiMessageStyle'
 import { IncomingCallIcon, OutgoingCallIcon, TimeoutCallIcon } from '~/components/Icons/Icons'
 import CustomImage from '~/components/Image/Image'
 import * as messageServices from '~/services/messageService'
-import { ConversationModel, LinkPreviewModel, MessageModel, MessageResponse, UserModel } from '~/type/type'
+import {
+    ConversationModel,
+    LinkPreviewModel,
+    MessageMedia,
+    MessageModel,
+    MessageResponse,
+    UserModel,
+} from '~/type/type'
 import openWindowCall from '~/utils/openWindowCall'
 
 interface MessageContentProps {
@@ -237,7 +244,7 @@ const MessageContent = ({
                 <div
                     ref={combinedRef}
                     className={`relative w-full rounded-2xl ${
-                        JSON.parse(message.content as string).length > 1
+                        message.media.length > 1
                             ? 'max-w-[60%] sm:max-w-[55%] md:max-w-[50%] lg:max-w-[45%] xl:max-w-[35%]'
                             : 'max-w-[60%] sm:max-w-[40%] md:max-w-[35%] lg:max-w-[30%] xl:max-w-[25%]'
                     }`}
@@ -245,15 +252,15 @@ const MessageContent = ({
                     <div
                         className={`flex w-full max-w-full flex-wrap gap-1 overflow-hidden rounded-2xl [word-break:break-word] ${consecutiveMessageStyle()}`}
                     >
-                        {JSON.parse(message.content as string).map((url: string, index: number) => (
+                        {message.media.map((media: MessageMedia, index: number) => (
                             <div className="w-full max-w-full flex-1" key={index}>
                                 <CustomImage
-                                    src={url}
+                                    src={media.media_url || ''}
                                     alt="message"
-                                    className={`max-h-[260px] sm:min-w-[100px] ${JSON.parse(message.content as string).length === 1 ? 'min-w-[180px]' : 'aspect-square'} h-full w-full max-w-full! min-w-[160px] cursor-pointer rounded-md object-cover object-center`}
+                                    className={`max-h-[260px] sm:min-w-[100px] ${message.media.length === 1 ? 'min-w-[180px]' : 'aspect-square'} h-full w-full max-w-full! min-w-[160px] cursor-pointer rounded-md object-cover object-center`}
                                     priority
                                     quality={100}
-                                    onClick={() => handleOpenImageModal(url, message.id)}
+                                    onClick={() => handleOpenImageModal(media.media_url || '', message.id)}
                                 />
                             </div>
                         ))}
@@ -273,7 +280,7 @@ const MessageContent = ({
                     <div className="flex items-center gap-2">
                         <Button
                             buttonType="icon"
-                            className={`shrink-0 ${message.type === 'call_timeout' ? 'bg-error! dark:bg-error!' : ''}`}
+                            className={`shrink-0 ${message.type === 'call_timeout' ? 'bg-error! dark:bg-error! dark:text-white!' : ''}`}
                         >
                             {(() => {
                                 switch (message.type) {
@@ -284,7 +291,7 @@ const MessageContent = ({
                                             <IncomingCallIcon />
                                         )
                                     case 'call_timeout':
-                                        return <TimeoutCallIcon />
+                                        return <TimeoutCallIcon className="text-white" />
                                 }
                             })()}
                         </Button>
