@@ -1,4 +1,4 @@
-import { forwardRef, LegacyRef } from 'react'
+import { LegacyRef } from 'react'
 
 import { faReply } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -10,9 +10,10 @@ interface ReplyMessageProps {
     message: MessageModel
     currentUser?: UserModel
     memberMap: Record<number, ConversationMember>
+    ref: LegacyRef<HTMLDivElement>
 }
 
-const ReplyMessage = ({ message, currentUser, memberMap }: ReplyMessageProps, ref: LegacyRef<HTMLDivElement>) => {
+const ReplyMessage = ({ message, currentUser, memberMap, ref }: ReplyMessageProps) => {
     const handleScrollToMessage = (message: MessageModel) => {
         sendEvent('MESSAGE:SCROLL-TO-MESSAGE', {
             parentMessage: message,
@@ -102,4 +103,4 @@ const ReplyMessage = ({ message, currentUser, memberMap }: ReplyMessageProps, re
     )
 }
 
-export default forwardRef(ReplyMessage)
+export default ReplyMessage

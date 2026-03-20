@@ -1,4 +1,4 @@
-import { forwardRef, LegacyRef, useEffect, useState } from 'react'
+import { LegacyRef, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 
@@ -22,27 +22,26 @@ interface MessageContentProps {
     diffTime: (message: MessageModel, targetMessage: MessageModel) => number
     handleFormatTime: (time: Date) => string
     conversation?: ConversationModel
+    ref: LegacyRef<HTMLDivElement>
 }
 
 const BETWEEN_TIME_MESSAGE = 7 // minute
 
 const linkRegex = /(http|ftp|https):\/\/([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:\/~+#-]*[\w@?^=%&\/~+#-])/
 
-const MessageContent = (
-    {
-        message,
-        messageIndex,
-        messageRef,
-        currentUser,
-        handleOpenReactionModal,
-        handleOpenImageModal,
-        messages,
-        diffTime,
-        handleFormatTime,
-        conversation,
-    }: MessageContentProps,
-    ref: LegacyRef<HTMLDivElement>,
-) => {
+const MessageContent = ({
+    message,
+    messageIndex,
+    messageRef,
+    currentUser,
+    handleOpenReactionModal,
+    handleOpenImageModal,
+    messages,
+    diffTime,
+    handleFormatTime,
+    conversation,
+    ref,
+}: MessageContentProps) => {
     const { uuid } = useParams()
 
     const [linkPreview, setLinkPreview] = useState<LinkPreviewModel | null>(null)
@@ -332,4 +331,4 @@ const MessageContent = (
     }
 }
 
-export default forwardRef(MessageContent)
+export default MessageContent

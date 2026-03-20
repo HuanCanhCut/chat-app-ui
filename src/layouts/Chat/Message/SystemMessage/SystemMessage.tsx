@@ -1,4 +1,4 @@
-import { forwardRef } from 'react'
+import { LegacyRef } from 'react'
 
 import { sendEvent } from '~/helpers/events'
 import { useAppSelector } from '~/redux'
@@ -10,14 +10,18 @@ interface SystemMessageProps {
     messageIndex: number
     className?: string
     hiddenQuickAction?: boolean
+    ref?: LegacyRef<HTMLDivElement> | undefined
 }
 
 const allowedQuickActions = ['system_change_theme']
 
-const SystemMessage = (
-    { message, messageIndex, className = '', hiddenQuickAction = false }: SystemMessageProps,
-    ref: React.Ref<HTMLDivElement>,
-) => {
+const SystemMessage = ({
+    message,
+    messageIndex,
+    className = '',
+    hiddenQuickAction = false,
+    ref,
+}: SystemMessageProps) => {
     const currentUser = useAppSelector(getCurrentUser)
 
     const handleQuickAction = (type: string) => {
@@ -96,4 +100,4 @@ const SystemMessage = (
     )
 }
 
-export default forwardRef(SystemMessage)
+export default SystemMessage

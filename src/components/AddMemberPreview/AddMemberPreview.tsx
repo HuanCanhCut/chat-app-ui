@@ -1,4 +1,4 @@
-import { forwardRef, useCallback, useEffect, useImperativeHandle, useState } from 'react'
+import { useCallback, useEffect, useImperativeHandle, useState } from 'react'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import useSWR from 'swr'
 
@@ -20,13 +20,14 @@ const PER_PAGE = 20
 
 interface AddMemberPreviewProps {
     className?: string
+    ref: any
 }
 
 interface ImperativeHandle {
     GET_PREVIEW_MEMBER: () => UserModel[]
 }
 
-const AddMemberPreview = forwardRef<ImperativeHandle, AddMemberPreviewProps>(({ className = '' }, ref) => {
+const AddMemberPreview: React.FC<AddMemberPreviewProps> = ({ className = '', ref }) => {
     const currentUser = useAppSelector(getCurrentUser)
 
     const [searchResult, setSearchResult] = useState<FriendsShip[]>([])
@@ -172,7 +173,7 @@ const AddMemberPreview = forwardRef<ImperativeHandle, AddMemberPreviewProps>(({ 
             </div>
         </main>
     )
-})
+}
 
 AddMemberPreview.displayName = 'AddMemberPreview'
 

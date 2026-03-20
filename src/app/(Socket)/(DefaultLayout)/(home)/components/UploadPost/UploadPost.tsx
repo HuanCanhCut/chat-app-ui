@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { EmojiClickData } from 'emoji-picker-react'
 import Tippy from 'huanpenguin-tippy-react'
 import HeadlessTippy from 'huanpenguin-tippy-react/headless'
-import { Earth, Images, ImagesIcon, Smile, X } from 'lucide-react'
+import { Earth, ImagesIcon, Smile, X } from 'lucide-react'
 import pMap from 'p-map'
 import { toast } from 'sonner'
 
@@ -394,12 +394,6 @@ const UploadPost = () => {
                     </DialogContent>
                 </div>
             </Dialog>
-
-            <div>
-                <Button variant="ghost" size="icon-lg" className="dark:hover:bg-zinc-700">
-                    <Images size={30} />
-                </Button>
-            </div>
         </PopperWrapper>
     )
 }
