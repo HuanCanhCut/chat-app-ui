@@ -69,7 +69,7 @@ const ReplyMessage = ({ message, currentUser, memberMap, ref }: ReplyMessageProp
 
                                 return (
                                     <Image
-                                        src={message.parent?.media && message.parent.type === 'image' ? firstImage : ''}
+                                        src={message.parent?.media && message.parent.type === 'media' ? firstImage : ''}
                                         alt="reply-message"
                                         className="h-24 w-24 rounded-2xl opacity-70"
                                         onClick={() => {

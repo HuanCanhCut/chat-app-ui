@@ -289,7 +289,7 @@ const UploadPost = () => {
 
                                         return (
                                             <div
-                                                className={`border-border mt-4 grid gap-[2px] rounded-md border ${gridClass}`}
+                                                className={`border-border mt-4 grid gap-0.5 rounded-md border ${gridClass}`}
                                             >
                                                 {displayFiles.map((file, index) => {
                                                     const spanClass =

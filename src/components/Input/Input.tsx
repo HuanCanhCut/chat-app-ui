@@ -13,7 +13,7 @@ interface Props {
     setShowIcon?: () => void
     IconClass?: string
     defaultValue?: string
-    ref: LegacyRef<HTMLInputElement>
+    ref?: LegacyRef<HTMLInputElement>
 }
 
 const IconClasses = 'absolute right-3 top-1/2 translate-y-[-50%] leading-none text-zinc-700'

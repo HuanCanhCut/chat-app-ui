@@ -234,7 +234,7 @@ const MessageItem = ({ message, messageIndex, messages, currentUser, messageRef 
 
     return (
         <div>
-            {message.type === 'image' && (
+            {message.type === 'media' && (
                 <ReactModal
                     isOpen={openImageModal.isOpen}
                     ariaHideApp={false}

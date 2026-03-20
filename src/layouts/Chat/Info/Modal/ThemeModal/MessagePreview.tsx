@@ -18,7 +18,7 @@ const MessagePreview: React.FC<MessagePreviewProps> = ({ content, index, current
             className={`mt-px max-w-[80%] ${type === 'system' ? 'flex-center max-w-full' : type === 'receiver' ? 'mt-2!' : 'self-end'}`}
         >
             <p
-                className={`rounded-2xl p-2 text-[15px] ${type === 'system' ? 'text-system-message-light dark:text-system-message-dark text-xs font-medium' : ''} ${index === 0 ? 'rounded-br-[4px]!' : index === 1 ? 'rounded-tr-[4px]!' : ''}`}
+                className={`w-fit rounded-2xl p-2 text-[15px] ${type === 'system' ? 'text-system-message-light dark:text-system-message-dark! text-xs! font-medium' : ''} ${index === 0 ? 'rounded-br-lg!' : index === 1 ? 'rounded-tr-lg!' : ''}`}
                 style={{
                     backgroundColor:
                         type !== 'system' ? currentTheme.theme_config[type][theme].background_color : 'transparent',
@@ -26,7 +26,7 @@ const MessagePreview: React.FC<MessagePreviewProps> = ({ content, index, current
                 }}
             >
                 {type === 'system'
-                    ? new Date(content).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
+                    ? new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
                     : content}
             </p>
         </div>

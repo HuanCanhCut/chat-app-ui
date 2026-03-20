@@ -1,7 +1,7 @@
 import type { NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
 
-const privateRoutes = ['/message', '/user']
+const privateRoutes = ['/message', '/user', '/']
 const authRoutes = ['/auth']
 
 // This function can be marked `async` if using `await` inside
@@ -16,7 +16,12 @@ export async function middleware(request: NextRequest) {
     }
 
     // Check if the user is on the private route and has no access token
-    if (privateRoutes.some((path) => pathname.startsWith(path)) && !authRoutes.includes(pathname) && !token) {
+    if (
+        privateRoutes.some((path) => pathname.startsWith(path)) &&
+        !authRoutes.includes(pathname) &&
+        !token &&
+        pathname !== '/'
+    ) {
         return NextResponse.redirect(new URL('/auth', request.url))
     }
 
@@ -25,5 +30,5 @@ export async function middleware(request: NextRequest) {
 
 // See "Matching Paths" below to learn more
 export const config = {
-    matcher: ['/:path*'],
+    matcher: ['/((?!_next/static|_next/image|favicon.ico|api|.*\\..*).*)'],
 }

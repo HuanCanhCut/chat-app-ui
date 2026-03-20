@@ -239,12 +239,12 @@ const MessageContent = ({
                     <Reaction message={message} handleOpenReactionModal={handleOpenReactionModal} />
                 </div>
             )
-        case 'image':
+        case 'media':
             return (
                 <div
                     ref={combinedRef}
                     className={`relative w-full rounded-2xl ${
-                        message.media.length > 1
+                        message.media?.length > 1
                             ? 'max-w-[60%] sm:max-w-[55%] md:max-w-[50%] lg:max-w-[45%] xl:max-w-[35%]'
                             : 'max-w-[60%] sm:max-w-[40%] md:max-w-[35%] lg:max-w-[30%] xl:max-w-[25%]'
                     }`}
@@ -252,12 +252,12 @@ const MessageContent = ({
                     <div
                         className={`flex w-full max-w-full flex-wrap gap-1 overflow-hidden rounded-2xl [word-break:break-word] ${consecutiveMessageStyle()}`}
                     >
-                        {message.media.map((media: MessageMedia, index: number) => (
+                        {message.media?.map((media: MessageMedia, index: number) => (
                             <div className="w-full max-w-full flex-1" key={index}>
                                 <CustomImage
                                     src={media.media_url || ''}
                                     alt="message"
-                                    className={`max-h-[260px] sm:min-w-[100px] ${message.media.length === 1 ? 'min-w-[180px]' : 'aspect-square'} h-full w-full max-w-full! min-w-[160px] cursor-pointer rounded-md object-cover object-center`}
+                                    className={`max-h-[260px] sm:min-w-[100px] ${message.media.length === 1 ? 'min-w-[180px]' : 'aspect-square'} h-full w-full max-w-full! min-w-40 cursor-pointer rounded-md object-cover object-center`}
                                     priority
                                     quality={100}
                                     onClick={() => handleOpenImageModal(media.media_url || '', message.id)}
@@ -318,7 +318,7 @@ const MessageContent = ({
             return (
                 <div
                     ref={combinedRef}
-                    className={`relative w-fit max-w-[80%] rounded-3xl py-[2px] font-normal [word-break:break-word] whitespace-pre-wrap`}
+                    className={`relative w-fit max-w-[80%] rounded-3xl py-0.5 font-normal [word-break:break-word] whitespace-pre-wrap`}
                 >
                     <span className="max-w-fit gap-3 text-3xl wrap-break-word">
                         <EmojiMessageStyle

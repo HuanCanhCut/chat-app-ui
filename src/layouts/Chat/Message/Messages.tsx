@@ -152,9 +152,13 @@ const Message: React.FC<MessageProps> = ({ conversation }) => {
 
                 // revoke object url of image
                 for (const message of messages.data) {
-                    if (message.type === 'image') {
+                    if (message.type === 'media') {
                         message.media.forEach((media) => {
-                            if (media.media_url && media.media_url.startsWith('blob:')) {
+                            if (
+                                media.media_url &&
+                                media.media_type === 'image' &&
+                                media.media_url.startsWith('blob:')
+                            ) {
                                 URL.revokeObjectURL(media.media_url)
                             }
                         })

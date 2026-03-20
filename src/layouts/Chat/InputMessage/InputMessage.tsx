@@ -3,6 +3,7 @@ import { useParams } from 'next/navigation'
 import { Emoji as EmojiPicker, EmojiClickData, EmojiStyle } from 'emoji-picker-react'
 import Tippy from 'huanpenguin-tippy-react'
 import HeadlessTippy from 'huanpenguin-tippy-react/headless'
+import pMap from 'p-map'
 import useSWR, { mutate } from 'swr'
 
 import { faImage, faSmile } from '@fortawesome/free-regular-svg-icons'
@@ -14,10 +15,12 @@ import CustomImage from '~/components/Image/Image'
 import SWRKey from '~/enum/SWRKey'
 import { listenEvent, sendEvent } from '~/helpers/events'
 import socket from '~/helpers/socket'
+import uploadToCloudinary from '~/helpers/uploadToCloudinary'
 import { useAppSelector } from '~/redux'
 import { getCurrentUser } from '~/redux/selector'
+import * as cloudinaryService from '~/services/cloudinaryService'
 import * as conversationServices from '~/services/conversationService'
-import { ConversationMember, MessageModel } from '~/type/type'
+import { ConversationMember, MessageMedia, MessageModel } from '~/type/type'
 
 interface InputMessageProps {
     className?: string
@@ -66,7 +69,11 @@ const InputMessage: React.FC<InputMessageProps> = () => {
     }
 
     const handleEmitMessage = async (conversationUuid: string) => {
-        const messageDetails = (type: string, content: string) => {
+        const messageDetails = (
+            type: string,
+            content: string,
+            media?: Pick<MessageMedia, 'media_type' | 'media_url'>[],
+        ) => {
             return {
                 conversation_uuid: conversationUuid,
                 message: {
@@ -92,6 +99,7 @@ const InputMessage: React.FC<InputMessageProps> = () => {
                     }),
                     parent_id: replyMessage?.id,
                     parent: replyMessage,
+                    media: media || [],
                 },
             }
         }
@@ -116,33 +124,35 @@ const InputMessage: React.FC<InputMessageProps> = () => {
 
         // handle image message
         if (images.length) {
-            const uploadToCloudinary = async (file: File, folder: string, publicId: string) => {
-                const UPLOAD_PRESET = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET as string
+            // const uploadToCloudinary = async (file: File, folder: string, publicId: string) => {
+            //     const UPLOAD_PRESET = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET as string
 
-                const formData = new FormData()
-                formData.append('file', file)
-                formData.append('upload_preset', UPLOAD_PRESET)
-                formData.append('folder', folder)
-                formData.append('public_id', publicId)
+            //     const formData = new FormData()
+            //     formData.append('file', file)
+            //     formData.append('upload_preset', UPLOAD_PRESET)
+            //     formData.append('folder', folder)
+            //     formData.append('public_id', publicId)
 
-                const response = await fetch(
-                    `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_NAME}/image/upload`,
-                    {
-                        method: 'POST',
-                        body: formData,
-                    },
-                )
+            //     const response = await fetch(
+            //         `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_NAME}/image/upload`,
+            //         {
+            //             method: 'POST',
+            //             body: formData,
+            //         },
+            //     )
 
-                return await response.json()
-            }
+            //     return await response.json()
+            // }
 
             const { conversation_uuid, message } = messageDetails(
-                'image',
-                JSON.stringify(
-                    images.map((image) => {
-                        return image.preview
-                    }),
-                ),
+                'media',
+                '',
+                images.map((image) => {
+                    return {
+                        media_type: 'image',
+                        media_url: image.preview!,
+                    }
+                }),
             )
 
             setTimeout(
@@ -166,21 +176,33 @@ const InputMessage: React.FC<InputMessageProps> = () => {
 
             setImages([])
 
-            const payload = await Promise.all(
-                images.map((image) =>
-                    uploadToCloudinary(
-                        image,
-                        `chat-app-${process.env.NODE_ENV}/messages`,
-                        `${uuid}-${image.name}-${Math.random().toString().substring(2, 15)}`,
-                    ),
-                ),
+            const folder = `chat-app-${process.env.NODE_ENV}/messages`
+
+            const { data: signature } = await cloudinaryService.createCloudinarySignature({
+                folder,
+            })
+
+            const payload = await pMap(
+                images,
+                async (image) => {
+                    const [fileType] = image.type.split('/')
+
+                    return uploadToCloudinary({ file: image, signature, type: fileType })
+                },
+                {
+                    concurrency: 5,
+                },
             )
 
             socket.emit('NEW_MESSAGE', {
                 conversation_uuid,
-                message: JSON.stringify(payload.map((item) => item.secure_url)),
-                type: 'image',
+                message: '',
+                type: 'media',
                 parent_id: replyMessage?.id,
+                media: payload.map((item) => ({
+                    media_url: item.secure_url,
+                    media_type: item.resource_type,
+                })),
             })
 
             sendEvent('MESSAGE:SEND', null)

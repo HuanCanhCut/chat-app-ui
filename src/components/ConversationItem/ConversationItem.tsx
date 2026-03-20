@@ -41,7 +41,7 @@ const ConversationItem: React.FC<Props> = ({ conversation, className = '' }) => 
 
         const messageType = new Map<string | null, string>([
             [null, 'Đã thu hồi một tin nhắn'],
-            ['image', 'Đã gửi một ảnh'],
+            ['media', 'Đã gửi một file'],
         ])
 
         if (currentUser?.data.id === message.sender_id) {

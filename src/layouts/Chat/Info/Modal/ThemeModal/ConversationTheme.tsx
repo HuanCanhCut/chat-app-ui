@@ -149,7 +149,7 @@ const ConversationTheme: React.FC<ConversationThemeProps> = ({ onClose, currentT
                     className="flex h-full w-[200%] flex-1 overflow-hidden py-4 pr-0 transition-all duration-100 ease-linear md:w-full md:translate-x-0 md:p-5"
                 >
                     <div className="w-full [overflow-y:overlay] pr-1 md:w-1/2" id="theme-scrollable">
-                        <div className="border border-b border-[#D0D3D7] pb-3 dark:border-[#65686C]">
+                        <div className="pb-3">
                             <ThemeItem
                                 theme={currentTheme}
                                 checked
