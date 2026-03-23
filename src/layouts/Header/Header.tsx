@@ -37,29 +37,29 @@ export default function Header() {
     return (
         <header
             id="header"
-            className={`${headerStyle} flex h-(--header-height-mobile) flex-col sm:h-(--header-height) sm:flex-row sm:items-center`}
+            className={`${headerStyle} flex h-(--header-height-mobile) flex-col md:h-(--header-height) md:flex-row md:items-center`}
         >
             <SearchModal isOpen={isOpen} closeModal={closeModal} />
 
-            <div className="flex items-center justify-between sm:h-full sm:w-full">
+            <div className="flex items-center justify-between md:h-full md:w-full">
                 <div className="flex items-center gap-4">
                     <Logo className="col-span-1" />
 
-                    <Search className="hidden w-[240px] sm:block" />
+                    <Search className="hidden w-60 md:block" />
 
-                    <Button buttonType="icon" className="sm:hidden" onClick={openModal}>
+                    <Button buttonType="icon" className="md:hidden" onClick={openModal}>
                         <FontAwesomeIcon icon={faSearch} width={16} height={16} className="text-gray-400" />
                     </Button>
                 </div>
 
-                <div className="hidden sm:flex sm:h-full sm:items-center">
+                <div className="hidden md:flex md:h-full md:items-center">
                     <Nav />
                 </div>
 
                 <Interaction />
             </div>
 
-            <div className="mx-auto flex-1 sm:hidden">
+            <div className="mx-auto flex-1 md:hidden">
                 <Nav />
             </div>
         </header>

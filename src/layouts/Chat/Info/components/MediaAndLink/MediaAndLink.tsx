@@ -5,13 +5,13 @@ import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import useSWR from 'swr'
 
-import { faArrowLeft, faSpinner } from '@fortawesome/free-solid-svg-icons'
+import { faArrowLeft, faPlay, faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Button from '~/components/Button'
 import CustomImage from '~/components/Image'
 import SWRKey from '~/enum/SWRKey'
 import handleApiError from '~/helpers/handleApiError'
-import MessageImagesModel from '~/layouts/Chat/Message/Modal/MessageImagesModal'
+import MessageImagesModel from '~/layouts/Chat/Message/Modal/MessageMediaModal'
 import * as messageServices from '~/services/messageService'
 import { MessageMedia } from '~/type/type'
 
@@ -42,9 +42,18 @@ const MediaAndLink: React.FC<MediaAndLinkProps> = ({ onBack, defaultActiveTab })
     const { uuid } = useParams()
 
     const [activeTab, setActiveTab] = useState<Tab>(tabs.find((tab) => tab.type === defaultActiveTab) || tabs[0])
-    const [openImageModal, setOpenImageModal] = useState({
+    const [openImageModal, setOpenImageModal] = useState<{
+        isOpen: boolean
+        media: {
+            media_type: 'image' | 'video'
+            media_url: string
+        }
+    }>({
         isOpen: false,
-        image: '',
+        media: {
+            media_type: 'image',
+            media_url: '',
+        },
     })
 
     const groupedMediaByMonth = (media: MessageMedia[]) => {
@@ -102,17 +111,23 @@ const MediaAndLink: React.FC<MediaAndLinkProps> = ({ onBack, defaultActiveTab })
         },
     )
 
-    const handleCloseImageModal = useCallback(() => {
+    const handleCloseMediaModal = useCallback(() => {
         setOpenImageModal({
             isOpen: false,
-            image: '',
+            media: {
+                media_type: 'image',
+                media_url: '',
+            },
         })
     }, [])
 
-    const handleOpenImageModal = useCallback((image: string) => {
+    const handleOpenMediaModal = useCallback((url: string, type: 'image' | 'video') => {
         setOpenImageModal({
             isOpen: true,
-            image,
+            media: {
+                media_type: type,
+                media_url: url,
+            },
         })
     }, [])
 
@@ -123,10 +138,14 @@ const MediaAndLink: React.FC<MediaAndLinkProps> = ({ onBack, defaultActiveTab })
                 ariaHideApp={false}
                 overlayClassName="overlay"
                 closeTimeoutMS={200}
-                onRequestClose={handleCloseImageModal}
+                onRequestClose={handleCloseMediaModal}
                 className="fixed top-0 right-0 bottom-0 left-0"
             >
-                <MessageImagesModel onClose={handleCloseImageModal} imageUrl={openImageModal.image} />
+                <MessageImagesModel
+                    onClose={handleCloseMediaModal}
+                    mediaUrl={openImageModal.media.media_url}
+                    mediaType={openImageModal.media.media_type}
+                />
             </ReactModal>
 
             <div>
@@ -246,14 +265,45 @@ const MediaAndLink: React.FC<MediaAndLinkProps> = ({ onBack, defaultActiveTab })
                                                 {media.data[title].map((media) => {
                                                     return (
                                                         <div key={media.id}>
-                                                            <CustomImage
-                                                                src={media.media_url || ''}
-                                                                alt={'ảnh'}
-                                                                className="aspect-square w-full object-cover"
-                                                                onClick={() => {
-                                                                    handleOpenImageModal(media.media_url || '')
-                                                                }}
-                                                            />
+                                                            {(() => {
+                                                                switch (media.media_type) {
+                                                                    case 'image':
+                                                                        return (
+                                                                            <CustomImage
+                                                                                src={media.media_url || ''}
+                                                                                alt={'ảnh'}
+                                                                                className="aspect-square w-full object-cover"
+                                                                                onClick={() => {
+                                                                                    handleOpenMediaModal(
+                                                                                        media.media_url || '',
+                                                                                        media.media_type,
+                                                                                    )
+                                                                                }}
+                                                                            />
+                                                                        )
+                                                                    case 'video':
+                                                                        return (
+                                                                            <div className="relative">
+                                                                                <div className="flex-center pointer-events-none absolute top-1/2 left-1/2 z-10 h-8 w-8 -translate-x-1/2 -translate-y-1/2 rounded-full select-none">
+                                                                                    <FontAwesomeIcon
+                                                                                        icon={faPlay}
+                                                                                        size="2xl"
+                                                                                    />
+                                                                                </div>
+                                                                                <video
+                                                                                    src={media.media_url || ''}
+                                                                                    className="aspect-square w-full cursor-pointer object-cover"
+                                                                                    onClick={() => {
+                                                                                        handleOpenMediaModal(
+                                                                                            media.media_url || '',
+                                                                                            media.media_type,
+                                                                                        )
+                                                                                    }}
+                                                                                ></video>
+                                                                            </div>
+                                                                        )
+                                                                }
+                                                            })()}
                                                         </div>
                                                     )
                                                 })}

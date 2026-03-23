@@ -4,6 +4,7 @@ export interface CloudinarySignature {
     signature: string
     folder: string
     cloud_name: string
+    transformation: string
 }
 
 export interface CloudinarySignatureResponse {

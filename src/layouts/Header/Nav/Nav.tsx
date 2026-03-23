@@ -1,11 +1,13 @@
 import { useMemo } from 'react'
 import { usePathname } from 'next/navigation'
 import Tippy from 'huanpenguin-tippy-react'
-import { MessageSquare } from 'lucide-react'
 
-import { HomeIcon, UserGroupIcon } from '~/components/Icons'
+import { faFacebookMessenger } from '@fortawesome/free-brands-svg-icons'
+import { faHome, faUser } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import NavLink from '~/components/NavLink'
 import config from '~/config'
+import { cn } from '~/lib/utils'
 import { useAppSelector } from '~/redux'
 import { getCurrentUser } from '~/redux/selector'
 
@@ -21,19 +23,19 @@ const NavBar = ({ className }: NavBarProps) => {
         return [
             {
                 type: 'home',
-                icon: <HomeIcon />,
+                icon: <FontAwesomeIcon icon={faHome} size="lg" className="h-[22px] w-[22px]" />,
                 href: config.routes.home,
                 tooltip: 'Trang chủ',
             },
             {
                 type: 'messages',
-                icon: <MessageSquare size={22} />,
+                icon: <FontAwesomeIcon icon={faFacebookMessenger} size="lg" className="h-[22px] w-[22px]" />,
                 href: config.routes.message,
                 tooltip: 'Tin nhắn',
             },
             {
                 type: 'user',
-                icon: <UserGroupIcon />,
+                icon: <FontAwesomeIcon icon={faUser} size="lg" className="h-[18px] w-[18px]" />,
                 href: `${config.routes.user}/@${currentUser?.data?.nickname}`,
                 tooltip: 'Tài khoản',
             },
@@ -51,7 +53,10 @@ const NavBar = ({ className }: NavBarProps) => {
                             <NavLink
                                 href={item.href}
                                 className={(nav) => {
-                                    return `${nav.isActive ? 'text-primary' : ''} flex-center h-full rounded-md text-xl hover:bg-[#a7a7a736] dark:hover:bg-[#313333]`
+                                    return cn(
+                                        'text-foreground/80 flex-center h-full rounded-md text-xl hover:bg-[#a7a7a736] dark:hover:bg-[#313333]',
+                                        nav.isActive && 'text-primary',
+                                    )
                                 }}
                             >
                                 {item.icon}

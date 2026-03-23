@@ -24,6 +24,7 @@ import { useAppSelector } from '~/redux'
 import { getCurrentUser } from '~/redux/selector'
 import * as cloudinaryService from '~/services/cloudinaryService'
 import * as postService from '~/services/postService'
+import { validateMedia } from '~/utils/validateMediaUpload'
 
 interface IFile extends File {
     preview?: string
@@ -84,15 +85,7 @@ const UploadPost = () => {
         const ACCEPTED_TYPES = ['image/', 'video/']
 
         if (files?.length) {
-            const isValidFile = (file: File) => {
-                if (file.type) {
-                    return ACCEPTED_TYPES.some((type) => file.type.startsWith(type))
-                }
-                return /\.(jpg|jpeg|png|gif|webp|mp4|mov|avi|mkv)$/i.test(file.name)
-            }
-
-            const validFiles = Array.from(files).filter(isValidFile)
-            const invalidFiles = Array.from(files).filter((f) => !isValidFile(f))
+            const { validFiles, invalidFiles } = validateMedia(files, ACCEPTED_TYPES)
 
             if (invalidFiles.length > 0) {
                 toast.error('Chỉ chấp nhận tải lên ảnh và video')

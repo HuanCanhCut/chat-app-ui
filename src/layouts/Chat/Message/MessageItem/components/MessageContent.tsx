@@ -24,7 +24,15 @@ interface MessageContentProps {
     messageRef: (el: HTMLDivElement) => void
     currentUser: UserModel
     handleOpenReactionModal: (messageId: number) => void
-    handleOpenImageModal: (url: string, messageId: number) => void
+    handleOpenMediaModal: ({
+        url,
+        messageId,
+        type,
+    }: {
+        url: string
+        messageId: number
+        type: 'image' | 'video'
+    }) => void
     messages: MessageResponse
     diffTime: (message: MessageModel, targetMessage: MessageModel) => number
     handleFormatTime: (time: Date) => string
@@ -42,7 +50,7 @@ const MessageContent = ({
     messageRef,
     currentUser,
     handleOpenReactionModal,
-    handleOpenImageModal,
+    handleOpenMediaModal,
     messages,
     diffTime,
     handleFormatTime,
@@ -239,35 +247,84 @@ const MessageContent = ({
                     <Reaction message={message} handleOpenReactionModal={handleOpenReactionModal} />
                 </div>
             )
-        case 'media':
+        case 'media': {
+            const count = message.media?.length ?? 0
+
+            const gridClass =
+                {
+                    1: 'grid-cols-1',
+                    2: 'grid-cols-1 sm:grid-cols-2',
+                    3: 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3',
+                    4: 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3',
+                }[count] ?? 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3'
+
+            const getSpanClass = (index: number) => {
+                if (count === 4 && index === 3) return 'sm:col-span-2 md:col-span-3'
+                return ''
+            }
+
             return (
                 <div
                     ref={combinedRef}
-                    className={`relative w-full rounded-2xl ${
-                        message.media?.length > 1
-                            ? 'max-w-[60%] sm:max-w-[55%] md:max-w-[50%] lg:max-w-[45%] xl:max-w-[35%]'
-                            : 'max-w-[60%] sm:max-w-[40%] md:max-w-[35%] lg:max-w-[30%] xl:max-w-[25%]'
-                    }`}
+                    className="relative w-fit max-w-[80vw] sm:max-w-[60vw] md:max-w-[45vw] lg:max-w-[35vw]"
                 >
                     <div
-                        className={`flex w-full max-w-full flex-wrap gap-1 overflow-hidden rounded-2xl [word-break:break-word] ${consecutiveMessageStyle()}`}
+                        className={`grid w-full gap-1 overflow-hidden rounded-2xl [word-break:break-word] ${gridClass} ${consecutiveMessageStyle()}`}
                     >
                         {message.media?.map((media: MessageMedia, index: number) => (
-                            <div className="w-full max-w-full flex-1" key={index}>
-                                <CustomImage
-                                    src={media.media_url || ''}
-                                    alt="message"
-                                    className={`max-h-[260px] sm:min-w-[100px] ${message.media.length === 1 ? 'min-w-[180px]' : 'aspect-square'} h-full w-full max-w-full! min-w-40 cursor-pointer rounded-md object-cover object-center`}
-                                    priority
-                                    quality={100}
-                                    onClick={() => handleOpenImageModal(media.media_url || '', message.id)}
-                                />
+                            <div key={index} className={`relative w-full ${getSpanClass(index)}`}>
+                                {(() => {
+                                    switch (media.media_type.split('/')[0]) {
+                                        case 'image':
+                                            return (
+                                                <CustomImage
+                                                    src={media.media_url || ''}
+                                                    alt="message"
+                                                    className={`h-full w-full cursor-pointer rounded-md object-cover object-center ${
+                                                        count === 1
+                                                            ? 'max-h-[260px] min-w-[180px]'
+                                                            : 'aspect-square max-h-[250px]'
+                                                    }`}
+                                                    priority
+                                                    quality={100}
+                                                    onClick={() =>
+                                                        handleOpenMediaModal({
+                                                            url: media.media_url || '',
+                                                            messageId: message.id,
+                                                            type: 'image',
+                                                        })
+                                                    }
+                                                />
+                                            )
+                                        case 'video':
+                                            return (
+                                                <video
+                                                    src={media.media_url || ''}
+                                                    className={`h-full w-full cursor-pointer rounded-md object-cover object-center ${
+                                                        count === 1
+                                                            ? 'max-h-[260px] min-w-[180px]'
+                                                            : 'aspect-square max-h-[250px]'
+                                                    }`}
+                                                    controls
+                                                    onClick={() =>
+                                                        handleOpenMediaModal({
+                                                            url: media.media_url || '',
+                                                            messageId: message.id,
+                                                            type: 'video',
+                                                        })
+                                                    }
+                                                />
+                                            )
+                                    }
+                                })()}
                             </div>
                         ))}
                     </div>
                     <Reaction message={message} handleOpenReactionModal={handleOpenReactionModal} />
                 </div>
             )
+        }
+
         case 'call_ended':
         case 'call_timeout':
             return (

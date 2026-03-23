@@ -20,6 +20,7 @@ const uploadToCloudinary = async ({
         formData.append('timestamp', `${signature.timestamp}`)
         formData.append('signature', signature.signature)
         formData.append('folder', signature.folder)
+        formData.append('transformation', signature.transformation)
 
         // Upload to Cloudinary
         const uploadResponse = await fetch(`https://api.cloudinary.com/v1_1/${signature.cloud_name}/${type}/upload`, {

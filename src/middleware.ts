@@ -16,12 +16,7 @@ export async function middleware(request: NextRequest) {
     }
 
     // Check if the user is on the private route and has no access token
-    if (
-        privateRoutes.some((path) => pathname.startsWith(path)) &&
-        !authRoutes.includes(pathname) &&
-        !token &&
-        pathname !== '/'
-    ) {
+    if (privateRoutes.some((path) => pathname.startsWith(path)) && !authRoutes.includes(pathname) && !token) {
         return NextResponse.redirect(new URL('/auth', request.url))
     }
 

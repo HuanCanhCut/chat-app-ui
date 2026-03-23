@@ -16,11 +16,11 @@ import SWRKey from '~/enum/SWRKey'
 import { sendEvent } from '~/helpers/events'
 import socket from '~/helpers/socket'
 import useVisible from '~/hooks/useVisible'
-import MessageImagesModel from '~/layouts/Chat/Message/Modal/MessageImagesModal'
+import MessageImagesModel from '~/layouts/Chat/Message/Modal/MessageMediaModal'
 import ReactionModal from '~/layouts/Chat/Message/Modal/ReactionModal'
 import RevokeModal from '~/layouts/Chat/Message/Modal/RevokeModal'
 import * as conversationServices from '~/services/conversationService'
-import { ConversationMember, MessageModel, MessageResponse, UserModel } from '~/type/type'
+import { ConversationMember, MessageMedia, MessageModel, MessageResponse, UserModel } from '~/type/type'
 
 const BETWEEN_TIME_MESSAGE = 7 // minute
 
@@ -47,9 +47,16 @@ const MessageItem = ({ message, messageIndex, messages, currentUser, messageRef 
     const replyMessageRef = useRef<HTMLDivElement>(null)
     const groupMessageRef = useRef<HTMLDivElement>(null)
 
-    const [openImageModal, setOpenImageModal] = useState({
+    const [openMediaModal, setOpenMediaModal] = useState<{
+        isOpen: boolean
+        media: Pick<MessageMedia, 'media_type' | 'media_url'>
+        messageId: number
+    }>({
         isOpen: false,
-        image: '',
+        media: {
+            media_type: 'image',
+            media_url: '',
+        },
         messageId: 0,
     })
     const [openReactionModal, setOpenReactionModal] = useState({
@@ -145,22 +152,36 @@ const MessageItem = ({ message, messageIndex, messages, currentUser, messageRef 
         return moment(new Date(time)).locale('vi').format('DD [Tháng] MM, YYYY')
     }, [])
 
-    const handleOpenImageModal = (url: string, messageId: number) => {
+    const handleOpenMediaModal = ({
+        url,
+        messageId,
+        type,
+    }: {
+        url: string
+        messageId: number
+        type: 'image' | 'video'
+    }) => {
         if (url.startsWith('blob:http')) {
             return
         }
 
-        setOpenImageModal({
+        setOpenMediaModal({
             isOpen: true,
-            image: url,
+            media: {
+                media_type: type,
+                media_url: url,
+            },
             messageId,
         })
     }
 
     const handleCloseImageModal = useCallback(() => {
-        setOpenImageModal({
+        setOpenMediaModal({
             isOpen: false,
-            image: '',
+            media: {
+                media_type: 'image',
+                media_url: '',
+            },
             messageId: 0,
         })
     }, [])
@@ -236,14 +257,18 @@ const MessageItem = ({ message, messageIndex, messages, currentUser, messageRef 
         <div>
             {message.type === 'media' && (
                 <ReactModal
-                    isOpen={openImageModal.isOpen}
+                    isOpen={openMediaModal.isOpen}
                     ariaHideApp={false}
                     overlayClassName="overlay"
                     closeTimeoutMS={200}
                     onRequestClose={handleCloseImageModal}
                     className="fixed top-0 right-0 bottom-0 left-0"
                 >
-                    <MessageImagesModel onClose={handleCloseImageModal} imageUrl={openImageModal.image} />
+                    <MessageImagesModel
+                        onClose={handleCloseImageModal}
+                        mediaUrl={openMediaModal.media.media_url}
+                        mediaType={openMediaModal.media.media_type}
+                    />
                 </ReactModal>
             )}
 
@@ -317,7 +342,7 @@ const MessageItem = ({ message, messageIndex, messages, currentUser, messageRef 
                                 ref={firstMessageRef}
                                 messageRef={messageRef}
                                 currentUser={currentUser}
-                                handleOpenImageModal={handleOpenImageModal}
+                                handleOpenMediaModal={handleOpenMediaModal}
                                 handleOpenReactionModal={handleOpenReactionModal}
                                 messages={messages}
                                 diffTime={diffTime}

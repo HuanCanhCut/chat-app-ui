@@ -4,10 +4,11 @@ import { Emoji as EmojiPicker, EmojiClickData, EmojiStyle } from 'emoji-picker-r
 import Tippy from 'huanpenguin-tippy-react'
 import HeadlessTippy from 'huanpenguin-tippy-react/headless'
 import pMap from 'p-map'
+import { toast } from 'sonner'
 import useSWR, { mutate } from 'swr'
 
 import { faImage, faSmile } from '@fortawesome/free-regular-svg-icons'
-import { faFolderPlus, faXmark } from '@fortawesome/free-solid-svg-icons'
+import { faFolderPlus, faPlay, faXmark } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Emoji from '~/components/Emoji'
 import { SendHorizontalIcon } from '~/components/Icons'
@@ -21,6 +22,7 @@ import { getCurrentUser } from '~/redux/selector'
 import * as cloudinaryService from '~/services/cloudinaryService'
 import * as conversationServices from '~/services/conversationService'
 import { ConversationMember, MessageMedia, MessageModel } from '~/type/type'
+import { validateMedia } from '~/utils/validateMediaUpload'
 
 interface InputMessageProps {
     className?: string
@@ -47,7 +49,7 @@ const InputMessage: React.FC<InputMessageProps> = () => {
         emojiOpen: false,
         emojiWrapperOpen: false,
     })
-    const [images, setImages] = useState<IFile[]>([])
+    const [media, setMedia] = useState<IFile[]>([])
     const [replyMessage, setReplyMessage] = useState<MessageModel | null>(null)
 
     const memberMap = useMemo(() => {
@@ -123,34 +125,14 @@ const InputMessage: React.FC<InputMessageProps> = () => {
         }
 
         // handle image message
-        if (images.length) {
-            // const uploadToCloudinary = async (file: File, folder: string, publicId: string) => {
-            //     const UPLOAD_PRESET = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET as string
-
-            //     const formData = new FormData()
-            //     formData.append('file', file)
-            //     formData.append('upload_preset', UPLOAD_PRESET)
-            //     formData.append('folder', folder)
-            //     formData.append('public_id', publicId)
-
-            //     const response = await fetch(
-            //         `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_NAME}/image/upload`,
-            //         {
-            //             method: 'POST',
-            //             body: formData,
-            //         },
-            //     )
-
-            //     return await response.json()
-            // }
-
+        if (media.length) {
             const { conversation_uuid, message } = messageDetails(
                 'media',
                 '',
-                images.map((image) => {
+                media.map((m) => {
                     return {
-                        media_type: 'image',
-                        media_url: image.preview!,
+                        media_type: m.type.split('/')[0] as 'video' | 'image',
+                        media_url: m.preview!,
                     }
                 }),
             )
@@ -174,7 +156,7 @@ const InputMessage: React.FC<InputMessageProps> = () => {
                 messageValue.trim().length ? 500 : 0,
             )
 
-            setImages([])
+            setMedia([])
 
             const folder = `chat-app-${process.env.NODE_ENV}/messages`
 
@@ -183,11 +165,11 @@ const InputMessage: React.FC<InputMessageProps> = () => {
             })
 
             const payload = await pMap(
-                images,
-                async (image) => {
-                    const [fileType] = image.type.split('/')
+                media,
+                async (m) => {
+                    const [fileType] = m.type.split('/')
 
-                    return uploadToCloudinary({ file: image, signature, type: fileType })
+                    return uploadToCloudinary({ file: m, signature, type: fileType })
                 },
                 {
                     concurrency: 5,
@@ -244,9 +226,23 @@ const InputMessage: React.FC<InputMessageProps> = () => {
         const files = e.target.files
 
         if (files?.length) {
-            Array.from(files).forEach((file: IFile) => {
+            const ACCEPTED_MEDIA = ['image/', 'video/']
+
+            const { invalidFiles, validFiles } = validateMedia(files, ACCEPTED_MEDIA)
+
+            if (invalidFiles.length > 0) {
+                toast.error('Chỉ chấp nhận tải lên ảnh và video')
+            }
+
+            validFiles.forEach((file: IFile) => {
+                // validate file max 10 MB
+                if (file.size > 10 * 1024 * 1024) {
+                    toast.error('File quá lớn, tối đa 10MB')
+                    return
+                }
+
                 file.preview = URL.createObjectURL(file)
-                setImages((prev) => [...prev, file])
+                setMedia((prev) => [...prev, file])
             })
         }
 
@@ -258,7 +254,7 @@ const InputMessage: React.FC<InputMessageProps> = () => {
 
     useEffect(() => {
         return () => {
-            images.forEach((file) => {
+            media.forEach((file) => {
                 file.preview && URL.revokeObjectURL(file.preview)
             })
         }
@@ -309,17 +305,17 @@ const InputMessage: React.FC<InputMessageProps> = () => {
         inputFileRef.current?.click()
     }
 
-    const handleRemoveImage = (index: number) => {
+    const handleRemoveMedia = (index: number) => {
         // revoke object url of image
-        const imagePreview = images[index].preview
+        const imagePreview = media[index].preview
 
         if (imagePreview) {
             URL.revokeObjectURL(imagePreview)
         }
 
-        const newImages = [...images]
-        newImages.splice(index, 1)
-        setImages(newImages)
+        const newMedia = [...media]
+        newMedia.splice(index, 1)
+        setMedia(newMedia)
     }
 
     useEffect(() => {
@@ -339,7 +335,7 @@ const InputMessage: React.FC<InputMessageProps> = () => {
                 const file = item.getAsFile() as IFile
                 if (file) {
                     file.preview = URL.createObjectURL(file)
-                    setImages((prev) => [...prev, file])
+                    setMedia((prev) => [...prev, file])
                 }
             }
         }
@@ -381,17 +377,9 @@ const InputMessage: React.FC<InputMessageProps> = () => {
                 </div>
             )}
             <div className="flex w-full items-center justify-between gap-2 px-2 py-4 pt-2">
-                <input
-                    ref={inputFileRef}
-                    id="image-input"
-                    type="file"
-                    accept="image/*"
-                    hidden
-                    multiple
-                    onChange={handleUploadImage}
-                />
+                <input ref={inputFileRef} id="image-input" type="file" hidden multiple onChange={handleUploadImage} />
                 <div
-                    className={`flex cursor-pointer items-center p-2 ${images.length > 0 || textareaRows() > 1 ? 'self-end' : 'self-center'}`}
+                    className={`flex cursor-pointer items-center p-2 ${media.length > 0 || textareaRows() > 1 ? 'self-end' : 'self-center'}`}
                 >
                     <Tippy delay={[200, 0]} content="Đính kèm hình ảnh có kích thước tối đa là 10MB">
                         <div className="flex-center" onClick={handleOpenUploadImage}>
@@ -403,7 +391,7 @@ const InputMessage: React.FC<InputMessageProps> = () => {
                 </div>
                 <div className="relative flex grow">
                     <div className="flex w-full flex-col justify-center">
-                        {images.length > 0 && (
+                        {media.length > 0 && (
                             <div className="bg-light-gray flex w-full max-w-full items-center gap-3 overflow-x-auto rounded-t-2xl p-3 dark:bg-[#333334]">
                                 <Tippy content="Tải lên hình ảnh khác" delay={[200, 0]}>
                                     <button
@@ -417,22 +405,47 @@ const InputMessage: React.FC<InputMessageProps> = () => {
                                         />
                                     </button>
                                 </Tippy>
-                                {images.map((image, index) => {
+                                {media.map((m, index) => {
                                     return (
                                         <div key={index} className="relative shrink-0">
-                                            <CustomImage
-                                                src={image.preview}
-                                                alt="image"
-                                                width={48}
-                                                height={48}
-                                                className="rounded-lg"
-                                                style={{ objectFit: 'cover', width: '48px', height: '48px' }}
-                                                priority
-                                                quality={100}
-                                            />
+                                            {(() => {
+                                                switch (m.type.split('/')[0]) {
+                                                    case 'image':
+                                                        return (
+                                                            <CustomImage
+                                                                src={m.preview}
+                                                                alt="image"
+                                                                width={48}
+                                                                height={48}
+                                                                className="rounded-lg"
+                                                                style={{
+                                                                    objectFit: 'cover',
+                                                                    width: '48px',
+                                                                    height: '48px',
+                                                                }}
+                                                                priority
+                                                                quality={100}
+                                                            />
+                                                        )
+                                                    case 'video':
+                                                        return (
+                                                            <>
+                                                                <div className="flex-center absolute top-1/2 left-1/2 h-6 w-6 -translate-x-1/2 -translate-y-1/2 rounded-full">
+                                                                    <FontAwesomeIcon icon={faPlay} />
+                                                                </div>
+
+                                                                <video
+                                                                    className="h-12 w-12 rounded-lg object-cover"
+                                                                    src={m.preview}
+                                                                />
+                                                            </>
+                                                        )
+                                                }
+                                            })()}
+
                                             <button
                                                 onClick={() => {
-                                                    handleRemoveImage(index)
+                                                    handleRemoveMedia(index)
                                                 }}
                                                 className="flex-center border-opacity-20 bg-light-gray absolute -top-2 -right-2 h-6 w-6 rounded-full border border-black p-1 hover:bg-[#e2e4e8] dark:bg-[#333334] dark:hover:bg-[#3c3c3d]"
                                             >
@@ -444,7 +457,7 @@ const InputMessage: React.FC<InputMessageProps> = () => {
                             </div>
                         )}
                         <textarea
-                            className={`bg-light-gray max-h-[140px] min-h-9 w-full resize-none rounded-3xl px-4 py-1 pt-1.5 pr-12 outline-hidden dark:bg-[#333334] ${images.length && 'rounded-t-none'}`}
+                            className={`max-h-[140px] min-h-9 w-full resize-none rounded-3xl bg-(--receiver-light-background-color) px-4 py-1 pt-1.5 pr-12 text-(--receiver-light-text-color) outline-hidden dark:bg-(--receiver-dark-background-color) dark:text-(--receiver-dark-text-color) ${media.length && 'rounded-t-none'}`}
                             value={messageValue}
                             autoFocus
                             onChange={handleInputChange}
@@ -486,11 +499,11 @@ const InputMessage: React.FC<InputMessageProps> = () => {
                 </div>
                 <div
                     // prettier-ignore
-                    className={`flex-center ${images.length > 0 || textareaRows() > 1 ? 'self-end' : 'self-center'}`}
+                    className={`flex-center ${media.length > 0 || textareaRows() > 1 ? 'self-end' : 'self-center'}`}
                 >
-                    {messageValue.length || images.length > 0 ? (
+                    {messageValue.length || media.length > 0 ? (
                         <button
-                            className="hover:bg-light-gray dark:hover:bg-dark-gray rounded-full p-2"
+                            className="hover:bg-light-gray dark:hover:bg-dark-gray/30 cursor-pointer rounded-full p-2"
                             onClick={() => handleEmitMessage(uuid as string)}
                         >
                             <SendHorizontalIcon />
