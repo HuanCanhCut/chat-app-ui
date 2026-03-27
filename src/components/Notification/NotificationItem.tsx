@@ -13,7 +13,7 @@ import UserAvatar from '~/components/UserAvatar/UserAvatar'
 import config from '~/config'
 import { listenEvent, sendEvent } from '~/helpers/events'
 import * as NotificationServices from '~/services/notificationService'
-import { NotificationData } from '~/type/type'
+import { NotificationModel } from '~/type/type'
 import { handleAcceptFriend, handleRejectFriendRequest } from '~/utils/friendEvent'
 import { momentTimezone } from '~/utils/moment'
 
@@ -21,7 +21,7 @@ const NotificationItem = ({
     notification,
     notificationIcon,
 }: {
-    notification: NotificationData
+    notification: NotificationModel
     notificationIcon: any
 }) => {
     const [isAccept, setIsAccept] = useState(false)
@@ -34,7 +34,7 @@ const NotificationItem = ({
     }
 
     const handleAccept = async () => {
-        const response = await handleAcceptFriend(notification.sender_id, notification.sender_user.nickname)
+        const response = await handleAcceptFriend(notification.actor_id, notification.actor.nickname)
         if (response) {
             setIsAccept(true)
         }
@@ -140,16 +140,12 @@ const NotificationItem = ({
                     </div>
                 </CustomTippy>
                 <Link
-                    href={`${config.routes.user}/@${notification.sender_user.nickname}`}
+                    href={`${config.routes.user}/@${notification.actor.nickname}`}
                     className={`mt-4 flex gap-3 ${notification.is_read ? 'pr-3' : ''}`}
                     onClick={handleReadNotification}
                 >
                     <div className="relative">
-                        <UserAvatar
-                            src={notification.sender_user.avatar}
-                            size={56}
-                            className="aspect-square min-w-[56px]"
-                        />
+                        <UserAvatar src={notification.actor.avatar} size={56} className="aspect-square min-w-[56px]" />
                         <div className="flex-center absolute right-0 bottom-[-3px] gap-2">
                             <div
                                 className="flex-center h-7 w-7 rounded-full text-white"
@@ -167,8 +163,8 @@ const NotificationItem = ({
                             dangerouslySetInnerHTML={{
                                 __html: `
                                 ${notification.message.replace(
-                                    `${notification.sender_user.full_name.trim()}`,
-                                    `<span class="font-semibold">${notification.sender_user.full_name.trim()}</span>`,
+                                    `${notification.actor.full_name.trim()}`,
+                                    `<span class="font-semibold">${notification.actor.full_name.trim()}</span>`,
                                 )}`,
                             }}
                             className={`pr-4 text-sm font-normal ${notification.is_read ? 'text-gray-600 dark:text-gray-400' : 'text-gray-800 dark:text-gray-200'}`}
@@ -193,7 +189,7 @@ const NotificationItem = ({
                     <Button
                         buttonType="rounded"
                         className="inline-block flex-1"
-                        onClick={() => handleRejectFriendRequest(notification.sender_id)}
+                        onClick={() => handleRejectFriendRequest(notification.actor_id)}
                     >
                         Xóa
                     </Button>

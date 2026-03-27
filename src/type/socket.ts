@@ -5,6 +5,7 @@ import {
     ConversationThemeModel,
     MessageModel,
     MessageReactionModel,
+    NotificationModel,
     UserModel,
 } from './type'
 
@@ -213,22 +214,7 @@ interface ServerToClientEvents {
     NEW_CONVERSATION: (conversation: ConversationModel) => void
 
     // ------------------------------- Notification -------------------------------
-    NEW_NOTIFICATION: ({
-        notification,
-    }: {
-        notification: {
-            sender_id: number
-            sender_user: UserModel
-            id?: number
-            type: 'friend_request' | 'accept_friend_request' | 'message'
-            recipient_id: number
-            message: string
-            is_read?: boolean
-            is_seen?: boolean
-            created_at?: Date
-            updated_at?: Date
-        }
-    }) => void
+    NEW_NOTIFICATION: ({ notification }: { notification: NotificationModel }) => void
 
     REMOVE_NOTIFICATION: ({ notification_id }: { notification_id?: number }) => void
 }

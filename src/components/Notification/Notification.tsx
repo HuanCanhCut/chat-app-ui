@@ -13,7 +13,7 @@ import SWRKey from '~/enum/SWRKey'
 import { listenEvent } from '~/helpers/events'
 import socket from '~/helpers/socket'
 import * as notificationServices from '~/services/notificationService'
-import { NotificationData, NotificationResponse } from '~/type/type'
+import { NotificationModel, NotificationResponse } from '~/type/type'
 
 const PER_PAGE = 6
 
@@ -33,7 +33,7 @@ const Notification = () => {
 
     // Count notification
     useMemo(() => {
-        const count = notifications?.data.reduce((acc: number, curr: NotificationData) => {
+        const count = notifications?.data.reduce((acc: number, curr: NotificationModel) => {
             return acc + (curr.is_seen ? 0 : 1)
         }, 0)
 
@@ -83,7 +83,7 @@ const Notification = () => {
         if (notificationUnSeenCount) {
             notificationServices.seen()
 
-            const newData = notifications?.data.map((notification: NotificationData) => ({
+            const newData = notifications?.data.map((notification: NotificationModel) => ({
                 ...notification,
                 is_seen: true,
             }))
@@ -104,7 +104,7 @@ const Notification = () => {
 
     // Listen event new notification
     useEffect(() => {
-        const socketHandler = (newNotification: { notification: NotificationData }) => {
+        const socketHandler = (newNotification: { notification: NotificationModel }) => {
             if (!notifications) {
                 return
             }
@@ -141,7 +141,7 @@ const Notification = () => {
             }
 
             const newNotifications = notifications.data.filter(
-                (notification: NotificationData) => notification.id !== notification_id,
+                (notification: NotificationModel) => notification.id !== notification_id,
             )
 
             mutateNotifications(
@@ -174,7 +174,7 @@ const Notification = () => {
             }
 
             const newNotifications = {
-                data: notifications?.data.map((notification: NotificationData) => ({
+                data: notifications?.data.map((notification: NotificationModel) => ({
                     ...notification,
                     is_read: notification.id === notificationId ? type === 'read' : notification.is_read,
                 })),
@@ -194,7 +194,7 @@ const Notification = () => {
     useEffect(() => {
         const remove = listenEvent('NOTIFICATION:DELETE-NOTIFICATION', ({ notificationId }) => {
             const newNotifications = notifications?.data.filter(
-                (notification: NotificationData) => notification.id !== notificationId,
+                (notification: NotificationModel) => notification.id !== notificationId,
             )
 
             if (notifications) {
@@ -288,7 +288,7 @@ const Notification = () => {
                 <main className="mt-2">
                     {notifications ? (
                         <>
-                            {notifications.data.map((notification: NotificationData) => {
+                            {notifications.data.map((notification: NotificationModel) => {
                                 return (
                                     <React.Fragment key={notification.id}>
                                         <NotificationItem
