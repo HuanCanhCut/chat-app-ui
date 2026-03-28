@@ -1,12 +1,15 @@
 import { memo, useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
+import { Emoji, EmojiStyle } from 'emoji-picker-react'
+import { SendIcon } from 'lucide-react'
 import { toast } from 'sonner'
 
 import 'moment/locale/vi'
 import ConfirmModel from '../ConfirmModal'
 import CustomTippy from '../CustomTippy/CustomTippy'
+import { AngryIcon, CareIcon, HahaIcon, HeartIcon, LikeIcon, SadIcon, WowIcon } from '../Icons'
 import PopperWrapper from '../PopperWrapper/PopperWrapper'
-import { faCheck, faEllipsis, faTrash } from '@fortawesome/free-solid-svg-icons'
+import { faCheck, faEllipsis, faTrash, faUser } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Button from '~/components/Button/Button'
 import UserAvatar from '~/components/UserAvatar/UserAvatar'
@@ -17,15 +20,29 @@ import { NotificationModel } from '~/type/type'
 import { handleAcceptFriend, handleRejectFriendRequest } from '~/utils/friendEvent'
 import { momentTimezone } from '~/utils/moment'
 
-const NotificationItem = ({
-    notification,
-    notificationIcon,
-}: {
-    notification: NotificationModel
-    notificationIcon: any
-}) => {
+interface NotificationIcon {
+    backgroundColor: string
+    icon: React.ReactNode
+}
+
+const NotificationItem = ({ notification }: { notification: NotificationModel }) => {
     const [isAccept, setIsAccept] = useState(false)
     const [isOpenConfirmModel, setIsOpenConfirmModel] = useState(false)
+
+    const notificationIcon: Record<string, NotificationIcon> = {
+        friend_request: {
+            backgroundColor: '#1086ee',
+            icon: <FontAwesomeIcon icon={faUser} />,
+        },
+        accept_friend_request: {
+            backgroundColor: '#1086ee',
+            icon: <FontAwesomeIcon icon={faUser} />,
+        },
+        message: {
+            backgroundColor: '#41cc64',
+            icon: <SendIcon />,
+        },
+    }
 
     const tippyInstance = useRef<any>(null)
 
@@ -146,16 +163,46 @@ const NotificationItem = ({
                 >
                     <div className="relative">
                         <UserAvatar src={notification.actor.avatar} size={56} className="aspect-square min-w-[56px]" />
-                        <div className="flex-center absolute right-0 bottom-[-3px] gap-2">
-                            <div
-                                className="flex-center h-7 w-7 rounded-full text-white"
-                                style={{
-                                    backgroundColor: notificationIcon[notification.type].backgroundColor,
-                                }}
-                            >
-                                {notificationIcon[notification.type].icon}
-                            </div>
-                        </div>
+                        {(() => {
+                            switch (notification.type) {
+                                case 'friend_request':
+                                case 'accept_friend_request':
+                                case 'message':
+                                    return (
+                                        <div className="flex-center absolute right-0 bottom-[-3px] gap-2">
+                                            <div
+                                                className="flex-center h-7 w-7 rounded-full text-white"
+                                                style={{
+                                                    backgroundColor:
+                                                        notificationIcon[notification.type].backgroundColor,
+                                                }}
+                                            >
+                                                {notificationIcon[notification.type].icon}
+                                            </div>
+                                        </div>
+                                    )
+                                case 'reaction':
+                                    const iconMapping = {
+                                        '1f44d': <LikeIcon width={28} height={28} />,
+                                        '1f970': <CareIcon width={28} height={28} />,
+                                        '2764-fe0f': <HeartIcon width={28} height={28} />,
+                                        '1f602': <HahaIcon width={28} height={28} />,
+                                        '1f62e': <WowIcon width={28} height={28} />,
+                                        '1f622': <SadIcon width={28} height={28} />,
+                                        '1f621': <AngryIcon width={28} height={28} />,
+                                    }
+
+                                    const unified = JSON.parse(notification.metadata || '""').reaction
+
+                                    return (
+                                        <div className="absolute right-0 bottom-0">
+                                            {iconMapping[unified?.toLowerCase() as keyof typeof iconMapping]}
+                                        </div>
+                                    )
+                                default:
+                                    return null
+                            }
+                        })()}
                     </div>
 
                     <div>
@@ -170,7 +217,7 @@ const NotificationItem = ({
                             className={`pr-4 text-sm font-normal ${notification.is_read ? 'text-gray-600 dark:text-gray-400' : 'text-gray-800 dark:text-gray-200'}`}
                         ></p>
                         <small
-                            className={`text-xs ${!notification.is_read ? 'text-primary' : 'text-gray-600 dark:text-gray-400'} font-normal`}
+                            className={`text-xs ${!notification.is_read ? 'text-primary' : 'text-gray-600 dark:text-gray-400'} font-medium`}
                         >
                             {momentTimezone(notification.created_at!)}
                         </small>

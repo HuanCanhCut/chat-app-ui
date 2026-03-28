@@ -265,7 +265,7 @@ export interface NotificationModel extends BaseModel {
     is_read?: boolean
     is_seen?: boolean
     actor_id: number
-    metadata?: JSON
+    metadata?: string
     target_type: string
     target_id: number
     actor: UserModel

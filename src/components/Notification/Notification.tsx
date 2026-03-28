@@ -3,11 +3,10 @@ import Skeleton from 'react-loading-skeleton'
 import useSWR from 'swr'
 
 import NotificationItem from './NotificationItem'
-import { faBell, faUser } from '@fortawesome/free-solid-svg-icons'
+import { faBell } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Button from '~/components/Button/Button'
 import CustomTippy from '~/components/CustomTippy/CustomTippy'
-import { SendIcon } from '~/components/Icons/Icons'
 import PopperWrapper from '~/components/PopperWrapper'
 import SWRKey from '~/enum/SWRKey'
 import { listenEvent } from '~/helpers/events'
@@ -43,21 +42,6 @@ const Notification = () => {
     }, [notifications])
 
     const tippyInstanceRef = useRef<InstanceType<any>>(null)
-
-    const notificationIcon = {
-        friend_request: {
-            backgroundColor: '#1086ee',
-            icon: <FontAwesomeIcon icon={faUser} />,
-        },
-        accept_friend_request: {
-            backgroundColor: '#1086ee',
-            icon: <FontAwesomeIcon icon={faUser} />,
-        },
-        message: {
-            backgroundColor: '#41cc64',
-            icon: <SendIcon />,
-        },
-    }
 
     interface Tab {
         name: string
@@ -291,10 +275,7 @@ const Notification = () => {
                             {notifications.data.map((notification: NotificationModel) => {
                                 return (
                                     <React.Fragment key={notification.id}>
-                                        <NotificationItem
-                                            notification={notification}
-                                            notificationIcon={notificationIcon}
-                                        />
+                                        <NotificationItem notification={notification} />
                                     </React.Fragment>
                                 )
                             })}

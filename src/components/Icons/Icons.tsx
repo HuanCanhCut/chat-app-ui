@@ -317,3 +317,563 @@ export const OutgoingCallIcon = ({ width = 20, height = 20, className }: IconPro
         </svg>
     )
 }
+
+/**
+ * Reaction Icon
+ */
+
+export const LikeIcon = ({ width = 20, height = 20, className }: IconProps) => {
+    return (
+        <svg
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 16 16"
+            width={width}
+            height={height}
+            className={className}
+        >
+            <path
+                d="M16.0001 7.9996c0 4.418-3.5815 7.9996-7.9995 7.9996S.001 12.4176.001 7.9996 3.5825 0 8.0006 0C12.4186 0 16 3.5815 16 7.9996Z"
+                fill="url(#paint0_linear)"
+            />
+            <path
+                d="M16.0001 7.9996c0 4.418-3.5815 7.9996-7.9995 7.9996S.001 12.4176.001 7.9996 3.5825 0 8.0006 0C12.4186 0 16 3.5815 16 7.9996Z"
+                fill="url(#paint1_radial)"
+            />
+            <path
+                d="M16.0001 7.9996c0 4.418-3.5815 7.9996-7.9995 7.9996S.001 12.4176.001 7.9996 3.5825 0 8.0006 0C12.4186 0 16 3.5815 16 7.9996Z"
+                fill="url(#paint2_radial)"
+                fillOpacity=".5"
+            />
+            <path
+                d="M7.3014 3.8662a.6974.6974 0 0 1 .6974-.6977c.6742 0 1.2207.5465 1.2207 1.2206v1.7464a.101.101 0 0 0 .101.101h1.7953c.992 0 1.7232.9273 1.4917 1.892l-.4572 1.9047a2.301 2.301 0 0 1-2.2374 1.764H6.9185a.5752.5752 0 0 1-.5752-.5752V7.7384c0-.4168.097-.8278.2834-1.2005l.2856-.5712a3.6878 3.6878 0 0 0 .3893-1.6509l-.0002-.4496Z"
+                fill="#fff"
+            />
+            <path
+                d="M4.367 7a.767.767 0 0 0-.7669.767v3.2598a.767.767 0 0 0 .767.767h.767a.3835.3835 0 0 0 .3835-.3835V7.3835A.3835.3835 0 0 0 5.134 7h-.767Z"
+                fill="#fff"
+            />
+            <defs>
+                <linearGradient
+                    id="paint0_linear"
+                    x1="2.3989"
+                    y1="2.3999"
+                    x2="13.5983"
+                    y2="13.5993"
+                    gradientUnits="userSpaceOnUse"
+                >
+                    <stop stopColor="#02ADFC" />
+                    <stop offset=".5" stopColor="#0866FF" />
+                    <stop offset="1" stopColor="#2B7EFF" />
+                </linearGradient>
+                <radialGradient
+                    id="paint1_radial"
+                    cx="0"
+                    cy="0"
+                    r="1"
+                    gradientUnits="userSpaceOnUse"
+                    gradientTransform="rotate(90 .0005 8) scale(7.99958)"
+                >
+                    <stop offset=".5618" stopColor="#0866FF" stopOpacity="0" />
+                    <stop offset="1" stopColor="#0866FF" stopOpacity=".1" />
+                </radialGradient>
+                <radialGradient
+                    id="paint2_radial"
+                    cx="0"
+                    cy="0"
+                    r="1"
+                    gradientUnits="userSpaceOnUse"
+                    gradientTransform="rotate(45 -4.5257 10.9237) scale(10.1818)"
+                >
+                    <stop offset=".3143" stopColor="#02ADFC" />
+                    <stop offset="1" stopColor="#02ADFC" stopOpacity="0" />
+                </radialGradient>
+            </defs>
+        </svg>
+    )
+}
+
+export const HahaIcon = ({ width = 20, height = 20, className }: IconProps) => {
+    return (
+        <svg
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 16 16"
+            width={width}
+            height={height}
+            className={className}
+        >
+            <g clip-path="url(#clip0)">
+                <path
+                    d="M15.9953 7.9996c0 4.418-3.5816 7.9996-7.9996 7.9996S-.004 12.4176-.004 7.9996 3.5776 0 7.9957 0c4.418 0 7.9996 3.5815 7.9996 7.9996Z"
+                    fill="url(#paint0_linear)"
+                />
+
+                <path
+                    d="M15.9973 7.9992c0 4.4178-3.5811 7.9992-7.9987 7.9992C3.5811 15.9984 0 12.417 0 7.9992S3.5811 0 7.9986 0c4.4176 0 7.9987 3.5814 7.9987 7.9992Z"
+                    fill="url(#paint1_radial)"
+                />
+
+                <path
+                    d="M15.9953 7.9996c0 4.418-3.5816 7.9996-7.9996 7.9996S-.004 12.4176-.004 7.9996 3.5776 0 7.9957 0c4.418 0 7.9996 3.5815 7.9996 7.9996Z"
+                    fill="url(#paint2_radial)"
+                    fillOpacity=".8"
+                />
+
+                <path
+                    d="M12.5278 8.1957c.4057.1104.6772.4854.623.9024-.3379 2.6001-2.5167 4.9012-5.1542 4.9012s-4.8163-2.3011-5.1542-4.9012c-.0542-.417.2173-.792.623-.9024.8708-.237 2.5215-.596 4.5312-.596 2.0098 0 3.6605.359 4.5312.596Z"
+                    fill="#4B280E"
+                />
+
+                <path
+                    d="M11.5809 12.3764c-.9328.9843-2.1948 1.6228-3.5841 1.6228-1.3892 0-2.6512-.6383-3.5839-1.6225a1.5425 1.5425 0 0 0-.016-.0174c.4475-1.0137 2.2-1.3599 3.5999-1.3599 1.4 0 3.1514.3468 3.5998 1.3599l-.0157.0171Z"
+                    fill="url(#paint3_linear)"
+                />
+
+                <path
+                    fillRule="evenodd"
+                    clipRule="evenodd"
+                    d="M13.3049 5.8793c.1614-1.1485-.6387-2.2103-1.7872-2.3717l-.0979-.0138c-1.1484-.1614-2.2103.6388-2.3717 1.7872l-.0163.1164a.5.5 0 0 0 .9902.1392l.0163-.1164c.0846-.6016.6408-1.0207 1.2424-.9362l.0978.0138c.6016.0845 1.0207.6407.9362 1.2423l-.0164.1164a.5.5 0 0 0 .9903.1392l.0163-.1164ZM2.6902 5.8793c-.1614-1.1485.6387-2.2103 1.7872-2.3717l.0979-.0138c1.1484-.1614 2.2103.6388 2.3717 1.7872l.0164.1164a.5.5 0 1 1-.9903.1392l-.0163-.1164c-.0846-.6016-.6408-1.0207-1.2423-.9362l-.098.0138c-.6015.0845-1.0206.6407-.936 1.2423l.0163.1164a.5.5 0 0 1-.9902.1392l-.0164-.1164Z"
+                    fill="#1C1C1D"
+                />
+            </g>
+
+            <defs>
+                <radialGradient
+                    id="paint1_radial"
+                    cx="0"
+                    cy="0"
+                    r="1"
+                    gradientUnits="userSpaceOnUse"
+                    gradientTransform="matrix(0 7.9992 -7.99863 0 7.9986 7.9992)"
+                >
+                    <stop offset=".5637" stopColor="#FF5758" stopOpacity="0" />
+                    <stop offset="1" stopColor="#FF5758" stopOpacity=".1" />
+                </radialGradient>
+
+                <radialGradient
+                    id="paint2_radial"
+                    cx="0"
+                    cy="0"
+                    r="1"
+                    gradientUnits="userSpaceOnUse"
+                    gradientTransform="rotate(45 -4.5272 10.9202) scale(10.1818)"
+                >
+                    <stop stopColor="#FFF287" />
+                    <stop offset="1" stopColor="#FFF287" stopOpacity="0" />
+                </radialGradient>
+
+                <linearGradient
+                    id="paint0_linear"
+                    x1="2.396"
+                    y1="2.3999"
+                    x2="13.5954"
+                    y2="13.5993"
+                    gradientUnits="userSpaceOnUse"
+                >
+                    <stop stopColor="#FFF287" />
+                    <stop offset="1" stopColor="#F68628" />
+                </linearGradient>
+
+                <linearGradient
+                    id="paint3_linear"
+                    x1="5.1979"
+                    y1="10.7996"
+                    x2="5.245"
+                    y2="14.2452"
+                    gradientUnits="userSpaceOnUse"
+                >
+                    <stop stopColor="#FF60A4" />
+                    <stop offset=".2417" stopColor="#FA2E3E" />
+                    <stop offset="1" stopColor="#BC0A26" />
+                </linearGradient>
+
+                <clipPath id="clip0">
+                    <path fill="#fff" d="M-.002 0h16v15.9992h-16z" />
+                </clipPath>
+            </defs>
+        </svg>
+    )
+}
+
+export const HeartIcon = ({ width = 20, height = 20, className }: IconProps) => {
+    return (
+        <svg
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 16 16"
+            width={width}
+            height={height}
+            className={className}
+        >
+            <g clipPath="url(#clip0)">
+                <path
+                    d="M15.9963 8c0 4.4179-3.5811 7.9993-7.9986 7.9993-4.4176 0-7.9987-3.5814-7.9987-7.9992 0-4.4179 3.5811-7.9992 7.9987-7.9992 4.4175 0 7.9986 3.5813 7.9986 7.9992Z"
+                    fill="url(#paint0_linear)"
+                />
+                <path
+                    d="M15.9973 7.9992c0 4.4178-3.5811 7.9992-7.9987 7.9992C3.5811 15.9984 0 12.417 0 7.9992S3.5811 0 7.9986 0c4.4176 0 7.9987 3.5814 7.9987 7.9992Z"
+                    fill="url(#paint1_radial)"
+                />
+                <path
+                    d="M7.9996 5.9081c-.3528-.8845-1.1936-1.507-2.1748-1.507-1.4323 0-2.4254 1.328-2.4254 2.6797 0 2.2718 2.3938 4.0094 4.0816 5.1589.3168.2157.7205.2157 1.0373 0 1.6878-1.1495 4.0815-2.8871 4.0815-5.159 0-1.3517-.993-2.6796-2.4254-2.6796-.9811 0-1.822.6225-2.1748 1.507Z"
+                    fill="#fff"
+                />
+            </g>
+
+            <defs>
+                <linearGradient
+                    id="paint0_linear"
+                    x1="2.3986"
+                    y1="2.4007"
+                    x2="13.5975"
+                    y2="13.5993"
+                    gradientUnits="userSpaceOnUse"
+                >
+                    <stop stopColor="#FF74AE" />
+                    <stop offset=".5001" stopColor="#FA2E3E" />
+                    <stop offset="1" stopColor="#FF5758" />
+                </linearGradient>
+
+                <radialGradient
+                    id="paint1_radial"
+                    cx="0"
+                    cy="0"
+                    r="1"
+                    gradientUnits="userSpaceOnUse"
+                    gradientTransform="matrix(0 7.9992 -7.99863 0 7.9986 7.9992)"
+                >
+                    <stop offset=".5637" stopColor="#E11731" stopOpacity="0" />
+                    <stop offset="1" stopColor="#E11731" stopOpacity=".1" />
+                </radialGradient>
+
+                <clipPath id="clip0">
+                    <path fill="#fff" d="M-.001.0009h15.9992v15.9984H-.001z" />
+                </clipPath>
+            </defs>
+        </svg>
+    )
+}
+
+export const CareIcon = ({ width = 20, height = 20, className }: IconProps) => {
+    return (
+        <svg
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 16 16"
+            width={width}
+            height={height}
+            className={className}
+        >
+            <g clipPath="url(#clip0)">
+                <path
+                    d="M15.9982 7.9998c0 4.4181-3.5815 7.9996-7.9996 7.9996-4.418 0-7.9996-3.5815-7.9996-7.9996 0-4.418 3.5816-7.9996 7.9996-7.9996 4.4181 0 7.9996 3.5816 7.9996 7.9996Z"
+                    fill="url(#paint0)"
+                />
+                <path
+                    d="M15.9973 7.9992c0 4.4178-3.5811 7.9992-7.9987 7.9992C3.5811 15.9984 0 12.417 0 7.9992S3.5811 0 7.9986 0c4.4176 0 7.9987 3.5814 7.9987 7.9992Z"
+                    fill="url(#paint1)"
+                />
+
+                <mask id="mask0" maskUnits="userSpaceOnUse" x="6" y="13" width="8" height="3">
+                    <path
+                        d="M13.6084 13.7029c-1.4438 1.4203-3.4244 2.2965-5.6097 2.2965a8.0393 8.0393 0 0 1-1.5715-.1543c.6898-.2867 1.6353-.7368 2.5437-1.3171 1.2793.5295 3.4828.2415 4.6285-.8326l.009.0075Z"
+                        fill="#fff"
+                    />
+                </mask>
+
+                <g mask="url(#mask0)">
+                    <path
+                        d="M15.9982 7.9998c0 4.4181-3.5815 7.9996-7.9996 7.9996-4.418 0-7.9996-3.5815-7.9996-7.9996 0-4.418 3.5816-7.9996 7.9996-7.9996 4.4181 0 7.9996 3.5816 7.9996 7.9996Z"
+                        fill="url(#paint2)"
+                    />
+                </g>
+
+                <path d="M7.9977 6.8c.71 0 1.1723-.1164 1.4952-.2331..." fill="#4B280E" />
+                <path d="M10.1526 2.0928a3.3945 3.3945 0 0 1 2.0299..." fill="#E0761A" />
+                <path d="M9.998 4.3577c-.001.7238.483.936..." fill="#1C1C1D" />
+            </g>
+
+            <defs>
+                <linearGradient id="paint0" x1="2.5" y1="2.5" x2="16" y2="16">
+                    <stop offset=".26" stopColor="#FFF287" />
+                    <stop offset="1" stopColor="#F68628" />
+                </linearGradient>
+
+                <radialGradient id="paint1" cx="0" cy="0" r="1">
+                    <stop offset=".56" stopColor="#FF5758" stopOpacity="0" />
+                    <stop offset="1" stopColor="#FF5758" stopOpacity=".1" />
+                </radialGradient>
+
+                <linearGradient id="paint2" x1="10" y1="14.5" x2="10" y2="17">
+                    <stop stopColor="#FFF287" stopOpacity="0" />
+                    <stop offset="1" stopColor="#FFF287" />
+                </linearGradient>
+
+                <clipPath id="clip0">
+                    <path d="M0 0h16v16H0z" fill="#fff" />
+                </clipPath>
+            </defs>
+        </svg>
+    )
+}
+
+export const SadIcon = ({ width = 20, height = 20, className }: IconProps) => {
+    return (
+        <svg
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 16 16"
+            width={width}
+            height={height}
+            className={className}
+        >
+            <g clipPath="url(#clip0)">
+                <path
+                    d="M15.9943 8.0004c0 4.4181-3.5815 7.9996-7.9996 7.9996-4.418 0-7.9996-3.5815-7.9996-7.9996 0-4.418 3.5816-7.9995 7.9996-7.9995 4.4181 0 7.9996 3.5815 7.9996 7.9995Z"
+                    fill="url(#paint0)"
+                />
+                <path
+                    d="M15.9973 7.9992c0 4.4178-3.5811 7.9992-7.9987 7.9992C3.5811 15.9984 0 12.417 0 7.9992S3.5811 0 7.9986 0c4.4176 0 7.9987 3.5814 7.9987 7.9992Z"
+                    fill="url(#paint1)"
+                />
+                <path
+                    d="M15.9943 8.0004c0 4.4181-3.5815 7.9996-7.9996 7.9996-4.418 0-7.9996-3.5815-7.9996-7.9996 0-4.418 3.5816-7.9995 7.9996-7.9995 4.4181 0 7.9996 3.5815 7.9996 7.9995Z"
+                    fill="url(#paint2)"
+                    fillOpacity=".8"
+                />
+
+                {/* Eyes */}
+                <path
+                    d="M12.3964 9.0861c0 1.1142-.3999 1.1142-1.1999 1.1142-.7999 0-1.2 0-1.2-1.1142 0-.8205.5373-1.4856 1.2-1.4856s1.1999.6651 1.1999 1.4856ZM5.9965 9.0861c0 1.1142-.4 1.1142-1.1999 1.1142-.8 0-1.2 0-1.2-1.1142 0-.8205.5373-1.4856 1.2-1.4856s1.2.6651 1.2 1.4856Z"
+                    fill="#1C1C1D"
+                />
+
+                {/* Mouth */}
+                <path
+                    fillRule="evenodd"
+                    clipRule="evenodd"
+                    d="M7.9946 11.2002c1.6447 0 2.3999 1.0936 2.3999 1.4122 0 .1095-.084.1877-.2248.1877-.3152 0-.752-.4-2.1751-.4s-1.8599.4-2.175.4c-.1409 0-.2249-.0782-.2249-.1877 0-.3186.7552-1.4122 2.3999-1.4122Z"
+                    fill="#4B280E"
+                />
+
+                {/* Eyebrows */}
+                <path
+                    fillRule="evenodd"
+                    clipRule="evenodd"
+                    d="M10.7861 6.3078a3.3942 3.3942 0 0 1 1.8777 1.0409.4.4 0 0 0 .5892-.5411 4.1944 4.1944 0 0 0-2.3202-1.2862.4.4 0 1 0-.1467.7864ZM5.206 6.3078a3.3946 3.3946 0 0 0-1.8777 1.0409.4.4 0 1 1-.5891-.5411 4.1946 4.1946 0 0 1 2.3202-1.2862.4.4 0 0 1 .1467.7864Z"
+                    fill="#E0761A"
+                />
+
+                {/* Tear */}
+                <g filter="url(#tearShadow)">
+                    <path
+                        d="M2.9952 11.2004c-.2647-.003-.435.1598-1.1536 1.3088-.3267.5231-.6468 1.0515-.6468 1.691 0 .994.8 1.7999 1.8 1.7999.9999 0 1.8008-.8 1.8008-1.7999 0-.6395-.32-1.1679-.6468-1.691-.7186-1.149-.8887-1.3118-1.1536-1.3088Z"
+                        fill="#02ADFC"
+                        fillOpacity=".9"
+                    />
+                </g>
+            </g>
+
+            <defs>
+                <linearGradient id="paint0" x1="2.395" y1="2.4" x2="13.594" y2="13.6">
+                    <stop stopColor="#FFF287" />
+                    <stop offset="1" stopColor="#F68628" />
+                </linearGradient>
+
+                <radialGradient id="paint1">
+                    <stop offset=".56" stopColor="#FF5758" stopOpacity="0" />
+                    <stop offset="1" stopColor="#FF5758" stopOpacity=".1" />
+                </radialGradient>
+
+                <radialGradient id="paint2">
+                    <stop stopColor="#FFF287" />
+                    <stop offset="1" stopColor="#FFF287" stopOpacity="0" />
+                </radialGradient>
+
+                <filter id="tearShadow">
+                    <feGaussianBlur stdDeviation="1.2" />
+                </filter>
+
+                <clipPath id="clip0">
+                    <path d="M0 0h16v16H0z" fill="#fff" />
+                </clipPath>
+            </defs>
+        </svg>
+    )
+}
+
+export const AngryIcon = ({ width = 20, height = 20, className }: IconProps) => {
+    return (
+        <svg
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 16 16"
+            width={width}
+            height={height}
+            className={className}
+        >
+            <g clipPath="url(#clip0)">
+                <path
+                    d="M15.9972 7.9996c0 4.418-3.5815 7.9996-7.9996 7.9996-4.418 0-7.9996-3.5816-7.9996-7.9996S3.5796 0 7.9976 0c4.4181 0 7.9996 3.5815 7.9996 7.9996Z"
+                    fill="url(#paint0_linear)"
+                />
+                <path
+                    d="M15.9973 7.9992c0 4.4178-3.5811 7.9992-7.9987 7.9992C3.5811 15.9984 0 12.417 0 7.9992S3.5811 0 7.9986 0c4.4176 0 7.9987 3.5814 7.9987 7.9992Z"
+                    fill="url(#paint1_radial)"
+                />
+                <path
+                    d="M15.9972 7.9996c0 4.418-3.5815 7.9996-7.9996 7.9996-4.418 0-7.9996-3.5816-7.9996-7.9996S3.5796 0 7.9976 0c4.4181 0 7.9996 3.5815 7.9996 7.9996Z"
+                    fill="url(#paint2_radial)"
+                    fillOpacity=".8"
+                />
+                <path
+                    d="M12.3955 9.0853c0 1.1142-.4 1.1142-1.2 1.1142-.7999 0-1.1999 0-1.1999-1.1143 0-.8205.5372-1.4856 1.1999-1.4856s1.2.6651 1.2 1.4857ZM5.9956 9.0853c0 1.1142-.4 1.1142-1.2 1.1142-.8 0-1.1999 0-1.1999-1.1143 0-.8205.5372-1.4856 1.2-1.4856.6626 0 1.1999.6651 1.1999 1.4857Z"
+                    fill="#1C1C1D"
+                />
+                <path
+                    fillRule="evenodd"
+                    clipRule="evenodd"
+                    d="M7.9936 11.5994c1.3257 0 2.3999.292 2.3999.8023 0 .4234-1.0742.3973-2.3999.3973-1.3256 0-2.3998.0261-2.3998-.3973 0-.5103 1.0742-.8023 2.3998-.8023Z"
+                    fill="#4B280E"
+                />
+                <path
+                    fillRule="evenodd"
+                    clipRule="evenodd"
+                    d="M13.3283 7.0331a.4.4 0 0 0-.5444-.1535c-.4415.2472-1.0866.4228-1.7434.5373-.6488.1132-1.2697.1604-1.6367.1691a.4.4 0 1 0 .0191.7997c.4037-.0096 1.0643-.0602 1.755-.1807.6828-.119 1.4354-.313 1.9969-.6275a.4.4 0 0 0 .1535-.5444ZM2.491 7.0331a.4.4 0 0 1 .5444-.1535c.4416.2472 1.0866.4228 1.7434.5373.6488.1132 1.2697.1604 1.6367.1691a.4.4 0 1 1-.019.7997c-.4038-.0096-1.0643-.0602-1.7551-.1807-.6827-.119-1.4353-.313-1.9968-.6275a.4.4 0 0 1-.1536-.5444Z"
+                    fill="#BC0A26"
+                />
+            </g>
+
+            <defs>
+                <radialGradient
+                    id="paint1_radial"
+                    cx="0"
+                    cy="0"
+                    r="1"
+                    gradientUnits="userSpaceOnUse"
+                    gradientTransform="matrix(0 7.9992 -7.99863 0 7.9986 7.9992)"
+                >
+                    <stop offset=".8134" stopColor="#FA2E3E" stopOpacity="0" />
+                    <stop offset="1" stopColor="#FA2E3E" stopOpacity=".1" />
+                </radialGradient>
+
+                <radialGradient
+                    id="paint2_radial"
+                    cx="0"
+                    cy="0"
+                    r="1"
+                    gradientUnits="userSpaceOnUse"
+                    gradientTransform="rotate(45 -4.5272 10.9202) scale(10.1818)"
+                >
+                    <stop stopColor="#FFB169" />
+                    <stop offset="1" stopColor="#FFB169" stopOpacity="0" />
+                </radialGradient>
+
+                <linearGradient
+                    id="paint0_linear"
+                    x1="2.396"
+                    y1="2.3999"
+                    x2="13.5954"
+                    y2="13.5993"
+                    gradientUnits="userSpaceOnUse"
+                >
+                    <stop stopColor="#FFB169" />
+                    <stop offset="1" stopColor="#FF5758" />
+                </linearGradient>
+
+                <clipPath id="clip0">
+                    <path fill="#fff" d="M-.004 0h15.9993v15.9992H-.004z" />
+                </clipPath>
+            </defs>
+        </svg>
+    )
+}
+
+export const WowIcon = ({ width = 20, height = 20, className }: IconProps) => {
+    return (
+        <svg
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 16 16"
+            width={width}
+            height={height}
+            className={className}
+        >
+            <g clipPath="url(#clip0)">
+                <path
+                    d="M15.9972 7.9996c0 4.418-3.5815 7.9996-7.9996 7.9996-4.418 0-7.9996-3.5816-7.9996-7.9996S3.5796 0 7.9976 0c4.4181 0 7.9996 3.5815 7.9996 7.9996Z"
+                    fill="url(#paint0_linear)"
+                />
+                <path
+                    d="M15.9973 7.9992c0 4.4178-3.5811 7.9992-7.9987 7.9992C3.5811 15.9984 0 12.417 0 7.9992S3.5811 0 7.9986 0c4.4176 0 7.9987 3.5814 7.9987 7.9992Z"
+                    fill="url(#paint1_radial)"
+                />
+                <path
+                    d="M15.9972 7.9996c0 4.418-3.5815 7.9996-7.9996 7.9996-4.418 0-7.9996-3.5816-7.9996-7.9996S3.5796 0 7.9976 0c4.4181 0 7.9996 3.5815 7.9996 7.9996Z"
+                    fill="url(#paint2_radial)"
+                    fillOpacity=".8"
+                />
+
+                <path
+                    fillRule="evenodd"
+                    clipRule="evenodd"
+                    d="M5.6144 10.8866c.159-1.8461 1.127-2.887 2.382-2.887 1.2551 0 2.2231 1.0418 2.3822 2.887.1591 1.8461-.7342 3.1127-2.3821 3.1127-1.648 0-2.5412-1.2666-2.3821-3.1127Z"
+                    fill="#4B280E"
+                />
+
+                <ellipse cx="11.1978" cy="5.6997" rx="1.3999" ry="1.6999" fill="#1C1C1D" />
+                <ellipse cx="4.7979" cy="5.6997" rx="1.3999" ry="1.6999" fill="#1C1C1D" />
+
+                <path
+                    fillRule="evenodd"
+                    clipRule="evenodd"
+                    d="M12.3528 3.166a1.4744 1.4744 0 0 0-1.8591-.3279.4.4 0 1 1-.3976-.6941c.9527-.5457 2.1592-.333 2.8678.5056a.4.4 0 0 1-.6111.5163ZM5.4998 2.8381a1.4744 1.4744 0 0 0-1.859.3278.4.4 0 0 1-.6111-.5162c.7085-.8387 1.915-1.0514 2.8677-.5057a.4.4 0 0 1-.3976.6941Z"
+                    fill="#E0761A"
+                />
+            </g>
+
+            <defs>
+                <radialGradient
+                    id="paint1_radial"
+                    cx="0"
+                    cy="0"
+                    r="1"
+                    gradientUnits="userSpaceOnUse"
+                    gradientTransform="matrix(0 7.9992 -7.99863 0 7.9986 7.9992)"
+                >
+                    <stop offset=".5637" stopColor="#FF5758" stopOpacity="0" />
+                    <stop offset="1" stopColor="#FF5758" stopOpacity=".1" />
+                </radialGradient>
+
+                <radialGradient
+                    id="paint2_radial"
+                    cx="0"
+                    cy="0"
+                    r="1"
+                    gradientUnits="userSpaceOnUse"
+                    gradientTransform="rotate(45 -4.5262 10.9226) scale(10.1818)"
+                >
+                    <stop stopColor="#FFF287" />
+                    <stop offset="1" stopColor="#FFF287" stopOpacity="0" />
+                </radialGradient>
+
+                <linearGradient
+                    id="paint0_linear"
+                    x1="2.3979"
+                    y1="2.3999"
+                    x2="13.5973"
+                    y2="13.5993"
+                    gradientUnits="userSpaceOnUse"
+                >
+                    <stop stopColor="#FFF287" />
+                    <stop offset="1" stopColor="#F68628" />
+                </linearGradient>
+
+                <clipPath id="clip0">
+                    <path fill="#fff" d="M-.002 0h15.9992v15.9992H-.002z" />
+                </clipPath>
+            </defs>
+        </svg>
+    )
+}
