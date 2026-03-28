@@ -208,18 +208,14 @@ const NotificationItem = ({ notification }: { notification: NotificationModel })
                         <p
                             className={`pr-4 text-sm font-normal ${notification.is_read ? 'text-gray-600 dark:text-gray-400' : 'text-gray-800 dark:text-gray-200'}`}
                         >
-                            {(() => {
-                                const parts = notification.message.split(`${notification.actor.full_name.trim()}`)
-
-                                return parts.map((part, index) => (
-                                    <span key={index}>
-                                        {part}
-                                        {index < parts.length - 1 && (
-                                            <span className="font-semibold">{notification.actor.full_name.trim()}</span>
-                                        )}
-                                    </span>
-                                ))
-                            })()}
+                            {notification.message.split('{actor}').map((part, index, arr) => (
+                                <span key={index}>
+                                    {part}
+                                    {index < arr.length - 1 && (
+                                        <span className="font-semibold">{notification.actor.full_name.trim()}</span>
+                                    )}
+                                </span>
+                            ))}
                         </p>
                         <small
                             className={`text-xs ${!notification.is_read ? 'text-primary' : 'text-gray-600 dark:text-gray-400'} font-medium`}
