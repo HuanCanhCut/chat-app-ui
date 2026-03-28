@@ -1,6 +1,5 @@
 import { memo, useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
-import { Emoji, EmojiStyle } from 'emoji-picker-react'
 import { SendIcon } from 'lucide-react'
 import { toast } from 'sonner'
 
@@ -207,15 +206,21 @@ const NotificationItem = ({ notification }: { notification: NotificationModel })
 
                     <div>
                         <p
-                            dangerouslySetInnerHTML={{
-                                __html: `
-                                ${notification.message.replace(
-                                    `${notification.actor.full_name.trim()}`,
-                                    `<span class="font-semibold">${notification.actor.full_name.trim()}</span>`,
-                                )}`,
-                            }}
                             className={`pr-4 text-sm font-normal ${notification.is_read ? 'text-gray-600 dark:text-gray-400' : 'text-gray-800 dark:text-gray-200'}`}
-                        ></p>
+                        >
+                            {(() => {
+                                const parts = notification.message.split(`${notification.actor.full_name.trim()}`)
+
+                                return parts.map((part, index) => (
+                                    <span key={index}>
+                                        {part}
+                                        {index < parts.length - 1 && (
+                                            <span className="font-semibold">{notification.actor.full_name.trim()}</span>
+                                        )}
+                                    </span>
+                                ))
+                            })()}
+                        </p>
                         <small
                             className={`text-xs ${!notification.is_read ? 'text-primary' : 'text-gray-600 dark:text-gray-400'} font-medium`}
                         >
