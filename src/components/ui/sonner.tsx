@@ -3,11 +3,11 @@
 import { CircleCheckIcon, InfoIcon, Loader2Icon, OctagonXIcon, TriangleAlertIcon } from 'lucide-react'
 import { Toaster as Sonner, type ToasterProps } from 'sonner'
 
-import { useAppSelector } from '~/redux'
-import { getCurrentTheme } from '~/redux/selector'
+import { selectTheme } from '~/redux/selector'
+import { useAppSelector } from '~/redux/types'
 
 const Toaster = ({ ...props }: ToasterProps) => {
-    const currentTheme = useAppSelector(getCurrentTheme)
+    const currentTheme = useAppSelector(selectTheme)
 
     return (
         <Sonner

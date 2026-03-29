@@ -7,13 +7,13 @@ import { MessageIcon } from '~/components/Icons'
 import config from '~/config'
 import SWRKey from '~/enum/SWRKey'
 import socket from '~/helpers/socket'
-import { useAppSelector } from '~/redux'
-import { getCurrentUser } from '~/redux/selector'
+import { selectCurrentUser } from '~/redux/selector'
+import { useAppSelector } from '~/redux/types'
 import * as messageService from '~/services/messageService'
 import { SocketMessage } from '~/type/type'
 
 const Message = () => {
-    const currentUser = useAppSelector(getCurrentUser)
+    const currentUser = useAppSelector(selectCurrentUser)
 
     const { data: unseenCount, mutate } = useSWR(SWRKey.GET_UNSEEN_COUNT, async () => {
         const response = await messageService.getUnseenCount()

@@ -12,7 +12,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Button from '~/components/Button'
 import SWRKey from '~/enum/SWRKey'
 import handleApiError from '~/helpers/handleApiError'
-import { getCurrentTheme } from '~/redux/selector'
+import { selectTheme } from '~/redux/selector'
 import * as themeService from '~/services/themeService'
 import { ConversationThemeModel, ConversationThemeResponse } from '~/type/type'
 
@@ -60,7 +60,7 @@ const mockMessage: MessagePreviewProps[] = [
 const ConversationTheme: React.FC<ConversationThemeProps> = ({ onClose, currentTheme }) => {
     const { uuid } = useParams()
 
-    const theme: 'light' | 'dark' = useSelector(getCurrentTheme)
+    const theme: 'light' | 'dark' = useSelector(selectTheme)
 
     const themeContainerRef = useRef<HTMLDivElement>(null)
 

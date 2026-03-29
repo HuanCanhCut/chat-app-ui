@@ -7,8 +7,8 @@ import MediaAndLink from './components/MediaAndLink'
 import SearchMessage from './components/SearchMessage'
 import SWRKey from '~/enum/SWRKey'
 import socket from '~/helpers/socket'
-import { useAppSelector } from '~/redux'
-import { getCurrentUser } from '~/redux/selector'
+import { selectCurrentUser } from '~/redux/selector'
+import { useAppSelector } from '~/redux/types'
 import { ConversationMember, ConversationModel, ConversationThemeModel } from '~/type/type'
 
 interface InfoProps {
@@ -35,7 +35,7 @@ interface InfoHierarchyItem {
 
 const Info: React.FC<InfoProps> = ({ className = '', isOpen }) => {
     const { uuid } = useParams()
-    const currentUser = useAppSelector(getCurrentUser)
+    const currentUser = useAppSelector(selectCurrentUser)
 
     const handleChose = useCallback(
         (type: string) => {
@@ -225,7 +225,7 @@ const Info: React.FC<InfoProps> = ({ className = '', isOpen }) => {
 
                         // if member_id is current user, set deleted_at to current time
 
-                        if (member_id === currentUser.data.id) {
+                        if (member_id === currentUser?.data.id) {
                             newMembers = newMembers.map((member) => {
                                 if (member.id === Number(member_id)) {
                                     return { ...member, deleted_at: new Date() }

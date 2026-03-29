@@ -10,13 +10,13 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Modal from '~/components/Modal'
 import UserAvatar from '~/components/UserAvatar/UserAvatar'
 import config from '~/config'
-import { useAppSelector } from '~/redux'
-import { getCurrentUser } from '~/redux/selector'
+import { useAppSelector } from '~/redux/types'
+import { selectCurrentUser } from '~/redux/selector'
 
 const Header: React.FC = () => {
     const router = useRouter()
 
-    const currentUser = useAppSelector(getCurrentUser)
+    const currentUser = useAppSelector(selectCurrentUser)
 
     const [isCreateConversationModalOpen, setIsCreateConversationModalOpen] = useState(false)
 

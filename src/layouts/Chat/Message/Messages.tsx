@@ -15,8 +15,8 @@ import config from '~/config'
 import SWRKey from '~/enum/SWRKey'
 import { listenEvent, sendEvent } from '~/helpers/events'
 import socket from '~/helpers/socket'
-import { useAppSelector } from '~/redux'
-import { getCurrentTheme, getCurrentUser } from '~/redux/selector'
+import { selectCurrentUser, selectTheme } from '~/redux/selector'
+import { useAppSelector } from '~/redux/types'
 import * as messageServices from '~/services/messageService'
 import { ConversationModel, MessageModel, MessageResponse, SocketMessage } from '~/type/type'
 
@@ -33,9 +33,9 @@ interface MessageProps {
 const Message: React.FC<MessageProps> = ({ conversation }) => {
     const { uuid } = useParams()
 
-    const currentUser = useAppSelector(getCurrentUser)
+    const currentUser = useAppSelector(selectCurrentUser)
 
-    const theme = useAppSelector(getCurrentTheme)
+    const theme = useAppSelector(selectTheme)
 
     // save offset range for scroll down and scroll up
     const [offsetRange, setOffsetRange] = useState({
@@ -611,15 +611,17 @@ const Message: React.FC<MessageProps> = ({ conversation }) => {
                         <React.Fragment key={message.id}>
                             {index === 0 && <Typing />}
 
-                            <MessageItem
-                                message={message}
-                                messageIndex={index}
-                                messages={messages}
-                                currentUser={currentUser?.data}
-                                messageRef={(el) => {
-                                    messageRefs.current[message.id] = el
-                                }}
-                            />
+                            {currentUser?.data && (
+                                <MessageItem
+                                    message={message}
+                                    messageIndex={index}
+                                    messages={messages}
+                                    currentUser={currentUser?.data}
+                                    messageRef={(el) => {
+                                        messageRefs.current[message.id] = el
+                                    }}
+                                />
+                            )}
                         </React.Fragment>
                     ))}
                 </InfiniteScroll>

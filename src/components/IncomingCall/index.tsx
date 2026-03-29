@@ -7,13 +7,13 @@ import UserAvatar from '../UserAvatar'
 import { faPhone, faXmark } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import socket from '~/helpers/socket'
-import { useAppSelector } from '~/redux'
-import { getCurrentUser } from '~/redux/selector'
+import { useAppSelector } from '~/redux/types'
+import { selectCurrentUser } from '~/redux/selector'
 import { UserModel } from '~/type/type'
 import openWindowCall from '~/utils/openWindowCall'
 
 const IncomingCall = ({ children }: { children: React.ReactNode }) => {
-    const currentUser = useAppSelector(getCurrentUser)
+    const currentUser = useAppSelector(selectCurrentUser)
 
     const audioRef = useRef<HTMLAudioElement>(null)
 

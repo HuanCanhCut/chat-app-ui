@@ -10,8 +10,8 @@ import UserAvatar from '~/components/UserAvatar'
 import config from '~/config'
 import { sendEvent } from '~/helpers/events'
 import socket from '~/helpers/socket'
-import { useAppSelector } from '~/redux'
-import { getCurrentUser } from '~/redux/selector'
+import { useAppSelector } from '~/redux/types'
+import { selectCurrentUser } from '~/redux/selector'
 import { ConversationModel } from '~/type/type'
 import { momentTimezone } from '~/utils/moment'
 interface HeaderProps {
@@ -21,7 +21,7 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ className = '', isInfoOpen, conversation }) => {
-    const currentUser = useAppSelector(getCurrentUser)
+    const currentUser = useAppSelector(selectCurrentUser)
     const router = useRouter()
 
     const offlineTimerSocket = useRef<NodeJS.Timeout | null>(null)

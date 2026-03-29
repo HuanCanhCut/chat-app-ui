@@ -1,6 +1,6 @@
 import { useSelector } from 'react-redux'
 
-import { getCurrentTheme } from '~/redux/selector'
+import { selectTheme } from '~/redux/selector'
 import { ConversationThemeModel } from '~/type/type'
 
 interface MessagePreviewProps {
@@ -11,7 +11,7 @@ interface MessagePreviewProps {
 }
 
 const MessagePreview: React.FC<MessagePreviewProps> = ({ content, index, currentTheme, type }) => {
-    const theme: 'light' | 'dark' = useSelector(getCurrentTheme)
+    const theme: 'light' | 'dark' = useSelector(selectTheme)
 
     return (
         <div

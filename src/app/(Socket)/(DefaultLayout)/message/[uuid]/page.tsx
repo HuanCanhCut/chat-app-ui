@@ -12,15 +12,15 @@ import Info from '~/layouts/Chat/Info/Info'
 import Message from '~/layouts/Chat/Message'
 import InputMessage from '~/layouts/Chat/MessageComposer'
 import Block from '~/layouts/Chat/MessageComposer/Block'
-import { useAppSelector } from '~/redux'
-import { getCurrentUser } from '~/redux/selector'
+import { selectCurrentUser } from '~/redux/selector'
+import { useAppSelector } from '~/redux/types'
 import * as conversationServices from '~/services/conversationService'
 import { SocketMessage } from '~/type/type'
 
 const MessagePage = () => {
     const { uuid } = useParams()
 
-    const currentUser = useAppSelector(getCurrentUser)
+    const currentUser = useAppSelector(selectCurrentUser)
 
     const [infoOpen, setInfoOpen] = useState(false)
 

@@ -17,8 +17,8 @@ import SWRKey from '~/enum/SWRKey'
 import { listenEvent, sendEvent } from '~/helpers/events'
 import socket from '~/helpers/socket'
 import uploadToCloudinary from '~/helpers/uploadToCloudinary'
-import { useAppSelector } from '~/redux'
-import { getCurrentUser } from '~/redux/selector'
+import { selectCurrentUser } from '~/redux/selector'
+import { useAppSelector } from '~/redux/types'
 import * as cloudinaryService from '~/services/cloudinaryService'
 import * as conversationServices from '~/services/conversationService'
 import { ConversationMember, MessageMedia, MessageModel } from '~/type/type'
@@ -35,7 +35,7 @@ interface IFile extends File {
 const InputMessage: React.FC<InputMessageProps> = () => {
     const { uuid } = useParams()
 
-    const currentUser = useAppSelector(getCurrentUser)
+    const currentUser = useAppSelector(selectCurrentUser)
 
     const { data: conversation } = useSWR(uuid ? [SWRKey.GET_CONVERSATION_BY_UUID, uuid] : null, () => {
         return conversationServices.getConversationByUuid({ uuid: uuid as string })
@@ -266,25 +266,27 @@ const InputMessage: React.FC<InputMessageProps> = () => {
         e.target.style.height = 'auto'
         e.target.style.height = e.target.scrollHeight + 'px'
 
-        // Only send when user enters the first letter, the following letters will not be sent.
-        if (messageValue.trim().length === 0 && e.target.value.trim().length > 0) {
-            socket.emit('MESSAGE_TYPING', {
-                conversation_uuid: uuid as string,
-                user_id: currentUser?.data.id,
-                is_typing: true,
-            })
-        }
+        if (currentUser?.data) {
+            // Only send when user enters the first letter, the following letters will not be sent.
+            if (messageValue.trim().length === 0 && e.target.value.trim().length > 0) {
+                socket.emit('MESSAGE_TYPING', {
+                    conversation_uuid: uuid as string,
+                    user_id: currentUser?.data.id,
+                    is_typing: true,
+                })
+            }
 
-        // Only send when user deletes all letters
-        if (e.target.value.trim().length === 0) {
-            socket.emit('MESSAGE_TYPING', {
-                conversation_uuid: uuid as string,
-                user_id: currentUser?.data.id,
-                is_typing: false,
-            })
-        }
+            // Only send when user deletes all letters
+            if (e.target.value.trim().length === 0) {
+                socket.emit('MESSAGE_TYPING', {
+                    conversation_uuid: uuid as string,
+                    user_id: currentUser?.data.id,
+                    is_typing: false,
+                })
+            }
 
-        setMessageValue(e.target.value)
+            setMessageValue(e.target.value)
+        }
     }
 
     const handleTextareaKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {

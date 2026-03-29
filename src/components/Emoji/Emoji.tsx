@@ -6,8 +6,8 @@ import { Theme } from 'emoji-picker-react'
 
 import './Emoji.css'
 import Picker from '~/helpers/picker'
-import { useAppSelector } from '~/redux'
-import { getCurrentTheme } from '~/redux/selector'
+import { selectTheme } from '~/redux/selector'
+import { useAppSelector } from '~/redux/types'
 
 interface EmojiProps extends Omit<PickerProps, 'isReaction' | 'isOpen' | 'className'> {
     placeholder?: string
@@ -23,7 +23,7 @@ const Emoji: React.FC<EmojiProps> = ({
     className = '',
     ...passProps
 }) => {
-    const theme = useAppSelector(getCurrentTheme)
+    const theme = useAppSelector(selectTheme)
 
     const category = [
         {

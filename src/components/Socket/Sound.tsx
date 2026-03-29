@@ -3,12 +3,12 @@
 import { useEffect, useRef } from 'react'
 
 import socket from '~/helpers/socket'
-import { useAppSelector } from '~/redux'
-import { getCurrentUser } from '~/redux/selector'
+import { selectCurrentUser } from '~/redux/selector'
+import { useAppSelector } from '~/redux/types'
 import { SocketMessage } from '~/type/type'
 
 const Sound = ({ children }: { children: React.ReactNode }) => {
-    const currentUser = useAppSelector(getCurrentUser)
+    const currentUser = useAppSelector(selectCurrentUser)
 
     const audioRef = useRef<HTMLAudioElement>(null)
 

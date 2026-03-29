@@ -22,8 +22,8 @@ import UserAvatar from '~/components/UserAvatar'
 import SWRKey from '~/enum/SWRKey'
 import socket from '~/helpers/socket'
 import useMediaStream from '~/hooks/useMediaStream'
-import { useAppSelector } from '~/redux'
-import { getCurrentUser } from '~/redux/selector'
+import { selectCurrentUser } from '~/redux/selector'
+import { useAppSelector } from '~/redux/types'
 import * as userService from '~/services/userService'
 
 type CallStatus =
@@ -41,7 +41,7 @@ const CALL_TIMEOUT_DURATION = 15000 // 15 seconds
 
 const CallClient = () => {
     const router = useRouter()
-    const currentUser = useAppSelector(getCurrentUser)
+    const currentUser = useAppSelector(selectCurrentUser)
     const audioRef = useRef<HTMLAudioElement>(null)
 
     const searchParams = useSearchParams()
@@ -100,47 +100,50 @@ const CallClient = () => {
             } catch (error) {}
 
             callTimeoutRef.current = setTimeout(() => {
-                setCallStatus('timeout')
+                if (currentUser?.data) {
+                    setCallStatus('timeout')
 
-                // Emit cancel event to server
-                socket.emit('END_CALL', {
-                    caller_id: currentUser?.data.id,
-                    callee_id: member?.data.id,
-                    uuid,
-                })
+                    // Emit cancel event to server
+                    socket.emit('END_CALL', {
+                        caller_id: currentUser?.data.id,
+                        callee_id: member?.data.id,
+                        uuid,
+                    })
 
-                // Clean up resources
-                if (localStreamRef.current) {
-                    stopStream()
-                }
+                    // Clean up resources
+                    if (localStreamRef.current) {
+                        stopStream()
+                    }
 
-                if (peerInstance.current) {
-                    peerInstance.current.destroy()
-                }
+                    if (peerInstance.current) {
+                        peerInstance.current.destroy()
+                    }
 
-                if (currentCallRef.current) {
-                    currentCallRef.current.close()
+                    if (currentCallRef.current) {
+                        currentCallRef.current.close()
+                    }
                 }
             }, CALL_TIMEOUT_DURATION)
         }
-    }, [subType, currentUser?.data.id, member?.data.id, uuid, localStreamRef, stopStream])
+    }, [subType, currentUser?.data, member?.data.id, uuid, localStreamRef, stopStream])
 
     // Các hàm khởi tạo và chấp nhận cuộc gọi - đặt ở đây để tránh lỗi "used before declaration"
     const handleInitiateCall = useCallback(() => {
-        if (callStatus !== 'connecting') return
+        if (currentUser?.data) {
+            if (callStatus !== 'connecting') return
 
-        socket.emit('INITIATE_CALL', {
-            caller_id: currentUser?.data.id,
-            callee_id: member?.data.id,
-            type: initializeVideo === 'true' ? 'video' : 'voice',
-            uuid,
-        })
+            socket.emit('INITIATE_CALL', {
+                caller_id: currentUser?.data.id,
+                callee_id: member?.data.id,
+                type: initializeVideo === 'true' ? 'video' : 'voice',
+                uuid,
+            })
 
-        // Start timeout after initiating call
-        startCallTimeout()
-
+            // Start timeout after initiating call
+            startCallTimeout()
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [currentUser?.data.id, initializeVideo, member?.data.id, startCallTimeout])
+    }, [currentUser?.data, callStatus, initializeVideo, member?.data.id, startCallTimeout, uuid])
 
     const handleAcceptCall = useCallback(
         (peerId: string) => {
@@ -262,15 +265,17 @@ const CallClient = () => {
                     const offer = await pc.createOffer()
                     await pc.setLocalDescription(offer)
 
-                    // TODO: Gửi offer mới cho remote peer
-                    // Gửi offer mới cho remote peer
-                    socket.emit('RENEGOTIATION_OFFER', {
-                        from_user_id: currentUser?.data.id,
-                        to_user_id: member?.data.id,
-                        caller_id: subType === 'caller' ? currentUser?.data.id : member?.data.id,
-                        callee_id: subType === 'callee' ? currentUser?.data.id : member?.data.id,
-                        offer: offer,
-                    })
+                    if (currentUser?.data) {
+                        // TODO: Gửi offer mới cho remote peer
+                        // Gửi offer mới cho remote peer
+                        socket.emit('RENEGOTIATION_OFFER', {
+                            from_user_id: currentUser?.data.id,
+                            to_user_id: member?.data.id,
+                            caller_id: subType === 'caller' ? currentUser?.data.id : member?.data.id,
+                            callee_id: subType === 'callee' ? currentUser?.data.id : member?.data.id,
+                            offer: offer,
+                        })
+                    }
                 } catch (error) {
                     console.error('Error during renegotiation:', error)
                 }
@@ -280,7 +285,7 @@ const CallClient = () => {
         }
 
         setOnNeedRenegotiation(handleRenegotiation)
-    }, [setOnNeedRenegotiation, currentUser?.data.id, member?.data.id, subType, cleanupDuplicateSenders])
+    }, [cleanupDuplicateSenders, currentUser?.data, member?.data.id, setOnNeedRenegotiation, subType])
 
     // IMPROVED: Xử lý renegotiation events với error handling tốt hơn
     useEffect(() => {
@@ -312,14 +317,16 @@ const CallClient = () => {
                     const answer = await pc.createAnswer()
                     await pc.setLocalDescription(answer)
 
-                    // TODO: Gửi answer mới cho remote peer
-                    socket.emit('RENEGOTIATION_ANSWER', {
-                        from_user_id: currentUser?.data.id,
-                        to_user_id: data.from_user_id,
-                        caller_id: data.caller_id,
-                        callee_id: data.callee_id,
-                        answer: answer,
-                    })
+                    if (currentUser?.data) {
+                        // TODO: Gửi answer mới cho remote peer
+                        socket.emit('RENEGOTIATION_ANSWER', {
+                            from_user_id: currentUser?.data.id,
+                            to_user_id: data.from_user_id,
+                            caller_id: data.caller_id,
+                            callee_id: data.callee_id,
+                            answer: answer,
+                        })
+                    }
                 } catch (error) {
                     console.error('Error handling renegotiation offer:', error)
                 }
@@ -353,7 +360,7 @@ const CallClient = () => {
             socket.off('RENEGOTIATION_OFFER', handleRenegotiationOffer)
             socket.off('RENEGOTIATION_ANSWER', handleRenegotiationAnswer)
         }
-    }, [currentUser?.data.id])
+    }, [currentUser?.data])
 
     const setupRemoteStreamMonitoring = useCallback((remoteStream: MediaStream) => {
         if (remoteVideoRef.current) {

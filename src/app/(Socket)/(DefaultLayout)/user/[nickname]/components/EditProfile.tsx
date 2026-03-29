@@ -13,8 +13,8 @@ import UserAvatar from '~/components/UserAvatar/UserAvatar'
 import config from '~/config'
 import SWRKey from '~/enum/SWRKey'
 import handleApiError from '~/helpers/handleApiError'
-import { useAppSelector } from '~/redux'
-import { getCurrentUser } from '~/redux/selector'
+import { selectCurrentUser } from '~/redux/selector'
+import { useAppSelector } from '~/redux/types'
 import * as meService from '~/services/meService'
 
 interface IFile extends File {
@@ -33,7 +33,7 @@ interface EditProfileProps {
 const defaultCoverPhoto = '/static/media/login-form.jpg'
 
 const EditProfile = ({ closeModal }: EditProfileProps) => {
-    const currentUser = useAppSelector(getCurrentUser)
+    const currentUser = useAppSelector(selectCurrentUser)
 
     const { handleSubmit, control } = useForm<FieldValue>()
 

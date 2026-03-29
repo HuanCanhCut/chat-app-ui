@@ -1,12 +1,12 @@
-import authReducer from './reducers/auth'
-import themeReducer from './reducers/theme'
+import themeReducer from './slices/themeSlice'
+import userReducer from './slices/userSlice'
 import { configureStore } from '@reduxjs/toolkit'
 
 export const makeStore = () => {
     return configureStore({
         reducer: {
+            user: userReducer,
             theme: themeReducer,
-            auth: authReducer,
         },
     })
 }

@@ -8,8 +8,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import NavLink from '~/components/NavLink'
 import config from '~/config'
 import { cn } from '~/lib/utils'
-import { useAppSelector } from '~/redux'
-import { getCurrentUser } from '~/redux/selector'
+import { selectCurrentUser } from '~/redux/selector'
+import { useAppSelector } from '~/redux/types'
 
 interface NavBarProps {
     className?: string
@@ -17,7 +17,7 @@ interface NavBarProps {
 
 const NavBar = ({ className }: NavBarProps) => {
     const pathname = usePathname()
-    const currentUser = useAppSelector(getCurrentUser)
+    const currentUser = useAppSelector(selectCurrentUser)
 
     const NAV_ITEMS = useMemo(() => {
         return [

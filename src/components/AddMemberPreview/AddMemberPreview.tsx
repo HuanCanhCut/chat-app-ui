@@ -11,8 +11,8 @@ import UserAvatar from '~/components/UserAvatar/UserAvatar'
 import SWRKey from '~/enum/SWRKey'
 import { sendEvent } from '~/helpers/events'
 import handleApiError from '~/helpers/handleApiError'
-import { useAppSelector } from '~/redux'
-import { getCurrentUser } from '~/redux/selector'
+import { selectCurrentUser } from '~/redux/selector'
+import { useAppSelector } from '~/redux/types'
 import * as friendService from '~/services/friendService'
 import { FriendsResponse, FriendsShip, UserModel } from '~/type/type'
 
@@ -28,15 +28,15 @@ interface ImperativeHandle {
 }
 
 const AddMemberPreview: React.FC<AddMemberPreviewProps> = ({ className = '', ref }) => {
-    const currentUser = useAppSelector(getCurrentUser)
+    const currentUser = useAppSelector(selectCurrentUser)
 
     const [searchResult, setSearchResult] = useState<FriendsShip[]>([])
     const [previewMember, setPreviewMember] = useState<UserModel[]>([])
 
     const { data: friends, mutate: mutateFriends } = useSWR<FriendsResponse | undefined>(
-        [SWRKey.GET_ALL_FRIENDS, currentUser?.data.id],
+        currentUser?.data ? [SWRKey.GET_ALL_FRIENDS, currentUser?.data.id] : null,
         () => {
-            return friendService.getFriends({ page: 1, user_id: currentUser?.data.id })
+            return friendService.getFriends({ page: 1, user_id: currentUser!.data.id })
         },
     )
 
@@ -48,26 +48,28 @@ const AddMemberPreview: React.FC<AddMemberPreviewProps> = ({ className = '', ref
 
     const handleLoadMoreFriend = useCallback(async () => {
         try {
-            const res = await friendService.getFriends({
-                page: friends ? friends?.meta.pagination.current_page + 1 : 1,
-                per_page: PER_PAGE,
-                user_id: currentUser?.data.id,
-            })
+            if (currentUser?.data) {
+                const res = await friendService.getFriends({
+                    page: friends ? friends?.meta.pagination.current_page + 1 : 1,
+                    per_page: PER_PAGE,
+                    user_id: currentUser?.data.id,
+                })
 
-            if (!res) return
+                if (!res) return
 
-            mutateFriends((prev: FriendsResponse | undefined) => {
-                if (!prev) return prev
+                mutateFriends((prev: FriendsResponse | undefined) => {
+                    if (!prev) return prev
 
-                return {
-                    data: [...prev.data, ...res.data],
-                    meta: res.meta,
-                }
-            })
+                    return {
+                        data: [...prev.data, ...res.data],
+                        meta: res.meta,
+                    }
+                })
+            }
         } catch (error: any) {
             handleApiError(error)
         }
-    }, [currentUser?.data.id, friends, mutateFriends])
+    }, [currentUser?.data, friends, mutateFriends])
 
     const handleToggleAddPreview = (friend: UserModel) => {
         const isAdded = previewMember.find((user) => user.id === friend.id)

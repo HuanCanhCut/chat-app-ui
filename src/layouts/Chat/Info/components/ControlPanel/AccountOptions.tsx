@@ -9,8 +9,8 @@ import PopperWrapper from '~/components/PopperWrapper'
 import config from '~/config'
 import { sendEvent } from '~/helpers/events'
 import handleApiError from '~/helpers/handleApiError'
-import { useAppSelector } from '~/redux'
-import { getCurrentUser } from '~/redux/selector'
+import { selectCurrentUser } from '~/redux/selector'
+import { useAppSelector } from '~/redux/types'
 import * as conversationService from '~/services/conversationService'
 import { ConversationMember } from '~/type/type'
 
@@ -38,7 +38,7 @@ const AccountOptions: React.FC<AccountOptionsProps> = ({ member, isAdmin }) => {
 
     const router = useRouter()
 
-    const currentUser = useAppSelector(getCurrentUser)
+    const currentUser = useAppSelector(selectCurrentUser)
 
     const [confirmModalState, setConfirmModalState] = useState({
         isOpen: false,

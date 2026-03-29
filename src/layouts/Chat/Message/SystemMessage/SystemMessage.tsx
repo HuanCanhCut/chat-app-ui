@@ -1,8 +1,8 @@
 import { LegacyRef } from 'react'
 
 import { sendEvent } from '~/helpers/events'
-import { useAppSelector } from '~/redux'
-import { getCurrentUser } from '~/redux/selector'
+import { selectCurrentUser } from '~/redux/selector'
+import { useAppSelector } from '~/redux/types'
 import { MessageModel } from '~/type/type'
 
 interface SystemMessageProps {
@@ -22,7 +22,7 @@ const SystemMessage = ({
     hiddenQuickAction = false,
     ref,
 }: SystemMessageProps) => {
-    const currentUser = useAppSelector(getCurrentUser)
+    const currentUser = useAppSelector(selectCurrentUser)
 
     const handleQuickAction = (type: string) => {
         switch (type) {

@@ -13,8 +13,8 @@ import SWRKey from '~/enum/SWRKey'
 import { listenEvent } from '~/helpers/events'
 import handleApiError from '~/helpers/handleApiError'
 import socket from '~/helpers/socket'
-import { useAppSelector } from '~/redux'
-import { getCurrentTheme } from '~/redux/selector'
+import { selectTheme } from '~/redux/selector'
+import { useAppSelector } from '~/redux/types'
 import * as conversationService from '~/services/conversationService'
 import { ConversationMember, ConversationModel, ConversationThemeModel, MessageModel, SocketMessage } from '~/type/type'
 
@@ -25,7 +25,7 @@ interface Conversation<T> {
 const PER_PAGE = 10
 
 const Conversations = () => {
-    const theme = useAppSelector(getCurrentTheme)
+    const theme = useAppSelector(selectTheme)
 
     const groupConversationsByUuid = (conversations: ConversationModel[]) => {
         return conversations.reduce<Conversation<ConversationModel>>((acc, conversation) => {

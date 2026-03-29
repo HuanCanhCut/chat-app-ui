@@ -11,8 +11,8 @@ import UserAvatar from '~/components/UserAvatar'
 import config from '~/config'
 import SWRKey from '~/enum/SWRKey'
 import socket from '~/helpers/socket'
-import { useAppSelector } from '~/redux'
-import { getCurrentUser } from '~/redux/selector'
+import { selectCurrentUser } from '~/redux/selector'
+import { useAppSelector } from '~/redux/types'
 import * as messageServices from '~/services/messageService'
 import { MessageReactionModel, TopReaction } from '~/type/type'
 
@@ -29,7 +29,7 @@ const ReactionModal: React.FC<Props> = ({ isOpen, onClose, messageId }) => {
 
     const router = useRouter()
 
-    const currentUser = useAppSelector(getCurrentUser)
+    const currentUser = useAppSelector(selectCurrentUser)
 
     const [currentTab, setCurrentTab] = useState('all')
     const [page, setPage] = useState(1)

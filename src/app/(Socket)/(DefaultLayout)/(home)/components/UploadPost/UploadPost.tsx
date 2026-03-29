@@ -20,8 +20,8 @@ import UserAvatar from '~/components/UserAvatar'
 import handleApiError from '~/helpers/handleApiError'
 import uploadToCloudinary from '~/helpers/uploadToCloudinary'
 import { cn } from '~/lib/utils'
-import { useAppSelector } from '~/redux'
-import { getCurrentUser } from '~/redux/selector'
+import { selectCurrentUser } from '~/redux/selector'
+import { useAppSelector } from '~/redux/types'
 import * as cloudinaryService from '~/services/cloudinaryService'
 import * as postService from '~/services/postService'
 import { validateMedia } from '~/utils/validateMediaUpload'
@@ -31,7 +31,7 @@ interface IFile extends File {
 }
 
 const UploadPost = () => {
-    const currentUser = useAppSelector(getCurrentUser)
+    const currentUser = useAppSelector(selectCurrentUser)
 
     const fileInputRef = useRef<HTMLInputElement>(null)
     const contenteditableRef = useRef<HTMLDivElement | null>(null)

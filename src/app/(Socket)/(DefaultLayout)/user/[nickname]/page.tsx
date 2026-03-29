@@ -13,8 +13,8 @@ import CustomImage from '~/components/Image'
 import SWRKey from '~/enum/SWRKey'
 import { listenEvent } from '~/helpers/events'
 import socket from '~/helpers/socket'
-import { useAppSelector } from '~/redux'
-import { getCurrentUser } from '~/redux/selector'
+import { selectCurrentUser } from '~/redux/selector'
+import { useAppSelector } from '~/redux/types'
 import * as userService from '~/services/userService'
 import { UserResponse } from '~/type/type'
 
@@ -26,7 +26,7 @@ interface Tab {
 export default function UserPage() {
     const { nickname } = useParams()
 
-    const currentUser = useAppSelector(getCurrentUser)
+    const currentUser = useAppSelector(selectCurrentUser)
 
     const [currentTab, setCurrentTab] = useState<'friend' | 'friend-invitation'>('friend')
 

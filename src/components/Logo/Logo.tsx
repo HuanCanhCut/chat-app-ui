@@ -4,11 +4,11 @@ import Image from 'next/image'
 import Link from 'next/link'
 
 import config from '~/config'
-import { useAppSelector } from '~/redux'
-import { getCurrentTheme } from '~/redux/selector'
+import { selectTheme } from '~/redux/selector'
+import { useAppSelector } from '~/redux/types'
 
 export default function Logo({ className = '' }: { className?: string }) {
-    const theme = useAppSelector(getCurrentTheme)
+    const theme = useAppSelector(selectTheme)
 
     return (
         <>

@@ -11,8 +11,8 @@ import { faEllipsis } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import UserAvatar from '~/components/UserAvatar'
 import SystemMessage from '~/layouts/Chat/Message/SystemMessage'
-import { useAppSelector } from '~/redux'
-import { getCurrentUser } from '~/redux/selector'
+import { selectCurrentUser } from '~/redux/selector'
+import { useAppSelector } from '~/redux/types'
 import { ConversationModel, MessageModel } from '~/type/type'
 import { momentTimezone } from '~/utils/moment'
 
@@ -22,7 +22,7 @@ interface Props {
 }
 
 const ConversationItem: React.FC<Props> = ({ conversation, className = '' }) => {
-    const currentUser = useAppSelector(getCurrentUser)
+    const currentUser = useAppSelector(selectCurrentUser)
 
     const tippyInstanceRef = useRef<any>(null)
 

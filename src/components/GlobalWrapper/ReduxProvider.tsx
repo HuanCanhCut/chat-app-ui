@@ -2,39 +2,29 @@
 
 import { useEffect, useRef } from 'react'
 import { Provider } from 'react-redux'
-import { useRouter } from 'next/navigation'
-import useSWR from 'swr'
 
-import { AppStore, makeStore } from '../../redux/store'
-import SWRKey from '~/enum/SWRKey'
-import { actions } from '~/redux'
-import * as meServices from '~/services/meService'
+import { setTheme } from '~/redux/slices/themeSlice'
+import { getCurrentUser } from '~/redux/slices/userSlice'
+import { AppStore, makeStore } from '~/redux/store'
 
-export default function ReduxProvider({ children }: { children: React.ReactNode }) {
-    const router = useRouter()
-    const storeRef = useRef<AppStore>()
-
-    const { data: currentUser } = useSWR(SWRKey.GET_CURRENT_USER, () => {
-        return meServices.getCurrentUser()
-    })
+export default function StoreProvider({ children }: { children: React.ReactNode }) {
+    const storeRef = useRef<AppStore>(undefined)
 
     if (!storeRef.current) {
+        // Create the store instance the first time this renders
         storeRef.current = makeStore()
     }
 
     useEffect(() => {
-        if (!storeRef.current) {
-            storeRef.current = makeStore()
+        if (storeRef.current) {
+            storeRef.current.dispatch(getCurrentUser)
+
+            const currentTheme = JSON.parse(localStorage.getItem('theme') || '"light"')
+            document.documentElement.classList.toggle('dark', currentTheme === 'dark')
+
+            storeRef.current.dispatch(setTheme(currentTheme))
         }
-
-        const currentTheme = JSON.parse(localStorage.getItem('theme')!) || 'light'
-
-        storeRef.current.dispatch(actions.setTheme(currentTheme))
-
-        document.documentElement.classList.toggle('dark', currentTheme === 'dark')
-
-        storeRef.current.dispatch(actions.setCurrentUser(currentUser))
-    }, [currentUser, router])
+    }, [])
 
     return <Provider store={storeRef.current}>{children}</Provider>
 }

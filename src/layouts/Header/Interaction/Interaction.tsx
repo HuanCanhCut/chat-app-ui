@@ -13,8 +13,10 @@ import PopperWrapper from '~/components/PopperWrapper'
 import UserAvatar from '~/components/UserAvatar/UserAvatar'
 import config from '~/config'
 import { sendEvent } from '~/helpers/events'
-import { actions, useAppDispatch, useAppSelector } from '~/redux'
-import { getCurrentTheme, getCurrentUser } from '~/redux/selector'
+import { selectCurrentUser, selectTheme } from '~/redux/selector'
+import { setTheme } from '~/redux/slices/themeSlice'
+import { setActiveStatus } from '~/redux/slices/userSlice'
+import { useAppDispatch, useAppSelector } from '~/redux/types'
 import * as authService from '~/services/authService'
 import * as meService from '~/services/meService'
 
@@ -49,9 +51,9 @@ const reducer = (state: MenuItemType[], action: { type: MenuItemType['type']; is
 const Interaction = () => {
     const reduxDispatch = useAppDispatch()
     const router = useRouter()
-    const currentUser = useAppSelector(getCurrentUser)
+    const currentUser = useAppSelector(selectCurrentUser)
 
-    const theme = useAppSelector(getCurrentTheme)
+    const theme = useAppSelector(selectTheme)
 
     const MENU_ITEMS: MenuItemType[] = [
         {
@@ -95,7 +97,8 @@ const Interaction = () => {
 
         switch (type) {
             case 'theme':
-                reduxDispatch(actions.setTheme(isOn ? 'light' : 'dark'))
+                // reduxDispatch(actions.setTheme(isOn ? 'light' : 'dark'))
+                reduxDispatch(setTheme(isOn ? 'light' : 'dark'))
                 document.documentElement.classList.toggle('dark')
 
                 dispatch({ type, isOn: !isOn })
@@ -106,7 +109,7 @@ const Interaction = () => {
 
                     await meService.updateActiveStatus(!isOn)
 
-                    reduxDispatch(actions.setActiveStatus(!isOn))
+                    reduxDispatch(setActiveStatus(!isOn))
                 } catch (error) {
                     dispatch({ type, isOn })
                 }

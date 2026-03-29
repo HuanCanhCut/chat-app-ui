@@ -10,8 +10,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import UserAvatar from '~/components/UserAvatar'
 import config from '~/config'
 import useDebounce from '~/hooks/useDebounce'
-import { useAppSelector } from '~/redux'
-import { getCurrentUser } from '~/redux/selector'
+import { useAppSelector } from '~/redux/types'
+import { selectCurrentUser } from '~/redux/selector'
 import * as conversationService from '~/services/conversationService'
 import { ConversationModel } from '~/type/type'
 
@@ -23,7 +23,7 @@ interface Props {
 
 const Search: React.FC<Props> = ({ setSearchMode, searchMode }) => {
     const { uuid } = useParams()
-    const currentUser = useAppSelector(getCurrentUser)
+    const currentUser = useAppSelector(selectCurrentUser)
 
     const [searchResult, setSearchResult] = useState<ConversationModel[]>([])
     const [searchValue, setSearchValue] = useState('')

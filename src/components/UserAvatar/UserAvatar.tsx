@@ -4,8 +4,8 @@ import { memo, useState } from 'react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 
-import { useAppSelector } from '~/redux'
-import { getCurrentUser } from '~/redux/selector'
+import { selectCurrentUser } from '~/redux/selector'
+import { useAppSelector } from '~/redux/types'
 
 interface Props {
     src?: string
@@ -35,7 +35,7 @@ const UserAvatar = ({
     const router = useRouter()
     const [fallback, setFallback] = useState<string>()
 
-    const currentUser = useAppSelector(getCurrentUser)
+    const currentUser = useAppSelector(selectCurrentUser)
 
     const handleError = () => {
         setFallback(defaultAvatar)

@@ -35,8 +35,8 @@ import SWRKey from '~/enum/SWRKey'
 import { listenEvent, sendEvent } from '~/helpers/events'
 import handleApiError from '~/helpers/handleApiError'
 import RenameConversationModal from '~/layouts/Chat/Info/Modal/RenameConversationModal/RenameConversationModal'
-import { useAppSelector } from '~/redux'
-import { getCurrentUser } from '~/redux/selector'
+import { selectCurrentUser } from '~/redux/selector'
+import { useAppSelector } from '~/redux/types'
 import * as conversationServices from '~/services/conversationService'
 import { ConversationMember } from '~/type/type'
 import { momentTimezone } from '~/utils/moment'
@@ -56,7 +56,7 @@ interface AccordionItem {
 }
 
 const ControlPanel: React.FC<ControlPanelProps> = ({ onChose }) => {
-    const currentUser = useAppSelector(getCurrentUser)
+    const currentUser = useAppSelector(selectCurrentUser)
     const { uuid } = useParams()
 
     const fileInputRef = useRef<HTMLInputElement>(null)

@@ -6,8 +6,8 @@ import Button from '~/components/Button'
 import ConfirmModal from '~/components/ConfirmModal'
 import SWRKey from '~/enum/SWRKey'
 import handleApiError from '~/helpers/handleApiError'
-import { useAppSelector } from '~/redux'
-import { getCurrentUser } from '~/redux/selector'
+import { selectCurrentUser } from '~/redux/selector'
+import { useAppSelector } from '~/redux/types'
 import * as conversationServices from '~/services/conversationService'
 import { ConversationMember } from '~/type/type'
 
@@ -20,7 +20,7 @@ const Block: React.FC<BlockProps> = ({ currentMember }) => {
 
     const { uuid } = useParams()
 
-    const currentUser = useAppSelector(getCurrentUser)
+    const currentUser = useAppSelector(selectCurrentUser)
 
     const { data: conversation } = useSWR(uuid ? [SWRKey.GET_CONVERSATION_BY_UUID, uuid] : null, () => {
         return conversationServices.getConversationByUuid({ uuid: uuid as string })
