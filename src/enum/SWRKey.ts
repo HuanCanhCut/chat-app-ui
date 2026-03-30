@@ -59,6 +59,12 @@ enum SWRKey {
      * Theme
      */
     GET_THEMES = '/themes',
+
+    /**
+     * Story
+     */
+
+    GET_STORY = '/stories',
 }
 
 export default SWRKey

@@ -19,3 +19,7 @@ export interface MetaPagination {
         }
     }
 }
+
+export interface ResponsePagination<T> extends MetaPagination {
+    data: T
+}
