@@ -44,7 +44,7 @@ const StoryItem: React.FC<StoryItemProps> = ({ story }) => {
                 />
             </div>
 
-            <p className="absolute bottom-2 line-clamp-2 truncate text-sm font-medium [word-break:break-word]">
+            <p className="absolute bottom-2 line-clamp-2 max-w-full truncate text-sm font-medium [word-break:break-word]">
                 {story.user.full_name}
             </p>
         </div>
