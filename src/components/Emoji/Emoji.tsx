@@ -61,7 +61,7 @@ const Emoji: React.FC<EmojiProps> = ({
     ]
 
     return (
-        <div tabIndex={-1}>
+        <div tabIndex={-1} className="relative [z-index:999999999]">
             <Picker
                 className={`bg-transparent ${className}`}
                 open={isOpen}

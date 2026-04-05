@@ -90,10 +90,10 @@ const Story = () => {
     }
 
     return (
-        <div className="relative flex max-h-dvh flex-col overflow-hidden rounded-md">
-            {currentStory && (
-                <>
-                    <div className="flex-center relative aspect-9/16 h-full min-h-0 flex-1 overflow-hidden rounded-md">
+        <div className="relative flex max-h-dvh w-full flex-col items-center overflow-hidden rounded-md">
+            <div className="relative aspect-9/16 max-w-dvw flex-1 overflow-hidden rounded-lg">
+                {currentStory && (
+                    <>
                         <div
                             className="absolute inset-0 min-h-0 bg-cover bg-center bg-no-repeat blur-md"
                             style={{ backgroundImage: `url(${getCloudinaryVideoThumbnail(currentStory.url)})` }}
@@ -181,10 +181,10 @@ const Story = () => {
                                 />
                             ) : null}
                         </div>
-                    </div>
-                    <StoryAction story={currentStory} />
-                </>
-            )}
+                    </>
+                )}
+            </div>
+            {currentStory && <StoryAction story={currentStory} />}
         </div>
     )
 }

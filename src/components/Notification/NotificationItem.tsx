@@ -6,10 +6,10 @@ import { toast } from 'sonner'
 import 'moment/locale/vi'
 import ConfirmModel from '../ConfirmModal'
 import CustomTippy from '../CustomTippy/CustomTippy'
-import { AngryIcon, CareIcon, HahaIcon, HeartIcon, LikeIcon, SadIcon, WowIcon } from '../Icons'
 import PopperWrapper from '../PopperWrapper/PopperWrapper'
 import { faCheck, faEllipsis, faTrash, faUser } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import baseReactionIcon from '~/common/baseReactionIcon'
 import Button from '~/components/Button/Button'
 import UserAvatar from '~/components/UserAvatar/UserAvatar'
 import config from '~/config'
@@ -181,20 +181,12 @@ const NotificationItem = ({ notification }: { notification: NotificationModel })
                                         </div>
                                     )
                                 case 'reaction':
-                                    const iconMapping = {
-                                        '1f44d': <LikeIcon width={28} height={28} />,
-                                        '1f970': <CareIcon width={28} height={28} />,
-                                        '2764-fe0f': <HeartIcon width={28} height={28} />,
-                                        '1f602': <HahaIcon width={28} height={28} />,
-                                        '1f62e': <WowIcon width={28} height={28} />,
-                                        '1f622': <SadIcon width={28} height={28} />,
-                                        '1f621': <AngryIcon width={28} height={28} />,
-                                    }
-
                                     const unified = JSON.parse(notification.metadata || '""').reaction
 
+                                    const iconMapping = baseReactionIcon(28)
+
                                     return (
-                                        <div className="absolute right-0 bottom-0">
+                                        <div className="absolute right-0 -bottom-2">
                                             {iconMapping[unified?.toLowerCase() as keyof typeof iconMapping]}
                                         </div>
                                     )
