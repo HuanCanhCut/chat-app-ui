@@ -17,3 +17,12 @@ export const getStories = async ({
     })
     return response.data
 }
+
+export const getUserStories = async (
+    uuid: string,
+): Promise<{
+    data: StoryModel[]
+}> => {
+    const response = await request.get(`/stories/${uuid}`)
+    return response.data
+}

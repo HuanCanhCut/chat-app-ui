@@ -18,7 +18,7 @@ const SidebarStoryItem: React.FC<SidebarStoryItemProps> = ({ story, className = 
                 'hover:bg-muted-foreground/10 flex cursor-pointer items-center gap-2 rounded-lg p-2 select-none',
                 className,
             )}
-            href={`${config.routes.stories}/${story.user.uuid}`}
+            href={`${config.routes.stories.replace(':uuid', story.uuid)}`}
         >
             <UserAvatar story={story} src={story.user.avatar} className="size-14" size={200} />
 

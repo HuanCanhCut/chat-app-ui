@@ -9,6 +9,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import SWRKey from '~/enum/SWRKey'
 import * as messageServices from '~/services/messageService'
 import { MessageMedia, MetaPagination } from '~/type/type'
+import getCloudinaryVideoThumbnail from '~/utils/getCloudinaryThumb'
 
 interface MessageImagesModelProps {
     onClose: () => void
@@ -222,9 +223,6 @@ const MessageImagesModel = ({ onClose, mediaUrl, mediaType }: MessageImagesModel
         window.addEventListener('keydown', handleKeyDown)
         return () => window.removeEventListener('keydown', handleKeyDown)
     }, [handleNextImage, handlePreviousImage, onClose])
-
-    const getCloudinaryVideoThumbnail = (videoUrl: string) =>
-        videoUrl.replace('/video/upload/', '/video/upload/so_auto/').replace(/\.(mp4|mov|avi|webm)$/, '.jpg')
 
     return (
         <div className="fixed top-0 right-0 bottom-0 left-0 bg-black">
