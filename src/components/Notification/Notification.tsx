@@ -1,11 +1,12 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import Skeleton from 'react-loading-skeleton'
+import Tippy from 'huanpenguin-tippy-react'
 import useSWR from 'swr'
 
+import { Button } from '../ui/button'
 import NotificationItem from './NotificationItem'
 import { faBell } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import Button from '~/components/Button/Button'
 import CustomTippy from '~/components/CustomTippy/CustomTippy'
 import PopperWrapper from '~/components/PopperWrapper'
 import SWRKey from '~/enum/SWRKey'
@@ -260,7 +261,7 @@ const Notification = () => {
                         {tabsMenu.map((tab: Tab, index: number) => (
                             <Button
                                 key={index}
-                                buttonType={tab.value === currentTab ? 'primary' : 'rounded'}
+                                variant={tab.value === currentTab ? 'default' : 'secondary'}
                                 className="rounded-full! py-[6px]"
                                 onClick={() => setCurrentTab(tab.value)}
                             >
@@ -280,7 +281,7 @@ const Notification = () => {
                                 )
                             })}
                             {notifications.meta.pagination.count < notifications.meta.pagination.total && (
-                                <Button buttonType="rounded" className="mt-4 w-full" onClick={handleSeeMore}>
+                                <Button variant="secondary" className="mt-4 w-full" onClick={handleSeeMore}>
                                     Xem thêm
                                 </Button>
                             )}
@@ -305,11 +306,18 @@ const Notification = () => {
     }
 
     return (
-        <CustomTippy renderItem={renderNotification} onShow={tippyShow}>
+        <CustomTippy renderItem={renderNotification} onShow={tippyShow} offsetY={10}>
             <div className="relative">
-                <Button buttonType="icon" onClick={handleOpenNotification}>
-                    <FontAwesomeIcon icon={faBell} className="text-lg sm:text-xl" width={20} height={20} />
-                </Button>
+                <Tippy content="Thông báo">
+                    <Button
+                        size="icon"
+                        variant="ghost"
+                        className="size-10 rounded-full"
+                        onClick={handleOpenNotification}
+                    >
+                        <FontAwesomeIcon icon={faBell} className="text-lg sm:text-xl" width={20} height={20} />
+                    </Button>
+                </Tippy>
                 {notifications && notificationUnSeenCount !== 0 && (
                     <span className="flex-center absolute top-[-3px] right-[-3px] h-4 w-4 rounded-full bg-red-500 text-xs text-white">
                         {notificationUnSeenCount}

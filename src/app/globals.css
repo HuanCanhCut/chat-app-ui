@@ -41,7 +41,7 @@
 @layer utilities {
     :root {
         --header-height: 60px;
-        --header-height-mobile: 90px;
+        --header-height-mobile: 100px;
         --sidebar-width: 330px;
         --sidebar-width-tablet: 280px;
 
@@ -130,7 +130,7 @@ html {
 }
 
 html.dark {
-    background-color: #1e1e1e;
+    background-color: #212223;
     ::-webkit-scrollbar-thumb {
         border-radius: 4px;
         background-color: rgba(255, 255, 255, 0.2);
@@ -222,7 +222,6 @@ body.ReactModal__Body--open {
     --breakpoint-xs: 480px;
     --breakpoint-bp900: 900px;
 
-    --color-primary: #0866ff;
     --color-error: #ff453a;
     --color-dark: #18191a;
     --color-dark-gray: #252728;
@@ -257,6 +256,7 @@ body.ReactModal__Body--open {
     --popover: oklch(1 0 0);
     --popover-foreground: oklch(0.145 0 0);
     --primary: oklch(53.892% 0.25554 264.505);
+    --blue-link: #0064d1;
     --primary-foreground: oklch(0.97 0.014 254.604);
     --secondary: oklch(0.967 0.001 286.375);
     --secondary-foreground: oklch(0.21 0.006 285.885);
@@ -291,7 +291,8 @@ body.ReactModal__Body--open {
     --card-foreground: oklch(0.985 0 0);
     --popover: oklch(0.205 0 0);
     --popover-foreground: oklch(0.985 0 0);
-    --primary: oklch(55.102% 0.24763 268.443);
+    --primary: oklch(56.4% 0.23941 269.072);
+    --blue-link: #5aa7ff;
     --primary-foreground: oklch(0.97 0.014 254.604);
     --secondary: oklch(0.274 0.006 286.033);
     --secondary-foreground: oklch(0.985 0 0);
@@ -349,6 +350,7 @@ body.ReactModal__Body--open {
     --color-secondary: var(--secondary);
     --color-primary-foreground: var(--primary-foreground);
     --color-primary: var(--primary);
+    --color-blue-link: var(--blue-link);
     --color-popover-foreground: var(--popover-foreground);
     --color-popover: var(--popover);
     --color-card-foreground: var(--card-foreground);

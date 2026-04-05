@@ -4,8 +4,10 @@ import { memo, useState } from 'react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 
+import { cn } from '~/lib/utils'
 import { selectCurrentUser } from '~/redux/selector'
 import { useAppSelector } from '~/redux/types'
+import { StoryModel } from '~/type/story.type'
 
 interface Props {
     src?: string
@@ -16,6 +18,7 @@ interface Props {
     onClick?: () => void
     isOnline?: boolean
     onlineClassName?: string
+    story?: StoryModel
     href?: string
 }
 
@@ -30,6 +33,7 @@ const UserAvatar = ({
     onClick = () => {},
     isOnline = false,
     onlineClassName = '',
+    story,
     href,
 }: Props) => {
     const router = useRouter()
@@ -60,7 +64,11 @@ const UserAvatar = ({
                 alt={alt}
                 width={size}
                 height={size}
-                className={`aspect-square shrink-0 cursor-pointer rounded-full object-cover ${className}`}
+                className={cn(`aspect-square shrink-0 cursor-pointer rounded-full object-cover`, className, {
+                    'border-2 p-0.5': story,
+                    'border-primary': story && !story.is_viewed,
+                    'border-zinc-300 dark:border-zinc-600': story && story.is_viewed,
+                })}
                 priority
                 quality={100}
                 style={style}

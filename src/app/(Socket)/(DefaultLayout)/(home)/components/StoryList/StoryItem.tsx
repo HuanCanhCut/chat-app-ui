@@ -1,4 +1,5 @@
 import Image from 'next/image'
+import Link from 'next/link'
 
 import UserAvatar from '~/components/UserAvatar'
 import { cn } from '~/lib/utils'
@@ -10,8 +11,8 @@ interface StoryItemProps {
 
 const StoryItem: React.FC<StoryItemProps> = ({ story }) => {
     return (
-        <div
-            key={story.id}
+        <Link
+            href={`/stories/${story.uuid}`}
             className="relative flex aspect-10/16 h-50 cursor-pointer flex-col overflow-hidden rounded-md [&_img]:hover:scale-101 [&_img]:hover:brightness-90"
         >
             {(() => {
@@ -47,7 +48,7 @@ const StoryItem: React.FC<StoryItemProps> = ({ story }) => {
             <p className="absolute bottom-2 line-clamp-2 max-w-full truncate text-sm font-medium [word-break:break-word]">
                 {story.user.full_name}
             </p>
-        </div>
+        </Link>
     )
 }
 

@@ -23,6 +23,7 @@ interface AppEvents {
     'MESSAGE:READ-MESSAGE': { conversationUuid: string }
     'MESSAGE:REPLY': { message: MessageModel }
     'CONVERSATION:OPEN-MODAL': { type: 'theme' }
+    'STORIES:CLOSE-MODAL': null
 }
 
 export type { AppEvents }

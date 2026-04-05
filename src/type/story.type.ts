@@ -7,5 +7,7 @@ export interface StoryModel extends BaseModel {
     type: 'video' | 'image' | 'text'
     background_url: string
     is_viewed: boolean
-    user: Pick<UserModel, 'id' | 'full_name' | 'avatar'>
+    uuid: string
+    unviewed_count: number
+    user: UserModel
 }

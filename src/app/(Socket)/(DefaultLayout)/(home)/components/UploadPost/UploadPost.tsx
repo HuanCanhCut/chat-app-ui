@@ -190,7 +190,7 @@ const UploadPost = () => {
     }
 
     return (
-        <PopperWrapper className="flex items-center gap-4 rounded-xl border-none p-3 shadow-xs dark:bg-[#27292a]">
+        <PopperWrapper className="flex max-w-none items-center gap-4 rounded-xl border-none p-3 shadow-xs dark:bg-[#27292a]">
             <UserAvatar src={currentUser?.data.avatar} />
 
             <Dialog open={isOpen} onOpenChange={handleOpenChange}>

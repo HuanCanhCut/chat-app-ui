@@ -64,7 +64,7 @@ enum SWRKey {
      * Story
      */
 
-    GET_STORY = '/stories',
+    GET_STORIES = '/stories',
 }
 
 export default SWRKey

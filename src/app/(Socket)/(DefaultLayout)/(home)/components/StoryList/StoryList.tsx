@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { useSelector } from 'react-redux'
 import Image from 'next/image'
@@ -21,7 +21,7 @@ const PER_PAGE = 10
 const StoryList = () => {
     const currentUser = useSelector(selectCurrentUser)
 
-    const { data: stories, mutate } = useSWR([SWRKey.GET_STORY], async () => {
+    const { data: stories, mutate } = useSWR([SWRKey.GET_STORIES], async () => {
         return await storyServices.getStories({ page: 1, per_page: PER_PAGE })
     })
 
@@ -29,6 +29,14 @@ const StoryList = () => {
     const [showRightScrollButton, setShowRightScrollButton] = useState(true)
 
     const storyContainerRef = useRef<HTMLDivElement>(null)
+
+    useEffect(() => {
+        if (storyContainerRef.current) {
+            const isScrollable = storyContainerRef.current.scrollWidth > storyContainerRef.current.clientWidth
+
+            setShowRightScrollButton(isScrollable)
+        }
+    }, [stories])
 
     const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
         const { scrollLeft, scrollWidth, clientWidth } = e.currentTarget
@@ -141,7 +149,11 @@ const StoryList = () => {
                             scrollableTarget="stories-scrollable"
                         >
                             {stories.data.map((story) => {
-                                return <StoryItem key={story.id} story={story} />
+                                return (
+                                    <React.Fragment key={story.uuid}>
+                                        <StoryItem story={story} />
+                                    </React.Fragment>
+                                )
                             })}
                         </InfiniteScroll>
                     </div>
