@@ -4,8 +4,8 @@ import {
     ConversationModel,
     ConversationThemeModel,
     MessageModel,
-    MessageReactionModel,
     NotificationModel,
+    ReactionModel,
     UserModel,
 } from './type'
 
@@ -27,8 +27,8 @@ interface ServerToClientEvents {
         top_reactions,
         total_reactions,
     }: {
-        reaction: MessageReactionModel | null
-        top_reactions: MessageReactionModel[]
+        reaction: ReactionModel | null
+        top_reactions: ReactionModel[]
         total_reactions: number
     }) => void
 
@@ -40,7 +40,7 @@ interface ServerToClientEvents {
     }: {
         message_id: number
         react: string
-        top_reactions: MessageReactionModel[]
+        top_reactions: ReactionModel[]
         total_reactions: number
     }) => void
 

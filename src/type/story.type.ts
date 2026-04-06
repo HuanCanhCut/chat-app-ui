@@ -1,4 +1,5 @@
 import { BaseModel } from './common.type'
+import { ReactionModel } from './reaction.type'
 import { UserModel } from './user.type'
 
 export interface StoryModel extends BaseModel {
@@ -10,4 +11,8 @@ export interface StoryModel extends BaseModel {
     uuid: string
     unviewed_count: number
     user: UserModel
+}
+
+export interface StoryWithReactions extends StoryModel {
+    reactions: ReactionModel[]
 }

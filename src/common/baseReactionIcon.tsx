@@ -1,6 +1,11 @@
 import { AngryIcon, CareIcon, HahaIcon, HeartIcon, LikeIcon, SadIcon, WowIcon } from '~/components/Icons'
+import { BaseReactionUnified } from '~/type/reaction.type'
 
-const baseReactionIcon = (size: number = 16) => {
+type IconMapping = {
+    [K in BaseReactionUnified]: React.ReactNode
+}
+
+const baseReactionIcon = (size: number = 16): IconMapping => {
     return {
         '1f44d': <LikeIcon width={size} height={size} />,
         '1f970': <CareIcon width={size} height={size} />,

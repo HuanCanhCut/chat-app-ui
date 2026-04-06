@@ -9,10 +9,13 @@ import { Send, Smile } from 'lucide-react'
 import baseReactionMapping from '~/common/baseReactionIcon'
 import Emoji from '~/components/Emoji'
 import { cn } from '~/lib/utils'
+import * as storyServices from '~/services/storyService'
+import { BaseReactionUnified, ReactionModel } from '~/type/reaction.type'
 import { StoryModel } from '~/type/story.type'
 
 interface StoryActionProps {
     story: StoryModel
+    handleReactStory: (reactions: ReactionModel[]) => void
 }
 
 interface FloatingReaction {
@@ -28,7 +31,7 @@ const iconMapping = baseReactionMapping(36)
 
 const FLOATING_DURATION = 1800
 
-const StoryAction: React.FC<StoryActionProps> = ({ story }) => {
+const StoryAction: React.FC<StoryActionProps> = ({ story, handleReactStory }) => {
     const inputRef = useRef<HTMLInputElement>(null)
 
     const [isFocused, setIsFocused] = useState(false)
@@ -72,16 +75,20 @@ const StoryAction: React.FC<StoryActionProps> = ({ story }) => {
         }, FLOATING_DURATION + 200)
     }
 
-    const handleReaction = ({
+    const handleReaction = async ({
         unified,
         emoji,
         initPosition,
     }: {
-        unified: keyof typeof iconMapping
+        unified: BaseReactionUnified
         emoji: React.ReactNode
         initPosition: { x: number; y: number }
     }) => {
         handleFloatingReaction({ emoji, initPosition })
+
+        const response = await storyServices.reactStory(story.uuid, unified)
+
+        handleReactStory(response.data)
     }
 
     return (
@@ -161,7 +168,7 @@ const StoryAction: React.FC<StoryActionProps> = ({ story }) => {
                             const rect = e.currentTarget.getBoundingClientRect()
 
                             handleReaction({
-                                unified: key as keyof typeof iconMapping,
+                                unified: key as BaseReactionUnified,
                                 emoji: value,
                                 initPosition: { x: rect.x, y: rect.y },
                             })

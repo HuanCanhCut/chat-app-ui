@@ -14,7 +14,7 @@ import socket from '~/helpers/socket'
 import { selectCurrentUser } from '~/redux/selector'
 import { useAppSelector } from '~/redux/types'
 import * as messageServices from '~/services/messageService'
-import { MessageReactionModel, TopReaction } from '~/type/type'
+import { ReactionModel, TopReaction } from '~/type/type'
 
 interface Props {
     isOpen: boolean
@@ -76,7 +76,7 @@ const ReactionModal: React.FC<Props> = ({ isOpen, onClose, messageId }) => {
         setPage(1)
     }
 
-    const handleChooseReaction = (reaction: MessageReactionModel) => {
+    const handleChooseReaction = (reaction: ReactionModel) => {
         if (reaction.user_id === currentUser?.data.id) {
             socket.emit('REMOVE_REACTION', {
                 message_id: messageId,
@@ -135,7 +135,9 @@ const ReactionModal: React.FC<Props> = ({ isOpen, onClose, messageId }) => {
             }
 
             if (data.message_id === messageId) {
-                const newReactions = reactions?.data.filter((reaction) => reaction.user_id !== currentUser?.data.id)
+                const newReactions = reactions?.data.filter(
+                    (reaction: ReactionModel) => reaction.user_id !== currentUser?.data.id,
+                )
 
                 const newReactionTypes = reactionTypes?.map((reaction) => {
                     if (reaction.react === data.react) {
@@ -220,7 +222,7 @@ const ReactionModal: React.FC<Props> = ({ isOpen, onClose, messageId }) => {
                         }
                         scrollableTarget="reaction-scrollable"
                     >
-                        {reactions?.data.map((reaction, index) => {
+                        {reactions?.data.map((reaction: ReactionModel, index: number) => {
                             return (
                                 <div
                                     key={index}

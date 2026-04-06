@@ -6,7 +6,7 @@ import { mutate } from 'swr'
 
 import SWRKey from '~/enum/SWRKey'
 import socket from '~/helpers/socket'
-import { MessageModel, MessageReactionModel, MessageResponse, TopReaction } from '~/type/type'
+import { MessageModel, MessageResponse, ReactionModel, TopReaction } from '~/type/type'
 interface ReactionProps {
     message: MessageModel
     handleOpenReactionModal: (messageId: number) => void
@@ -21,7 +21,7 @@ const Reaction = ({ message, handleOpenReactionModal }: ReactionProps) => {
             total_reactions,
             top_reactions,
         }: {
-            reaction: MessageReactionModel | null
+            reaction: ReactionModel | null
             total_reactions: number
             top_reactions: TopReaction[]
         }) => {

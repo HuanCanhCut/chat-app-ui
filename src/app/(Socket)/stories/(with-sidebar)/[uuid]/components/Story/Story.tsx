@@ -6,13 +6,17 @@ import useSWR from 'swr'
 import StoryAction from './StoryAction'
 import { faPause, faPlay, faVolumeHigh, faVolumeMute } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import baseReactionIcon from '~/common/baseReactionIcon'
 import UserAvatar from '~/components/UserAvatar'
 import config from '~/config'
 import SWRKey from '~/enum/SWRKey'
 import * as storyServices from '~/services/storyService'
-import { StoryModel } from '~/type/story.type'
+import { BaseReactionUnified, ReactionModel } from '~/type/reaction.type'
+import { StoryModel, StoryWithReactions } from '~/type/story.type'
 import getCloudinaryVideoThumbnail from '~/utils/getCloudinaryThumb'
 import { momentTimezone } from '~/utils/moment'
+
+const iconMapping = baseReactionIcon(18)
 
 const Story = () => {
     const router = useRouter()
@@ -26,9 +30,10 @@ const Story = () => {
         return storyServices.getUserStories(uuid as string)
     })
 
-    const [currentStory, setCurrentStory] = useState<StoryModel | null>(null)
+    const [currentStory, setCurrentStory] = useState<StoryWithReactions | null>(null)
     const [isMuted, setIsMuted] = useState(false)
     const [isPlaying, setIsPlaying] = useState(false)
+    const [reactions, setReactions] = useState<ReactionModel[]>([])
 
     useEffect(() => {
         if (error) {
@@ -47,6 +52,12 @@ const Story = () => {
             stopProgress()
         }
     }, [])
+
+    useEffect(() => {
+        if (currentStory) {
+            setReactions(currentStory.reactions)
+        }
+    }, [currentStory])
 
     useEffect(() => {
         window.addEventListener('visibilitychange', async () => {
@@ -87,6 +98,11 @@ const Story = () => {
 
     const stopProgress = () => {
         cancelAnimationFrame(rafRef.current)
+        setIsPlaying(false)
+    }
+
+    const handleReactStory = (reactions: ReactionModel[]) => {
+        setReactions(reactions)
     }
 
     return (
@@ -181,10 +197,27 @@ const Story = () => {
                                 />
                             ) : null}
                         </div>
+
+                        <div className="absolute bottom-1 left-2">
+                            <p className="flex items-center gap-2">
+                                <span className="flex items-center gap-1">
+                                    {reactions.reverse().map((reaction) => {
+                                        const react = reaction.react as BaseReactionUnified
+
+                                        const icon = iconMapping[react]
+
+                                        return <React.Fragment key={reaction.id}>{icon}</React.Fragment>
+                                    })}
+                                </span>
+                                <span className="mr-1 line-clamp-1 truncate whitespace-pre-wrap">
+                                    đã gửi cho {currentStory.user.full_name}
+                                </span>
+                            </p>
+                        </div>
                     </>
                 )}
             </div>
-            {currentStory && <StoryAction story={currentStory} />}
+            {currentStory && <StoryAction story={currentStory} handleReactStory={handleReactStory} />}
         </div>
     )
 }

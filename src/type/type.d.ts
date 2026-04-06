@@ -15,7 +15,7 @@ export type {
     TopReaction,
 } from './message.type'
 export type { NotificationModel, NotificationResponse } from './notification.type'
-export type { MessageReactionModel, MessageReactionResponse } from './reaction.type'
+export type { ReactionModel, ReactionResponse } from './reaction.type'
 export type { SearchHistory, SearchHistoryData } from './search.type'
 export type { SocketMessage } from './socket.type'
 export type { BlockModel, ConversationThemeModel, ConversationThemeResponse } from './theme.type'
