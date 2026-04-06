@@ -173,13 +173,17 @@ const Info: React.FC<InfoProps> = ({ className = '', isOpen }) => {
                             return prev
                         }
 
-                        const members = prev.data.members.map((member) => {
+                        const members = prev.data.members?.map((member) => {
                             if (member.user.id === Number(user_id)) {
                                 return { ...member, [key]: value }
                             }
 
                             return member
                         })
+
+                        if (!members) {
+                            return prev
+                        }
 
                         return {
                             ...prev,
@@ -226,7 +230,7 @@ const Info: React.FC<InfoProps> = ({ className = '', isOpen }) => {
                         // if member_id is current user, set deleted_at to current time
 
                         if (member_id === currentUser?.data.id) {
-                            newMembers = newMembers.map((member) => {
+                            newMembers = newMembers?.map((member) => {
                                 if (member.id === Number(member_id)) {
                                     return { ...member, deleted_at: new Date() }
                                 }
@@ -234,14 +238,18 @@ const Info: React.FC<InfoProps> = ({ className = '', isOpen }) => {
                                 return member
                             })
                         } else {
-                            newMembers = newMembers.filter((member) => member.id !== Number(member_id))
+                            newMembers = newMembers?.filter((member) => member.id !== Number(member_id))
                         }
 
                         // leave conversation
                         socket.emit('LEAVE_ROOM', {
                             conversation_uuid: uuid,
-                            user_id: prev.data.members.find((member) => member.id === member_id)?.user.id,
+                            user_id: prev.data.members?.find((member) => member.id === member_id)?.user.id,
                         })
+
+                        if (!newMembers) {
+                            return prev
+                        }
 
                         return {
                             ...prev,
@@ -284,6 +292,10 @@ const Info: React.FC<InfoProps> = ({ className = '', isOpen }) => {
                         }
 
                         if (!prev?.data) {
+                            return prev
+                        }
+
+                        if (!prev.data.members) {
                             return prev
                         }
 

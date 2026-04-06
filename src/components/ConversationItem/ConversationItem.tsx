@@ -31,7 +31,7 @@ const ConversationItem: React.FC<Props> = ({ conversation, className = '' }) => 
     const isActive = uuid === conversation.uuid
 
     // if not group then get user !== current user in conversation_members
-    const userMember = conversation.members.find((member) => member.user_id !== currentUser?.data.id)
+    const userMember = conversation.members?.find((member) => member.user_id !== currentUser?.data.id)
 
     const isRead =
         conversation.last_message.sender_id !== currentUser?.data.id ? !!conversation.last_message.is_read : true
@@ -91,7 +91,7 @@ const ConversationItem: React.FC<Props> = ({ conversation, className = '' }) => 
                         src={conversation.is_group ? conversation.avatar : userMember?.user.avatar}
                         size={56}
                         className="h-[48px] w-[48px] lg:h-[56px] lg:w-[56px]"
-                        isOnline={conversation.members.some(
+                        isOnline={conversation.members?.some(
                             (member) => member.user.is_online && member.user.id !== currentUser?.data.id,
                         )}
                         onlineClassName="h-4 w-4"

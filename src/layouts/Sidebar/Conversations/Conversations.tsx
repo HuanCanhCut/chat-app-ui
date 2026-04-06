@@ -92,7 +92,7 @@ const Conversations = () => {
                     [data.conversation.uuid]: {
                         ...conversationData,
                         last_message: data.conversation.last_message,
-                        members: conversationData.members.map((member: ConversationMember, index: number) => {
+                        members: conversationData.members?.map((member: ConversationMember, index: number) => {
                             return {
                                 ...member,
                                 user: {
@@ -146,7 +146,7 @@ const Conversations = () => {
                             ...conversations.data,
                             [conversationUserMap[user_id]]: {
                                 ...conversations.data[conversationUserMap[user_id]],
-                                members: conversations.data[conversationUserMap[user_id]].members.map(
+                                members: conversations.data[conversationUserMap[user_id]].members?.map(
                                     (member: ConversationMember) => {
                                         if (member.user_id === user_id) {
                                             return { ...member, user: { ...member.user, is_online: is_online } }
@@ -167,7 +167,7 @@ const Conversations = () => {
                     const conversation: ConversationModel = conversations.data[key]
 
                     if (!conversation.is_group) {
-                        const hasUser = conversation.members.find((member) => member.user_id === user_id)
+                        const hasUser = conversation.members?.find((member) => member.user_id === user_id)
 
                         if (hasUser) {
                             mutateConversations(
@@ -176,7 +176,7 @@ const Conversations = () => {
                                         ...conversations.data,
                                         [key]: {
                                             ...conversation,
-                                            members: conversation.members.map((member) => {
+                                            members: conversation.members?.map((member) => {
                                                 if (member.user_id === user_id) {
                                                     return {
                                                         ...member,

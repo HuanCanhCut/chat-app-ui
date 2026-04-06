@@ -10,8 +10,8 @@ import UserAvatar from '~/components/UserAvatar'
 import config from '~/config'
 import { sendEvent } from '~/helpers/events'
 import socket from '~/helpers/socket'
-import { useAppSelector } from '~/redux/types'
 import { selectCurrentUser } from '~/redux/selector'
+import { useAppSelector } from '~/redux/types'
 import { ConversationModel } from '~/type/type'
 import { momentTimezone } from '~/utils/moment'
 interface HeaderProps {
@@ -29,13 +29,13 @@ const Header: React.FC<HeaderProps> = ({ className = '', isInfoOpen, conversatio
 
     const handleNavigate = () => {
         if (!conversation.is_group) {
-            const member = conversation.members.find((member) => member.user_id !== currentUser?.data.id)
+            const member = conversation.members?.find((member) => member.user_id !== currentUser?.data.id)
 
             router.push(`${config.routes.user}/@${member?.user.nickname}`)
         }
     }
 
-    const conversationMember = conversation.members.find((member) => member.user_id !== currentUser?.data.id)
+    const conversationMember = conversation.members?.find((member) => member.user_id !== currentUser?.data.id)
 
     const [lastOnlineTime, setLastOnlineTime] = useState<Date | null>(null)
 
@@ -133,7 +133,7 @@ const Header: React.FC<HeaderProps> = ({ className = '', isInfoOpen, conversatio
                         <UserAvatar
                             src={conversation.is_group ? conversation.avatar : conversationMember?.user?.avatar}
                             size={40}
-                            isOnline={conversation.members.some(
+                            isOnline={conversation.members?.some(
                                 (member) => member.user.is_online && member.user.id !== currentUser?.data.id,
                             )}
                         />
@@ -149,7 +149,7 @@ const Header: React.FC<HeaderProps> = ({ className = '', isInfoOpen, conversatio
                                 ? conversationMember?.user?.is_online
                                     ? 'Đang hoạt động'
                                     : lastOnlineTime && `Hoạt động ${momentTimezone(lastOnlineTime)} trước`
-                                : `${conversation.members.filter((member) => member.user.is_online && member.user.id !== currentUser?.data.id).length} người đang hoạt động`}
+                                : `${conversation.members?.filter((member) => member.user.is_online && member.user.id !== currentUser?.data.id).length} người đang hoạt động`}
                         </span>
                     </div>
                 </div>

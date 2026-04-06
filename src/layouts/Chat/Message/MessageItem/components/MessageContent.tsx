@@ -189,7 +189,7 @@ const MessageContent = ({
     }
 
     const handleCallAgain = () => {
-        const otherMember = conversation?.members.find((member) => member.user_id !== currentUser?.id)
+        const otherMember = conversation?.members?.find((member) => member.user_id !== currentUser?.id)
 
         if (!otherMember) {
             return

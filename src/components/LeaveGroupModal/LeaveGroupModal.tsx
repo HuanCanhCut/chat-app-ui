@@ -18,7 +18,7 @@ const LeaveGroupModal: React.FC<LeaveGroupModalProps> = ({ onClose, conversation
     const currentUser = useAppSelector(selectCurrentUser)
     const { uuid } = useParams()
 
-    const currentUserMember = conversation?.members.find((member) => {
+    const currentUserMember = conversation?.members?.find((member) => {
         return member.user_id === currentUser?.data.id
     }) as ConversationMember | undefined
 

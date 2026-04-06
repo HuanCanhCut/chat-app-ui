@@ -27,7 +27,7 @@ const Block: React.FC<BlockProps> = ({ currentMember }) => {
     })
 
     const otherMember = useMemo(() => {
-        return conversation?.data?.members.find((member) => member.user_id !== currentUser?.data.id)
+        return conversation?.data?.members?.find((member) => member.user_id !== currentUser?.data.id)
     }, [conversation?.data?.members, currentUser?.data.id])
 
     const handleCloseModal = useCallback(() => {

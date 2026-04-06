@@ -76,7 +76,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ onChose }) => {
         return conversationServices.getConversationByUuid({ uuid: uuid as string })
     })
 
-    const member = conversation?.data.members.find((member) => {
+    const member = conversation?.data.members?.find((member) => {
         return member.user_id !== currentUser?.data.id
     }) as ConversationMember | undefined
 
@@ -109,7 +109,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ onChose }) => {
 
     // if current user is admin or leader in conversation
     const isAdmin = useMemo(() => {
-        return conversation?.data.members.some(
+        return conversation?.data.members?.some(
             (member) =>
                 member.user_id === currentUser?.data.id && (member.role === 'admin' || member.role === 'leader'),
         )
@@ -158,7 +158,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ onChose }) => {
                   title: 'Thành viên trong đoạn chat',
                   type: 'member_in_conversation',
                   children: [
-                      ...conversation.data.members.map((member) => {
+                      ...(conversation.data.members?.map((member) => {
                           const addedBy = () => {
                               if (member.added_by_id === currentUser?.data.id) {
                                   return 'bạn'
@@ -217,7 +217,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ onChose }) => {
                                   </CustomTippy>
                               ),
                           }
-                      }),
+                      }) || []),
                       {
                           title: 'Thêm người',
                           leftIcon: <FontAwesomeIcon icon={faUserPlus} width={20} height={20} />,

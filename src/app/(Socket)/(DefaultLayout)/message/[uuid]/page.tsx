@@ -32,7 +32,7 @@ const MessagePage = () => {
     )
 
     const currentMember = useMemo(() => {
-        return conversation?.data?.members.find((member) => member.user_id === currentUser?.data.id)
+        return conversation?.data?.members?.find((member) => member.user_id === currentUser?.data.id)
     }, [conversation?.data?.members, currentUser?.data.id])
 
     const isBlocked = currentMember?.deleted_at || !currentMember || conversation?.data.block_conversation
@@ -48,7 +48,7 @@ const MessagePage = () => {
                     ...conversation,
                     data: {
                         ...conversation.data,
-                        members: conversation.data.members.map((member) => {
+                        members: conversation.data.members?.map((member) => {
                             if (member.user_id === data.user_id) {
                                 return {
                                     ...member,

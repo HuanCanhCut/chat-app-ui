@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useRef, useState } from 'react'
 import ReactDOM from 'react-dom'
 import { EmojiClickData } from 'emoji-picker-react'
 import { motion } from 'framer-motion'
@@ -174,7 +174,7 @@ const StoryAction: React.FC<StoryActionProps> = ({ story }) => {
 
             {/* Append to body to avoid overflow hidden */}
             {ReactDOM.createPortal(
-                <div className="pointer-events-none fixed inset-0 z-[9999999]">
+                <div className="pointer-events-none fixed inset-0 z-9999999">
                     {floatingReactions.map((reaction) => (
                         <motion.div
                             key={reaction.id}

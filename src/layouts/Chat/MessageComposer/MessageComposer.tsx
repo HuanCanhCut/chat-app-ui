@@ -87,7 +87,7 @@ const InputMessage: React.FC<InputMessageProps> = () => {
                     created_at: new Date().toISOString(),
                     updated_at: new Date().toISOString(),
                     sender: currentUser?.data,
-                    message_status: conversation?.data.members.map((conversation) => {
+                    message_status: conversation?.data.members?.map((conversation) => {
                         return {
                             receiver_id: conversation.user_id,
                             status: 'sending',

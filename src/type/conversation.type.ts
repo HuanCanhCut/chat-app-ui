@@ -10,7 +10,7 @@ export interface ConversationModel extends BaseModel {
     name?: string
     avatar?: string
     uuid: string
-    members: ConversationMember[]
+    members?: ConversationMember[]
     last_message: MessageModel
     emoji: string
     theme_id: number

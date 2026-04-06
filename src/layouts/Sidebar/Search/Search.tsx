@@ -10,8 +10,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import UserAvatar from '~/components/UserAvatar'
 import config from '~/config'
 import useDebounce from '~/hooks/useDebounce'
-import { useAppSelector } from '~/redux/types'
 import { selectCurrentUser } from '~/redux/selector'
+import { useAppSelector } from '~/redux/types'
 import * as conversationService from '~/services/conversationService'
 import { ConversationModel } from '~/type/type'
 
@@ -54,7 +54,7 @@ const Search: React.FC<Props> = ({ setSearchMode, searchMode }) => {
             // 20px: padding left and right
             <div className="dark:bg-dark bp900:w-[calc(var(--sidebar-width-tablet)-20px)] h-[calc(100dvh-210px)] w-[calc(100vw-20px)] [overflow:overlay] sm:h-[calc(100dvh-180px)] lg:w-[calc(var(--sidebar-width)-20px)]">
                 {searchResult.map((conversation) => {
-                    let conversationMember = conversation.members.find(
+                    let conversationMember = conversation.members?.find(
                         (member) => member.user_id !== currentUser?.data.id,
                     )
 

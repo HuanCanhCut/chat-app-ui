@@ -63,11 +63,11 @@ const Message: React.FC<MessageProps> = ({ conversation }) => {
         },
     )
 
-    const member = conversation?.members.find((member) => member.user_id !== currentUser?.data?.id)
+    const member = conversation?.members?.find((member) => member.user_id !== currentUser?.data?.id)
 
     // Join room when component mount and current user is not banned
     useEffect(() => {
-        const member = conversation?.members.find((member) => member.user_id === currentUser?.data?.id)
+        const member = conversation?.members?.find((member) => member.user_id === currentUser?.data?.id)
         // if current user is banned, not join room
         if (member?.deleted_at || !member) {
             return
