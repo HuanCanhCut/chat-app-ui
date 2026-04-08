@@ -227,6 +227,8 @@ interface ClientToServerEvents {
         type,
         parent_id,
         media,
+        forward_type,
+        forward_origin_id,
     }: {
         conversation_uuid: string
         message: string
@@ -236,6 +238,8 @@ interface ClientToServerEvents {
             media_url: string
             media_type: 'image' | 'video'
         }>
+        forward_type?: 'Story' | 'Message' | 'Post'
+        forward_origin_id?: number
     }) => void
 
     READ_MESSAGE: ({ conversation_uuid, message_id }: { conversation_uuid: string; message_id: number }) => void

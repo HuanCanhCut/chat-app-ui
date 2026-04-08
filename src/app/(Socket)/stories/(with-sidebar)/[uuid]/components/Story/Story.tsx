@@ -357,7 +357,13 @@ const Story = () => {
                 </div>
             )}
 
-            {currentStory && <StoryAction story={currentStory} handleReactStory={handleReactStory} />}
+            {currentStory && (
+                <StoryAction
+                    story={currentStory}
+                    handleReactStory={handleReactStory}
+                    conversation_uuid={userStories?.meta.general_conversation?.uuid}
+                />
+            )}
         </div>
     )
 }

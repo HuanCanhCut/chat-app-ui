@@ -23,6 +23,11 @@ export const getUserStories = async (
     uuid: string,
 ): Promise<{
     data: StoryWithReactions[]
+    meta: {
+        general_conversation?: {
+            uuid?: string
+        }
+    }
 }> => {
     const response = await request.get(`/stories/${uuid}`)
     return response.data

@@ -8,16 +8,18 @@ import { Send, Smile } from 'lucide-react'
 
 import baseReactionMapping from '~/common/baseReactionIcon'
 import Emoji from '~/components/Emoji'
+import socket from '~/helpers/socket'
 import { cn } from '~/lib/utils'
+import { selectCurrentUser } from '~/redux/selector'
+import { useAppSelector } from '~/redux/types'
+import * as conversationServices from '~/services/conversationService'
 import * as storyServices from '~/services/storyService'
 import { BaseReactionUnified, ReactionModel } from '~/type/reaction.type'
 import { StoryModel } from '~/type/story.type'
 
-interface StoryActionProps {
-    story: StoryModel
-    handleReactStory: (reactions: ReactionModel[]) => void
-}
+const iconMapping = baseReactionMapping(36)
 
+const FLOATING_DURATION = 1800
 interface FloatingReaction {
     id: string
     emoji: React.ReactNode
@@ -27,26 +29,37 @@ interface FloatingReaction {
     initY: number
 }
 
-const iconMapping = baseReactionMapping(36)
+interface StoryActionProps {
+    story: StoryModel
+    handleReactStory: (reactions: ReactionModel[]) => void
+    conversation_uuid?: string
+}
 
-const FLOATING_DURATION = 1800
+const StoryAction: React.FC<StoryActionProps> = ({ story, handleReactStory, conversation_uuid }) => {
+    const currentUser = useAppSelector(selectCurrentUser)
 
-const StoryAction: React.FC<StoryActionProps> = ({ story, handleReactStory }) => {
     const inputRef = useRef<HTMLInputElement>(null)
 
     const [isFocused, setIsFocused] = useState(false)
     const [isOpenEmoji, setIsOpenEmoji] = useState(false)
     const [floatingReactions, setFloatingReactions] = useState<FloatingReaction[]>([])
+    const [message, setMessage] = useState('')
 
     const handleEmojiClick = (emojiData: EmojiClickData) => {
-        //
+        setMessage((prev) => prev + emojiData.emoji)
     }
 
-    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-        if (e.key === 'Escape') {
-            e.preventDefault()
-            e.currentTarget.blur()
-            setIsFocused(false)
+    const handleKeyDown = async (e: React.KeyboardEvent<HTMLInputElement>) => {
+        switch (e.key) {
+            case 'Enter':
+                e.preventDefault()
+                await handleEmitMessage()
+                break
+            case 'Escape':
+                e.preventDefault()
+                e.currentTarget.blur()
+                setIsFocused(false)
+                break
         }
     }
 
@@ -91,26 +104,56 @@ const StoryAction: React.FC<StoryActionProps> = ({ story, handleReactStory }) =>
         handleReactStory(response.data)
     }
 
+    const handleEmitMessage = async () => {
+        const onlyIcon = new RegExp(/^(\p{Emoji_Presentation}|\p{Emoji}\uFE0F|\p{Emoji_Modifier_Base})+$/u).test(
+            message.trim() as string,
+        )
+
+        if (!conversation_uuid) {
+            // create temp conversation
+            const conversation = await conversationServices.createTempConversation({ userId: story.user_id })
+
+            conversation_uuid = conversation.data.uuid
+        }
+
+        if (conversation_uuid) {
+            socket.emit('NEW_MESSAGE', {
+                conversation_uuid,
+                message: message,
+                type: onlyIcon ? 'icon' : 'text',
+                forward_type: 'Story',
+                forward_origin_id: story.id,
+            })
+
+            setMessage('')
+            setIsFocused(false)
+        }
+    }
+
     return (
         <div className="flex w-full max-w-dvw items-center gap-3 overflow-x-scroll overflow-y-hidden px-3 pt-3 pb-1 sm:justify-center">
             <div className="relative">
-                <input
-                    ref={inputRef}
-                    className={cn(
-                        'w-[300px] max-w-full rounded-3xl border border-white p-2 px-4 placeholder-white transition-all duration-200 ease-linear outline-none select-none dark:border-white',
-                        isFocused && 'w-[600px]',
-                    )}
-                    onFocus={() => {
-                        setIsFocused(true)
-                    }}
-                    onBlur={() => {
-                        if (!isOpenEmoji) {
-                            setIsFocused(false)
-                        }
-                    }}
-                    placeholder="Gửi tin nhắn..."
-                    onKeyDown={handleKeyDown}
-                />
+                {story.user_id !== currentUser?.data.id && (
+                    <input
+                        ref={inputRef}
+                        className={cn(
+                            'w-[300px] max-w-full rounded-3xl border border-white p-2 px-4 placeholder-white transition-all duration-200 ease-linear outline-none select-none dark:border-white',
+                            isFocused && 'w-[600px]',
+                        )}
+                        onFocus={() => {
+                            setIsFocused(true)
+                        }}
+                        onBlur={() => {
+                            if (!isOpenEmoji) {
+                                setIsFocused(false)
+                            }
+                        }}
+                        placeholder="Gửi tin nhắn..."
+                        onKeyDown={handleKeyDown}
+                        value={message}
+                        onChange={(e) => setMessage(e.target.value)}
+                    />
+                )}
                 {isFocused && (
                     <div className="absolute top-1/2 right-3 flex -translate-y-1/2 items-center gap-2">
                         <HeadlessTippy
@@ -142,14 +185,17 @@ const StoryAction: React.FC<StoryActionProps> = ({ story, handleReactStory }) =>
                                 </Tippy>
                             </div>
                         </HeadlessTippy>
-                        <button
-                            className="cursor-pointer"
-                            onMouseDown={(e) => {
-                                e.preventDefault()
-                            }}
-                        >
-                            <Send />
-                        </button>
+                        <Tippy content="Gửi">
+                            <button
+                                className="cursor-pointer"
+                                onMouseDown={(e) => {
+                                    e.preventDefault()
+                                }}
+                                onClick={handleEmitMessage}
+                            >
+                                <Send />
+                            </button>
+                        </Tippy>
                     </div>
                 )}
             </div>
