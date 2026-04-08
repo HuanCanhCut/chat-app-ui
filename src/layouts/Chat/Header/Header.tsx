@@ -3,7 +3,7 @@
 import { memo, useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 
-import { faChevronLeft, faCircleInfo } from '@fortawesome/free-solid-svg-icons'
+import { faChevronLeft, faCircleInfo, faPhone, faVideo } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Button from '~/components/Button'
 import UserAvatar from '~/components/UserAvatar'
@@ -14,6 +14,8 @@ import { selectCurrentUser } from '~/redux/selector'
 import { useAppSelector } from '~/redux/types'
 import { ConversationModel } from '~/type/type'
 import { momentTimezone } from '~/utils/moment'
+import openWindowCall from '~/utils/openWindowCall'
+
 interface HeaderProps {
     className?: string
     isInfoOpen: boolean
@@ -109,6 +111,24 @@ const Header: React.FC<HeaderProps> = ({ className = '', isInfoOpen, conversatio
         sendEvent('INFO:TOGGLE', { isOpen: !isInfoOpen })
     }
 
+    const handleVoiceCall = () => {
+        openWindowCall({
+            memberNickname: conversationMember?.user.nickname,
+            type: 'voice',
+            conversationUuid: conversation.uuid,
+            subType: 'caller',
+        })
+    }
+
+    const handleVideoCall = () => {
+        openWindowCall({
+            memberNickname: conversationMember?.user.nickname,
+            type: 'video',
+            conversationUuid: conversation.uuid,
+            subType: 'caller',
+        })
+    }
+
     return (
         <div
             className={`${className} z-10 flex items-center justify-between bg-(--background-theme-light-header-color) px-2 py-1 shadow-xs [box-shadow:1px_0px_8px_rgba(0,0,0,0.1)] dark:bg-(--background-theme-dark-header-color) dark:[box-shadow:1px_0px_8px_rgba(0,0,0,0.2)]`}
@@ -155,7 +175,37 @@ const Header: React.FC<HeaderProps> = ({ className = '', isInfoOpen, conversatio
                 </div>
             </div>
             {!conversation.is_temp && (
-                <div className="flex items-center">
+                <div className="flex items-center gap-1">
+                    {!conversation.is_group && !conversation.is_temp && (
+                        <>
+                            <Button
+                                buttonType="icon"
+                                className="bg-transparent hover:bg-[#99999926]! dark:bg-transparent dark:hover:bg-[#383b3b25]!"
+                                onClick={handleVoiceCall}
+                            >
+                                <FontAwesomeIcon
+                                    icon={faPhone}
+                                    width={20}
+                                    height={20}
+                                    className="cursor-pointer text-xl text-(--sender-light-background-color) dark:text-(--sender-dark-background-color)"
+                                />
+                            </Button>
+
+                            <Button
+                                buttonType="icon"
+                                className="bg-transparent hover:bg-[#99999926]! dark:bg-transparent dark:hover:bg-[#383b3b25]!"
+                                onClick={handleVideoCall}
+                            >
+                                <FontAwesomeIcon
+                                    icon={faVideo}
+                                    width={20}
+                                    height={20}
+                                    className="cursor-pointer text-xl text-(--sender-light-background-color) dark:text-(--sender-dark-background-color)"
+                                />
+                            </Button>
+                        </>
+                    )}
+
                     <Button
                         buttonType="icon"
                         className="bg-transparent hover:bg-[#99999926]! dark:bg-transparent dark:hover:bg-[#383b3b25]!"

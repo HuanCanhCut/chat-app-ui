@@ -1,4 +1,5 @@
 import { BaseModel, MetaPagination } from './common.type'
+import { StoryModel } from './story.type'
 import { UserModel } from './user.type'
 
 export interface TopReaction {
@@ -11,6 +12,22 @@ export interface MessageMedia extends BaseModel {
     media_url: string
     media_type: 'image' | 'video'
 }
+
+interface ForwardMessage {
+    id: number
+    content: string | null
+    type: string
+}
+
+interface ForwardStory {
+    id: number
+    url: string
+    type: string
+    background_url: string
+    user: Pick<UserModel, 'id' | 'full_name'>
+}
+
+// Interface chính
 
 export interface MessageModel extends BaseModel {
     conversation_id: number
@@ -25,6 +42,9 @@ export interface MessageModel extends BaseModel {
     parent_id: number | null
     parent: MessageModel | null
     media: MessageMedia[]
+    forward_type: 'Story' | 'Message' | 'Post' | null
+    forward_origin_id: number | null
+    forward_origin: ForwardMessage | ForwardStory | null
 }
 
 export interface MessageResponse {
