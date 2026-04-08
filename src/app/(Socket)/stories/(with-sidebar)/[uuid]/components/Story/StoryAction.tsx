@@ -92,7 +92,7 @@ const StoryAction: React.FC<StoryActionProps> = ({ story, handleReactStory }) =>
     }
 
     return (
-        <div className="flex w-full max-w-dvw items-center gap-3 overflow-x-scroll px-3 pt-3 pb-1 sm:justify-center">
+        <div className="flex w-full max-w-dvw items-center gap-3 overflow-x-scroll overflow-y-hidden px-3 pt-3 pb-1 sm:justify-center">
             <div className="relative">
                 <input
                     ref={inputRef}
