@@ -5,12 +5,10 @@ import { CloudinarySignature } from '~/type/cloudinary'
 const uploadToCloudinary = async ({
     file,
     signature,
-    type,
     toastId,
 }: {
     file: File
     signature: CloudinarySignature
-    type: string
     toastId?: string
 }) => {
     try {
@@ -22,14 +20,19 @@ const uploadToCloudinary = async ({
         formData.append('folder', signature.folder)
         formData.append('transformation', signature.transformation)
 
+        const [fileType] = file.type.split('/')
+
         // Upload to Cloudinary
-        const uploadResponse = await fetch(`https://api.cloudinary.com/v1_1/${signature.cloud_name}/${type}/upload`, {
-            method: 'POST',
-            body: formData,
-        })
+        const uploadResponse = await fetch(
+            `https://api.cloudinary.com/v1_1/${signature.cloud_name}/${fileType}/upload`,
+            {
+                method: 'POST',
+                body: formData,
+            },
+        )
 
         return await uploadResponse.json()
-    } catch (_) {
+    } catch (error) {
         toast.error('Lỗi khi tải lên file', {
             id: toastId?.toString(),
         })

@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { useSelector } from 'react-redux'
 import Image from 'next/image'
+import Link from 'next/link'
 import { ChevronLeft, ChevronRight, Plus } from 'lucide-react'
 import { toast } from 'sonner'
 import useSWR from 'swr'
@@ -12,6 +13,7 @@ import StoryItem from './StoryItem'
 import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { Button } from '~/components/ui/button'
+import config from '~/config'
 import SWRKey from '~/enum/SWRKey'
 import { selectCurrentUser } from '~/redux/selector'
 import * as storyServices from '~/services/storyService'
@@ -83,7 +85,10 @@ const StoryList = () => {
                 onScroll={handleScroll}
             >
                 {currentUser?.data && (
-                    <div className="flex aspect-10/16 h-50 shrink-0 cursor-pointer flex-col overflow-hidden rounded-md [&_img]:hover:scale-102 [&_img]:hover:brightness-90">
+                    <Link
+                        href={config.routes.create_story}
+                        className="flex aspect-10/16 h-50 shrink-0 cursor-pointer flex-col overflow-hidden rounded-md [&_img]:hover:scale-102 [&_img]:hover:brightness-90"
+                    >
                         <Image
                             src={currentUser?.data.avatar || '/static/media/default-avatar.jpg'}
                             alt="Story"
@@ -104,7 +109,7 @@ const StoryList = () => {
                                 <Plus className="text-white" />
                             </div>
                         </div>
-                    </div>
+                    </Link>
                 )}
 
                 {stories?.data && (

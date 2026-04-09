@@ -37,3 +37,24 @@ export const reactStory = async (story_uuid: string, unified: BaseReactionUnifie
     const response = await request.post(`/stories/${story_uuid}/react`, { unified })
     return response.data
 }
+
+export const createStory = async ({
+    type,
+    url,
+    caption,
+}: {
+    type: 'text' | 'image' | 'video'
+    url: string
+    caption?: string
+}) => {
+    try {
+        const response = await request.post('/stories', {
+            type,
+            url,
+            caption,
+        })
+        return response.data
+    } catch (error) {
+        throw error
+    }
+}

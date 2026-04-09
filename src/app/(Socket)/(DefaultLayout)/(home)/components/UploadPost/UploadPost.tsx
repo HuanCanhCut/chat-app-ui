@@ -155,11 +155,9 @@ const UploadPost = () => {
                 const postMedia = await pMap(
                     postFiles,
                     async (file) => {
-                        const [fileType] = file.type.split('/')
                         return uploadToCloudinary({
                             file,
                             signature,
-                            type: fileType,
                         })
                     },
                     { concurrency: 5 },

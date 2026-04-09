@@ -167,9 +167,7 @@ const InputMessage: React.FC<InputMessageProps> = () => {
             const payload = await pMap(
                 media,
                 async (m) => {
-                    const [fileType] = m.type.split('/')
-
-                    return uploadToCloudinary({ file: m, signature, type: fileType })
+                    return uploadToCloudinary({ file: m, signature })
                 },
                 {
                     concurrency: 5,

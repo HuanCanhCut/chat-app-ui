@@ -19,7 +19,7 @@ const StoryItem: React.FC<StoryItemProps> = ({ story }) => {
     const handleOpenStoryModal = () => {
         setIsOpen(true)
 
-        window.history.pushState({}, '', `/stories/${story.user.uuid}`)
+        window.history.pushState({}, '', `/stories/${story.uuid}`)
     }
 
     useEffect(() => {
