@@ -80,7 +80,13 @@ const Story: React.FC<StoryProps> = ({ uuid }) => {
 
     useEffect(() => {
         if (userStories) {
-            setCurrentStory(userStories.data[0])
+            const lastViewedStoryIndex = userStories.data.findLastIndex((story) => story.is_viewed)
+
+            if (lastViewedStoryIndex !== -1) {
+                setCurrentStory(userStories.data[lastViewedStoryIndex + 1])
+            } else {
+                setCurrentStory(userStories.data[0])
+            }
         }
     }, [userStories])
 
@@ -97,17 +103,29 @@ const Story: React.FC<StoryProps> = ({ uuid }) => {
     }, [currentStory])
 
     useEffect(() => {
-        window.addEventListener('visibilitychange', async () => {
+        const handler = async () => {
             if (document.visibilityState === 'visible') {
-                setIsPlaying(true)
-                try {
-                    await videoRef.current?.play()
-                } catch (_) {}
+                if (currentStory?.type === 'video') {
+                    try {
+                        await videoRef.current?.play()
+                    } catch (_) {}
+                } else if (currentStory?.type === 'image' || currentStory?.type === 'text') {
+                    startImageProgress()
+                }
             } else {
-                setIsPlaying(false)
-                videoRef.current?.pause()
+                if (currentStory?.type === 'video') {
+                    videoRef.current?.pause()
+                }
+                stopProgress()
             }
-        })
+        }
+
+        window.addEventListener('visibilitychange', handler)
+
+        return () => {
+            window.removeEventListener('visibilitychange', handler)
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     const handleNextStory = useCallback(() => {
@@ -145,35 +163,44 @@ const Story: React.FC<StoryProps> = ({ uuid }) => {
         }
     }, [currentStory, hasNextStory, router, stories, userStories])
 
+    const startImageProgress = useCallback(() => {
+        cancelAnimationFrame(rafRef.current)
+        setIsPlaying(true)
+
+        let lastTime = Date.now()
+
+        const tick = () => {
+            const now = Date.now()
+            elapsedRef.current += now - lastTime
+            lastTime = now
+
+            const percent = Math.min((elapsedRef.current / IMAGE_DURATION) * 100, 100)
+
+            const el = currentStory ? progressRefs.current[currentStory.id] : null
+            if (el) {
+                el.style.width = `${percent}%`
+            }
+
+            if (percent < 100) {
+                rafRef.current = requestAnimationFrame(tick)
+            } else {
+                handleNextStory()
+            }
+        }
+
+        rafRef.current = requestAnimationFrame(tick)
+    }, [currentStory, handleNextStory])
+
     useEffect(() => {
         if (!currentStory) return
 
         if (currentStory.type === 'image' || currentStory.type === 'text') {
-            setIsPlaying(true)
-
-            const startTime = Date.now()
-
-            const tick = () => {
-                const elapsed = Date.now() - startTime
-                const percent = Math.min((elapsed / IMAGE_DURATION) * 100, 100)
-
-                const el = progressRefs.current[currentStory.id]
-                if (el) {
-                    el.style.width = `${percent}%`
-                }
-
-                if (percent < 100) {
-                    rafRef.current = requestAnimationFrame(tick)
-                } else {
-                    handleNextStory()
-                }
-            }
-
-            rafRef.current = requestAnimationFrame(tick)
+            elapsedRef.current = 0
+            startImageProgress()
 
             return () => cancelAnimationFrame(rafRef.current)
         }
-    }, [currentStory, handleNextStory])
+    }, [currentStory, startImageProgress])
 
     const handlePrevStory = useCallback(() => {
         if (!userStories) {
@@ -254,17 +281,6 @@ const Story: React.FC<StoryProps> = ({ uuid }) => {
                 case 'ArrowLeft':
                     handlePrevStory()
                     break
-                case 'Space':
-                    if (isPlaying) {
-                        videoRef.current?.pause()
-                        setIsPlaying(false)
-                        stopProgress()
-                    } else {
-                        videoRef.current?.play()
-                        setIsPlaying(true)
-                        startProgress()
-                    }
-                    break
             }
         }
 
@@ -273,7 +289,7 @@ const Story: React.FC<StoryProps> = ({ uuid }) => {
         return () => {
             window.removeEventListener('keydown', handleKeyDown)
         }
-    }, [handleNextStory, handlePrevStory, isPlaying, router, startProgress])
+    }, [handleNextStory, handlePrevStory, isPlaying, router, startProgress, currentStory, startImageProgress])
 
     return (
         <div className="relative flex max-h-dvh w-full flex-col items-center overflow-hidden rounded-md">
@@ -353,14 +369,20 @@ const Story: React.FC<StoryProps> = ({ uuid }) => {
                                             <button
                                                 className="size-6 cursor-pointer outline-none"
                                                 onClick={() => {
-                                                    setIsPlaying((prev) => !prev)
-
                                                     if (isPlaying) {
-                                                        videoRef.current?.pause()
+                                                        if (currentStory.type === 'video') {
+                                                            videoRef.current?.pause()
+                                                        } else {
+                                                            stopProgress()
+                                                        }
                                                     } else {
-                                                        try {
-                                                            videoRef.current?.play()
-                                                        } catch (_) {}
+                                                        if (currentStory.type === 'video') {
+                                                            try {
+                                                                videoRef.current?.play()
+                                                            } catch (_) {}
+                                                        } else {
+                                                            startImageProgress()
+                                                        }
                                                     }
                                                 }}
                                             >
