@@ -82,13 +82,23 @@ const Story: React.FC<StoryProps> = ({ uuid }) => {
         if (userStories) {
             const lastViewedStoryIndex = userStories.data.findLastIndex((story) => story.is_viewed)
 
-            if (lastViewedStoryIndex !== -1) {
-                setCurrentStory(userStories.data[lastViewedStoryIndex + 1])
+            if (lastViewedStoryIndex === userStories.data.length - 1) {
+                setCurrentStory(userStories.data[0])
             } else {
                 setCurrentStory(userStories.data[0])
             }
         }
     }, [userStories])
+
+    useEffect(() => {
+        if (currentStory && !currentStory.is_viewed) {
+            ;(async () => {
+                try {
+                    await storyServices.viewStory(currentStory.uuid)
+                } catch (_) {}
+            })()
+        }
+    }, [currentStory])
 
     useEffect(() => {
         return () => {

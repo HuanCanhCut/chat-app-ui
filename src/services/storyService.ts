@@ -58,3 +58,8 @@ export const createStory = async ({
         throw error
     }
 }
+
+export const viewStory = async (uuid: string) => {
+    const response = await request.post(`/stories/${uuid}/view`)
+    return response.data
+}

@@ -1,5 +1,7 @@
 'use client'
 
+import { useEffect } from 'react'
+
 import SidebarStory from './[uuid]/components/Sidebar/SidebarStory'
 
 interface StoryLayoutProps {
@@ -8,6 +10,10 @@ interface StoryLayoutProps {
 }
 
 const StoryLayout = ({ children, isModal = false }: StoryLayoutProps) => {
+    useEffect(() => {
+        document.title = 'Story | HuanCanhCut'
+    }, [])
+
     return (
         <div className="flex">
             <SidebarStory isModal={isModal} />
