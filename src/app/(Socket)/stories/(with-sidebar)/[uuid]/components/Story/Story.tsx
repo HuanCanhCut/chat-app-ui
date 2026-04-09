@@ -1,4 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
+import Image from 'next/image'
 import { useParams, useRouter } from 'next/navigation'
 import Tippy from 'huanpenguin-tippy-react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
@@ -21,6 +22,7 @@ import { momentTimezone } from '~/utils/moment'
 const iconMapping = baseReactionIcon(18)
 
 const PER_PAGE = 10
+const IMAGE_DURATION = 5000
 
 interface StoryProps {
     uuid?: string
@@ -34,6 +36,7 @@ const Story: React.FC<StoryProps> = ({ uuid }) => {
     const videoRef = useRef<HTMLVideoElement>(null)
     const rafRef = useRef<number>(0)
     const isAnimatingRef = useRef(false)
+    const elapsedRef = useRef(0)
 
     const { data: stories } = useSWR(SWRKey.GET_STORIES, () => {
         return storyServices.getStories({ page: 1, per_page: PER_PAGE })
@@ -57,23 +60,23 @@ const Story: React.FC<StoryProps> = ({ uuid }) => {
         }
     }, [error, router])
 
-    const hasNextStory = () => {
+    const hasNextStory = useCallback(() => {
         if (!userStories || !stories) return false
 
         const currentIndex = userStories.data.findIndex((story) => story.id === currentStory?.id)
         const currentUserStoryIndex = stories.data.findIndex((story) => story.user_id === currentStory?.user_id)
 
         return currentIndex < userStories.data.length - 1 || currentUserStoryIndex < stories.data.length - 1
-    }
+    }, [currentStory?.id, currentStory?.user_id, stories, userStories])
 
-    const hasPrevStory = () => {
+    const hasPrevStory = useCallback(() => {
         if (!userStories || !stories) return false
 
         const currentIndex = userStories.data.findIndex((story) => story.id === currentStory?.id)
         const currentUserStoryIndex = stories.data.findIndex((story) => story.user_id === currentStory?.user_id)
 
         return currentIndex > 0 || currentUserStoryIndex > 0
-    }
+    }, [currentStory?.id, currentStory?.user_id, stories, userStories])
 
     useEffect(() => {
         if (userStories) {
@@ -107,77 +110,7 @@ const Story: React.FC<StoryProps> = ({ uuid }) => {
         })
     }, [])
 
-    const startProgress = () => {
-        if (isAnimatingRef.current) return
-
-        setIsPlaying(true)
-
-        const tick = () => {
-            const video = videoRef.current
-
-            if (!video || !currentStory) return
-
-            if (video.duration) {
-                const percent = (video.currentTime / video.duration) * 100
-
-                const el = progressRefs.current[currentStory.id]
-
-                if (el) {
-                    el.style.width = `${percent}%`
-                }
-            }
-
-            rafRef.current = requestAnimationFrame(tick)
-        }
-        rafRef.current = requestAnimationFrame(tick)
-    }
-
-    const stopProgress = () => {
-        cancelAnimationFrame(rafRef.current)
-        isAnimatingRef.current = false
-        setIsPlaying(false)
-    }
-
-    const handleReactStory = (reactions: ReactionModel[]) => {
-        setReactions(reactions)
-    }
-
-    const handlePrevStory = () => {
-        if (!userStories) {
-            return
-        }
-
-        if (!hasPrevStory()) {
-            return
-        }
-
-        stopProgress()
-
-        const currentIndex = userStories.data.findIndex((story) => story.id === currentStory?.id)
-
-        if (currentIndex === 0) {
-            // go to prev user stories
-            if (stories) {
-                const currentUserStoryIndex = stories.data.findIndex((story) => story.user_id === currentStory?.user_id)
-
-                if (currentUserStoryIndex > 0) {
-                    const prevUserStories = stories.data[currentUserStoryIndex - 1]
-
-                    router.push(`${config.routes.stories.replace(':uuid', prevUserStories.uuid)}`)
-                }
-            }
-        } else {
-            const progress = progressRefs.current[currentStory!.id]
-            if (progress) {
-                progress.style.width = '0%'
-            }
-
-            const prevStory = userStories.data[currentIndex - 1]
-            setCurrentStory(prevStory)
-        }
-    }
-
-    const handleNextStory = () => {
+    const handleNextStory = useCallback(() => {
         if (!userStories) {
             return
         }
@@ -210,7 +143,137 @@ const Story: React.FC<StoryProps> = ({ uuid }) => {
             const nextStory = userStories.data[currentIndex + 1]
             setCurrentStory(nextStory)
         }
+    }, [currentStory, hasNextStory, router, stories, userStories])
+
+    useEffect(() => {
+        if (!currentStory) return
+
+        if (currentStory.type === 'image' || currentStory.type === 'text') {
+            setIsPlaying(true)
+
+            const startTime = Date.now()
+
+            const tick = () => {
+                const elapsed = Date.now() - startTime
+                const percent = Math.min((elapsed / IMAGE_DURATION) * 100, 100)
+
+                const el = progressRefs.current[currentStory.id]
+                if (el) {
+                    el.style.width = `${percent}%`
+                }
+
+                if (percent < 100) {
+                    rafRef.current = requestAnimationFrame(tick)
+                } else {
+                    handleNextStory()
+                }
+            }
+
+            rafRef.current = requestAnimationFrame(tick)
+
+            return () => cancelAnimationFrame(rafRef.current)
+        }
+    }, [currentStory, handleNextStory])
+
+    const handlePrevStory = useCallback(() => {
+        if (!userStories) {
+            return
+        }
+
+        if (!hasPrevStory()) {
+            return
+        }
+
+        stopProgress()
+
+        const currentIndex = userStories.data.findIndex((story) => story.id === currentStory?.id)
+
+        if (currentIndex === 0) {
+            // go to prev user stories
+            if (stories) {
+                const currentUserStoryIndex = stories.data.findIndex((story) => story.user_id === currentStory?.user_id)
+
+                if (currentUserStoryIndex > 0) {
+                    const prevUserStories = stories.data[currentUserStoryIndex - 1]
+
+                    router.push(`${config.routes.stories.replace(':uuid', prevUserStories.uuid)}`)
+                }
+            }
+        } else {
+            const progress = progressRefs.current[currentStory!.id]
+            if (progress) {
+                progress.style.width = '0%'
+            }
+
+            const prevStory = userStories.data[currentIndex - 1]
+            setCurrentStory(prevStory)
+        }
+    }, [currentStory, hasPrevStory, router, stories, userStories])
+
+    const startProgress = useCallback(() => {
+        if (isAnimatingRef.current) return
+
+        setIsPlaying(true)
+
+        const tick = () => {
+            const video = videoRef.current
+
+            if (!video || !currentStory) return
+
+            if (video.duration) {
+                const percent = (video.currentTime / video.duration) * 100
+
+                const el = progressRefs.current[currentStory.id]
+
+                if (el) {
+                    el.style.width = `${percent}%`
+                }
+            }
+
+            rafRef.current = requestAnimationFrame(tick)
+        }
+        rafRef.current = requestAnimationFrame(tick)
+    }, [currentStory])
+
+    const stopProgress = () => {
+        cancelAnimationFrame(rafRef.current)
+        isAnimatingRef.current = false
+        setIsPlaying(false)
     }
+
+    const handleReactStory = (reactions: ReactionModel[]) => {
+        setReactions(reactions)
+    }
+
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            switch (e.key) {
+                case 'ArrowRight':
+                    handleNextStory()
+                    break
+                case 'ArrowLeft':
+                    handlePrevStory()
+                    break
+                case 'Space':
+                    if (isPlaying) {
+                        videoRef.current?.pause()
+                        setIsPlaying(false)
+                        stopProgress()
+                    } else {
+                        videoRef.current?.play()
+                        setIsPlaying(true)
+                        startProgress()
+                    }
+                    break
+            }
+        }
+
+        window.addEventListener('keydown', handleKeyDown)
+
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown)
+        }
+    }, [handleNextStory, handlePrevStory, isPlaying, router, startProgress])
 
     return (
         <div className="relative flex max-h-dvh w-full flex-col items-center overflow-hidden rounded-md">
@@ -313,19 +376,52 @@ const Story: React.FC<StoryProps> = ({ uuid }) => {
                             </div>
 
                             <div className="flex-center relative h-full max-h-full flex-1">
-                                {currentStory?.type === 'video' ? (
-                                    <video
-                                        key={currentStory.id}
-                                        ref={videoRef}
-                                        src={currentStory.url}
-                                        onPlay={startProgress}
-                                        onPause={stopProgress}
-                                        onEnded={handleNextStory}
-                                        className="pointer-events-none w-full object-cover"
-                                        autoPlay
-                                        muted={isMuted}
-                                    />
-                                ) : null}
+                                {(() => {
+                                    switch (currentStory.type) {
+                                        case 'video':
+                                            return (
+                                                <video
+                                                    key={currentStory.id}
+                                                    ref={videoRef}
+                                                    src={currentStory.url}
+                                                    onPlay={startProgress}
+                                                    onPause={stopProgress}
+                                                    onEnded={handleNextStory}
+                                                    className="pointer-events-none w-full object-cover"
+                                                    autoPlay
+                                                    muted={isMuted}
+                                                />
+                                            )
+                                        case 'image':
+                                            return (
+                                                <Image
+                                                    className="w-full object-cover"
+                                                    key={currentStory.id}
+                                                    src={currentStory.url}
+                                                    alt="Story"
+                                                    width={100}
+                                                    height={100}
+                                                    unoptimized
+                                                />
+                                            )
+                                        case 'text':
+                                            return (
+                                                <div
+                                                    className="flex-center h-full w-full"
+                                                    style={{
+                                                        backgroundImage: `url('${currentStory.background_url}')`,
+                                                        backgroundRepeat: 'no-repeat',
+                                                        backgroundSize: 'cover',
+                                                        backgroundPosition: 'center',
+                                                    }}
+                                                >
+                                                    <p className="text-2xl font-bold">{currentStory.caption}</p>
+                                                </div>
+                                            )
+                                        default:
+                                            return null
+                                    }
+                                })()}
                             </div>
 
                             {reactions.length > 0 && (

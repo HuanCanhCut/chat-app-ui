@@ -46,7 +46,7 @@ const CreateStoryPage = () => {
         try {
             if (!selectedType) return
 
-            if (!file) {
+            if (selectedType !== 'text' && !file) {
                 toast.error('Vui lòng tải lên file')
                 return
             }
@@ -59,15 +59,21 @@ const CreateStoryPage = () => {
                 folder: `chat-app-${process.env.NODE_ENV}/stories`,
             })
 
-            const response = await uploadToCloudinary({
-                file,
-                signature,
-            })
+            let url = selectedBackground
 
-            if (response.secure_url) {
+            if (selectedType !== 'text' && file) {
+                const response = await uploadToCloudinary({
+                    file,
+                    signature,
+                })
+
+                url = response.secure_url
+            }
+
+            if (url) {
                 await storyServices.createStory({
                     type: selectedType,
-                    url: response.secure_url,
+                    url,
                     caption,
                 })
             }
@@ -164,7 +170,7 @@ const CreateStoryPage = () => {
                                             case 'text':
                                                 return (
                                                     <div
-                                                        className="h-full w-full"
+                                                        className="flex-center h-full w-full"
                                                         style={{ backgroundImage: `url('${selectedBackground}')` }}
                                                     >
                                                         <div

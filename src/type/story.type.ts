@@ -9,6 +9,7 @@ export interface StoryModel extends BaseModel {
     background_url: string
     is_viewed: boolean
     uuid: string
+    caption?: string
     unviewed_count: number
     user: UserModel
 }
