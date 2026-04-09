@@ -22,9 +22,13 @@ const iconMapping = baseReactionIcon(18)
 
 const PER_PAGE = 10
 
-const Story = () => {
+interface StoryProps {
+    uuid?: string
+}
+
+const Story: React.FC<StoryProps> = ({ uuid }) => {
     const router = useRouter()
-    const { uuid } = useParams()
+    const params = useParams()
 
     const progressRefs = useRef<Record<number, HTMLDivElement>>({})
     const videoRef = useRef<HTMLVideoElement>(null)
@@ -35,9 +39,12 @@ const Story = () => {
         return storyServices.getStories({ page: 1, per_page: PER_PAGE })
     })
 
-    const { data: userStories, error } = useSWR(uuid ? [SWRKey.GET_USER_STORIES, uuid] : null, () => {
-        return storyServices.getUserStories(uuid as string)
-    })
+    const { data: userStories, error } = useSWR(
+        uuid || params.uuid ? [SWRKey.GET_USER_STORIES, uuid || params.uuid] : null,
+        () => {
+            return storyServices.getUserStories(uuid || (params.uuid as string))
+        },
+    )
 
     const [currentStory, setCurrentStory] = useState<StoryWithReactions | null>(null)
     const [isMuted, setIsMuted] = useState(false)

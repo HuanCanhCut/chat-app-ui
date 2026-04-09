@@ -1,11 +1,6 @@
-import { Metadata } from 'next'
+'use client'
 
 import SidebarStory from './[uuid]/components/Sidebar/SidebarStory'
-
-export const metadata: Metadata = {
-    title: 'Stories | HuanCanhCut',
-    description: 'Stories',
-}
 
 interface StoryLayoutProps {
     children: React.ReactNode
