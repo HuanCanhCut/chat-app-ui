@@ -5,6 +5,7 @@ import { motion } from 'framer-motion'
 import Tippy from 'huanpenguin-tippy-react'
 import HeadlessTippy from 'huanpenguin-tippy-react/headless'
 import { Send, Smile } from 'lucide-react'
+import { toast } from 'sonner'
 
 import baseReactionMapping from '~/common/baseReactionIcon'
 import Emoji from '~/components/Emoji'
@@ -127,6 +128,8 @@ const StoryAction: React.FC<StoryActionProps> = ({ story, handleReactStory, conv
 
             setMessage('')
             setIsFocused(false)
+
+            toast.success('Đã gửi tin nhắn')
         }
     }
 

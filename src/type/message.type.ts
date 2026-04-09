@@ -13,13 +13,13 @@ export interface MessageMedia extends BaseModel {
     media_type: 'image' | 'video'
 }
 
-interface ForwardMessage {
+export interface ForwardMessage {
     id: number
     content: string | null
     type: string
 }
 
-interface ForwardStory {
+export interface ForwardStory {
     id: number
     url: string
     type: string

@@ -80,7 +80,7 @@ const MessageItem = ({ message, messageIndex, messages, currentUser, messageRef 
 
     // handle margin top of reply message
     useEffect(() => {
-        if (message.parent) {
+        if (message.parent || message.forward_origin) {
             if (replyMessageRef.current && groupMessageRef.current) {
                 groupMessageRef.current.style.marginTop = replyMessageRef.current.offsetHeight + 'px'
             }
@@ -90,7 +90,7 @@ const MessageItem = ({ message, messageIndex, messages, currentUser, messageRef 
                 groupMessageRef.current.style.marginTop = '0px'
             }
         }
-    }, [message.parent])
+    }, [message.forward_origin, message.parent])
 
     const diffTime = (message: MessageModel, targetMessage: MessageModel) => {
         if (targetMessage && message) {

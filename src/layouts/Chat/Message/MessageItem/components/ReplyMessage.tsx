@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Image from '~/components/Image'
 import { sendEvent } from '~/helpers/events'
 import { ConversationMember, MessageModel, UserModel } from '~/type/type'
+import getCloudinaryVideoThumbnail from '~/utils/getCloudinaryThumb'
 
 interface ReplyMessageProps {
     message: MessageModel
@@ -97,6 +98,58 @@ const ReplyMessage = ({ message, currentUser, memberMap, ref }: ReplyMessageProp
                         })()}
                     </div>
                 ))}
+
+            {message.forward_type === 'Story' && (
+                <div
+                    className={`absolute bottom-[calc(100%-20px)] cursor-pointer ${message.sender_id === currentUser?.id ? 'flex flex-col items-end' : 'flex flex-col items-start'}`}
+                    ref={ref}
+                >
+                    <p className="text-system-message-light dark:text-system-message-dark mb-1 flex w-fit items-center gap-2 text-right text-xs">
+                        <FontAwesomeIcon icon={faReply} />
+                        {'  '}
+                        {(() => {
+                            let text = ''
+
+                            if (!message.forward_origin) return ''
+
+                            if ('user' in message.forward_origin) {
+                                if (message.forward_origin.user.id !== currentUser?.id) {
+                                    text += 'Bạn'
+                                } else {
+                                    text +=
+                                        memberMap[message.forward_origin.user.id].nickname ||
+                                        memberMap[message.forward_origin.user.id].user.full_name
+                                }
+
+                                text += ' đã trả lời tin của'
+                            }
+
+                            if ('user' in message.forward_origin) {
+                                if (message.forward_origin.user.id === currentUser?.id) {
+                                    text += ' bạn'
+                                } else {
+                                    text +=
+                                        ' ' +
+                                        (memberMap[message.forward_origin.user.id].nickname ||
+                                            memberMap[message.forward_origin.user.id].user.full_name)
+                                }
+                            }
+
+                            return text
+                        })()}
+                    </p>
+
+                    {(() => {
+                        if (message.forward_origin && 'url' in message.forward_origin) {
+                            const image = getCloudinaryVideoThumbnail(message.forward_origin?.url)
+
+                            return (
+                                <Image src={image} alt="reply-message" className="h-32 w-16 rounded-2xl opacity-70" />
+                            )
+                        }
+                    })()}
+                </div>
+            )}
         </>
     )
 }
