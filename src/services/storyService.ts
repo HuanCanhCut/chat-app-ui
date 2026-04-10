@@ -1,6 +1,7 @@
 import { ResponsePagination } from '~/type/common.type'
-import { BaseReactionUnified } from '~/type/reaction.type'
-import { StoryModel, StoryWithReactions } from '~/type/story.type'
+import { BaseReactionUnified, ReactionModel } from '~/type/reaction.type'
+import { StoryModel, StoryWithReactions, UserViewedStoryModel } from '~/type/story.type'
+import { UserModel } from '~/type/user.type'
 import * as request from '~/utils/httpRequest'
 
 export const getStories = async ({
@@ -61,5 +62,27 @@ export const createStory = async ({
 
 export const viewStory = async (uuid: string) => {
     const response = await request.post(`/stories/${uuid}/view`)
+    return response.data
+}
+
+interface UserViewedResponse extends UserViewedStoryModel {
+    user: UserModel & ReactionModel[]
+}
+
+export const getUserViewedStories = async ({
+    story_uuid,
+    page,
+    per_page,
+}: {
+    story_uuid: string
+    page: number
+    per_page: number
+}): Promise<ResponsePagination<UserViewedResponse[]>> => {
+    const response = await request.get(`/stories/${story_uuid}/viewed`, {
+        params: {
+            page,
+            per_page,
+        },
+    })
     return response.data
 }

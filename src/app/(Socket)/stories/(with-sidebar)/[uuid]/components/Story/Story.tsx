@@ -6,6 +6,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react'
 import useSWR from 'swr'
 
 import StoryAction from './StoryAction'
+import UserViewedStory from './UserViewedStory'
 import { faPause, faPlay, faVolumeHigh, faVolumeMute } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import baseReactionIcon from '~/common/baseReactionIcon'
@@ -13,6 +14,8 @@ import { Button } from '~/components/ui/button'
 import UserAvatar from '~/components/UserAvatar'
 import config from '~/config'
 import SWRKey from '~/enum/SWRKey'
+import { selectCurrentUser } from '~/redux/selector'
+import { useAppSelector } from '~/redux/types'
 import * as storyServices from '~/services/storyService'
 import { BaseReactionUnified, ReactionModel } from '~/type/reaction.type'
 import { StoryModel, StoryWithReactions } from '~/type/story.type'
@@ -29,6 +32,8 @@ interface StoryProps {
 }
 
 const Story: React.FC<StoryProps> = ({ uuid }) => {
+    const currentUser = useAppSelector(selectCurrentUser)
+
     const router = useRouter()
     const params = useParams()
 
@@ -82,10 +87,12 @@ const Story: React.FC<StoryProps> = ({ uuid }) => {
         if (userStories) {
             const lastViewedStoryIndex = userStories.data.findLastIndex((story) => story.is_viewed)
 
+            console.log(lastViewedStoryIndex)
+
             if (lastViewedStoryIndex === userStories.data.length - 1) {
                 setCurrentStory(userStories.data[0])
             } else {
-                setCurrentStory(userStories.data[0])
+                setCurrentStory(userStories.data[lastViewedStoryIndex + 1])
             }
         }
     }, [userStories])
@@ -456,7 +463,7 @@ const Story: React.FC<StoryProps> = ({ uuid }) => {
                                 })()}
                             </div>
 
-                            {reactions.length > 0 && (
+                            {reactions.length > 0 && currentStory.user_id !== currentUser?.data.id && (
                                 <div className="absolute bottom-1 left-2">
                                     <p className="flex items-center gap-2">
                                         <span className="flex items-center gap-1">
@@ -474,6 +481,8 @@ const Story: React.FC<StoryProps> = ({ uuid }) => {
                                     </p>
                                 </div>
                             )}
+
+                            <UserViewedStory story_uuid={currentStory.uuid} />
                         </>
                     </div>
                     <div className="h-full flex-1 cursor-pointer">
@@ -493,11 +502,15 @@ const Story: React.FC<StoryProps> = ({ uuid }) => {
             )}
 
             {currentStory && (
-                <StoryAction
-                    story={currentStory}
-                    handleReactStory={handleReactStory}
-                    conversation_uuid={userStories?.meta.general_conversation?.uuid}
-                />
+                <>
+                    {currentStory.user_id !== currentUser?.data.id && (
+                        <StoryAction
+                            story={currentStory}
+                            handleReactStory={handleReactStory}
+                            conversation_uuid={userStories?.meta.general_conversation?.uuid}
+                        />
+                    )}
+                </>
             )}
         </div>
     )

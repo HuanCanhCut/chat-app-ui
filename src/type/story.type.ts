@@ -17,3 +17,8 @@ export interface StoryModel extends BaseModel {
 export interface StoryWithReactions extends StoryModel {
     reactions: ReactionModel[]
 }
+
+export interface UserViewedStoryModel extends BaseModel {
+    user_id: number
+    story_id: number
+}

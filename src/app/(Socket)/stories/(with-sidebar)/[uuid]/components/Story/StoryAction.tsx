@@ -11,8 +11,6 @@ import baseReactionMapping from '~/common/baseReactionIcon'
 import Emoji from '~/components/Emoji'
 import socket from '~/helpers/socket'
 import { cn } from '~/lib/utils'
-import { selectCurrentUser } from '~/redux/selector'
-import { useAppSelector } from '~/redux/types'
 import * as conversationServices from '~/services/conversationService'
 import * as storyServices from '~/services/storyService'
 import { BaseReactionUnified, ReactionModel } from '~/type/reaction.type'
@@ -37,8 +35,6 @@ interface StoryActionProps {
 }
 
 const StoryAction: React.FC<StoryActionProps> = ({ story, handleReactStory, conversation_uuid }) => {
-    const currentUser = useAppSelector(selectCurrentUser)
-
     const inputRef = useRef<HTMLInputElement>(null)
 
     const [isFocused, setIsFocused] = useState(false)
@@ -136,27 +132,25 @@ const StoryAction: React.FC<StoryActionProps> = ({ story, handleReactStory, conv
     return (
         <div className="flex w-full max-w-dvw items-center gap-3 overflow-x-scroll overflow-y-hidden px-3 pt-3 pb-1 sm:justify-center">
             <div className="relative">
-                {story.user_id !== currentUser?.data.id && (
-                    <input
-                        ref={inputRef}
-                        className={cn(
-                            'w-[300px] max-w-full rounded-3xl border border-white p-2 px-4 placeholder-white transition-all duration-200 ease-linear outline-none select-none dark:border-white',
-                            isFocused && 'w-[600px]',
-                        )}
-                        onFocus={() => {
-                            setIsFocused(true)
-                        }}
-                        onBlur={() => {
-                            if (!isOpenEmoji) {
-                                setIsFocused(false)
-                            }
-                        }}
-                        placeholder="Gửi tin nhắn..."
-                        onKeyDown={handleKeyDown}
-                        value={message}
-                        onChange={(e) => setMessage(e.target.value)}
-                    />
-                )}
+                <input
+                    ref={inputRef}
+                    className={cn(
+                        'w-[300px] max-w-full rounded-3xl border border-white p-2 px-4 placeholder-white transition-all duration-200 ease-linear outline-none select-none dark:border-white',
+                        isFocused && 'w-[600px]',
+                    )}
+                    onFocus={() => {
+                        setIsFocused(true)
+                    }}
+                    onBlur={() => {
+                        if (!isOpenEmoji) {
+                            setIsFocused(false)
+                        }
+                    }}
+                    placeholder="Gửi tin nhắn..."
+                    onKeyDown={handleKeyDown}
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                />
                 {isFocused && (
                     <div className="absolute top-1/2 right-3 flex -translate-y-1/2 items-center gap-2">
                         <HeadlessTippy
