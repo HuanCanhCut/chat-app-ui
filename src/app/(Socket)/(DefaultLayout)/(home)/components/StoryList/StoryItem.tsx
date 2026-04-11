@@ -5,6 +5,7 @@ import Image from 'next/image'
 import StoriesPage from '~/app/(Socket)/stories/(with-sidebar)/[uuid]/page'
 import StoryLayout from '~/app/(Socket)/stories/(with-sidebar)/layout'
 import UserAvatar from '~/components/UserAvatar'
+import config from '~/config'
 import { listenEvent } from '~/helpers/events'
 import { cn } from '~/lib/utils'
 import { StoryModel } from '~/type/story.type'
@@ -37,7 +38,10 @@ const StoryItem: React.FC<StoryItemProps> = ({ story }) => {
                 ariaHideApp={false}
                 overlayClassName="overlay"
                 closeTimeoutMS={200}
-                onRequestClose={() => setIsOpen(false)}
+                onRequestClose={() => {
+                    setIsOpen(false)
+                    window.history.replaceState({}, '', config.routes.home)
+                }}
                 className="fixed inset-0"
             >
                 <StoryLayout isModal={true}>

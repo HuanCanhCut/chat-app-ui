@@ -4,13 +4,13 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { EmojiClickData } from 'emoji-picker-react'
 import Tippy from 'huanpenguin-tippy-react'
 import HeadlessTippy from 'huanpenguin-tippy-react/headless'
-import { Earth, ImagesIcon, Smile, X } from 'lucide-react'
+import { Earth, ImagesIcon, Smile } from 'lucide-react'
 import pMap from 'p-map'
 import { toast } from 'sonner'
 
 import BackgroundSelector from './BackgroundSelector'
 import Emoji from '~/components/Emoji'
-import CustomImage from '~/components/Image'
+import MediaGrid from '~/components/MediaGrid'
 import PopperWrapper from '~/components/PopperWrapper'
 import SwitchButton from '~/components/SwitchButton'
 import { Button } from '~/components/ui/button'
@@ -262,73 +262,15 @@ const UploadPost = () => {
                             )}
 
                             <div className="max-h-105 overflow-y-auto">
-                                {postFiles.length > 0 &&
-                                    (() => {
-                                        const MAX_DISPLAY_COUNT = 5
-
-                                        const displayFiles = postFiles.slice(0, MAX_DISPLAY_COUNT)
-                                        const count = displayFiles.length
-
-                                        const gridClass =
-                                            {
-                                                1: 'grid-cols-1',
-                                                2: 'grid-cols-2',
-                                                3: 'grid-cols-3',
-                                                4: 'grid-cols-2',
-                                                5: 'grid-cols-6',
-                                            }[count] ?? 'grid-cols-3'
-
-                                        return (
-                                            <div
-                                                className={`border-border mt-4 grid gap-0.5 rounded-md border ${gridClass}`}
-                                            >
-                                                {displayFiles.map((file, index) => {
-                                                    const spanClass =
-                                                        count === 5 ? (index < 2 ? 'col-span-3' : 'col-span-2') : ''
-
-                                                    return (
-                                                        <div key={index} className={`relative w-full ${spanClass}`}>
-                                                            {index === MAX_DISPLAY_COUNT - 1 &&
-                                                                postFiles.length > MAX_DISPLAY_COUNT && (
-                                                                    <div className="flex-center absolute top-0 right-0 bottom-0 left-0">
-                                                                        <p className="text-4xl font-bold select-none">
-                                                                            +{postFiles.length - 5}
-                                                                        </p>
-                                                                    </div>
-                                                                )}
-
-                                                            <Button
-                                                                className="absolute top-1 right-1 z-10 cursor-pointer bg-zinc-600! dark:bg-zinc-600!"
-                                                                variant="ghost"
-                                                                size="icon"
-                                                                onClick={() => {
-                                                                    handleRemoveFile(index)
-                                                                }}
-                                                            >
-                                                                <X />
-                                                            </Button>
-
-                                                            {file.type.startsWith('video') ? (
-                                                                <video
-                                                                    className={`aspect-square w-full rounded-md object-cover select-none ${spanClass}`}
-                                                                    src={file.preview}
-                                                                    autoPlay
-                                                                    muted
-                                                                    loop
-                                                                />
-                                                            ) : (
-                                                                <CustomImage
-                                                                    className={`aspect-square w-full rounded-md object-cover select-none ${spanClass}`}
-                                                                    src={file.preview}
-                                                                    alt={file.name}
-                                                                />
-                                                            )}
-                                                        </div>
-                                                    )
-                                                })}
-                                            </div>
-                                        )
-                                    })()}
+                                {postFiles.length > 0 && (
+                                    <MediaGrid
+                                        media={postFiles.map((file) => ({
+                                            url: file.preview!,
+                                            type: file.type,
+                                        }))}
+                                        handleRemoveFile={handleRemoveFile}
+                                    />
+                                )}
                             </div>
                             <div className="mt-3 flex items-center justify-between">
                                 {postFiles.length === 0 && (
@@ -336,7 +278,7 @@ const UploadPost = () => {
                                 )}
                                 <div className="flex shrink-0">
                                     {!background && (
-                                        <Tippy content="Thêm hình ảnh">
+                                        <Tippy content="Thêm ảnh/video">
                                             <Button
                                                 variant={'ghost'}
                                                 size={'icon'}
@@ -349,14 +291,7 @@ const UploadPost = () => {
                                         </Tippy>
                                     )}
 
-                                    <input
-                                        ref={fileInputRef}
-                                        type="file"
-                                        hidden
-                                        accept="image/*"
-                                        multiple
-                                        onChange={handleFileChange}
-                                    />
+                                    <input ref={fileInputRef} type="file" hidden multiple onChange={handleFileChange} />
 
                                     <HeadlessTippy
                                         interactive

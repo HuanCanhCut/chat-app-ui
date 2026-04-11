@@ -104,6 +104,19 @@ img {
     user-select: none;
 }
 
+video::-webkit-media-controls {
+    visibility: hidden;
+}
+
+video::-webkit-media-controls-enclosure {
+    visibility: visible;
+}
+
+video::-webkit-media-controls-fullscreen-button,
+video::-webkit-media-controls-overflow-menu-button {
+    display: none;
+}
+
 html {
     font-size: 16px;
 }

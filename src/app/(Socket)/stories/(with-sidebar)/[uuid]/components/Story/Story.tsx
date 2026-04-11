@@ -87,8 +87,6 @@ const Story: React.FC<StoryProps> = ({ uuid }) => {
         if (userStories) {
             const lastViewedStoryIndex = userStories.data.findLastIndex((story) => story.is_viewed)
 
-            console.log(lastViewedStoryIndex)
-
             if (lastViewedStoryIndex === userStories.data.length - 1) {
                 setCurrentStory(userStories.data[0])
             } else {

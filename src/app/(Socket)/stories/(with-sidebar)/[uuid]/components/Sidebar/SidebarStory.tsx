@@ -40,13 +40,14 @@ const SidebarStory: React.FC<SidebarStoryProps> = ({ isModal = false }) => {
     const handleBack = () => {
         if (isModal) {
             sendEvent('STORIES:CLOSE-MODAL', null)
+            window.history.replaceState({}, '', config.routes.home)
         } else {
             router.push(config.routes.home)
         }
     }
 
     return (
-        <div className="dark:bg-dark hidden h-dvh max-h-dvh w-[360px] flex-col overflow-hidden lg:flex">
+        <div className="dark:bg-dark hidden h-dvh max-h-dvh w-[360px] flex-col overflow-hidden bg-white lg:flex">
             <div className="border-border flex items-center gap-2 border-b px-2 py-1">
                 <Tippy content="Đóng">
                     <Button className="size-10 rounded-full" variant={'ghost'} size={'icon-lg'} onClick={handleBack}>

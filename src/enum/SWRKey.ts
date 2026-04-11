@@ -67,6 +67,12 @@ enum SWRKey {
     GET_STORIES = '/stories',
     GET_USER_STORIES = '/stories/:uuid',
     GET_USER_VIEWED_STORIES = '/stories/:uuid/viewed',
+
+    /**
+     * POST
+     */
+
+    GET_POSTS = '/posts',
 }
 
 export default SWRKey
