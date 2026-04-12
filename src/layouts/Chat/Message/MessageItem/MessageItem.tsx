@@ -11,13 +11,13 @@ import MessageAction from './components/MessageAction'
 import MessageContent from './components/MessageContent'
 import ReplyMessage from './components/ReplyMessage'
 import UserViewed from './components/UserViewed'
+import ReactionModal from '~/components/ReactionModal/ReactionModal'
 import UserAvatar from '~/components/UserAvatar'
 import SWRKey from '~/enum/SWRKey'
 import { sendEvent } from '~/helpers/events'
 import socket from '~/helpers/socket'
 import useVisible from '~/hooks/useVisible'
 import MessageImagesModel from '~/layouts/Chat/Message/Modal/MessageMediaModal'
-import ReactionModal from '~/layouts/Chat/Message/Modal/ReactionModal'
 import RevokeModal from '~/layouts/Chat/Message/Modal/RevokeModal'
 import * as conversationServices from '~/services/conversationService'
 import { ConversationMember, MessageMedia, MessageModel, MessageResponse, UserModel } from '~/type/type'
@@ -276,7 +276,8 @@ const MessageItem = ({ message, messageIndex, messages, currentUser, messageRef 
                 <ReactionModal
                     isOpen={openReactionModal.isOpen}
                     onClose={handleCloseReactionModal}
-                    messageId={openReactionModal.messageId}
+                    reactionableId={openReactionModal.messageId}
+                    reactionableType="Message"
                 />
             )}
 

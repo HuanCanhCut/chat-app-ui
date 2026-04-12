@@ -1,15 +1,17 @@
 import { BaseModel, MetaPagination } from './common.type'
 import { UserModel } from './user.type'
 
+export type ReactionableType = 'Message' | 'Comment' | 'Post'
+
 export interface ReactionModel extends BaseModel {
     reactionable_id: number
-    reactionable_type: 'Message' | 'Comment' | 'Post'
+    reactionable_type: ReactionableType
     user_id: number
     react: string
     user_reaction: UserModel
 }
 
-export interface MessageReactionResponse extends MetaPagination {
+export interface ReactionResponse extends MetaPagination {
     data: ReactionModel[]
 }
 

@@ -52,8 +52,8 @@ enum SWRKey {
     /**
      * Reaction
      */
-    GET_REACTIONS_TYPE = '/reactions/:messageId/types',
-    GET_REACTIONS = '/reactions/:messageId',
+    GET_REACTIONS_TYPE = '/reactions/:reactionableId/:reactionableType/types',
+    GET_REACTIONS = '/reactions/:reactionableId/:reactionableType',
 
     /**
      * Theme

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import moment from 'moment-timezone'
 
-import PostAction from './PostAction'
+import PostAction from './components/PostAction/PostAction'
 import MediaGrid from '~/components/MediaGrid'
 import UserAvatar from '~/components/UserAvatar'
 import { cn } from '~/lib/utils'

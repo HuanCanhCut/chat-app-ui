@@ -6,6 +6,7 @@ import useSWR from 'swr'
 
 import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import baseReactionIcon from '~/common/baseReactionIcon'
 import Modal from '~/components/Modal'
 import UserAvatar from '~/components/UserAvatar'
 import config from '~/config'
@@ -13,18 +14,21 @@ import SWRKey from '~/enum/SWRKey'
 import socket from '~/helpers/socket'
 import { selectCurrentUser } from '~/redux/selector'
 import { useAppSelector } from '~/redux/types'
-import * as messageServices from '~/services/messageService'
+import * as reactionServices from '~/services/reactionService'
 import { ReactionModel, TopReaction } from '~/type/type'
+
+const iconMapping = baseReactionIcon(18)
 
 interface Props {
     isOpen: boolean
     onClose: () => void
-    messageId: number
+    reactionableId: number
+    reactionableType: 'Message' | 'Post' | 'Comment'
 }
 
 const PER_PAGE = 7
 
-const ReactionModal: React.FC<Props> = ({ isOpen, onClose, messageId }) => {
+const ReactionModal: React.FC<Props> = ({ isOpen, onClose, reactionableId, reactionableType }) => {
     const { uuid } = useParams()
 
     const router = useRouter()
@@ -35,9 +39,9 @@ const ReactionModal: React.FC<Props> = ({ isOpen, onClose, messageId }) => {
     const [page, setPage] = useState(1)
 
     const { data: reactionTypes, mutate: mutateReactionTypes } = useSWR(
-        messageId ? [SWRKey.GET_REACTIONS, messageId] : null,
+        reactionableId ? [SWRKey.GET_REACTIONS, reactionableId] : null,
         () => {
-            return messageServices.getReactionTypes({ messageId })
+            return reactionServices.getReactionTypes({ reactionableId: reactionableId, reactionableType })
         },
         {
             revalidateOnMount: true,
@@ -45,9 +49,15 @@ const ReactionModal: React.FC<Props> = ({ isOpen, onClose, messageId }) => {
     )
 
     const { data: reactions, mutate: mutateReactions } = useSWR(
-        currentTab ? [SWRKey.GET_REACTIONS, currentTab, isOpen, messageId] : null,
+        currentTab ? [SWRKey.GET_REACTIONS, currentTab, isOpen, reactionableId] : null,
         () => {
-            return messageServices.getReactions({ messageId, type: currentTab, page, per_page: PER_PAGE })
+            return reactionServices.getReactions({
+                reactionableId: reactionableId,
+                reactionableType,
+                type: currentTab,
+                page,
+                per_page: PER_PAGE,
+            })
         },
         {
             revalidateOnMount: true,
@@ -79,7 +89,7 @@ const ReactionModal: React.FC<Props> = ({ isOpen, onClose, messageId }) => {
     const handleChooseReaction = (reaction: ReactionModel) => {
         if (reaction.user_id === currentUser?.data.id) {
             socket.emit('REMOVE_REACTION', {
-                message_id: messageId,
+                message_id: reactionableId,
                 user_reaction_id: currentUser?.data.id,
                 conversation_uuid: uuid as string,
                 react: reaction.react,
@@ -92,8 +102,9 @@ const ReactionModal: React.FC<Props> = ({ isOpen, onClose, messageId }) => {
     useEffect(() => {
         const getMoreReactions = async () => {
             if (page > 1) {
-                const newReactions = await messageServices.getReactions({
-                    messageId,
+                const newReactions = await reactionServices.getReactions({
+                    reactionableId: reactionableId,
+                    reactionableType,
                     type: currentTab,
                     page,
                     per_page: PER_PAGE,
@@ -119,7 +130,7 @@ const ReactionModal: React.FC<Props> = ({ isOpen, onClose, messageId }) => {
 
         getMoreReactions()
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [messageId, mutateReactions, page])
+    }, [reactionableId, mutateReactions, page])
 
     useEffect(() => {
         interface RemoveReaction {
@@ -134,7 +145,7 @@ const ReactionModal: React.FC<Props> = ({ isOpen, onClose, messageId }) => {
                 return
             }
 
-            if (data.message_id === messageId) {
+            if (data.message_id === reactionableId) {
                 const newReactions = reactions?.data.filter(
                     (reaction: ReactionModel) => reaction.user_id !== currentUser?.data.id,
                 )
@@ -171,33 +182,46 @@ const ReactionModal: React.FC<Props> = ({ isOpen, onClose, messageId }) => {
         return () => {
             socket.off('REMOVE_REACTION', socketHandler)
         }
-    }, [currentUser?.data.id, messageId, mutateReactionTypes, mutateReactions, reactionTypes, reactions])
+    }, [currentUser?.data.id, reactionableId, mutateReactionTypes, mutateReactions, reactionTypes, reactions])
 
     return (
         <Modal
             isOpen={isOpen}
             onClose={onClose}
-            title="Cảm xúc về tin nhắn"
+            title="Cảm xúc"
             popperClassName="w-[548px] max-w-[calc(100vw-40px)] p-0!"
         >
             <main className="p-4">
-                <div>
+                <div className="flex items-center">
                     {tabs.map((tab) => (
                         <button
                             key={tab.type}
-                            className={`h-[60px] px-4 font-medium [&>img]:inline-flex ${tab.type !== 'all' ? 'text-xl' : ''} ${
+                            className={`h-[60px] border-b-[3px] px-4 font-medium [&>img]:inline-flex ${tab.type !== 'all' ? 'text-xl' : ''} ${
                                 currentTab === tab.type
-                                    ? 'border-primary text-primary border-b-[3px]'
-                                    : 'rounded-lg border-b-[3px] border-transparent text-zinc-800 hover:bg-[#99999936] dark:text-zinc-400 dark:hover:bg-[#3e4141]'
+                                    ? 'border-primary text-primary'
+                                    : 'rounded-lg border-transparent text-zinc-800 hover:bg-[#99999936] dark:text-zinc-400 dark:hover:bg-[#3e4141]'
                             }`}
                             onClick={() => handleChangeReaction(tab.type)}
                         >
-                            {tab.type === 'all' ? (
-                                'Tất cả'
-                            ) : (
-                                <Emoji unified={tab.type} size={18} emojiStyle={EmojiStyle.FACEBOOK} />
-                            )}
-                            {!!tab.count && <span className={`ml-2 text-sm`}>{tab.count}</span>}
+                            <div className="flex h-full items-center">
+                                {tab.type === 'all' ? (
+                                    'Tất cả'
+                                ) : (
+                                    <>
+                                        {reactionableType === 'Message' ? (
+                                            <Emoji unified={tab.type} size={18} emojiStyle={EmojiStyle.FACEBOOK} />
+                                        ) : (
+                                            <>
+                                                {(() => {
+                                                    const react = tab.type as keyof typeof iconMapping
+                                                    return iconMapping[react]
+                                                })()}
+                                            </>
+                                        )}
+                                    </>
+                                )}
+                                {!!tab.count && <span className={`ml-2 text-sm`}>{tab.count}</span>}
+                            </div>
                         </button>
                     ))}
                 </div>
@@ -227,19 +251,42 @@ const ReactionModal: React.FC<Props> = ({ isOpen, onClose, messageId }) => {
                                 <div
                                     key={index}
                                     className="flex cursor-pointer items-center p-2"
-                                    onClick={() => handleChooseReaction(reaction)}
+                                    onClick={() => {
+                                        if (reactionableType === 'Message') {
+                                            handleChooseReaction(reaction)
+                                        } else {
+                                            router.push(`${config.routes.user}/@${reaction.user_reaction.nickname}`)
+                                        }
+                                    }}
                                 >
                                     <UserAvatar size={40} src={reaction.user_reaction.avatar} />
-                                    <div className="ml-2 grow">
-                                        <p className="font-medium">{reaction.user_reaction.full_name}</p>
-                                        <p className="text-xs font-normal text-zinc-600 dark:text-zinc-400">
-                                            {reaction.user_id === currentUser?.data.id
-                                                ? 'Nhấp để gỡ bỏ'
-                                                : 'Nhấp để xem trang cá nhân'}
+                                    <div className="ml-2 grow select-none">
+                                        <p className="font-medium hover:underline">
+                                            {reaction.user_reaction.full_name}
                                         </p>
+                                        {reactionableType === 'Message' && (
+                                            <p className="text-xs font-normal text-zinc-600 dark:text-zinc-400">
+                                                {reaction.user_id === currentUser?.data.id
+                                                    ? 'Nhấp để gỡ bỏ'
+                                                    : 'Nhấp để xem trang cá nhân'}
+                                            </p>
+                                        )}
                                     </div>
                                     <p className="text-2xl">
-                                        <Emoji unified={reaction.react} size={24} emojiStyle={EmojiStyle.FACEBOOK} />
+                                        {reactionableType === 'Message' ? (
+                                            <Emoji
+                                                unified={reaction.react}
+                                                size={24}
+                                                emojiStyle={EmojiStyle.FACEBOOK}
+                                            />
+                                        ) : (
+                                            <>
+                                                {(() => {
+                                                    const react = reaction.react as keyof typeof iconMapping
+                                                    return iconMapping[react]
+                                                })()}
+                                            </>
+                                        )}
                                     </p>
                                 </div>
                             )

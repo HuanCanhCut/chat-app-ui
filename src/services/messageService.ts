@@ -1,12 +1,6 @@
 import { AxiosResponse } from 'axios'
 
-import {
-    LinkPreviewResponse,
-    MessageImagesResponse,
-    MessageLinksPreviewResponse,
-    MessageReactionResponse,
-    MessageResponse,
-} from '~/type/type'
+import { LinkPreviewResponse, MessageImagesResponse, MessageLinksPreviewResponse, MessageResponse } from '~/type/type'
 import * as request from '~/utils/httpRequest'
 
 export const getMessages = async ({
@@ -52,51 +46,6 @@ export const getMessageImages = async ({
         return response.data
     } catch (error: any) {
         throw error
-    }
-}
-
-interface ReactionTypeResponse {
-    react: string
-    count: number
-}
-
-export const getReactionTypes = async ({
-    messageId,
-}: {
-    messageId: number
-}): Promise<ReactionTypeResponse[] | undefined> => {
-    try {
-        const response = await request.get(`messages/${messageId}/reaction/types`)
-
-        return response.data
-    } catch (error: any) {
-        throw error
-    }
-}
-
-export const getReactions = async ({
-    messageId,
-    type,
-    page,
-    per_page,
-}: {
-    messageId: number
-    type: string
-    page: number
-    per_page: number
-}): Promise<MessageReactionResponse | undefined> => {
-    try {
-        const response = await request.get(`messages/${messageId}/reactions`, {
-            params: {
-                type,
-                page,
-                per_page,
-            },
-        })
-
-        return response.data
-    } catch (error: any) {
-        console.log(error)
     }
 }
 
