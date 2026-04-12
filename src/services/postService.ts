@@ -1,5 +1,5 @@
-import { GetPostResponse } from '~/type/post.type'
-import { BaseReactionUnified } from '~/type/reaction.type'
+import { GetPostResponse, PostModel } from '~/type/post.type'
+import { BaseReactionUnified, ReactionModel } from '~/type/reaction.type'
 import * as request from '~/utils/httpRequest'
 
 interface CreatePostData {
@@ -48,4 +48,15 @@ export const unreactPost = async ({ postId }: { postId: number }) => {
     } catch (error: any) {
         throw error
     }
+}
+
+export const getPostById = async ({
+    postId,
+}: {
+    postId: number
+}): Promise<{
+    data: PostModel & { top_reactions?: Pick<ReactionModel, 'reactionable_id'> & { react: BaseReactionUnified }[] }
+}> => {
+    const response = await request.get(`posts/${postId}`)
+    return response.data
 }

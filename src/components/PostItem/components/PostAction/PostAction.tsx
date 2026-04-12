@@ -10,7 +10,7 @@ import ReactionModal from '~/components/ReactionModal/ReactionModal'
 import SWRKey from '~/enum/SWRKey'
 import handleApiError from '~/helpers/handleApiError'
 import * as postService from '~/services/postService'
-import { PostResponse } from '~/type/post.type'
+import { GetPostResponse, PostResponse } from '~/type/post.type'
 import { BaseReactionUnified } from '~/type/reaction.type'
 
 interface PostActionProps {
@@ -37,13 +37,47 @@ const PostAction = ({ post }: PostActionProps) => {
         postId: 0,
     })
 
-    const handleReaction = async (unified: BaseReactionUnified) => {
+    const handleReaction = async (unified?: BaseReactionUnified) => {
         try {
-            if (post.reaction !== unified) {
-                await postService.reactPost({ postId: post.id, unified })
-
-                mutate(SWRKey.GET_POSTS)
+            if (unified) {
+                if (post.reaction !== unified) {
+                    await postService.reactPost({ postId: post.id, unified })
+                }
+            } else {
+                await postService.unreactPost({ postId: post.id })
             }
+
+            const postResponse = await postService.getPostById({ postId: post.id })
+
+            mutate(
+                SWRKey.GET_POSTS,
+                (prev?: GetPostResponse) => {
+                    if (!prev) {
+                        return prev
+                    }
+
+                    const newData = prev.data.map((currentPost: PostResponse) => {
+                        if (currentPost.id === post.id) {
+                            return {
+                                ...currentPost,
+                                ...postResponse.data,
+                                reaction: unified,
+                                top_reactions: postResponse.data.top_reactions,
+                            }
+                        }
+
+                        return currentPost
+                    })
+
+                    return {
+                        ...prev,
+                        data: newData,
+                    }
+                },
+                {
+                    revalidate: false,
+                },
+            )
         } catch (error) {
             handleApiError(error)
         } finally {
@@ -82,20 +116,6 @@ const PostAction = ({ post }: PostActionProps) => {
         )
     }
 
-    const handleToggleReact = async () => {
-        try {
-            if (post.reaction) {
-                await postService.unreactPost({ postId: post.id })
-            } else {
-                await postService.reactPost({ postId: post.id, unified: '1f44d' })
-            }
-
-            mutate(SWRKey.GET_POSTS)
-        } catch (error) {
-            handleApiError(error)
-        }
-    }
-
     return (
         <>
             {openReactionModal.isOpen && (
@@ -108,7 +128,7 @@ const PostAction = ({ post }: PostActionProps) => {
             )}
 
             <div className="relative flex items-center justify-between px-2 py-2 pb-0">
-                {post.top_reactions?.length && (
+                {(post.top_reactions?.length || 0) > 0 && (
                     <div
                         onClick={() =>
                             setOpenReactionModal({
@@ -118,7 +138,7 @@ const PostAction = ({ post }: PostActionProps) => {
                         }
                         className="group flex cursor-pointer"
                     >
-                        {post.top_reactions.map((reaction, index) => {
+                        {post.top_reactions?.map((reaction, index) => {
                             const icon = baseReactionIcon(18)[reaction.react]
 
                             return (
@@ -134,9 +154,11 @@ const PostAction = ({ post }: PostActionProps) => {
                                 </div>
                             )
                         })}
-                        <span className="text-muted-foreground ml-1 select-none group-hover:underline">
-                            {post.reaction_count}
-                        </span>
+                        {post.reaction_count > 0 && (
+                            <span className="text-muted-foreground ml-1 select-none group-hover:underline">
+                                {post.reaction_count}
+                            </span>
+                        )}
                     </div>
                 )}
 
@@ -175,7 +197,9 @@ const PostAction = ({ post }: PostActionProps) => {
                 >
                     <button
                         className="flex-center text-muted-foreground flex-1 rounded-sm py-1 font-medium hover:bg-gray-100 dark:hover:bg-zinc-500/20"
-                        onClick={handleToggleReact}
+                        onClick={() => {
+                            handleReaction(post.reaction ? undefined : '1f44d')
+                        }}
                     >
                         {post.reaction ? (
                             <>

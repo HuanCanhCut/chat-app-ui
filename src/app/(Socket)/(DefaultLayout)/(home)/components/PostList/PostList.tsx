@@ -11,9 +11,11 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import SWRKey from '~/enum/SWRKey'
 import * as postService from '~/services/postService'
 
+const LIMIT = 10
+
 const PostList = () => {
     const { data: posts, mutate } = useSWR(SWRKey.GET_POSTS, () => {
-        return postService.getPosts({ limit: 10 })
+        return postService.getPosts({ limit: LIMIT })
     })
 
     return (
@@ -24,7 +26,7 @@ const PostList = () => {
                     next={async () => {
                         try {
                             const response = await postService.getPosts({
-                                limit: 10,
+                                limit: LIMIT,
                                 cursor: posts?.meta.pagination.next_cursor,
                             })
 
@@ -52,7 +54,6 @@ const PostList = () => {
                             <FontAwesomeIcon icon={faSpinner} className="animate-spin" />
                         </div>
                     }
-                    scrollableTarget="stories-scrollable"
                 >
                     {posts?.data.map((post) => {
                         return (

@@ -49,7 +49,7 @@ const ReactionModal: React.FC<Props> = ({ isOpen, onClose, reactionableId, react
     )
 
     const { data: reactions, mutate: mutateReactions } = useSWR(
-        currentTab ? [SWRKey.GET_REACTIONS, currentTab, isOpen, reactionableId] : null,
+        currentTab ? [SWRKey.GET_REACTIONS, currentTab, isOpen, reactionableId, currentTab] : null,
         () => {
             return reactionServices.getReactions({
                 reactionableId: reactionableId,
@@ -61,6 +61,8 @@ const ReactionModal: React.FC<Props> = ({ isOpen, onClose, reactionableId, react
         },
         {
             revalidateOnMount: true,
+            revalidateOnFocus: true,
+            revalidateIfStale: true,
         },
     )
 
