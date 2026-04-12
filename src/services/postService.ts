@@ -1,4 +1,5 @@
 import { GetPostResponse } from '~/type/post.type'
+import { BaseReactionUnified } from '~/type/reaction.type'
 import * as request from '~/utils/httpRequest'
 
 interface CreatePostData {
@@ -25,4 +26,26 @@ export const getPosts = async ({ limit, cursor }: { limit: number; cursor?: stri
         },
     })
     return response.data
+}
+
+export const reactPost = async ({ postId, unified }: { postId: number; unified: BaseReactionUnified }) => {
+    try {
+        const response = await request.post(`posts/${postId}/react`, {
+            unified,
+        })
+
+        return response.data
+    } catch (error: any) {
+        throw error
+    }
+}
+
+export const unreactPost = async ({ postId }: { postId: number }) => {
+    try {
+        const response = await request.del(`posts/${postId}/unreact`)
+
+        return response.data
+    } catch (error: any) {
+        throw error
+    }
 }

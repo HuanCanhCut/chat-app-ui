@@ -1,6 +1,7 @@
 import { memo, useEffect, useState } from 'react'
 import { motion, useSpring } from 'framer-motion'
 import Tippy from 'huanpenguin-tippy-react/headless'
+import { Instance, Props } from 'tippy.js'
 
 import { sendEvent } from '~/helpers/events'
 
@@ -29,8 +30,10 @@ interface CustomTippyProps {
     hideOnClick?: boolean
     timeDelayOpen?: number
     timeDelayClose?: number
+    initialScale?: number
     // eslint-disable-next-line no-unused-vars
-    onShow?: (instance: any) => void
+    onShow?: (instance: Instance<Props>) => void
+    className?: string
 }
 
 export default memo(function CustomTippy({
@@ -44,9 +47,10 @@ export default memo(function CustomTippy({
     offsetY = 0,
     hideOnClick = true,
     onShow,
+    initialScale = 0.5,
+    className,
 }: CustomTippyProps) {
     const springConfig: any = { damping: 15, stiffness: 300 }
-    const initialScale = 0.5
     const opacity = useSpring(0, springConfig)
     const scale = useSpring(initialScale, springConfig)
     const [appendToElement, setAppendToElement] = useState<HTMLElement | null>(null)
@@ -83,7 +87,7 @@ export default memo(function CustomTippy({
     }
 
     return (
-        <div>
+        <div className={className}>
             {appendToElement && (
                 <Tippy
                     trigger={trigger}

@@ -1,21 +1,100 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
+import { motion } from 'framer-motion'
 import { MessageCircle, Send, ThumbsUp } from 'lucide-react'
+import { mutate } from 'swr'
+import { Instance, Props } from 'tippy.js'
 
 import baseReactionIcon from '~/common/baseReactionIcon'
+import CustomTippy from '~/components/CustomTippy'
 import ReactionModal from '~/components/ReactionModal/ReactionModal'
+import SWRKey from '~/enum/SWRKey'
+import handleApiError from '~/helpers/handleApiError'
+import * as postService from '~/services/postService'
 import { PostResponse } from '~/type/post.type'
-
-const iconMapping = baseReactionIcon(18)
+import { BaseReactionUnified } from '~/type/reaction.type'
 
 interface PostActionProps {
     post: PostResponse
 }
 
+const iconMapping = baseReactionIcon(36)
+
+const reactionNameMapping: Record<keyof typeof iconMapping, string> = {
+    '1f44d': 'Thích',
+    '1f970': 'Thương thương',
+    '2764-fe0f': 'Yêu thích',
+    '1f602': 'Haha',
+    '1f62e': 'Wow',
+    '1f622': 'Buồn',
+    '1f621': 'Giận',
+}
+
 const PostAction = ({ post }: PostActionProps) => {
+    const reactionTippyRef = useRef<Instance<Props> | null>(null)
+
     const [openReactionModal, setOpenReactionModal] = useState({
         isOpen: false,
         postId: 0,
     })
+
+    const handleReaction = async (unified: BaseReactionUnified) => {
+        try {
+            if (post.reaction !== unified) {
+                await postService.reactPost({ postId: post.id, unified })
+
+                mutate(SWRKey.GET_POSTS)
+            }
+        } catch (error) {
+            handleApiError(error)
+        } finally {
+            // await while hover reaction tippy reset
+            setTimeout(() => {
+                reactionTippyRef.current?.hide()
+            }, 100)
+        }
+    }
+
+    const renderReaction = () => {
+        return (
+            <div className="flex items-center gap-1.5 rounded-full bg-white p-1 dark:bg-[#27292a]">
+                {(() => {
+                    return Object.keys(iconMapping).map((key, index) => {
+                        const unified = key as keyof typeof iconMapping
+
+                        const icon = iconMapping[unified]
+                        return (
+                            <motion.button
+                                key={key}
+                                whileHover={{ scale: 1.2 }}
+                                initial={{ y: 20, opacity: 0 }}
+                                transition={{ duration: 0.1, delay: index * 0.02 }}
+                                whileInView={{ y: 0, opacity: 1 }}
+                                onClick={() => {
+                                    handleReaction(unified)
+                                }}
+                            >
+                                {icon}
+                            </motion.button>
+                        )
+                    })
+                })()}
+            </div>
+        )
+    }
+
+    const handleToggleReact = async () => {
+        try {
+            if (post.reaction) {
+                await postService.unreactPost({ postId: post.id })
+            } else {
+                await postService.reactPost({ postId: post.id, unified: '1f44d' })
+            }
+
+            mutate(SWRKey.GET_POSTS)
+        } catch (error) {
+            handleApiError(error)
+        }
+    }
 
     return (
         <>
@@ -40,7 +119,7 @@ const PostAction = ({ post }: PostActionProps) => {
                         className="group flex cursor-pointer"
                     >
                         {post.top_reactions.map((reaction, index) => {
-                            const icon = iconMapping[reaction.react]
+                            const icon = baseReactionIcon(18)[reaction.react]
 
                             return (
                                 <div
@@ -81,9 +160,47 @@ const PostAction = ({ post }: PostActionProps) => {
             </div>
 
             <div className="flex items-center px-2 py-1">
-                <button className="flex-center text-muted-foreground flex-1 rounded-sm py-1 font-medium hover:bg-gray-100 dark:hover:bg-zinc-500/20">
-                    <ThumbsUp size={18} /> <span className="ml-2 select-none">Thích</span>
-                </button>
+                <CustomTippy
+                    trigger="mouseenter"
+                    renderItem={renderReaction}
+                    timeDelayOpen={400}
+                    timeDelayClose={500}
+                    placement="top-start"
+                    className="flex-center w-full flex-1"
+                    offsetY={10}
+                    initialScale={0.95}
+                    onShow={(instance) => {
+                        reactionTippyRef.current = instance
+                    }}
+                >
+                    <button
+                        className="flex-center text-muted-foreground flex-1 rounded-sm py-1 font-medium hover:bg-gray-100 dark:hover:bg-zinc-500/20"
+                        onClick={handleToggleReact}
+                    >
+                        {post.reaction ? (
+                            <>
+                                {(() => {
+                                    const iconMapping = baseReactionIcon(18)
+
+                                    const react = post.reaction
+
+                                    const icon = iconMapping[react]
+
+                                    return (
+                                        <>
+                                            {icon}{' '}
+                                            <span className="ml-2 select-none">{reactionNameMapping[react]}</span>
+                                        </>
+                                    )
+                                })()}
+                            </>
+                        ) : (
+                            <>
+                                <ThumbsUp size={18} /> <span className="ml-2 select-none">Thích</span>
+                            </>
+                        )}
+                    </button>
+                </CustomTippy>
                 <button className="flex-center text-muted-foreground flex-1 rounded-sm py-1 font-medium hover:bg-gray-100 dark:hover:bg-zinc-500/20">
                     <MessageCircle size={18} /> <span className="ml-2 select-none">Bình luận</span>
                 </button>
