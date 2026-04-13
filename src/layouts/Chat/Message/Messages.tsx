@@ -2,6 +2,7 @@ import React, { memo, useEffect, useRef, useState } from 'react'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
+import { toast } from 'sonner'
 import useSWR from 'swr'
 
 import MessageItem from './MessageItem'
@@ -11,21 +12,19 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Typing from '~/components/Typing'
 import UserAvatar from '~/components/UserAvatar'
 import config from '~/config'
-import { SocketEvent } from '~/enum/SocketEvent'
 import SWRKey from '~/enum/SWRKey'
 import { listenEvent, sendEvent } from '~/helpers/events'
 import socket from '~/helpers/socket'
-import { useAppSelector } from '~/redux'
-import { getCurrentTheme, getCurrentUser } from '~/redux/selector'
+import { selectCurrentUser, selectTheme } from '~/redux/selector'
+import { useAppSelector } from '~/redux/types'
 import * as messageServices from '~/services/messageService'
 import { ConversationModel, MessageModel, MessageResponse, SocketMessage } from '~/type/type'
-import { toast } from '~/utils/toast'
 
 interface MessageRef {
     [key: string]: HTMLDivElement
 }
 
-const PER_PAGE = 20
+const PER_PAGE = 25
 
 interface MessageProps {
     conversation: ConversationModel
@@ -34,9 +33,9 @@ interface MessageProps {
 const Message: React.FC<MessageProps> = ({ conversation }) => {
     const { uuid } = useParams()
 
-    const currentUser = useAppSelector(getCurrentUser)
+    const currentUser = useAppSelector(selectCurrentUser)
 
-    const theme = useAppSelector(getCurrentTheme)
+    const theme = useAppSelector(selectTheme)
 
     // save offset range for scroll down and scroll up
     const [offsetRange, setOffsetRange] = useState({
@@ -64,11 +63,11 @@ const Message: React.FC<MessageProps> = ({ conversation }) => {
         },
     )
 
-    const member = conversation?.members.find((member) => member.user_id !== currentUser?.data?.id)
+    const member = conversation?.members?.find((member) => member.user_id !== currentUser?.data?.id)
 
     // Join room when component mount and current user is not banned
     useEffect(() => {
-        const member = conversation?.members.find((member) => member.user_id === currentUser?.data?.id)
+        const member = conversation?.members?.find((member) => member.user_id === currentUser?.data?.id)
         // if current user is banned, not join room
         if (member?.deleted_at || !member) {
             return
@@ -99,7 +98,7 @@ const Message: React.FC<MessageProps> = ({ conversation }) => {
                 }, delayRetry)
             } else {
                 retryCount = 0
-                socket.emit(SocketEvent.JOIN_ROOM, uuid)
+                socket.emit('JOIN_ROOM', uuid as string)
             }
         }
 
@@ -108,7 +107,7 @@ const Message: React.FC<MessageProps> = ({ conversation }) => {
 
     const handleEnterMessage = (e: React.KeyboardEvent<HTMLDivElement>) => {
         if (e.key === 'Enter') {
-            sendEvent({ eventName: 'message:enter-message', detail: { roomUuid: uuid } })
+            sendEvent('MESSAGE:ENTER-MESSAGE', { conversationUuid: uuid as string })
         }
     }
 
@@ -153,10 +152,14 @@ const Message: React.FC<MessageProps> = ({ conversation }) => {
 
                 // revoke object url of image
                 for (const message of messages.data) {
-                    if (message.type === 'image' && message.content) {
-                        JSON.parse(message.content).forEach((url: string) => {
-                            if (url.startsWith('blob:')) {
-                                URL.revokeObjectURL(url)
+                    if (message.type === 'media') {
+                        message.media.forEach((media) => {
+                            if (
+                                media.media_url &&
+                                media.media_type === 'image' &&
+                                media.media_url.startsWith('blob:')
+                            ) {
+                                URL.revokeObjectURL(media.media_url)
                             }
                         })
                     }
@@ -195,10 +198,10 @@ const Message: React.FC<MessageProps> = ({ conversation }) => {
             }
         }
 
-        socket.on(SocketEvent.NEW_MESSAGE, socketHandler)
+        socket.on('NEW_MESSAGE', socketHandler)
 
         return () => {
-            socket.off(SocketEvent.NEW_MESSAGE, socketHandler)
+            socket.off('NEW_MESSAGE', socketHandler)
         }
     }, [messages, mutateMessages, offsetRange.start, uuid])
 
@@ -281,10 +284,10 @@ const Message: React.FC<MessageProps> = ({ conversation }) => {
             )
         }
 
-        socket.on(SocketEvent.UPDATE_READ_MESSAGE, socketHandler)
+        socket.on('UPDATE_READ_MESSAGE', socketHandler)
 
         return () => {
-            socket.off(SocketEvent.UPDATE_READ_MESSAGE, socketHandler)
+            socket.off('UPDATE_READ_MESSAGE', socketHandler)
         }
     }, [currentUser?.data?.id, messages?.data, messages?.meta, mutateMessages, uuid])
 
@@ -334,10 +337,10 @@ const Message: React.FC<MessageProps> = ({ conversation }) => {
             }
         }
 
-        socket.on(SocketEvent.MESSAGE_REVOKE, socketHandler)
+        socket.on('MESSAGE_REVOKE', socketHandler)
 
         return () => {
-            socket.off(SocketEvent.MESSAGE_REVOKE, socketHandler)
+            socket.off('MESSAGE_REVOKE', socketHandler)
         }
     }, [currentUser?.data?.id, messages?.data, messages?.meta, mutateMessages, uuid])
 
@@ -406,138 +409,130 @@ const Message: React.FC<MessageProps> = ({ conversation }) => {
     }
 
     useEffect(() => {
-        interface Detail {
-            parentMessage: MessageModel
-            type: string
-        }
+        const remove = listenEvent('MESSAGE:SCROLL-TO-MESSAGE', async ({ parentMessage, type }) => {
+            const handleAnimate = (messageElement: HTMLDivElement) => {
+                Object.values(messageRefs.current).forEach((ref) => {
+                    if (!ref) {
+                        return
+                    }
 
-        const remove = listenEvent({
-            eventName: 'message:scroll-to-message',
-            handler: async ({ detail: { parentMessage, type } }: { detail: Detail }) => {
-                const handleAnimate = (messageElement: HTMLDivElement) => {
-                    Object.values(messageRefs.current).forEach((ref) => {
-                        if (!ref) {
+                    ref.classList.remove(
+                        'border-2',
+                        'border-white',
+                        'dark:border-zinc-800',
+                        'shadow-[0_0_0_1px_#222]',
+                        'dark:shadow-[0_0_0_1px_#fff]',
+                        'animate-scale-up',
+                    )
+                })
+
+                if (messageElement) {
+                    messageElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+
+                    isJumpingToMessage.current = true
+
+                    setTimeout(() => {
+                        isJumpingToMessage.current = false
+                    }, 1000)
+
+                    const observer = new IntersectionObserver(
+                        ([entry]) => {
+                            if (entry.isIntersecting) {
+                                messageElement.classList.add(
+                                    'border-2',
+                                    'border-white',
+                                    'dark:border-zinc-800',
+                                    'shadow-[0_0_0_1px_#222]',
+                                    'dark:shadow-[0_0_0_1px_#fff]',
+                                )
+                                setTimeout(() => {
+                                    messageElement.classList.add('animate-scale-up')
+                                }, 250)
+
+                                observer.disconnect()
+                            }
+                        },
+                        {
+                            threshold: 0.5,
+                        },
+                    )
+                    observer.observe(messageElement)
+                }
+            }
+
+            const messageElement = messageRefs.current[parentMessage.id]
+            // if reply message is loaded
+            if (messageElement) {
+                handleAnimate(messageElement)
+            } else {
+                const aroundMessage = await messageServices.getAroundMessages({
+                    conversationUuid: uuid as string,
+                    messageId: parentMessage.id,
+                    limit: PER_PAGE,
+                })
+
+                if (aroundMessage) {
+                    // if around message is the next range of the current range
+                    if (aroundMessage?.meta.pagination.offset <= offsetRange.end && type === 'reply') {
+                        const diffOffset = offsetRange.end - aroundMessage?.meta.pagination.offset
+                        aroundMessage.data.splice(0, diffOffset)
+
+                        if (!messages?.data) {
                             return
                         }
 
-                        ref.classList.remove(
-                            'border-2',
-                            'border-white',
-                            'dark:border-zinc-800',
-                            'shadow-[0_0_0_1px_#222]',
-                            'dark:shadow-[0_0_0_1px_#fff]',
-                            'animate-scale-up',
-                        )
-                    })
+                        const newMessages = [...messages.data, ...aroundMessage.data]
+                        const messageItem = newMessages.find((message) => message.id === parentMessage.id)
 
-                    if (messageElement) {
-                        messageElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+                        if (messageItem) {
+                            requestIdleCallback(() => {
+                                handleAnimate(messageRefs.current[messageItem.id])
+                            })
+                        }
 
-                        isJumpingToMessage.current = true
-
-                        setTimeout(() => {
-                            isJumpingToMessage.current = false
-                        }, 1000)
-
-                        const observer = new IntersectionObserver(
-                            ([entry]) => {
-                                if (entry.isIntersecting) {
-                                    messageElement.classList.add(
-                                        'border-2',
-                                        'border-white',
-                                        'dark:border-zinc-800',
-                                        'shadow-[0_0_0_1px_#222]',
-                                        'dark:shadow-[0_0_0_1px_#fff]',
-                                    )
-                                    setTimeout(() => {
-                                        messageElement.classList.add('animate-scale-up')
-                                    }, 250)
-
-                                    observer.disconnect()
-                                }
+                        mutateMessages(
+                            {
+                                data: newMessages,
+                                meta: aroundMessage.meta,
                             },
                             {
-                                threshold: 0.5,
+                                revalidate: false,
                             },
                         )
-                        observer.observe(messageElement)
-                    }
-                }
 
-                const messageElement = messageRefs.current[parentMessage.id]
-                // if reply message is loaded
-                if (messageElement) {
-                    handleAnimate(messageElement)
-                } else {
-                    const aroundMessage = await messageServices.getAroundMessages({
-                        conversationUuid: uuid as string,
-                        messageId: parentMessage.id,
-                        limit: PER_PAGE,
-                    })
-
-                    if (aroundMessage) {
-                        // if around message is the next range of the current range
-                        if (aroundMessage?.meta.pagination.offset <= offsetRange.end && type === 'reply') {
-                            const diffOffset = offsetRange.end - aroundMessage?.meta.pagination.offset
-                            aroundMessage.data.splice(0, diffOffset)
-
-                            if (!messages?.data) {
-                                return
+                        setOffsetRange((prev) => {
+                            return {
+                                ...prev,
+                                end: prev.end + aroundMessage.meta.pagination.offset,
                             }
+                        })
+                    } else {
+                        setOffsetRange({
+                            start: aroundMessage.meta.pagination.offset,
+                            end: aroundMessage.meta.pagination.offset + aroundMessage.data.length,
+                        })
 
-                            const newMessages = [...messages.data, ...aroundMessage.data]
-                            const messageItem = newMessages.find((message) => message.id === parentMessage.id)
+                        mutateMessages(
+                            {
+                                data: aroundMessage.data,
+                                meta: aroundMessage.meta,
+                            },
+                            { revalidate: false },
+                        )
 
-                            if (messageItem) {
-                                requestIdleCallback(() => {
-                                    handleAnimate(messageRefs.current[messageItem.id])
-                                })
-                            }
+                        const messageItem = aroundMessage.data.find((message) => message.id === parentMessage.id)
+                        if (messageItem) {
+                            requestIdleCallback(() => {
+                                const messageElement = messageRefs.current[messageItem.id]
 
-                            mutateMessages(
-                                {
-                                    data: newMessages,
-                                    meta: aroundMessage.meta,
-                                },
-                                {
-                                    revalidate: false,
-                                },
-                            )
-
-                            setOffsetRange((prev) => {
-                                return {
-                                    ...prev,
-                                    end: prev.end + aroundMessage.meta.pagination.offset,
+                                if (messageElement) {
+                                    handleAnimate(messageElement)
                                 }
                             })
-                        } else {
-                            setOffsetRange({
-                                start: aroundMessage.meta.pagination.offset,
-                                end: aroundMessage.meta.pagination.offset + aroundMessage.data.length,
-                            })
-
-                            mutateMessages(
-                                {
-                                    data: aroundMessage.data,
-                                    meta: aroundMessage.meta,
-                                },
-                                { revalidate: false },
-                            )
-
-                            const messageItem = aroundMessage.data.find((message) => message.id === parentMessage.id)
-                            if (messageItem) {
-                                requestIdleCallback(() => {
-                                    const messageElement = messageRefs.current[messageItem.id]
-
-                                    if (messageElement) {
-                                        handleAnimate(messageElement)
-                                    }
-                                })
-                            }
                         }
                     }
                 }
-            },
+            }
         })
 
         return remove
@@ -580,19 +575,21 @@ const Message: React.FC<MessageProps> = ({ conversation }) => {
                                     meta: response?.meta,
                                 }
 
-                                mutateMessages(newData, {
-                                    revalidate: false,
-                                })
+                                setTimeout(() => {
+                                    mutateMessages(newData, {
+                                        revalidate: false,
+                                    })
 
-                                setOffsetRange((prev) => {
-                                    return {
-                                        ...prev,
-                                        end: response.meta.pagination.offset + response.data.length,
-                                    }
-                                })
+                                    setOffsetRange((prev) => {
+                                        return {
+                                            ...prev,
+                                            end: response.meta.pagination.offset + response.data.length,
+                                        }
+                                    })
+                                }, 200)
                             }
                         } catch (error) {
-                            toast('Có lỗi khi tải tin nhắn, vui lòng thử lại sau', 'error')
+                            toast.error('Có lỗi khi tải tin nhắn, vui lòng thử lại sau')
                         }
                     }}
                     className="flex flex-col-reverse gap-[2.5px] overflow-hidden! px-2 py-3"
@@ -614,15 +611,17 @@ const Message: React.FC<MessageProps> = ({ conversation }) => {
                         <React.Fragment key={message.id}>
                             {index === 0 && <Typing />}
 
-                            <MessageItem
-                                message={message}
-                                messageIndex={index}
-                                messages={messages}
-                                currentUser={currentUser?.data}
-                                messageRef={(el) => {
-                                    messageRefs.current[message.id] = el
-                                }}
-                            />
+                            {currentUser?.data && (
+                                <MessageItem
+                                    message={message}
+                                    messageIndex={index}
+                                    messages={messages}
+                                    currentUser={currentUser?.data}
+                                    messageRef={(el) => {
+                                        messageRefs.current[message.id] = el
+                                    }}
+                                />
+                            )}
                         </React.Fragment>
                     ))}
                 </InfiniteScroll>

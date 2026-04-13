@@ -1,12 +1,11 @@
-import { ToastContainer } from 'react-toastify'
 import { Inter } from 'next/font/google'
 
-import './globals.css'
 import 'react-loading-skeleton/dist/skeleton.css'
 import 'tippy.js/dist/tippy.css'
-import 'react-toastify/dist/ReactToastify.css'
+import './globals.css'
 import GlobalSWRConfig from '~/components/GlobalWrapper/GlobalSWRConfig'
 import ReduxProvider from '~/components/GlobalWrapper/ReduxProvider'
+import { Toaster } from '~/components/ui/sonner'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -17,10 +16,12 @@ function RootLayout({
 }>) {
     return (
         <html lang="en">
-            <body className={`${inter.className} text-black dark:text-dark`}>
+            <body className={`${inter.className} dark:text-dark text-black`}>
                 <GlobalSWRConfig>
-                    <ReduxProvider>{children}</ReduxProvider>
-                    <ToastContainer />
+                    <ReduxProvider>
+                        {children}
+                        <Toaster />
+                    </ReduxProvider>
                 </GlobalSWRConfig>
             </body>
         </html>

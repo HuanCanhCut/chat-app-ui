@@ -30,7 +30,7 @@ const Button = ({
             : ''
     const buttonIconClass =
         buttonType === 'icon'
-            ? 'h-7 w-7 xxs:h-9  xxs:w-9 flex-center rounded-full bg-lightGray dark:bg-[#313233] hover:bg-[#99999936] dark:hover:bg-[#383b3b]'
+            ? 'h-7 w-7 xxs:h-9  xxs:w-9 flex-center rounded-full bg-light-gray dark:bg-[#313233] hover:bg-[#99999936] dark:hover:bg-[#383b3b]'
             : ''
     const roundedClass =
         buttonType === 'rounded'

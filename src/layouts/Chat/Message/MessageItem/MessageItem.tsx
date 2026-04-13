@@ -2,6 +2,7 @@ import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import ReactModal from 'react-modal'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
+import Tippy from 'huanpenguin-tippy-react'
 import moment from 'moment-timezone'
 import useSWR from 'swr'
 
@@ -10,18 +11,16 @@ import MessageAction from './components/MessageAction'
 import MessageContent from './components/MessageContent'
 import ReplyMessage from './components/ReplyMessage'
 import UserViewed from './components/UserViewed'
-import Tippy from '@vendor/tippy'
+import ReactionModal from '~/components/ReactionModal/ReactionModal'
 import UserAvatar from '~/components/UserAvatar'
-import { SocketEvent } from '~/enum/SocketEvent'
 import SWRKey from '~/enum/SWRKey'
 import { sendEvent } from '~/helpers/events'
 import socket from '~/helpers/socket'
 import useVisible from '~/hooks/useVisible'
-import MessageImagesModel from '~/layouts/Chat/Message/Modal/MessageImagesModal'
-import ReactionModal from '~/layouts/Chat/Message/Modal/ReactionModal'
+import MessageImagesModel from '~/layouts/Chat/Message/Modal/MessageMediaModal'
 import RevokeModal from '~/layouts/Chat/Message/Modal/RevokeModal'
 import * as conversationServices from '~/services/conversationService'
-import { ConversationMember, MessageModel, MessageResponse, UserModel } from '~/type/type'
+import { ConversationMember, MessageMedia, MessageModel, MessageResponse, UserModel } from '~/type/type'
 
 const BETWEEN_TIME_MESSAGE = 7 // minute
 
@@ -48,9 +47,16 @@ const MessageItem = ({ message, messageIndex, messages, currentUser, messageRef 
     const replyMessageRef = useRef<HTMLDivElement>(null)
     const groupMessageRef = useRef<HTMLDivElement>(null)
 
-    const [openImageModal, setOpenImageModal] = useState({
+    const [openMediaModal, setOpenMediaModal] = useState<{
+        isOpen: boolean
+        media: Pick<MessageMedia, 'media_type' | 'media_url'>
+        messageId: number
+    }>({
         isOpen: false,
-        image: '',
+        media: {
+            media_type: 'image',
+            media_url: '',
+        },
         messageId: 0,
     })
     const [openReactionModal, setOpenReactionModal] = useState({
@@ -74,7 +80,7 @@ const MessageItem = ({ message, messageIndex, messages, currentUser, messageRef 
 
     // handle margin top of reply message
     useEffect(() => {
-        if (message.parent) {
+        if (message.parent || message.forward_origin) {
             if (replyMessageRef.current && groupMessageRef.current) {
                 groupMessageRef.current.style.marginTop = replyMessageRef.current.offsetHeight + 'px'
             }
@@ -84,7 +90,7 @@ const MessageItem = ({ message, messageIndex, messages, currentUser, messageRef 
                 groupMessageRef.current.style.marginTop = '0px'
             }
         }
-    }, [message.parent])
+    }, [message.forward_origin, message.parent])
 
     const diffTime = (message: MessageModel, targetMessage: MessageModel) => {
         if (targetMessage && message) {
@@ -126,11 +132,11 @@ const MessageItem = ({ message, messageIndex, messages, currentUser, messageRef 
                         return
                     }
 
-                    socket.emit(SocketEvent.READ_MESSAGE, {
+                    socket.emit('READ_MESSAGE', {
                         conversation_uuid: uuid as string,
                         message_id: message.id,
                     })
-                    sendEvent({ eventName: 'message:read-message', detail: uuid as string })
+                    sendEvent('MESSAGE:READ-MESSAGE', { conversationUuid: uuid as string })
                 }
             }
         }
@@ -146,22 +152,36 @@ const MessageItem = ({ message, messageIndex, messages, currentUser, messageRef 
         return moment(new Date(time)).locale('vi').format('DD [Tháng] MM, YYYY')
     }, [])
 
-    const handleOpenImageModal = (url: string, messageId: number) => {
+    const handleOpenMediaModal = ({
+        url,
+        messageId,
+        type,
+    }: {
+        url: string
+        messageId: number
+        type: 'image' | 'video'
+    }) => {
         if (url.startsWith('blob:http')) {
             return
         }
 
-        setOpenImageModal({
+        setOpenMediaModal({
             isOpen: true,
-            image: url,
+            media: {
+                media_type: type,
+                media_url: url,
+            },
             messageId,
         })
     }
 
     const handleCloseImageModal = useCallback(() => {
-        setOpenImageModal({
+        setOpenMediaModal({
             isOpen: false,
-            image: '',
+            media: {
+                media_type: 'image',
+                media_url: '',
+            },
             messageId: 0,
         })
     }, [])
@@ -235,16 +255,20 @@ const MessageItem = ({ message, messageIndex, messages, currentUser, messageRef 
 
     return (
         <div>
-            {message.type === 'image' && (
+            {message.type === 'media' && (
                 <ReactModal
-                    isOpen={openImageModal.isOpen}
+                    isOpen={openMediaModal.isOpen}
                     ariaHideApp={false}
                     overlayClassName="overlay"
                     closeTimeoutMS={200}
                     onRequestClose={handleCloseImageModal}
-                    className="fixed bottom-0 left-0 right-0 top-0"
+                    className="fixed top-0 right-0 bottom-0 left-0"
                 >
-                    <MessageImagesModel onClose={handleCloseImageModal} imageUrl={openImageModal.image} />
+                    <MessageImagesModel
+                        onClose={handleCloseImageModal}
+                        mediaUrl={openMediaModal.media.media_url}
+                        mediaType={openMediaModal.media.media_type}
+                    />
                 </ReactModal>
             )}
 
@@ -252,7 +276,8 @@ const MessageItem = ({ message, messageIndex, messages, currentUser, messageRef 
                 <ReactionModal
                     isOpen={openReactionModal.isOpen}
                     onClose={handleCloseReactionModal}
-                    messageId={openReactionModal.messageId}
+                    reactionableId={openReactionModal.messageId}
+                    reactionableType="Message"
                 />
             )}
 
@@ -289,7 +314,7 @@ const MessageItem = ({ message, messageIndex, messages, currentUser, messageRef 
                     {message.sender_id !== currentUser.id &&
                         isFirstMessageInConsecutiveGroup() &&
                         conversation?.data.is_group && (
-                            <p className="mb-1 ml-2 flex w-fit items-center gap-2 text-right text-xs text-system-message-light dark:text-system-message-dark">
+                            <p className="text-system-message-light dark:text-system-message-dark mb-1 ml-2 flex w-fit items-center gap-2 text-right text-xs">
                                 {memberMap[message.sender_id]?.nickname || memberMap[message.sender_id]?.user.full_name}
                             </p>
                         )}
@@ -318,7 +343,7 @@ const MessageItem = ({ message, messageIndex, messages, currentUser, messageRef 
                                 ref={firstMessageRef}
                                 messageRef={messageRef}
                                 currentUser={currentUser}
-                                handleOpenImageModal={handleOpenImageModal}
+                                handleOpenMediaModal={handleOpenMediaModal}
                                 handleOpenReactionModal={handleOpenReactionModal}
                                 messages={messages}
                                 diffTime={diffTime}

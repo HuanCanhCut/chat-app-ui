@@ -1,21 +1,26 @@
 import { AxiosError } from 'axios'
+import { toast } from 'sonner'
 
-import { toast } from '../utils/toast'
-
-const handleApiError = (error: any, message?: string) => {
+const handleApiError = (error: any, message?: string, toastId?: string | number) => {
     if (error instanceof AxiosError) {
         if (message) {
-            toast(message, 'error')
+            toast.error(message, {
+                id: toastId,
+            })
             return
         }
 
         if (error.response?.data.message && !error.status?.toString().startsWith('5')) {
-            toast(error.response?.data.message, 'error')
+            toast.error(error.response?.data.message, { id: toastId })
         } else {
-            toast('Có lỗi xảy ra, vui lòng thử lại sau hoặc liên hệ admin để xử lí', 'error')
+            toast.error('Có lỗi xảy ra, vui lòng thử lại sau hoặc liên hệ admin để xử lí', {
+                id: toastId,
+            })
         }
     } else {
-        toast(error.message, 'error')
+        toast.error(error.message, {
+            id: toastId,
+        })
     }
 }
 

@@ -10,14 +10,13 @@ import FriendList from './components/FriendList'
 import User from './components/User'
 import NotFound from '~/app/not-found'
 import CustomImage from '~/components/Image'
-import { SocketEvent } from '~/enum/SocketEvent'
 import SWRKey from '~/enum/SWRKey'
 import { listenEvent } from '~/helpers/events'
 import socket from '~/helpers/socket'
-import { useAppSelector } from '~/redux'
-import { getCurrentUser } from '~/redux/selector'
+import { selectCurrentUser } from '~/redux/selector'
+import { useAppSelector } from '~/redux/types'
 import * as userService from '~/services/userService'
-import { UserResponse, UserStatus } from '~/type/type'
+import { UserResponse } from '~/type/type'
 
 interface Tab {
     label: string
@@ -27,7 +26,7 @@ interface Tab {
 export default function UserPage() {
     const { nickname } = useParams()
 
-    const currentUser = useAppSelector(getCurrentUser)
+    const currentUser = useAppSelector(selectCurrentUser)
 
     const [currentTab, setCurrentTab] = useState<'friend' | 'friend-invitation'>('friend')
 
@@ -59,7 +58,7 @@ export default function UserPage() {
     }, [currentUser?.data.id, user?.data.id])
 
     useEffect(() => {
-        const socketHandler = (data: UserStatus) => {
+        const socketHandler = (data: { user_id: number; is_online: boolean; last_online_at: string | null }) => {
             if (!user) {
                 return
             }
@@ -80,31 +79,28 @@ export default function UserPage() {
             }
         }
 
-        socket.on(SocketEvent.USER_STATUS, socketHandler)
+        socket.on('USER_STATUS', socketHandler)
 
         return () => {
-            socket.off(SocketEvent.USER_STATUS, socketHandler)
+            socket.off('USER_STATUS', socketHandler)
         }
     }, [mutate, user])
 
     useEffect(() => {
-        const remove = listenEvent({
-            eventName: 'friend:change-friend-status',
-            handler: ({ detail }: { detail: { send_friend_request: boolean } }) => {
-                if (!user?.data) {
-                    return
-                }
+        const remove = listenEvent('FRIEND:CHANGE-FRIEND-STATUS', (detail) => {
+            if (!user?.data) {
+                return
+            }
 
-                const newData: UserResponse = {
-                    ...user,
-                    data: {
-                        ...user.data,
-                        ...detail,
-                    },
-                }
+            const newData: UserResponse = {
+                ...user,
+                data: {
+                    ...user.data,
+                    ...detail,
+                },
+            }
 
-                mutate(newData, { revalidate: false })
-            },
+            mutate(newData, { revalidate: false })
         })
 
         return remove

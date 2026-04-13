@@ -52,13 +52,27 @@ enum SWRKey {
     /**
      * Reaction
      */
-    GET_REACTIONS_TYPE = '/reactions/:messageId/types',
-    GET_REACTIONS = '/reactions/:messageId',
+    GET_REACTIONS_TYPE = '/reactions/:reactionableId/:reactionableType/types',
+    GET_REACTIONS = '/reactions/:reactionableId/:reactionableType',
 
     /**
      * Theme
      */
     GET_THEMES = '/themes',
+
+    /**
+     * Story
+     */
+
+    GET_STORIES = '/stories',
+    GET_USER_STORIES = '/stories/:uuid',
+    GET_USER_VIEWED_STORIES = '/stories/:uuid/viewed',
+
+    /**
+     * POST
+     */
+
+    GET_POSTS = '/posts',
 }
 
 export default SWRKey

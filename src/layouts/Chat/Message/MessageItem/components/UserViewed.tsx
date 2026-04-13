@@ -1,6 +1,6 @@
 import React, { useRef } from 'react'
+import Tippy from 'huanpenguin-tippy-react'
 
-import Tippy from '@vendor/tippy'
 import UserAvatar from '~/components/UserAvatar'
 import { MessageModel, MessageStatus, UserModel } from '~/type/type'
 
@@ -73,7 +73,7 @@ const UserViewed: React.FC<UserViewedProp> = ({ message, currentUser, messageInd
 
                             if (statusText) {
                                 return (
-                                    <p className="mt-[2px] text-xs font-normal text-system-message-light dark:text-system-message-dark">
+                                    <p className="text-system-message-light dark:text-system-message-dark mt-[2px] text-xs font-normal">
                                         {statusText}
                                     </p>
                                 )

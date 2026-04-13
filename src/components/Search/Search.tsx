@@ -1,11 +1,11 @@
 import { memo, useCallback, useEffect, useState } from 'react'
+import Tippy from 'huanpenguin-tippy-react/headless'
 import useSWR from 'swr'
 
 import AccountItem from '../AccountItem'
 import PopperWrapper from '../PopperWrapper'
 import { faSearch, faXmark } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import Tippy from '@vendor/tippy/headless'
 import config from '~/config'
 import SWRKey from '~/enum/SWRKey'
 import { sendEvent } from '~/helpers/events'
@@ -66,7 +66,7 @@ const Search: React.FC<SearchProps> = ({ placeholder = 'Tìm kiếm', className 
         (user?: UserModel) => {
             handleHideTippy()
 
-            sendEvent({ eventName: 'tippy:hide-search-modal' })
+            sendEvent('TIPPY:HIDE-SEARCH-MODAL', null)
 
             const getSearchHistory = async () => {
                 // Set search history
@@ -129,25 +129,25 @@ const Search: React.FC<SearchProps> = ({ placeholder = 'Tìm kiếm', className 
                 render={renderResult}
                 placement="bottom-start"
             >
-                <div className={`relative rounded-3xl bg-lightGray pl-3 dark:bg-[#313233] sm:pl-10`}>
+                <div className={`bg-light-gray dark:bg-dark-gray relative rounded-3xl pl-3 sm:pl-10`}>
                     <input
                         name="search"
                         type="text"
                         placeholder={placeholder}
-                        className="w-full rounded-3xl bg-transparent py-[8px] pl-px pr-11 caret-primary outline-hidden placeholder:text-sm dark:bg-[#313233]"
+                        className="caret-primary dark:bg-dark-gray w-full rounded-3xl bg-transparent py-[8px] pr-11 pl-px outline-hidden placeholder:text-sm"
                         value={searchValue}
                         onChange={(e) => setSearchValue(e.target.value)}
                         onFocus={() => setShowResult(true)}
                     />
                     <FontAwesomeIcon
                         icon={faSearch}
-                        className="absolute left-3 top-1/2 hidden -translate-y-1/2 text-xl text-gray-400 sm:block"
+                        className="absolute top-1/2 left-3 hidden -translate-y-1/2 text-xl text-gray-400 sm:block"
                         width={16}
                         height={16}
                     />
                     {searchResult.length > 0 ||
                         (true && (
-                            <button className="absolute right-0 top-1/2 block aspect-square h-full -translate-y-1/2 rounded-full leading-none sm:hidden">
+                            <button className="absolute top-1/2 right-0 block aspect-square h-full -translate-y-1/2 rounded-full leading-none sm:hidden">
                                 <FontAwesomeIcon
                                     icon={faXmark}
                                     className="text-xl leading-none"

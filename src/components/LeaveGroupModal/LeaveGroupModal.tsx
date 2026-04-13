@@ -4,8 +4,8 @@ import { useParams } from 'next/navigation'
 import ConfirmModel from '~/components/ConfirmModal'
 import { sendEvent } from '~/helpers/events'
 import handleApiError from '~/helpers/handleApiError'
-import { useAppSelector } from '~/redux'
-import { getCurrentUser } from '~/redux/selector'
+import { selectCurrentUser } from '~/redux/selector'
+import { useAppSelector } from '~/redux/types'
 import * as conversationService from '~/services/conversationService'
 import { ConversationMember, ConversationModel } from '~/type/type'
 
@@ -15,10 +15,10 @@ interface LeaveGroupModalProps {
 }
 
 const LeaveGroupModal: React.FC<LeaveGroupModalProps> = ({ onClose, conversation }) => {
-    const currentUser = useAppSelector(getCurrentUser)
+    const currentUser = useAppSelector(selectCurrentUser)
     const { uuid } = useParams()
 
-    const currentUserMember = conversation?.members.find((member) => {
+    const currentUserMember = conversation?.members?.find((member) => {
         return member.user_id === currentUser?.data.id
     }) as ConversationMember | undefined
 
@@ -28,12 +28,7 @@ const LeaveGroupModal: React.FC<LeaveGroupModalProps> = ({ onClose, conversation
         try {
             await conversationService.leaveConversation({ uuid: uuid as string })
 
-            sendEvent({
-                eventName: 'conversation:leave-group',
-                detail: {
-                    conversation_uuid: uuid as string,
-                },
-            })
+            sendEvent('CONVERSATION:LEAVE-GROUP', { conversation_uuid: uuid as string })
 
             onClose()
         } catch (error) {

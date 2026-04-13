@@ -2,11 +2,11 @@
 
 import Image from 'next/image'
 
-import { useAppSelector } from '~/redux'
-import { getCurrentTheme } from '~/redux/selector'
+import { selectTheme } from '~/redux/selector'
+import { useAppSelector } from '~/redux/types'
 
 const NoChatSelected = () => {
-    const theme = useAppSelector(getCurrentTheme)
+    const theme = useAppSelector(selectTheme)
     return (
         <div className="[overflow: overlay] h-full max-h-[calc(100dvh-var(--header-height-mobile))] sm:max-h-[calc(100dvh-var(--header-height))]">
             <div className="flex h-full flex-col items-center justify-center">

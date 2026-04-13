@@ -8,14 +8,14 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Button from '~/components/Button'
 import UserAvatar from '~/components/UserAvatar'
 import config from '~/config'
-import { SocketEvent } from '~/enum/SocketEvent'
 import { sendEvent } from '~/helpers/events'
 import socket from '~/helpers/socket'
-import { useAppSelector } from '~/redux'
-import { getCurrentUser } from '~/redux/selector'
-import { ConversationModel, UserStatus } from '~/type/type'
+import { selectCurrentUser } from '~/redux/selector'
+import { useAppSelector } from '~/redux/types'
+import { ConversationModel } from '~/type/type'
 import { momentTimezone } from '~/utils/moment'
 import openWindowCall from '~/utils/openWindowCall'
+
 interface HeaderProps {
     className?: string
     isInfoOpen: boolean
@@ -23,7 +23,7 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ className = '', isInfoOpen, conversation }) => {
-    const currentUser = useAppSelector(getCurrentUser)
+    const currentUser = useAppSelector(selectCurrentUser)
     const router = useRouter()
 
     const offlineTimerSocket = useRef<NodeJS.Timeout | null>(null)
@@ -31,13 +31,13 @@ const Header: React.FC<HeaderProps> = ({ className = '', isInfoOpen, conversatio
 
     const handleNavigate = () => {
         if (!conversation.is_group) {
-            const member = conversation.members.find((member) => member.user_id !== currentUser?.data.id)
+            const member = conversation.members?.find((member) => member.user_id !== currentUser?.data.id)
 
             router.push(`${config.routes.user}/@${member?.user.nickname}`)
         }
     }
 
-    const conversationMember = conversation.members.find((member) => member.user_id !== currentUser?.data.id)
+    const conversationMember = conversation.members?.find((member) => member.user_id !== currentUser?.data.id)
 
     const [lastOnlineTime, setLastOnlineTime] = useState<Date | null>(null)
 
@@ -48,31 +48,36 @@ const Header: React.FC<HeaderProps> = ({ className = '', isInfoOpen, conversatio
     }, [conversationMember])
 
     useEffect(() => {
-        const socketHandler = (data: UserStatus) => {
+        const socketHandler = ({
+            user_id,
+            is_online,
+            last_online_at,
+        }: {
+            user_id: number
+            is_online: boolean
+            last_online_at: string | null
+        }) => {
             if (offlineTimer.current) {
                 clearTimeout(offlineTimer.current)
             }
 
-            if (data.user_id === conversationMember?.user.id && !data.is_online) {
-                sendEvent({
-                    eventName: 'user:status',
-                    detail: {
-                        user_id: conversationMember?.user.id,
-                        is_online: false,
-                        last_online_at: new Date(conversationMember?.user.last_online_at || new Date()),
-                    },
+            if (user_id === conversationMember?.user.id && !is_online) {
+                sendEvent('USER:STATUS', {
+                    user_id: conversationMember?.user.id,
+                    is_online: false,
+                    last_online_at: new Date(conversationMember?.user.last_online_at || new Date()),
                 })
 
                 offlineTimerSocket.current = setInterval(() => {
-                    setLastOnlineTime(new Date(data.last_online_at || new Date()))
+                    setLastOnlineTime(new Date(last_online_at || new Date()))
                 }, 1000 * 30) // 30 seconds
             }
         }
 
-        socket.on(SocketEvent.USER_STATUS, socketHandler)
+        socket.on('USER_STATUS', socketHandler)
 
         return () => {
-            socket.off(SocketEvent.USER_STATUS, socketHandler)
+            socket.off('USER_STATUS', socketHandler)
 
             if (offlineTimerSocket.current) {
                 clearTimeout(offlineTimerSocket.current)
@@ -83,13 +88,10 @@ const Header: React.FC<HeaderProps> = ({ className = '', isInfoOpen, conversatio
     useEffect(() => {
         if (!conversationMember?.user.is_online) {
             if (conversationMember?.user.last_online_at) {
-                sendEvent({
-                    eventName: 'user:status',
-                    detail: {
-                        user_id: conversationMember?.user.id,
-                        is_online: false,
-                        last_online_at: new Date(conversationMember?.user.last_online_at),
-                    },
+                sendEvent('USER:STATUS', {
+                    user_id: conversationMember?.user.id,
+                    is_online: false,
+                    last_online_at: new Date(conversationMember?.user.last_online_at),
                 })
 
                 offlineTimer.current = setInterval(() => {
@@ -106,12 +108,7 @@ const Header: React.FC<HeaderProps> = ({ className = '', isInfoOpen, conversatio
     }, [conversationMember?.user.id, conversationMember?.user.is_online, conversationMember?.user.last_online_at])
 
     const handleToggleInfo = () => {
-        sendEvent({
-            eventName: 'info:toggle',
-            detail: {
-                isOpen: !isInfoOpen,
-            },
-        })
+        sendEvent('INFO:TOGGLE', { isOpen: !isInfoOpen })
     }
 
     const handleVoiceCall = () => {
@@ -138,7 +135,7 @@ const Header: React.FC<HeaderProps> = ({ className = '', isInfoOpen, conversatio
         >
             <div className="flex items-center">
                 <div
-                    className="flex-center cursor-pointer rounded-lg px-1 py-1 hover:bg-[#99999926]! dark:hover:bg-[#383b3b25]! bp900:hidden"
+                    className="flex-center bp900:hidden cursor-pointer rounded-lg px-1 py-1 hover:bg-[#99999926]! dark:hover:bg-[#383b3b25]!"
                     onClick={() => router.push('/message')}
                 >
                     <FontAwesomeIcon
@@ -156,13 +153,13 @@ const Header: React.FC<HeaderProps> = ({ className = '', isInfoOpen, conversatio
                         <UserAvatar
                             src={conversation.is_group ? conversation.avatar : conversationMember?.user?.avatar}
                             size={40}
-                            isOnline={conversation.members.some(
+                            isOnline={conversation.members?.some(
                                 (member) => member.user.is_online && member.user.id !== currentUser?.data.id,
                             )}
                         />
                     </div>
                     <div className="flex flex-col">
-                        <h4 className="max-w-[150px] truncate whitespace-nowrap font-semibold xs:max-w-[200px] sm:max-w-[250px] md:max-w-[350px]">
+                        <h4 className="xs:max-w-[200px] max-w-[150px] truncate font-semibold whitespace-nowrap sm:max-w-[250px] md:max-w-[350px]">
                             {conversation.is_group
                                 ? conversation.name
                                 : conversationMember?.nickname || conversationMember?.user?.full_name}
@@ -172,13 +169,13 @@ const Header: React.FC<HeaderProps> = ({ className = '', isInfoOpen, conversatio
                                 ? conversationMember?.user?.is_online
                                     ? 'Đang hoạt động'
                                     : lastOnlineTime && `Hoạt động ${momentTimezone(lastOnlineTime)} trước`
-                                : `${conversation.members.filter((member) => member.user.is_online && member.user.id !== currentUser?.data.id).length} người đang hoạt động`}
+                                : `${conversation.members?.filter((member) => member.user.is_online && member.user.id !== currentUser?.data.id).length} người đang hoạt động`}
                         </span>
                     </div>
                 </div>
             </div>
             {!conversation.is_temp && (
-                <div className="flex items-center">
+                <div className="flex items-center gap-1">
                     {!conversation.is_group && !conversation.is_temp && (
                         <>
                             <Button

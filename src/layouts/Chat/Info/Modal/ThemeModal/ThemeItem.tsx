@@ -22,7 +22,7 @@ const ThemeItem: React.FC<ThemeItemProps> = ({
 }) => {
     return (
         <div
-            className={`flex w-full max-w-full cursor-pointer select-none items-center overflow-hidden rounded-lg p-2 ${active ? 'bg-primary/10' : ''} ${className}`}
+            className={`flex w-full max-w-full cursor-pointer items-center overflow-hidden rounded-lg p-2 select-none ${active ? 'bg-primary/10' : ''} ${className}`}
             onClick={onClick}
         >
             <UserAvatar size={40} src={theme.logo} />
@@ -31,7 +31,7 @@ const ThemeItem: React.FC<ThemeItemProps> = ({
                 <p className="truncate text-xs text-gray-500 dark:text-gray-400">{theme.description}</p>
             </div>
             {checked && (
-                <FontAwesomeIcon icon={faCheck} size="lg" className="ml-auto text-primary dark:text-[#5AA7FF]" />
+                <FontAwesomeIcon icon={faCheck} size="lg" className="text-primary ml-auto dark:text-[#5AA7FF]" />
             )}
         </div>
     )

@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import Image from 'next/image'
 import { signInWithPopup } from 'firebase/auth'
+import { toast } from 'sonner'
 
 import SendVerifyCode from './SendVerifyCode'
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons'
@@ -11,7 +12,6 @@ import Input from '~/components/Input/Input'
 import config from '~/config'
 import * as authServices from '~/services/authService'
 import { UserModel } from '~/type/type'
-import { toast } from '~/utils/toast'
 
 export interface FieldValue {
     email: string
@@ -85,7 +85,7 @@ const AuthForm = () => {
                 if (error?.response?.data?.message) {
                     setErrorMessage(error.response.data.message)
                 } else {
-                    toast('Đăng kí thất bại, vui lòng thử lại hoặc liên hệ admin để xử lí.', 'error')
+                    toast.error('Đăng kí thất bại, vui lòng thử lại hoặc liên hệ admin để xử lí.')
                 }
             }
         }
@@ -254,7 +254,7 @@ const AuthForm = () => {
                     </>
                 )}
 
-                {errorMessage && <span className="text-sm text-error">{errorMessage}</span>}
+                {errorMessage && <span className="text-error text-sm">{errorMessage}</span>}
 
                 {type === 'login' && (
                     <span
@@ -268,14 +268,14 @@ const AuthForm = () => {
                 )}
             </div>
 
-            <button className="w-full rounded-lg bg-primary p-2 text-white" type="submit">
+            <button className="bg-primary w-full rounded-lg p-2 text-white" type="submit">
                 {type === 'login' ? 'Đăng nhập' : type === 'register' ? 'Đăng kí' : 'Thay đổi mật khẩu'}
             </button>
 
             <span className="text-center text-sm text-gray-500 dark:text-gray-400">
                 Bạn không có tài khoản?{' '}
                 <span
-                    className="cursor-pointer font-semibold text-primary"
+                    className="text-primary cursor-pointer font-semibold"
                     onClick={() => setType(type === 'login' ? 'register' : 'login')}
                 >
                     {type === 'login' ? 'Đăng kí' : 'Đăng nhập'}

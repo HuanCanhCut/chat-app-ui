@@ -2,21 +2,21 @@
 
 import React, { memo, useCallback, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Tippy from 'huanpenguin-tippy-react'
 
 import CreateConversationModal from './CreateConversationModal'
 import { faUserGroup } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import Tippy from '@vendor/tippy'
 import Modal from '~/components/Modal'
 import UserAvatar from '~/components/UserAvatar/UserAvatar'
 import config from '~/config'
-import { useAppSelector } from '~/redux'
-import { getCurrentUser } from '~/redux/selector'
+import { useAppSelector } from '~/redux/types'
+import { selectCurrentUser } from '~/redux/selector'
 
 const Header: React.FC = () => {
     const router = useRouter()
 
-    const currentUser = useAppSelector(getCurrentUser)
+    const currentUser = useAppSelector(selectCurrentUser)
 
     const [isCreateConversationModalOpen, setIsCreateConversationModalOpen] = useState(false)
 
@@ -45,11 +45,11 @@ const Header: React.FC = () => {
             <div className="flex w-full items-center justify-between">
                 <>
                     <UserAvatar src={currentUser?.data?.avatar} onClick={handleNavigateToProfile} />
-                    <h3 className="text-xl font-semibold dark:text-dark">Huấn Cánh Cụt</h3>
+                    <h3 className="dark:text-dark text-xl font-semibold">Huấn Cánh Cụt</h3>
 
                     <Tippy content="Tạo nhóm" hideOnClick={true} placement="bottom-start">
                         <button
-                            className="flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-dark-gray dark:text-dark dark:hover:opacity-90"
+                            className="dark:bg-dark-gray dark:text-dark flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 dark:hover:opacity-90"
                             onClick={handleCreateConversation}
                         >
                             <FontAwesomeIcon icon={faUserGroup} className="text-xl" width={20} height={20} />

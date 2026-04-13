@@ -1,20 +1,18 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useParams } from 'next/navigation'
 import { EmojiClickData } from 'emoji-picker-react'
+import Tippy from 'huanpenguin-tippy-react'
+import HeadlessTippy from 'huanpenguin-tippy-react/headless'
 
 import { faSmile } from '@fortawesome/free-regular-svg-icons'
 import { faEllipsisVertical, faReply } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import Tippy from '@vendor/tippy'
 import CustomTippy from '~/components/CustomTippy'
 import Emoji from '~/components/Emoji'
 import PopperWrapper from '~/components/PopperWrapper'
-import { SocketEvent } from '~/enum/SocketEvent'
-import { listenEvent } from '~/helpers/events'
-import { sendEvent } from '~/helpers/events'
+import { listenEvent, sendEvent } from '~/helpers/events'
 import socket from '~/helpers/socket'
 import { MessageModel, MessageResponse, UserModel } from '~/type/type'
-import HeadlessTippy from '~/vendor/tippy/headless'
 
 interface MessageActionProps {
     message: MessageModel
@@ -42,11 +40,8 @@ const MessageAction: React.FC<MessageActionProps> = ({
     const [isOpenMoreAction, setIsOpenMoreAction] = useState(false)
 
     useEffect(() => {
-        const remove = listenEvent({
-            eventName: 'tippy:tippy-hidden',
-            handler: () => {
-                setIsOpenMoreAction(false)
-            },
+        const remove = listenEvent('TIPPY:HIDE', () => {
+            setIsOpenMoreAction(false)
         })
 
         return remove
@@ -74,7 +69,7 @@ const MessageAction: React.FC<MessageActionProps> = ({
     }
 
     const handleReply = () => {
-        sendEvent({ eventName: 'message:reply', detail: messages.data[messageIndex] })
+        sendEvent('MESSAGE:REPLY', { message: messages.data[messageIndex] })
     }
 
     const handleOpenRevokeModal = () => {
@@ -98,7 +93,7 @@ const MessageAction: React.FC<MessageActionProps> = ({
                 reactionWrapperOpen: false,
             }))
 
-            socket.emit(SocketEvent.REACT_MESSAGE, {
+            socket.emit('REACT_MESSAGE', {
                 conversation_uuid: uuid as string,
                 message_id: message.id,
                 react: EmojiClickData.unified,

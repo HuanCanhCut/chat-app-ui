@@ -1,16 +1,14 @@
 import { useEffect } from 'react'
 import { useParams } from 'next/navigation'
 import { Emoji, EmojiStyle } from 'emoji-picker-react'
+import Tippy from 'huanpenguin-tippy-react'
 import { mutate } from 'swr'
 
-import Tippy from '@vendor/tippy'
-import { SocketEvent } from '~/enum/SocketEvent'
 import SWRKey from '~/enum/SWRKey'
 import socket from '~/helpers/socket'
-import { MessageModel, MessageReactionModel, MessageResponse, TopReaction } from '~/type/type'
+import { MessageModel, MessageResponse, ReactionModel, TopReaction } from '~/type/type'
 interface ReactionProps {
     message: MessageModel
-    // eslint-disable-next-line no-unused-vars
     handleOpenReactionModal: (messageId: number) => void
 }
 
@@ -18,13 +16,16 @@ const Reaction = ({ message, handleOpenReactionModal }: ReactionProps) => {
     const { uuid } = useParams()
 
     useEffect(() => {
-        interface ReactionMessage {
-            reaction: MessageReactionModel
+        const socketHandler = ({
+            reaction,
+            total_reactions,
+            top_reactions,
+        }: {
+            reaction: ReactionModel | null
             total_reactions: number
             top_reactions: TopReaction[]
-        }
-        const socketHandler = (data: ReactionMessage) => {
-            if (message.id !== data.reaction.message_id) {
+        }) => {
+            if (message.id !== reaction?.reactionable_id) {
                 return
             }
 
@@ -40,11 +41,11 @@ const Reaction = ({ message, handleOpenReactionModal }: ReactionProps) => {
                     }
 
                     const newMessages = prev.data.map((message) => {
-                        if (message.id === data.reaction.message_id) {
+                        if (message.id === reaction.reactionable_id) {
                             return {
                                 ...message,
-                                top_reactions: data.top_reactions,
-                                total_reactions: data.total_reactions,
+                                top_reactions: top_reactions,
+                                total_reactions: total_reactions,
                             }
                         }
 
@@ -62,10 +63,10 @@ const Reaction = ({ message, handleOpenReactionModal }: ReactionProps) => {
             )
         }
 
-        socket.on(SocketEvent.REACT_MESSAGE, socketHandler)
+        socket.on('REACT_MESSAGE', socketHandler)
 
         return () => {
-            socket.off(SocketEvent.REACT_MESSAGE, socketHandler)
+            socket.off('REACT_MESSAGE', socketHandler)
         }
     }, [message.id, uuid])
 
@@ -110,10 +111,10 @@ const Reaction = ({ message, handleOpenReactionModal }: ReactionProps) => {
             )
         }
 
-        socket.on(SocketEvent.REMOVE_REACTION, socketHandler)
+        socket.on('REMOVE_REACTION', socketHandler)
 
         return () => {
-            socket.off(SocketEvent.REMOVE_REACTION, socketHandler)
+            socket.off('REMOVE_REACTION', socketHandler)
         }
     }, [message.id, uuid])
 
@@ -123,27 +124,27 @@ const Reaction = ({ message, handleOpenReactionModal }: ReactionProps) => {
                 <div>
                     {message?.top_reactions?.map((reaction, index) => {
                         return (
-                            <p className="font-normal leading-5" key={index}>
+                            <p className="leading-5 font-normal" key={index}>
                                 {reaction.user_reaction.full_name}
                             </p>
                         )
                     })}
 
                     {message?.total_reactions > 2 && (
-                        <p className="font-normal leading-5">và {message?.total_reactions - 2} người khác...</p>
+                        <p className="leading-5 font-normal">và {message?.total_reactions - 2} người khác...</p>
                     )}
                 </div>
             }
         >
             <div
-                className="absolute bottom-[-11px] right-1 flex cursor-pointer items-center rounded-full bg-white py-[2px] shadow-xs shadow-zinc-300 dark:bg-zinc-800 dark:shadow-zinc-700"
+                className="absolute right-1 bottom-[-11px] flex cursor-pointer items-center rounded-full bg-white py-0.5 shadow-xs shadow-zinc-300 dark:bg-zinc-800 dark:shadow-zinc-700"
                 onClick={() => {
                     handleOpenReactionModal(message.id)
                 }}
             >
                 {message?.top_reactions?.map((reaction, index) => {
                     return (
-                        <span className="ml-[2px] text-sm leading-none" key={index}>
+                        <span className="ml-0.5 text-sm leading-none" key={index}>
                             <Emoji unified={reaction.react} size={14} emojiStyle={EmojiStyle.FACEBOOK} />
                         </span>
                     )

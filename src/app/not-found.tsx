@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation'
 
 import Button from '~/components/Button/Button'
+import config from '~/config'
 
 const NotFound = () => {
     const router = useRouter()
@@ -18,10 +19,10 @@ const NotFound = () => {
                             Lỗi này thường do chủ sở hữu chỉ chia sẻ nội dung với một nhóm nhỏ, thay đổi người được xem
                             hoặc đã xóa nội dung.
                         </p>
-                        <Button buttonType="primary" className="mt-4" onClick={() => router.push('/message')}>
+                        <Button buttonType="primary" className="mt-4" onClick={() => router.push(config.routes.home)}>
                             Đi đến trang chủ
                         </Button>
-                        <p className="mt-4 cursor-pointer text-primary hover:underline" onClick={() => router.back()}>
+                        <p className="text-primary mt-4 cursor-pointer hover:underline" onClick={() => router.back()}>
                             Back zề
                         </p>
                     </div>

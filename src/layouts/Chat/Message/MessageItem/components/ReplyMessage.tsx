@@ -1,25 +1,24 @@
-import { forwardRef, LegacyRef } from 'react'
+import { LegacyRef } from 'react'
 
 import { faReply } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Image from '~/components/Image'
 import { sendEvent } from '~/helpers/events'
 import { ConversationMember, MessageModel, UserModel } from '~/type/type'
+import getCloudinaryVideoThumbnail from '~/utils/getCloudinaryThumb'
 
 interface ReplyMessageProps {
     message: MessageModel
     currentUser?: UserModel
     memberMap: Record<number, ConversationMember>
+    ref: LegacyRef<HTMLDivElement>
 }
 
-const ReplyMessage = ({ message, currentUser, memberMap }: ReplyMessageProps, ref: LegacyRef<HTMLDivElement>) => {
+const ReplyMessage = ({ message, currentUser, memberMap, ref }: ReplyMessageProps) => {
     const handleScrollToMessage = (message: MessageModel) => {
-        sendEvent({
-            eventName: 'message:scroll-to-message',
-            detail: {
-                parentMessage: message,
-                type: 'reply',
-            },
+        sendEvent('MESSAGE:SCROLL-TO-MESSAGE', {
+            parentMessage: message,
+            type: 'reply',
         })
     }
 
@@ -31,7 +30,7 @@ const ReplyMessage = ({ message, currentUser, memberMap }: ReplyMessageProps, re
                         className={`absolute bottom-[calc(100%-20px)] w-fit max-w-[85%] cursor-pointer ${message.sender_id === currentUser?.id ? 'flex flex-col items-end' : 'flex flex-col items-start'}`}
                         ref={ref}
                     >
-                        <p className="mb-1 flex w-fit items-center gap-2 text-right text-xs text-system-message-light dark:text-system-message-dark">
+                        <p className="text-system-message-light dark:text-system-message-dark mb-1 flex w-fit items-center gap-2 text-right text-xs">
                             <FontAwesomeIcon icon={faReply} />
                             {'  '}
                             {message.sender_id === currentUser?.id
@@ -39,7 +38,7 @@ const ReplyMessage = ({ message, currentUser, memberMap }: ReplyMessageProps, re
                                 : `${memberMap[message.sender_id]?.nickname || memberMap[message.sender_id]?.user.full_name} đã trả lời ${message.parent.sender_id === currentUser?.id ? 'bạn' : message.sender_id === message.parent.sender_id ? 'chính mình' : memberMap[message.parent.sender_id]?.nickname || memberMap[message.parent.sender_id]?.user.full_name}`}
                         </p>
                         <span
-                            className={`line-clamp-1 max-w-[85%] overflow-hidden text-ellipsis whitespace-nowrap rounded-2xl ${message.sender_id === currentUser?.id ? 'rounded-br-none' : 'rounded-bl-none'} bg-(--reply-message-light-background-color) px-3 py-1.5 pb-6 text-[13px] font-normal text-system-message-light dark:bg-(--reply-message-dark-background-color) dark:text-system-message-dark`}
+                            className={`line-clamp-1 max-w-[85%] overflow-hidden rounded-2xl text-ellipsis whitespace-nowrap ${message.sender_id === currentUser?.id ? 'rounded-br-none' : 'rounded-bl-none'} text-system-message-light dark:text-system-message-dark bg-(--reply-message-light-background-color) px-3 py-1.5 pb-6 text-[13px] font-normal dark:bg-(--reply-message-dark-background-color)`}
                             onClick={() => {
                                 handleScrollToMessage(message.parent as MessageModel)
                             }}
@@ -56,7 +55,7 @@ const ReplyMessage = ({ message, currentUser, memberMap }: ReplyMessageProps, re
                         className={`absolute bottom-[calc(100%-20px)] cursor-pointer ${message.sender_id === currentUser?.id ? 'flex flex-col items-end' : 'flex flex-col items-start'}`}
                         ref={ref}
                     >
-                        <p className="mb-1 flex w-fit items-center gap-2 text-right text-xs text-system-message-light dark:text-system-message-dark">
+                        <p className="text-system-message-light dark:text-system-message-dark mb-1 flex w-fit items-center gap-2 text-right text-xs">
                             <FontAwesomeIcon icon={faReply} />
                             {'  '}
                             {message.sender_id === currentUser?.id
@@ -66,14 +65,12 @@ const ReplyMessage = ({ message, currentUser, memberMap }: ReplyMessageProps, re
 
                         {(() => {
                             try {
-                                const images = JSON.parse(message.parent?.content as string)
-                                const firstImage = images[0] || ''
+                                const images = message.parent.media
+                                const firstImage = images[0]?.media_url
 
                                 return (
                                     <Image
-                                        src={
-                                            message.parent?.content && message.parent.type === 'image' ? firstImage : ''
-                                        }
+                                        src={message.parent?.media && message.parent.type === 'media' ? firstImage : ''}
                                         alt="reply-message"
                                         className="h-24 w-24 rounded-2xl opacity-70"
                                         onClick={() => {
@@ -84,7 +81,7 @@ const ReplyMessage = ({ message, currentUser, memberMap }: ReplyMessageProps, re
                             } catch (e) {
                                 return (
                                     <span
-                                        className={`line-clamp-1 max-w-[85%] overflow-hidden text-ellipsis whitespace-nowrap rounded-2xl ${message.sender_id === currentUser?.id ? 'rounded-br-none' : 'rounded-bl-none'} bg-(--reply-message-light-background-color) px-3 py-1.5 pb-6 text-[13px] font-normal text-system-message-light dark:bg-(--reply-message-dark-background-color) dark:text-system-message-dark`}
+                                        className={`line-clamp-1 max-w-[85%] overflow-hidden rounded-2xl text-ellipsis whitespace-nowrap ${message.sender_id === currentUser?.id ? 'rounded-br-none' : 'rounded-bl-none'} text-system-message-light dark:text-system-message-dark bg-(--reply-message-light-background-color) px-3 py-1.5 pb-6 text-[13px] font-normal dark:bg-(--reply-message-dark-background-color)`}
                                         onClick={() => {
                                             handleScrollToMessage(message.parent as MessageModel)
                                         }}
@@ -101,8 +98,60 @@ const ReplyMessage = ({ message, currentUser, memberMap }: ReplyMessageProps, re
                         })()}
                     </div>
                 ))}
+
+            {message.forward_type === 'Story' && (
+                <div
+                    className={`absolute bottom-[calc(100%-20px)] cursor-pointer ${message.sender_id === currentUser?.id ? 'flex flex-col items-end' : 'flex flex-col items-start'}`}
+                    ref={ref}
+                >
+                    <p className="text-system-message-light dark:text-system-message-dark mb-1 flex w-fit items-center gap-2 text-right text-xs">
+                        <FontAwesomeIcon icon={faReply} />
+                        {'  '}
+                        {(() => {
+                            let text = ''
+
+                            if (!message.forward_origin) return ''
+
+                            if ('user' in message.forward_origin) {
+                                if (message.forward_origin.user.id !== currentUser?.id) {
+                                    text += 'Bạn'
+                                } else {
+                                    text +=
+                                        memberMap[message.forward_origin.user.id].nickname ||
+                                        memberMap[message.forward_origin.user.id].user.full_name
+                                }
+
+                                text += ' đã trả lời tin của'
+                            }
+
+                            if ('user' in message.forward_origin) {
+                                if (message.forward_origin.user.id === currentUser?.id) {
+                                    text += ' bạn'
+                                } else {
+                                    text +=
+                                        ' ' +
+                                        (memberMap[message.forward_origin.user.id].nickname ||
+                                            memberMap[message.forward_origin.user.id].user.full_name)
+                                }
+                            }
+
+                            return text
+                        })()}
+                    </p>
+
+                    {(() => {
+                        if (message.forward_origin && 'url' in message.forward_origin) {
+                            const image = getCloudinaryVideoThumbnail(message.forward_origin?.url)
+
+                            return (
+                                <Image src={image} alt="reply-message" className="h-32 w-16 rounded-2xl opacity-70" />
+                            )
+                        }
+                    })()}
+                </div>
+            )}
         </>
     )
 }
 
-export default forwardRef(ReplyMessage)
+export default ReplyMessage

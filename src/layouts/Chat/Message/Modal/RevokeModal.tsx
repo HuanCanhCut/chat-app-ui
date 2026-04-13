@@ -1,15 +1,15 @@
 import React, { useState } from 'react'
 import { useParams } from 'next/navigation'
+import { toast } from 'sonner'
 import { mutate } from 'swr'
 
 import Button from '~/components/Button'
 import Modal from '~/components/Modal'
 import SWRKey from '~/enum/SWRKey'
-import { useAppSelector } from '~/redux'
-import { getCurrentUser } from '~/redux/selector'
+import { selectCurrentUser } from '~/redux/selector'
+import { useAppSelector } from '~/redux/types'
 import * as messageServices from '~/services/messageService'
 import { MessageModel, MessageResponse } from '~/type/type'
-import { toast } from '~/utils/toast'
 interface RevokeModalProps {
     message: MessageModel
     onClose: () => void
@@ -17,12 +17,12 @@ interface RevokeModalProps {
 }
 
 const RevokeModal = ({ isOpen, message, onClose }: RevokeModalProps) => {
-    const { data: currentUser } = useAppSelector(getCurrentUser)
+    const currentUser = useAppSelector(selectCurrentUser)
 
     const { uuid } = useParams()
 
     const revokeType =
-        message.sender_id !== currentUser?.id ? 'for-me' : message.content === null ? 'for-me' : 'for-other'
+        message.sender_id !== currentUser?.data.id ? 'for-me' : message.content === null ? 'for-me' : 'for-other'
 
     const [revokeChooseType, setRevokeChooseType] = useState<'for-me' | 'for-other'>(revokeType)
 
@@ -64,7 +64,7 @@ const RevokeModal = ({ isOpen, message, onClose }: RevokeModalProps) => {
                                         if (beforeMessage) {
                                             messageItem.message_status.forEach((status) => {
                                                 if (
-                                                    status.receiver.id !== currentUser.id &&
+                                                    status.receiver.id !== currentUser?.data.id &&
                                                     status.receiver.last_read_message_id === message.id
                                                 ) {
                                                     beforeMessage.message_status.forEach((status) => {
@@ -106,7 +106,7 @@ const RevokeModal = ({ isOpen, message, onClose }: RevokeModalProps) => {
                 onClose()
             }
         } catch (error) {
-            toast('Gỡ tin nhắn thất bại, vui lòng thử lại.', 'error')
+            toast.error('Gỡ tin nhắn thất bại, vui lòng thử lại.')
         }
     }
 

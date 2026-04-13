@@ -1,6 +1,6 @@
 {
     "extends": "next/core-web-vitals",
-    "plugins": ["simple-import-sort"],
+    "plugins": ["simple-import-sort", "prettier"],
     "rules": {
         "simple-import-sort/imports": [
             "warn",
@@ -9,6 +9,18 @@
             }
         ],
         "simple-import-sort/exports": "warn",
-        "no-fallthrough": "warn" // Warn when switch cases fall through without a break
+        "no-fallthrough": "warn",
+        "prettier/prettier": [
+            "warn",
+            {
+                "tabWidth": 4,
+                "printWidth": 120,
+                "semi": false,
+                "singleQuote": true,
+                "arrowParens": "always",
+                "endOfLine": "auto",
+                "plugins": ["prettier-plugin-tailwindcss"]
+            }
+        ]
     }
 }

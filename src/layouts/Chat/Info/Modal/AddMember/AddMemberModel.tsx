@@ -24,15 +24,12 @@ const AddMemberModel: React.FC<AddMemberModelProps> = ({ onClose }) => {
     const [previewMember, setPreviewMember] = useState<UserModel[]>([])
 
     useEffect(() => {
-        const remove = listenEvent({
-            eventName: 'add_member:preview',
-            handler: ({ detail }: { detail: { previewMember: UserModel[] } }) => {
-                setPreviewMember(detail.previewMember)
-            },
+        const remove = listenEvent('ADD_MEMBER:PREVIEW', ({ previewMember }) => {
+            setPreviewMember(previewMember)
         })
 
         return remove
-    })
+    }, [])
 
     const handleAddMember = async () => {
         if (addMemberPreviewRef.current?.GET_PREVIEW_MEMBER().length === 0) {

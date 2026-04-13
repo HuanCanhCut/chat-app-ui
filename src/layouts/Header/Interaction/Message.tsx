@@ -1,20 +1,20 @@
 import { useEffect } from 'react'
+import Link from 'next/link'
+import Tippy from 'huanpenguin-tippy-react'
 import useSWR from 'swr'
 
-import Tippy from '@vendor/tippy'
-import Button from '~/components/Button'
 import { MessageIcon } from '~/components/Icons'
+import { Button } from '~/components/ui/button'
 import config from '~/config'
-import { SocketEvent } from '~/enum/SocketEvent'
 import SWRKey from '~/enum/SWRKey'
 import socket from '~/helpers/socket'
-import { useAppSelector } from '~/redux'
-import { getCurrentUser } from '~/redux/selector'
+import { selectCurrentUser } from '~/redux/selector'
+import { useAppSelector } from '~/redux/types'
 import * as messageService from '~/services/messageService'
 import { SocketMessage } from '~/type/type'
 
 const Message = () => {
-    const currentUser = useAppSelector(getCurrentUser)
+    const currentUser = useAppSelector(selectCurrentUser)
 
     const { data: unseenCount, mutate } = useSWR(SWRKey.GET_UNSEEN_COUNT, async () => {
         const response = await messageService.getUnseenCount()
@@ -33,25 +33,27 @@ const Message = () => {
             }
         }
 
-        socket.on(SocketEvent.NEW_MESSAGE, socketHandler)
+        socket.on('NEW_MESSAGE', socketHandler)
 
         return () => {
-            socket.off(SocketEvent.NEW_MESSAGE, socketHandler)
+            socket.off('NEW_MESSAGE', socketHandler)
         }
     }, [currentUser?.data?.id, mutate, unseenCount])
 
     return (
         <Tippy content="Messenger">
             <div className="relative">
-                <Button buttonType="icon" href={config.routes.message}>
-                    <MessageIcon />
+                <Link href={config.routes.message}>
+                    <Button size="icon" variant="ghost" className="size-10 rounded-full">
+                        <MessageIcon className="size-5" />
 
-                    {unseenCount !== undefined && unseenCount > 0 && (
-                        <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-xs text-white">
-                            {unseenCount}
-                        </span>
-                    )}
-                </Button>
+                        {unseenCount !== undefined && unseenCount > 0 && (
+                            <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-xs text-white">
+                                {unseenCount}
+                            </span>
+                        )}
+                    </Button>
+                </Link>
             </div>
         </Tippy>
     )

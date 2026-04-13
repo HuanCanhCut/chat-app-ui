@@ -1,4 +1,4 @@
-import { forwardRef, useCallback, useEffect, useImperativeHandle, useState } from 'react'
+import { useCallback, useEffect, useImperativeHandle, useState } from 'react'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import useSWR from 'swr'
 
@@ -11,8 +11,8 @@ import UserAvatar from '~/components/UserAvatar/UserAvatar'
 import SWRKey from '~/enum/SWRKey'
 import { sendEvent } from '~/helpers/events'
 import handleApiError from '~/helpers/handleApiError'
-import { useAppSelector } from '~/redux'
-import { getCurrentUser } from '~/redux/selector'
+import { selectCurrentUser } from '~/redux/selector'
+import { useAppSelector } from '~/redux/types'
 import * as friendService from '~/services/friendService'
 import { FriendsResponse, FriendsShip, UserModel } from '~/type/type'
 
@@ -20,22 +20,23 @@ const PER_PAGE = 20
 
 interface AddMemberPreviewProps {
     className?: string
+    ref: any
 }
 
 interface ImperativeHandle {
     GET_PREVIEW_MEMBER: () => UserModel[]
 }
 
-const AddMemberPreview = forwardRef<ImperativeHandle, AddMemberPreviewProps>(({ className = '' }, ref) => {
-    const currentUser = useAppSelector(getCurrentUser)
+const AddMemberPreview: React.FC<AddMemberPreviewProps> = ({ className = '', ref }) => {
+    const currentUser = useAppSelector(selectCurrentUser)
 
     const [searchResult, setSearchResult] = useState<FriendsShip[]>([])
     const [previewMember, setPreviewMember] = useState<UserModel[]>([])
 
     const { data: friends, mutate: mutateFriends } = useSWR<FriendsResponse | undefined>(
-        [SWRKey.GET_ALL_FRIENDS, currentUser?.data.id],
+        currentUser?.data ? [SWRKey.GET_ALL_FRIENDS, currentUser?.data.id] : null,
         () => {
-            return friendService.getFriends({ page: 1, user_id: currentUser?.data.id })
+            return friendService.getFriends({ page: 1, user_id: currentUser!.data.id })
         },
     )
 
@@ -47,26 +48,28 @@ const AddMemberPreview = forwardRef<ImperativeHandle, AddMemberPreviewProps>(({ 
 
     const handleLoadMoreFriend = useCallback(async () => {
         try {
-            const res = await friendService.getFriends({
-                page: friends ? friends?.meta.pagination.current_page + 1 : 1,
-                per_page: PER_PAGE,
-                user_id: currentUser?.data.id,
-            })
+            if (currentUser?.data) {
+                const res = await friendService.getFriends({
+                    page: friends ? friends?.meta.pagination.current_page + 1 : 1,
+                    per_page: PER_PAGE,
+                    user_id: currentUser?.data.id,
+                })
 
-            if (!res) return
+                if (!res) return
 
-            mutateFriends((prev: FriendsResponse | undefined) => {
-                if (!prev) return prev
+                mutateFriends((prev: FriendsResponse | undefined) => {
+                    if (!prev) return prev
 
-                return {
-                    data: [...prev.data, ...res.data],
-                    meta: res.meta,
-                }
-            })
+                    return {
+                        data: [...prev.data, ...res.data],
+                        meta: res.meta,
+                    }
+                })
+            }
         } catch (error: any) {
             handleApiError(error)
         }
-    }, [currentUser?.data.id, friends, mutateFriends])
+    }, [currentUser?.data, friends, mutateFriends])
 
     const handleToggleAddPreview = (friend: UserModel) => {
         const isAdded = previewMember.find((user) => user.id === friend.id)
@@ -79,7 +82,7 @@ const AddMemberPreview = forwardRef<ImperativeHandle, AddMemberPreviewProps>(({ 
     }
 
     useEffect(() => {
-        sendEvent({ eventName: 'add_member:preview', detail: { previewMember } })
+        sendEvent('ADD_MEMBER:PREVIEW', { previewMember })
     }, [previewMember])
 
     const handleRemovePreview = (user: UserModel) => {
@@ -95,13 +98,13 @@ const AddMemberPreview = forwardRef<ImperativeHandle, AddMemberPreviewProps>(({ 
 
                 <div className="p-4">
                     {previewMember.length > 0 ? (
-                        <div className="flex gap-4 py-1 [overflow-x:overlay]">
+                        <div className="flex gap-4 [overflow-x:overlay] py-1">
                             {previewMember.map((user) => {
                                 return (
                                     <div key={user.id} className="relative">
                                         <button
                                             onClick={() => handleRemovePreview(user)}
-                                            className="flex-center absolute right-0 top-0 z-10 h-5 w-5 -translate-y-1 translate-x-2 rounded-full bg-white p-1 shadow-lg shadow-gray-400 hover:bg-zinc-100 dark:bg-dark-gray dark:shadow-md dark:shadow-zinc-800 dark:hover:bg-zinc-700"
+                                            className="flex-center dark:bg-dark-gray absolute top-0 right-0 z-10 h-5 w-5 translate-x-2 -translate-y-1 rounded-full bg-white p-1 shadow-lg shadow-gray-400 hover:bg-zinc-100 dark:shadow-md dark:shadow-zinc-800 dark:hover:bg-zinc-700"
                                         >
                                             <FontAwesomeIcon
                                                 icon={faXmark}
@@ -117,7 +120,7 @@ const AddMemberPreview = forwardRef<ImperativeHandle, AddMemberPreviewProps>(({ 
                         </div>
                     ) : (
                         <div className="text-center">
-                            <p className="text-sm text-system-message-light dark:text-system-message-dark">
+                            <p className="text-system-message-light dark:text-system-message-dark text-sm">
                                 Chưa chọn người dùng nào
                             </p>
                         </div>
@@ -155,12 +158,12 @@ const AddMemberPreview = forwardRef<ImperativeHandle, AddMemberPreviewProps>(({ 
                                         {previewMember.some((user) => user.id === friend.user.id) ? (
                                             <FontAwesomeIcon
                                                 icon={faCircleCheck}
-                                                className="absolute right-3 top-1/2 -translate-y-1/2 text-primary"
+                                                className="text-primary absolute top-1/2 right-3 -translate-y-1/2"
                                             />
                                         ) : (
                                             <FontAwesomeIcon
                                                 icon={faCircle}
-                                                className="absolute right-3 top-1/2 -translate-y-1/2"
+                                                className="absolute top-1/2 right-3 -translate-y-1/2"
                                             />
                                         )}
                                     </div>
@@ -172,7 +175,7 @@ const AddMemberPreview = forwardRef<ImperativeHandle, AddMemberPreviewProps>(({ 
             </div>
         </main>
     )
-})
+}
 
 AddMemberPreview.displayName = 'AddMemberPreview'
 

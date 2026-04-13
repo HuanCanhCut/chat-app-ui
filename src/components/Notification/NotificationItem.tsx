@@ -1,31 +1,47 @@
 import { memo, useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
+import { SendIcon } from 'lucide-react'
+import { toast } from 'sonner'
 
 import 'moment/locale/vi'
 import ConfirmModel from '../ConfirmModal'
 import CustomTippy from '../CustomTippy/CustomTippy'
 import PopperWrapper from '../PopperWrapper/PopperWrapper'
-import { faCheck, faEllipsis, faTrash } from '@fortawesome/free-solid-svg-icons'
+import { faCheck, faEllipsis, faTrash, faUser } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import baseReactionIcon from '~/common/baseReactionIcon'
 import Button from '~/components/Button/Button'
 import UserAvatar from '~/components/UserAvatar/UserAvatar'
 import config from '~/config'
 import { listenEvent, sendEvent } from '~/helpers/events'
 import * as NotificationServices from '~/services/notificationService'
-import { NotificationData } from '~/type/type'
+import { NotificationModel } from '~/type/type'
 import { handleAcceptFriend, handleRejectFriendRequest } from '~/utils/friendEvent'
 import { momentTimezone } from '~/utils/moment'
-import { toast } from '~/utils/toast'
 
-const NotificationItem = ({
-    notification,
-    notificationIcon,
-}: {
-    notification: NotificationData
-    notificationIcon: any
-}) => {
+interface NotificationIcon {
+    backgroundColor: string
+    icon: React.ReactNode
+}
+
+const NotificationItem = ({ notification }: { notification: NotificationModel }) => {
     const [isAccept, setIsAccept] = useState(false)
     const [isOpenConfirmModel, setIsOpenConfirmModel] = useState(false)
+
+    const notificationIcon: Record<string, NotificationIcon> = {
+        friend_request: {
+            backgroundColor: '#1086ee',
+            icon: <FontAwesomeIcon icon={faUser} />,
+        },
+        accept_friend_request: {
+            backgroundColor: '#1086ee',
+            icon: <FontAwesomeIcon icon={faUser} />,
+        },
+        message: {
+            backgroundColor: '#41cc64',
+            icon: <SendIcon />,
+        },
+    }
 
     const tippyInstance = useRef<any>(null)
 
@@ -34,46 +50,40 @@ const NotificationItem = ({
     }
 
     const handleAccept = async () => {
-        const response = await handleAcceptFriend(notification.sender_id, notification.sender_user.nickname)
+        const response = await handleAcceptFriend(notification.actor_id, notification.actor.nickname)
         if (response) {
             setIsAccept(true)
         }
     }
 
     useEffect(() => {
-        const remove = listenEvent({
-            eventName: 'tippy:tippy-hidden',
-            handler: () => {
-                // If user accept friend request and tippy is hidden, delete notification
-                if (isAccept) {
-                    sendEvent({ eventName: 'notification:delete-notification', detail: notification.id })
-                }
-            },
+        const remove = listenEvent('TIPPY:TIPPY-HIDDEN', () => {
+            // If user accept friend request and tippy is hidden, delete notification
+            if (isAccept) {
+                sendEvent('NOTIFICATION:DELETE-NOTIFICATION', { notificationId: notification.id! })
+            }
         })
 
         return remove
     }, [isAccept, notification.id])
 
     const handleReadNotification = async () => {
-        sendEvent({
-            eventName: 'notification:update-read-status',
-            detail: { notificationId: notification.id, type: 'read' },
-        })
+        sendEvent('NOTIFICATION:UPDATE-READ-STATUS', { notificationId: notification.id!, type: 'read' })
 
         if (notification.is_read) {
             return
         }
 
-        await NotificationServices.markAsRead(notification.id)
+        await NotificationServices.markAsRead(notification.id!)
 
         tippyInstance.current?.hide()
     }
 
     const handleDeleteNotification = async () => {
-        sendEvent({ eventName: 'notification:delete-notification', detail: notification.id })
+        sendEvent('NOTIFICATION:DELETE-NOTIFICATION', { notificationId: notification.id! })
         setIsOpenConfirmModel(false)
-        await NotificationServices.deleteNotification(notification.id)
-        toast('Xóa thành công', 'success')
+        await NotificationServices.deleteNotification(notification.id!)
+        toast.success('Xóa thành công')
     }
 
     const RenderMoreOptions = () => {
@@ -83,17 +93,14 @@ const NotificationItem = ({
         const handleToggleReadStatus = async (type: 'read' | 'unread') => {
             switch (type) {
                 case 'read':
-                    await NotificationServices.markAsRead(notification.id)
+                    await NotificationServices.markAsRead(notification.id!)
                     break
                 case 'unread':
-                    await NotificationServices.markAsUnread(notification.id)
+                    await NotificationServices.markAsUnread(notification.id!)
                     break
             }
 
-            sendEvent({
-                eventName: 'notification:update-read-status',
-                detail: { notificationId: notification.id, type },
-            })
+            sendEvent('NOTIFICATION:UPDATE-READ-STATUS', { notificationId: notification.id!, type })
 
             tippyInstance.current.hide()
         }
@@ -142,55 +149,75 @@ const NotificationItem = ({
             />
             <div className="group relative mt-3 flex items-center gap-2">
                 <CustomTippy renderItem={RenderMoreOptions} onShow={tippyShow}>
-                    <div className="absolute right-4 top-1/2 mt-2 -translate-y-1/2 opacity-0 group-hover:opacity-100">
+                    <div className="absolute top-1/2 right-4 mt-2 -translate-y-1/2 opacity-0 group-hover:opacity-100">
                         <Button buttonType="icon">
                             <FontAwesomeIcon icon={faEllipsis} />
                         </Button>
                     </div>
                 </CustomTippy>
                 <Link
-                    href={`${config.routes.user}/@${notification.sender_user.nickname}`}
+                    href={`${config.routes.user}/@${notification.actor.nickname}`}
                     className={`mt-4 flex gap-3 ${notification.is_read ? 'pr-3' : ''}`}
                     onClick={handleReadNotification}
                 >
                     <div className="relative">
-                        <UserAvatar
-                            src={notification.sender_user.avatar}
-                            size={56}
-                            className="aspect-square min-w-[56px]"
-                        />
-                        <div className="flex-center absolute bottom-[-3px] right-0 gap-2">
-                            <div
-                                className="flex-center h-7 w-7 rounded-full text-white"
-                                style={{
-                                    backgroundColor: notificationIcon[notification.type].backgroundColor,
-                                }}
-                            >
-                                {notificationIcon[notification.type].icon}
-                            </div>
-                        </div>
+                        <UserAvatar src={notification.actor.avatar} size={56} className="aspect-square min-w-[56px]" />
+                        {(() => {
+                            switch (notification.type) {
+                                case 'friend_request':
+                                case 'accept_friend_request':
+                                case 'message':
+                                    return (
+                                        <div className="flex-center absolute right-0 bottom-[-3px] gap-2">
+                                            <div
+                                                className="flex-center h-7 w-7 rounded-full text-white"
+                                                style={{
+                                                    backgroundColor:
+                                                        notificationIcon[notification.type].backgroundColor,
+                                                }}
+                                            >
+                                                {notificationIcon[notification.type].icon}
+                                            </div>
+                                        </div>
+                                    )
+                                case 'reaction':
+                                    const unified = JSON.parse(notification.metadata || '""').reaction
+
+                                    const iconMapping = baseReactionIcon(28)
+
+                                    return (
+                                        <div className="absolute right-0 -bottom-2">
+                                            {iconMapping[unified?.toLowerCase() as keyof typeof iconMapping]}
+                                        </div>
+                                    )
+                                default:
+                                    return null
+                            }
+                        })()}
                     </div>
 
                     <div>
                         <p
-                            dangerouslySetInnerHTML={{
-                                __html: `
-                                ${notification.message.replace(
-                                    `${notification.sender_user.full_name.trim()}`,
-                                    `<span class="font-semibold">${notification.sender_user.full_name.trim()}</span>`,
-                                )}`,
-                            }}
                             className={`pr-4 text-sm font-normal ${notification.is_read ? 'text-gray-600 dark:text-gray-400' : 'text-gray-800 dark:text-gray-200'}`}
-                        ></p>
-                        <small
-                            className={`text-xs ${!notification.is_read ? 'text-primary' : 'text-gray-600 dark:text-gray-400'} font-normal`}
                         >
-                            {momentTimezone(notification.created_at)}
+                            {notification.message.split('{actor}').map((part, index, arr) => (
+                                <span key={index}>
+                                    {part}
+                                    {index < arr.length - 1 && (
+                                        <span className="font-semibold">{notification.actor.full_name.trim()}</span>
+                                    )}
+                                </span>
+                            ))}
+                        </p>
+                        <small
+                            className={`text-xs ${!notification.is_read ? 'text-primary' : 'text-gray-600 dark:text-gray-400'} font-medium`}
+                        >
+                            {momentTimezone(notification.created_at!)}
                         </small>
                     </div>
                 </Link>
                 {!notification.is_read && (
-                    <button className="ml-auto mt-4 h-3 min-w-3 rounded-full bg-primary"></button>
+                    <button className="bg-primary mt-4 ml-auto h-3 min-w-3 rounded-full"></button>
                 )}
             </div>
 
@@ -202,7 +229,7 @@ const NotificationItem = ({
                     <Button
                         buttonType="rounded"
                         className="inline-block flex-1"
-                        onClick={() => handleRejectFriendRequest(notification.sender_id)}
+                        onClick={() => handleRejectFriendRequest(notification.actor_id)}
                     >
                         Xóa
                     </Button>

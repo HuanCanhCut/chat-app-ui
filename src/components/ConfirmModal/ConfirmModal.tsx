@@ -25,7 +25,7 @@ const ConfirmModel = ({
             <main className="px-4">
                 <p className="mt-2 text-[15px] text-zinc-700 dark:text-zinc-200">{description}</p>
                 <div className="mt-4 flex justify-end gap-2">
-                    <Button buttonType="outline" className="border-none px-4 py-1 text-primary" onClick={closeModal}>
+                    <Button buttonType="outline" className="text-primary border-none px-4 py-1" onClick={closeModal}>
                         Hủy
                     </Button>
                     <Button buttonType="primary" className="px-6 py-1" onClick={onConfirm}>

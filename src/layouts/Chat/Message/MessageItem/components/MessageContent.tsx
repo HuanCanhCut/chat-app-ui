@@ -1,4 +1,4 @@
-import { forwardRef, LegacyRef, useEffect, useState } from 'react'
+import { LegacyRef, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 
@@ -8,7 +8,14 @@ import EmojiMessageStyle from '~/components/EmojiMessageStyle'
 import { IncomingCallIcon, OutgoingCallIcon, TimeoutCallIcon } from '~/components/Icons/Icons'
 import CustomImage from '~/components/Image/Image'
 import * as messageServices from '~/services/messageService'
-import { ConversationModel, LinkPreviewModel, MessageModel, MessageResponse, UserModel } from '~/type/type'
+import {
+    ConversationModel,
+    LinkPreviewModel,
+    MessageMedia,
+    MessageModel,
+    MessageResponse,
+    UserModel,
+} from '~/type/type'
 import openWindowCall from '~/utils/openWindowCall'
 
 interface MessageContentProps {
@@ -17,32 +24,39 @@ interface MessageContentProps {
     messageRef: (el: HTMLDivElement) => void
     currentUser: UserModel
     handleOpenReactionModal: (messageId: number) => void
-    handleOpenImageModal: (url: string, messageId: number) => void
+    handleOpenMediaModal: ({
+        url,
+        messageId,
+        type,
+    }: {
+        url: string
+        messageId: number
+        type: 'image' | 'video'
+    }) => void
     messages: MessageResponse
     diffTime: (message: MessageModel, targetMessage: MessageModel) => number
     handleFormatTime: (time: Date) => string
     conversation?: ConversationModel
+    ref: LegacyRef<HTMLDivElement>
 }
 
 const BETWEEN_TIME_MESSAGE = 7 // minute
 
 const linkRegex = /(http|ftp|https):\/\/([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:\/~+#-]*[\w@?^=%&\/~+#-])/
 
-const MessageContent = (
-    {
-        message,
-        messageIndex,
-        messageRef,
-        currentUser,
-        handleOpenReactionModal,
-        handleOpenImageModal,
-        messages,
-        diffTime,
-        handleFormatTime,
-        conversation,
-    }: MessageContentProps,
-    ref: LegacyRef<HTMLDivElement>,
-) => {
+const MessageContent = ({
+    message,
+    messageIndex,
+    messageRef,
+    currentUser,
+    handleOpenReactionModal,
+    handleOpenMediaModal,
+    messages,
+    diffTime,
+    handleFormatTime,
+    conversation,
+    ref,
+}: MessageContentProps) => {
     const { uuid } = useParams()
 
     const [linkPreview, setLinkPreview] = useState<LinkPreviewModel | null>(null)
@@ -162,7 +176,7 @@ const MessageContent = (
         return (
             <p
                 ref={combinedRef}
-                className={`relative w-fit max-w-[80%] rounded-3xl px-4 py-1.5 italic opacity-85 [word-break:break-word] ${
+                className={`relative w-fit max-w-[80%] rounded-3xl px-4 py-1.5 [word-break:break-word] italic opacity-85 ${
                     message.sender_id === currentUser?.id
                         ? 'bg-(--sender-light-background-color) text-(--sender-light-text-color) dark:bg-(--sender-dark-background-color) dark:text-(--sender-dark-text-color)'
                         : 'bg-(--receiver-light-background-color) text-(--receiver-light-text-color) dark:bg-(--receiver-dark-background-color) dark:text-(--receiver-dark-text-color)'
@@ -175,7 +189,7 @@ const MessageContent = (
     }
 
     const handleCallAgain = () => {
-        const otherMember = conversation?.members.find((member) => member.user_id !== currentUser?.id)
+        const otherMember = conversation?.members?.find((member) => member.user_id !== currentUser?.id)
 
         if (!otherMember) {
             return
@@ -195,7 +209,7 @@ const MessageContent = (
                 <div className={`relative ${linkPreview?.image ? 'w-full max-w-[300px]' : 'w-fit max-w-[80%]'} `}>
                     <div
                         ref={combinedRef}
-                        className={`whitespace-pre-wrap rounded-3xl px-4 py-1.5 font-normal [word-break:break-word] ${linkPreview && 'rounded-bl-none rounded-br-none'} ${
+                        className={`rounded-3xl px-4 py-1.5 font-normal [word-break:break-word] whitespace-pre-wrap ${linkPreview && 'rounded-br-none rounded-bl-none'} ${
                             message.sender_id === currentUser?.id
                                 ? 'bg-(--sender-light-background-color) text-(--sender-light-text-color) dark:bg-(--sender-dark-background-color) dark:text-(--sender-dark-text-color)'
                                 : 'bg-(--receiver-light-background-color) text-(--receiver-light-text-color) dark:bg-(--receiver-dark-background-color) dark:text-(--receiver-dark-text-color)'
@@ -213,7 +227,7 @@ const MessageContent = (
                         <Link
                             href={linkPreview.url}
                             target="_blank"
-                            className="block rounded-bl-3xl rounded-br-3xl bg-(--receiver-light-background-color) dark:bg-(--receiver-dark-background-color)"
+                            className="block rounded-br-3xl rounded-bl-3xl bg-(--receiver-light-background-color) dark:bg-(--receiver-dark-background-color)"
                         >
                             {linkPreview?.image && (
                                 // eslint-disable-next-line @next/next/no-img-element
@@ -224,7 +238,7 @@ const MessageContent = (
                                 />
                             )}
                             <div className="flex flex-col px-4 py-2">
-                                <p className="line-clamp-3 overflow-hidden text-ellipsis font-medium">
+                                <p className="line-clamp-3 overflow-hidden font-medium text-ellipsis">
                                     {linkPreview?.title}
                                 </p>
                             </div>
@@ -233,35 +247,84 @@ const MessageContent = (
                     <Reaction message={message} handleOpenReactionModal={handleOpenReactionModal} />
                 </div>
             )
-        case 'image':
+        case 'media': {
+            const count = message.media?.length ?? 0
+
+            const gridClass =
+                {
+                    1: 'grid-cols-1',
+                    2: 'grid-cols-1 sm:grid-cols-2',
+                    3: 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3',
+                    4: 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3',
+                }[count] ?? 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3'
+
+            const getSpanClass = (index: number) => {
+                if (count === 4 && index === 3) return 'sm:col-span-2 md:col-span-3'
+                return ''
+            }
+
             return (
                 <div
                     ref={combinedRef}
-                    className={`relative w-full rounded-2xl ${
-                        JSON.parse(message.content as string).length > 1
-                            ? 'max-w-[60%] sm:max-w-[55%] md:max-w-[50%] lg:max-w-[45%] xl:max-w-[35%]'
-                            : 'max-w-[60%] sm:max-w-[40%] md:max-w-[35%] lg:max-w-[30%] xl:max-w-[25%]'
-                    }`}
+                    className="relative w-fit max-w-[80vw] sm:max-w-[60vw] md:max-w-[45vw] lg:max-w-[35vw]"
                 >
                     <div
-                        className={`flex w-full max-w-full flex-wrap gap-1 overflow-hidden rounded-2xl [word-break:break-word] ${consecutiveMessageStyle()}`}
+                        className={`grid w-full gap-1 overflow-hidden rounded-2xl [word-break:break-word] ${gridClass} ${consecutiveMessageStyle()}`}
                     >
-                        {JSON.parse(message.content as string).map((url: string, index: number) => (
-                            <div className="w-full max-w-full flex-1" key={index}>
-                                <CustomImage
-                                    src={url}
-                                    alt="message"
-                                    className={`max-h-[260px] sm:min-w-[100px] ${JSON.parse(message.content as string).length === 1 ? 'min-w-[180px]' : 'aspect-square'} h-full w-full min-w-[160px] max-w-full! cursor-pointer rounded-md object-cover object-center`}
-                                    priority
-                                    quality={100}
-                                    onClick={() => handleOpenImageModal(url, message.id)}
-                                />
+                        {message.media?.map((media: MessageMedia, index: number) => (
+                            <div key={index} className={`relative w-full ${getSpanClass(index)}`}>
+                                {(() => {
+                                    switch (media.media_type.split('/')[0]) {
+                                        case 'image':
+                                            return (
+                                                <CustomImage
+                                                    src={media.media_url || ''}
+                                                    alt="message"
+                                                    className={`h-full w-full cursor-pointer rounded-md object-cover object-center ${
+                                                        count === 1
+                                                            ? 'max-h-[260px] min-w-[180px]'
+                                                            : 'aspect-square max-h-[250px]'
+                                                    }`}
+                                                    priority
+                                                    quality={100}
+                                                    onClick={() =>
+                                                        handleOpenMediaModal({
+                                                            url: media.media_url || '',
+                                                            messageId: message.id,
+                                                            type: 'image',
+                                                        })
+                                                    }
+                                                />
+                                            )
+                                        case 'video':
+                                            return (
+                                                <video
+                                                    src={media.media_url || ''}
+                                                    className={`h-full w-full cursor-pointer rounded-md object-cover object-center ${
+                                                        count === 1
+                                                            ? 'max-h-[260px] min-w-[180px]'
+                                                            : 'aspect-square max-h-[250px]'
+                                                    }`}
+                                                    controls
+                                                    onClick={() =>
+                                                        handleOpenMediaModal({
+                                                            url: media.media_url || '',
+                                                            messageId: message.id,
+                                                            type: 'video',
+                                                        })
+                                                    }
+                                                />
+                                            )
+                                    }
+                                })()}
                             </div>
                         ))}
                     </div>
                     <Reaction message={message} handleOpenReactionModal={handleOpenReactionModal} />
                 </div>
             )
+        }
+
         case 'call_ended':
         case 'call_timeout':
             return (
@@ -274,7 +337,7 @@ const MessageContent = (
                     <div className="flex items-center gap-2">
                         <Button
                             buttonType="icon"
-                            className={`shrink-0 ${message.type === 'call_timeout' ? '!bg-error dark:!bg-error' : ''}`}
+                            className={`shrink-0 ${message.type === 'call_timeout' ? 'bg-error! dark:bg-error! dark:text-white!' : ''}`}
                         >
                             {(() => {
                                 switch (message.type) {
@@ -285,7 +348,7 @@ const MessageContent = (
                                             <IncomingCallIcon />
                                         )
                                     case 'call_timeout':
-                                        return <TimeoutCallIcon />
+                                        return <TimeoutCallIcon className="text-white" />
                                 }
                             })()}
                         </Button>
@@ -295,7 +358,7 @@ const MessageContent = (
                                     ? `Cuộc gọi ${message.sender_id === currentUser?.id ? 'đi' : 'đến'}`
                                     : 'Đã bỏ lỡ cuộc gọi'}
                             </p>
-                            <span className="text-xs text-system-message-light dark:text-system-message-dark">
+                            <span className="text-system-message-light dark:text-system-message-dark text-xs">
                                 {message.type === 'call_ended'
                                     ? message.content
                                     : handleFormatTime(new Date(message.created_at))}
@@ -312,9 +375,9 @@ const MessageContent = (
             return (
                 <div
                     ref={combinedRef}
-                    className={`relative w-fit max-w-[80%] whitespace-pre-wrap rounded-3xl py-[2px] font-normal [word-break:break-word]`}
+                    className={`relative w-fit max-w-[80%] rounded-3xl py-0.5 font-normal [word-break:break-word] whitespace-pre-wrap`}
                 >
-                    <span className="max-w-fit gap-3 wrap-break-word text-3xl">
+                    <span className="max-w-fit gap-3 text-3xl wrap-break-word">
                         <EmojiMessageStyle
                             text={message.content}
                             size={32}
@@ -332,4 +395,4 @@ const MessageContent = (
     }
 }
 
-export default forwardRef(MessageContent)
+export default MessageContent

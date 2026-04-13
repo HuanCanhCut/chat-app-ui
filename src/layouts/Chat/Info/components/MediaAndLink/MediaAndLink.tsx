@@ -5,15 +5,15 @@ import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import useSWR from 'swr'
 
-import { faArrowLeft, faSpinner } from '@fortawesome/free-solid-svg-icons'
+import { faArrowLeft, faPlay, faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Button from '~/components/Button'
 import CustomImage from '~/components/Image'
 import SWRKey from '~/enum/SWRKey'
 import handleApiError from '~/helpers/handleApiError'
-import MessageImagesModel from '~/layouts/Chat/Message/Modal/MessageImagesModal'
+import MessageImagesModel from '~/layouts/Chat/Message/Modal/MessageMediaModal'
 import * as messageServices from '~/services/messageService'
-import { MessageModel } from '~/type/type'
+import { MessageMedia } from '~/type/type'
 
 interface MediaAndLinkProps {
     onBack: () => void
@@ -42,14 +42,23 @@ const MediaAndLink: React.FC<MediaAndLinkProps> = ({ onBack, defaultActiveTab })
     const { uuid } = useParams()
 
     const [activeTab, setActiveTab] = useState<Tab>(tabs.find((tab) => tab.type === defaultActiveTab) || tabs[0])
-    const [openImageModal, setOpenImageModal] = useState({
+    const [openImageModal, setOpenImageModal] = useState<{
+        isOpen: boolean
+        media: {
+            media_type: 'image' | 'video'
+            media_url: string
+        }
+    }>({
         isOpen: false,
-        image: '',
+        media: {
+            media_type: 'image',
+            media_url: '',
+        },
     })
 
-    const groupedMediaByMonth = (media: MessageModel[]) => {
+    const groupedMediaByMonth = (media: MessageMedia[]) => {
         return media.reduce(
-            (acc: Record<string, MessageModel[]>, cur: MessageModel) => {
+            (acc: Record<string, MessageMedia[]>, cur: MessageMedia) => {
                 const month = new Date(cur.created_at).getMonth()
                 const year = new Date(cur.created_at).getFullYear()
 
@@ -65,12 +74,12 @@ const MediaAndLink: React.FC<MediaAndLinkProps> = ({ onBack, defaultActiveTab })
 
                 return acc
             },
-            {} as Record<string, MessageModel[]>,
+            {} as Record<string, MessageMedia[]>,
         )
     }
 
     const { data: media, mutate: mutateMedia } = useSWR<{
-        data: Record<string, MessageModel[]>
+        data: Record<string, MessageMedia[]>
         meta: { pagination: { current_page: number; total_pages: number } }
     }>(activeTab.type === 'media' ? [SWRKey.GET_MESSAGE_IMAGES, activeTab.type, uuid] : null, async () => {
         const response = await messageServices.getMessageImages({
@@ -81,7 +90,7 @@ const MediaAndLink: React.FC<MediaAndLinkProps> = ({ onBack, defaultActiveTab })
 
         if (!response?.data)
             return {} as {
-                data: Record<string, MessageModel[]>
+                data: Record<string, MessageMedia[]>
                 meta: { pagination: { current_page: number; total_pages: number } }
             }
 
@@ -102,17 +111,23 @@ const MediaAndLink: React.FC<MediaAndLinkProps> = ({ onBack, defaultActiveTab })
         },
     )
 
-    const handleCloseImageModal = useCallback(() => {
+    const handleCloseMediaModal = useCallback(() => {
         setOpenImageModal({
             isOpen: false,
-            image: '',
+            media: {
+                media_type: 'image',
+                media_url: '',
+            },
         })
     }, [])
 
-    const handleOpenImageModal = useCallback((image: string) => {
+    const handleOpenMediaModal = useCallback((url: string, type: 'image' | 'video') => {
         setOpenImageModal({
             isOpen: true,
-            image,
+            media: {
+                media_type: type,
+                media_url: url,
+            },
         })
     }, [])
 
@@ -123,10 +138,14 @@ const MediaAndLink: React.FC<MediaAndLinkProps> = ({ onBack, defaultActiveTab })
                 ariaHideApp={false}
                 overlayClassName="overlay"
                 closeTimeoutMS={200}
-                onRequestClose={handleCloseImageModal}
-                className="fixed bottom-0 left-0 right-0 top-0"
+                onRequestClose={handleCloseMediaModal}
+                className="fixed top-0 right-0 bottom-0 left-0"
             >
-                <MessageImagesModel onClose={handleCloseImageModal} imageUrl={openImageModal.image} />
+                <MessageImagesModel
+                    onClose={handleCloseMediaModal}
+                    mediaUrl={openImageModal.media.media_url}
+                    mediaType={openImageModal.media.media_type}
+                />
             </ReactModal>
 
             <div>
@@ -143,13 +162,13 @@ const MediaAndLink: React.FC<MediaAndLinkProps> = ({ onBack, defaultActiveTab })
                             <div key={index} className="w-full">
                                 <Button
                                     buttonType="rounded"
-                                    className={`w-full whitespace-nowrap bg-transparent py-3! text-center dark:bg-transparent ${tab.type === activeTab.type ? 'text-[#0064D1] hover:bg-transparent dark:text-[#5AA7FF] dark:hover:bg-transparent' : 'text-system-message-light dark:text-system-message-dark'}`}
+                                    className={`w-full bg-transparent py-3! text-center whitespace-nowrap dark:bg-transparent ${tab.type === activeTab.type ? 'text-[#0064D1] hover:bg-transparent dark:text-[#5AA7FF] dark:hover:bg-transparent' : 'text-system-message-light dark:text-system-message-dark'}`}
                                     onClick={() => setActiveTab(tab)}
                                 >
                                     {tab.title}
                                 </Button>
 
-                                {tab.type === activeTab.type && <div className="h-[3px] w-full bg-primary" />}
+                                {tab.type === activeTab.type && <div className="bg-primary h-[3px] w-full" />}
                             </div>
                         )
                     })}
@@ -160,7 +179,7 @@ const MediaAndLink: React.FC<MediaAndLinkProps> = ({ onBack, defaultActiveTab })
                 {activeTab.type === 'media' && media && (
                     <>
                         <InfiniteScroll
-                            dataLength={Object.keys(media).length || 0}
+                            dataLength={Object.values(media.data).reduce((acc, cur) => acc + cur.length, 0)}
                             next={async () => {
                                 try {
                                     const response = await messageServices.getMessageImages({
@@ -175,7 +194,7 @@ const MediaAndLink: React.FC<MediaAndLinkProps> = ({ onBack, defaultActiveTab })
                                         (
                                             prev:
                                                 | {
-                                                      data: Record<string, MessageModel[]>
+                                                      data: Record<string, MessageMedia[]>
                                                       meta: {
                                                           pagination: { current_page: number; total_pages: number }
                                                       }
@@ -186,11 +205,27 @@ const MediaAndLink: React.FC<MediaAndLinkProps> = ({ onBack, defaultActiveTab })
                                                 return prev
                                             }
 
+                                            const mergeGroupedMedia = (
+                                                prev: Record<string, MessageMedia[]>,
+                                                next: Record<string, MessageMedia[]>,
+                                            ): Record<string, MessageMedia[]> => {
+                                                const result = { ...prev }
+
+                                                for (const [key, value] of Object.entries(next)) {
+                                                    if (result[key]) {
+                                                        // Cùng tháng => append vào
+                                                        result[key] = [...result[key], ...value]
+                                                    } else {
+                                                        // Tháng mới => thêm key mới
+                                                        result[key] = value
+                                                    }
+                                                }
+
+                                                return result
+                                            }
+
                                             return {
-                                                data: {
-                                                    ...prev.data,
-                                                    ...groupedMediaByMonth(response.data),
-                                                },
+                                                data: mergeGroupedMedia(prev.data, groupedMediaByMonth(response.data)),
                                                 meta: {
                                                     pagination: {
                                                         ...prev.meta.pagination,
@@ -222,29 +257,53 @@ const MediaAndLink: React.FC<MediaAndLinkProps> = ({ onBack, defaultActiveTab })
                                 {Object.keys(media.data).map((title, index) => {
                                     return (
                                         <div key={index}>
-                                            <span className="text-lg font-semibold leading-5 dark:text-[#E2E5E9]">
+                                            <span className="text-lg leading-5 font-semibold dark:text-[#E2E5E9]">
                                                 {title}
                                             </span>
 
                                             <div className="mt-1 grid max-w-full grid-cols-3 gap-[6px]">
-                                                {media.data[title].map((message) => {
+                                                {media.data[title].map((media) => {
                                                     return (
-                                                        <div key={message.id}>
-                                                            {JSON.parse(message.content!).map(
-                                                                (url: string, index: number) => {
-                                                                    return (
-                                                                        <CustomImage
-                                                                            key={index}
-                                                                            src={url}
-                                                                            alt={'ảnh'}
-                                                                            className="aspect-square w-full object-cover"
-                                                                            onClick={() => {
-                                                                                handleOpenImageModal(url)
-                                                                            }}
-                                                                        />
-                                                                    )
-                                                                },
-                                                            )}
+                                                        <div key={media.id}>
+                                                            {(() => {
+                                                                switch (media.media_type) {
+                                                                    case 'image':
+                                                                        return (
+                                                                            <CustomImage
+                                                                                src={media.media_url || ''}
+                                                                                alt={'ảnh'}
+                                                                                className="aspect-square w-full object-cover"
+                                                                                onClick={() => {
+                                                                                    handleOpenMediaModal(
+                                                                                        media.media_url || '',
+                                                                                        media.media_type,
+                                                                                    )
+                                                                                }}
+                                                                            />
+                                                                        )
+                                                                    case 'video':
+                                                                        return (
+                                                                            <div className="relative">
+                                                                                <div className="flex-center pointer-events-none absolute top-1/2 left-1/2 z-10 h-8 w-8 -translate-x-1/2 -translate-y-1/2 rounded-full select-none">
+                                                                                    <FontAwesomeIcon
+                                                                                        icon={faPlay}
+                                                                                        size="2xl"
+                                                                                    />
+                                                                                </div>
+                                                                                <video
+                                                                                    src={media.media_url || ''}
+                                                                                    className="aspect-square w-full cursor-pointer object-cover"
+                                                                                    onClick={() => {
+                                                                                        handleOpenMediaModal(
+                                                                                            media.media_url || '',
+                                                                                            media.media_type,
+                                                                                        )
+                                                                                    }}
+                                                                                ></video>
+                                                                            </div>
+                                                                        )
+                                                                }
+                                                            })()}
                                                         </div>
                                                     )
                                                 })}

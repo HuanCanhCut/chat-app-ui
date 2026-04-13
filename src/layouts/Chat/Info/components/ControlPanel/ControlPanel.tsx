@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { Emoji, EmojiStyle } from 'emoji-picker-react'
+import Tippy from 'huanpenguin-tippy-react'
 import useSWR from 'swr'
 
 import AddMemberModel from '../../Modal/AddMember/AddMemberModel'
@@ -22,7 +23,6 @@ import {
     faUserPlus,
 } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import Tippy from '@vendor/tippy'
 import Accordion from '~/components/Accordion'
 import Button from '~/components/Button'
 import CustomTippy from '~/components/CustomTippy'
@@ -35,8 +35,8 @@ import SWRKey from '~/enum/SWRKey'
 import { listenEvent, sendEvent } from '~/helpers/events'
 import handleApiError from '~/helpers/handleApiError'
 import RenameConversationModal from '~/layouts/Chat/Info/Modal/RenameConversationModal/RenameConversationModal'
-import { useAppSelector } from '~/redux'
-import { getCurrentUser } from '~/redux/selector'
+import { selectCurrentUser } from '~/redux/selector'
+import { useAppSelector } from '~/redux/types'
 import * as conversationServices from '~/services/conversationService'
 import { ConversationMember } from '~/type/type'
 import { momentTimezone } from '~/utils/moment'
@@ -56,7 +56,7 @@ interface AccordionItem {
 }
 
 const ControlPanel: React.FC<ControlPanelProps> = ({ onChose }) => {
-    const currentUser = useAppSelector(getCurrentUser)
+    const currentUser = useAppSelector(selectCurrentUser)
     const { uuid } = useParams()
 
     const fileInputRef = useRef<HTMLInputElement>(null)
@@ -76,20 +76,17 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ onChose }) => {
         return conversationServices.getConversationByUuid({ uuid: uuid as string })
     })
 
-    const member = conversation?.data.members.find((member) => {
+    const member = conversation?.data.members?.find((member) => {
         return member.user_id !== currentUser?.data.id
     }) as ConversationMember | undefined
 
     const [lastOnlineTime, setLastOnlineTime] = useState<Date | null>(member?.user.last_online_at || null)
 
     useEffect(() => {
-        const remove = listenEvent({
-            eventName: 'tippy:hide',
-            handler: () => {
-                if (accountOptionsTippyRef.current) {
-                    accountOptionsTippyRef.current.hide()
-                }
-            },
+        const remove = listenEvent('TIPPY:HIDE', () => {
+            if (accountOptionsTippyRef.current) {
+                accountOptionsTippyRef.current.hide()
+            }
         })
 
         return remove
@@ -107,17 +104,12 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ onChose }) => {
     }, [conversation])
 
     const handleToggleInfo = useCallback(() => {
-        sendEvent({
-            eventName: 'info:toggle',
-            detail: {
-                isOpen: false,
-            },
-        })
+        sendEvent('INFO:TOGGLE', { isOpen: false })
     }, [])
 
     // if current user is admin or leader in conversation
     const isAdmin = useMemo(() => {
-        return conversation?.data.members.some(
+        return conversation?.data.members?.some(
             (member) =>
                 member.user_id === currentUser?.data.id && (member.role === 'admin' || member.role === 'leader'),
         )
@@ -166,7 +158,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ onChose }) => {
                   title: 'Thành viên trong đoạn chat',
                   type: 'member_in_conversation',
                   children: [
-                      ...conversation.data.members.map((member) => {
+                      ...(conversation.data.members?.map((member) => {
                           const addedBy = () => {
                               if (member.added_by_id === currentUser?.data.id) {
                                   return 'bạn'
@@ -225,7 +217,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ onChose }) => {
                                   </CustomTippy>
                               ),
                           }
-                      }),
+                      }) || []),
                       {
                           title: 'Thêm người',
                           leftIcon: <FontAwesomeIcon icon={faUserPlus} width={20} height={20} />,
@@ -356,13 +348,10 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ onChose }) => {
     )
 
     useEffect(() => {
-        const remove = listenEvent({
-            eventName: 'conversation:leave-choose',
-            handler: ({ detail }: { detail: { type: string } }) => {
-                if (detail.type === 'leave_group') {
-                    handleChoose('leave_group')
-                }
-            },
+        const remove = listenEvent('CONVERSATION:LEAVE-CHOOSE', ({ type }) => {
+            if (type === 'leave_group') {
+                handleChoose('leave_group')
+            }
         })
 
         return remove
@@ -387,38 +376,24 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ onChose }) => {
     }
 
     useEffect(() => {
-        interface UserStatus {
-            user_id: number
-            is_online: boolean
-            last_online_at: Date
-        }
-
-        const remove = listenEvent<UserStatus>({
-            eventName: 'user:status',
-            handler: ({ detail }) => {
-                if (detail.user_id === member?.user.id) {
-                    setLastOnlineTime(detail.last_online_at)
-                }
-            },
+        const remove = listenEvent('USER:STATUS', ({ user_id, last_online_at }) => {
+            if (user_id === member?.user.id) {
+                setLastOnlineTime(last_online_at)
+            }
         })
 
         return remove
     }, [member?.user.id])
 
     useEffect(() => {
-        const remove = listenEvent({
-            eventName: 'conversation:open-modal',
-            handler: ({ detail: type }) => {
-                if (type === 'theme') {
-                    setModalState({
-                        isOpen: true,
-                        component: (
-                            <ConversationTheme onClose={handleCloseModal} currentTheme={conversation!.data.theme} />
-                        ),
-                        title: 'Xem trước và chọn chủ đề',
-                    })
-                }
-            },
+        const remove = listenEvent('CONVERSATION:OPEN-MODAL', ({ type }) => {
+            if (type === 'theme') {
+                setModalState({
+                    isOpen: true,
+                    component: <ConversationTheme onClose={handleCloseModal} currentTheme={conversation!.data.theme} />,
+                    title: 'Xem trước và chọn chủ đề',
+                })
+            }
         })
 
         return remove
@@ -427,7 +402,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ onChose }) => {
         <>
             <Button
                 buttonType="icon"
-                className="block bg-transparent dark:bg-transparent sm:hidden"
+                className="block bg-transparent sm:hidden dark:bg-transparent"
                 onClick={handleToggleInfo}
             >
                 <FontAwesomeIcon icon={faArrowLeft} />
@@ -453,7 +428,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ onChose }) => {
                 />
 
                 <Link href={`${config.routes.user}/@${member?.user.nickname}`} className="mt-2 hover:underline">
-                    <p className="line-clamp-2 w-full text-ellipsis text-center font-medium">
+                    <p className="line-clamp-2 w-full text-center font-medium text-ellipsis">
                         {conversation?.data.is_group
                             ? conversation.data.name
                             : member?.nickname || member?.user.full_name}

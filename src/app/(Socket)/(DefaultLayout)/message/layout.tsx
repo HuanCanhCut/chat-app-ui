@@ -15,7 +15,7 @@ export default function MessageLayout({ children }: { children: React.ReactNode 
     }, [])
 
     return (
-        <div className="dark:bg-dark dark:text-dark flex h-dvh max-h-[calc(100dvh-var(--header-height-mobile))] w-full sm:max-h-[calc(100dvh-var(--header-height))]">
+        <div className="dark:bg-dark dark:text-dark flex h-dvh max-h-[calc(100dvh-var(--header-height-mobile))] w-full md:max-h-[calc(100dvh-var(--header-height))]">
             <div
                 className={`bp900:w-(--sidebar-width-tablet) h-full w-full shrink-0 overflow-y-auto lg:w-(--sidebar-width) ${uuid && 'bp900:block hidden'}`}
             >

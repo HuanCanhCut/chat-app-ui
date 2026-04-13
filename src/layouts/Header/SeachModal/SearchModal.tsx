@@ -20,10 +20,10 @@ const SearchModal: React.FC<Props> = ({ isOpen, closeModal }) => {
             onRequestClose={closeModal}
             className="bg-transparent"
         >
-            <div className="fixed bottom-0 left-0 right-0 top-0">
+            <div className="fixed top-0 right-0 bottom-0 left-0">
                 <header className="flex items-center justify-between gap-4 p-4">
                     <button
-                        className="flex-center h-9 w-9 rounded-full p-2 hover:bg-gray-100 dark:hover:bg-dark-gray"
+                        className="flex-center dark:hover:bg-dark-gray h-9 w-9 rounded-full p-2 hover:bg-gray-100"
                         onClick={closeModal}
                     >
                         <FontAwesomeIcon icon={faArrowLeft} />

@@ -1,8 +1,8 @@
-import { forwardRef } from 'react'
+import { LegacyRef } from 'react'
 
 import { sendEvent } from '~/helpers/events'
-import { useAppSelector } from '~/redux'
-import { getCurrentUser } from '~/redux/selector'
+import { selectCurrentUser } from '~/redux/selector'
+import { useAppSelector } from '~/redux/types'
 import { MessageModel } from '~/type/type'
 
 interface SystemMessageProps {
@@ -10,23 +10,24 @@ interface SystemMessageProps {
     messageIndex: number
     className?: string
     hiddenQuickAction?: boolean
+    ref?: LegacyRef<HTMLDivElement> | undefined
 }
 
 const allowedQuickActions = ['system_change_theme']
 
-const SystemMessage = (
-    { message, messageIndex, className = '', hiddenQuickAction = false }: SystemMessageProps,
-    ref: React.Ref<HTMLDivElement>,
-) => {
-    const currentUser = useAppSelector(getCurrentUser)
+const SystemMessage = ({
+    message,
+    messageIndex,
+    className = '',
+    hiddenQuickAction = false,
+    ref,
+}: SystemMessageProps) => {
+    const currentUser = useAppSelector(selectCurrentUser)
 
     const handleQuickAction = (type: string) => {
         switch (type) {
             case 'system_change_theme':
-                sendEvent({
-                    eventName: 'conversation:open-modal',
-                    detail: 'theme',
-                })
+                sendEvent('CONVERSATION:OPEN-MODAL', { type: 'theme' })
                 break
 
             default:
@@ -75,7 +76,7 @@ const SystemMessage = (
             jsx.push(
                 <span key={`quick-action`}>
                     <span
-                        className="cursor-pointer select-none font-medium text-(--sender-light-background-color) hover:underline dark:text-(--sender-dark-background-color)"
+                        className="cursor-pointer font-medium text-(--sender-light-background-color) select-none hover:underline dark:text-(--sender-dark-background-color)"
                         onClick={() => {
                             handleQuickAction(message.type)
                         }}
@@ -92,11 +93,11 @@ const SystemMessage = (
 
     return (
         <div className={`${className}`} ref={messageIndex === 0 ? ref : null}>
-            <p className={`text-center text-xs text-system-message-light dark:text-system-message-dark`}>
+            <p className={`text-system-message-light dark:text-system-message-dark text-center text-xs`}>
                 {handleReplaceJson(message.content || '')}
             </p>
         </div>
     )
 }
 
-export default forwardRef(SystemMessage)
+export default SystemMessage

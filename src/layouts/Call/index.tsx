@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { useRouter } from 'next/navigation'
+import Tippy from 'huanpenguin-tippy-react'
 import Peer from 'peerjs'
 import useSWR from 'swr'
 
@@ -17,14 +18,12 @@ import {
     faXmark,
 } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import Tippy from '@vendor/tippy'
 import UserAvatar from '~/components/UserAvatar'
-import { SocketEvent } from '~/enum/SocketEvent'
 import SWRKey from '~/enum/SWRKey'
 import socket from '~/helpers/socket'
 import useMediaStream from '~/hooks/useMediaStream'
-import { useAppSelector } from '~/redux'
-import { getCurrentUser } from '~/redux/selector'
+import { selectCurrentUser } from '~/redux/selector'
+import { useAppSelector } from '~/redux/types'
 import * as userService from '~/services/userService'
 
 type CallStatus =
@@ -42,7 +41,7 @@ const CALL_TIMEOUT_DURATION = 15000 // 15 seconds
 
 const CallClient = () => {
     const router = useRouter()
-    const currentUser = useAppSelector(getCurrentUser)
+    const currentUser = useAppSelector(selectCurrentUser)
     const audioRef = useRef<HTMLAudioElement>(null)
 
     const searchParams = useSearchParams()
@@ -101,51 +100,54 @@ const CallClient = () => {
             } catch (error) {}
 
             callTimeoutRef.current = setTimeout(() => {
-                setCallStatus('timeout')
+                if (currentUser?.data) {
+                    setCallStatus('timeout')
 
-                // Emit cancel event to server
-                socket.emit(SocketEvent.END_CALL, {
-                    caller_id: currentUser?.data.id,
-                    callee_id: member?.data.id,
-                    uuid,
-                })
+                    // Emit cancel event to server
+                    socket.emit('END_CALL', {
+                        caller_id: currentUser?.data.id,
+                        callee_id: member?.data.id,
+                        uuid,
+                    })
 
-                // Clean up resources
-                if (localStreamRef.current) {
-                    stopStream()
-                }
+                    // Clean up resources
+                    if (localStreamRef.current) {
+                        stopStream()
+                    }
 
-                if (peerInstance.current) {
-                    peerInstance.current.destroy()
-                }
+                    if (peerInstance.current) {
+                        peerInstance.current.destroy()
+                    }
 
-                if (currentCallRef.current) {
-                    currentCallRef.current.close()
+                    if (currentCallRef.current) {
+                        currentCallRef.current.close()
+                    }
                 }
             }, CALL_TIMEOUT_DURATION)
         }
-    }, [subType, currentUser?.data.id, member?.data.id, uuid, localStreamRef, stopStream])
+    }, [subType, currentUser?.data, member?.data.id, uuid, localStreamRef, stopStream])
 
     // Các hàm khởi tạo và chấp nhận cuộc gọi - đặt ở đây để tránh lỗi "used before declaration"
     const handleInitiateCall = useCallback(() => {
-        if (callStatus !== 'connecting') return
+        if (currentUser?.data) {
+            if (callStatus !== 'connecting') return
 
-        socket.emit(SocketEvent.INITIATE_CALL, {
-            caller_id: currentUser?.data.id,
-            callee_id: member?.data.id,
-            type: initializeVideo === 'true' ? 'video' : 'voice',
-            uuid,
-        })
+            socket.emit('INITIATE_CALL', {
+                caller_id: currentUser?.data.id,
+                callee_id: member?.data.id,
+                type: initializeVideo === 'true' ? 'video' : 'voice',
+                uuid,
+            })
 
-        // Start timeout after initiating call
-        startCallTimeout()
-
+            // Start timeout after initiating call
+            startCallTimeout()
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [currentUser?.data.id, initializeVideo, member?.data.id, startCallTimeout])
+    }, [currentUser?.data, callStatus, initializeVideo, member?.data.id, startCallTimeout, uuid])
 
     const handleAcceptCall = useCallback(
         (peerId: string) => {
-            socket.emit(SocketEvent.ACCEPTED_CALL, {
+            socket.emit('ACCEPTED_CALL', {
                 caller_id: member?.data.id,
                 peer_id: peerId,
                 callee_id: currentUser?.data.id,
@@ -263,15 +265,17 @@ const CallClient = () => {
                     const offer = await pc.createOffer()
                     await pc.setLocalDescription(offer)
 
-                    // TODO: Gửi offer mới cho remote peer
-                    // Gửi offer mới cho remote peer
-                    socket.emit(SocketEvent.RENEGOTIATION_OFFER, {
-                        from_user_id: currentUser?.data.id,
-                        to_user_id: member?.data.id,
-                        caller_id: subType === 'caller' ? currentUser?.data.id : member?.data.id,
-                        callee_id: subType === 'callee' ? currentUser?.data.id : member?.data.id,
-                        offer: offer,
-                    })
+                    if (currentUser?.data) {
+                        // TODO: Gửi offer mới cho remote peer
+                        // Gửi offer mới cho remote peer
+                        socket.emit('RENEGOTIATION_OFFER', {
+                            from_user_id: currentUser?.data.id,
+                            to_user_id: member?.data.id,
+                            caller_id: subType === 'caller' ? currentUser?.data.id : member?.data.id,
+                            callee_id: subType === 'callee' ? currentUser?.data.id : member?.data.id,
+                            offer: offer,
+                        })
+                    }
                 } catch (error) {
                     console.error('Error during renegotiation:', error)
                 }
@@ -281,7 +285,7 @@ const CallClient = () => {
         }
 
         setOnNeedRenegotiation(handleRenegotiation)
-    }, [setOnNeedRenegotiation, currentUser?.data.id, member?.data.id, subType, cleanupDuplicateSenders])
+    }, [cleanupDuplicateSenders, currentUser?.data, member?.data.id, setOnNeedRenegotiation, subType])
 
     // IMPROVED: Xử lý renegotiation events với error handling tốt hơn
     useEffect(() => {
@@ -313,14 +317,16 @@ const CallClient = () => {
                     const answer = await pc.createAnswer()
                     await pc.setLocalDescription(answer)
 
-                    // TODO: Gửi answer mới cho remote peer
-                    socket.emit(SocketEvent.RENEGOTIATION_ANSWER, {
-                        from_user_id: currentUser?.data.id,
-                        to_user_id: data.from_user_id,
-                        caller_id: data.caller_id,
-                        callee_id: data.callee_id,
-                        answer: answer,
-                    })
+                    if (currentUser?.data) {
+                        // TODO: Gửi answer mới cho remote peer
+                        socket.emit('RENEGOTIATION_ANSWER', {
+                            from_user_id: currentUser?.data.id,
+                            to_user_id: data.from_user_id,
+                            caller_id: data.caller_id,
+                            callee_id: data.callee_id,
+                            answer: answer,
+                        })
+                    }
                 } catch (error) {
                     console.error('Error handling renegotiation offer:', error)
                 }
@@ -347,14 +353,14 @@ const CallClient = () => {
             }
         }
 
-        socket.on(SocketEvent.RENEGOTIATION_OFFER, handleRenegotiationOffer)
-        socket.on(SocketEvent.RENEGOTIATION_ANSWER, handleRenegotiationAnswer)
+        socket.on('RENEGOTIATION_OFFER', handleRenegotiationOffer)
+        socket.on('RENEGOTIATION_ANSWER', handleRenegotiationAnswer)
 
         return () => {
-            socket.off(SocketEvent.RENEGOTIATION_OFFER, handleRenegotiationOffer)
-            socket.off(SocketEvent.RENEGOTIATION_ANSWER, handleRenegotiationAnswer)
+            socket.off('RENEGOTIATION_OFFER', handleRenegotiationOffer)
+            socket.off('RENEGOTIATION_ANSWER', handleRenegotiationAnswer)
         }
-    }, [currentUser?.data.id])
+    }, [currentUser?.data])
 
     const setupRemoteStreamMonitoring = useCallback((remoteStream: MediaStream) => {
         if (remoteVideoRef.current) {
@@ -558,10 +564,10 @@ const CallClient = () => {
             }
         }
 
-        socket.on(SocketEvent.ACCEPTED_CALL, socketHandler)
+        socket.on('ACCEPTED_CALL', socketHandler)
 
         return () => {
-            socket.off(SocketEvent.ACCEPTED_CALL, socketHandler)
+            socket.off('ACCEPTED_CALL', socketHandler)
         }
     }, [localStreamRef, setPeerConnection, setupRemoteStreamMonitoring, clearCallTimeout])
 
@@ -576,7 +582,7 @@ const CallClient = () => {
 
             // Thông báo cho người đối diện về việc kết thúc cuộc gọi
             if (currentUser?.data.id && member?.data.id) {
-                socket.emit(SocketEvent.END_CALL, {
+                socket.emit('END_CALL', {
                     caller_id: subType === 'caller' ? currentUser.data.id : member.data.id,
                     callee_id: oneWay ? Math.random() : subType === 'callee' ? currentUser.data.id : member.data.id,
                     uuid,
@@ -607,10 +613,10 @@ const CallClient = () => {
             setCallStatus('rejected')
         }
 
-        socket.on(SocketEvent.REJECT_CALL, socketHandler)
+        socket.on('REJECT_CALL', socketHandler)
 
         return () => {
-            socket.off(SocketEvent.REJECT_CALL, socketHandler)
+            socket.off('REJECT_CALL', socketHandler)
         }
     }, [clearCallTimeout])
 
@@ -625,10 +631,10 @@ const CallClient = () => {
             }, 3000)
         }
 
-        socket.on(SocketEvent.CALL_BUSY, socketHandler)
+        socket.on('CALL_BUSY', socketHandler)
 
         return () => {
-            socket.off(SocketEvent.CALL_BUSY, socketHandler)
+            socket.off('CALL_BUSY', socketHandler)
         }
     }, [handleEndCall])
 
@@ -651,10 +657,10 @@ const CallClient = () => {
             }
         }
 
-        socket.on(SocketEvent.CANCEL_INCOMING_CALL, handleCancelIncomingCall)
+        socket.on('CANCEL_INCOMING_CALL', handleCancelIncomingCall)
 
         return () => {
-            socket.off(SocketEvent.CANCEL_INCOMING_CALL, handleCancelIncomingCall)
+            socket.off('CANCEL_INCOMING_CALL', handleCancelIncomingCall)
         }
     }, [localStreamRef, stopStream])
 
@@ -693,10 +699,10 @@ const CallClient = () => {
             }
         }
 
-        socket.on(SocketEvent.END_CALL, handleRemoteEndCall)
+        socket.on('END_CALL', handleRemoteEndCall)
 
         return () => {
-            socket.off(SocketEvent.END_CALL, handleRemoteEndCall)
+            socket.off('END_CALL', handleRemoteEndCall)
         }
     }, [localStreamRef, router, stopStream, clearCallTimeout])
 
@@ -752,7 +758,7 @@ const CallClient = () => {
         <div className="relative h-dvh max-h-dvh w-full max-w-full overflow-hidden">
             <audio src="/static/audio/ringbacktone.mp3" ref={audioRef} />
             {subType === 'caller' && !isCalling ? (
-                <div className="blur-10 flex-center absolute bottom-0 left-0 right-0 top-0 z-10 backdrop-blur-sm">
+                <div className="blur-10 flex-center absolute top-0 right-0 bottom-0 left-0 z-10 backdrop-blur-sm">
                     <div className="flex flex-col items-center gap-2">
                         <UserAvatar src={member?.data.avatar} className="h-20 w-20" />
                         <div className="text-2xl font-bold">{member?.data.nickname}</div>
@@ -766,7 +772,7 @@ const CallClient = () => {
                 callStatus === 'failed' ||
                 callStatus === 'rejected' ||
                 callStatus === 'timeout') && (
-                <div className="blur-10 flex-center absolute bottom-0 left-0 right-0 top-0 z-50 bg-black bg-opacity-80 backdrop-blur-sm">
+                <div className="blur-10 flex-center bg-opacity-80 absolute top-0 right-0 bottom-0 left-0 z-50 bg-black backdrop-blur-sm">
                     <div className="flex flex-col items-center gap-4 text-white">
                         <div className="flex h-20 w-20 items-center justify-center rounded-full bg-red-500">
                             <FontAwesomeIcon icon={faPhoneSlash} className="text-3xl" />
@@ -807,11 +813,11 @@ const CallClient = () => {
             )}
 
             {/* Remote video container */}
-            <div className="absolute bottom-0 left-0 right-0 top-0 h-full w-full">
+            <div className="absolute top-0 right-0 bottom-0 left-0 h-full w-full">
                 {/* Fallback when remote video is off */}
                 {!isRemoteVideoVisible && (
                     <div
-                        className="z-5 absolute inset-0 flex items-center justify-center"
+                        className="absolute inset-0 z-5 flex items-center justify-center"
                         style={{
                             backgroundImage: `url(${member?.data.avatar})`,
                             backgroundSize: 'cover',
@@ -841,7 +847,7 @@ const CallClient = () => {
                 <Tippy content={`${isMicOn ? 'Tắt mic' : 'Bật mic'}`} placement="top">
                     <button
                         className={`flex h-10 w-10 items-center justify-center rounded-full transition-all duration-200 ${
-                            !isMicOn ? 'bg-white text-dark' : 'bg-white/30 hover:bg-white/40'
+                            !isMicOn ? 'text-dark bg-white' : 'bg-white/30 hover:bg-white/40'
                         }`}
                         onClick={toggleMic}
                     >
@@ -866,7 +872,7 @@ const CallClient = () => {
                 <Tippy content={`${isCameraOn ? 'Tắt camera' : 'Bật camera'}`} placement="top">
                     <button
                         className={`flex h-10 w-10 items-center justify-center rounded-full transition-all duration-200 ${
-                            !isCameraOn ? 'bg-white text-dark' : 'bg-white/30 hover:bg-white/40'
+                            !isCameraOn ? 'text-dark bg-white' : 'bg-white/30 hover:bg-white/40'
                         }`}
                         onClick={handleToggleCamera}
                     >
@@ -898,7 +904,7 @@ const CallClient = () => {
             {/* Local video preview */}
             <div
                 ref={previewRef}
-                className="absolute bottom-auto right-[20px] top-[20px] z-10 h-[30%] max-w-[calc(100dvw-40px)] rounded-xl transition-all duration-300 ease-in-out aspect-10/16 md:top-auto! md:bottom-[20px] md:aspect-video md:w-[300px] lg:w-[350px]"
+                className="absolute top-[20px] right-[20px] bottom-auto z-10 aspect-10/16 h-[30%] max-w-[calc(100dvw-40px)] rounded-xl transition-all duration-300 ease-in-out md:top-auto! md:bottom-[20px] md:aspect-video md:w-[300px] lg:w-[350px]"
                 style={{
                     backgroundImage: `url(${currentUser?.data.avatar})`,
                     backgroundSize: 'cover',
@@ -907,7 +913,7 @@ const CallClient = () => {
             >
                 <button
                     ref={previewButtonRef}
-                    className="flex-center absolute left-2 top-4 z-10 h-7 w-7 transform cursor-pointer! rounded-full bg-opacity-50 p-2 transition duration-200 ease-in-out hover:bg-opacity-70 xxs:h-9 xxs:w-9 md:top-1/2 md:h-10 md:w-10 md:-translate-y-1/2"
+                    className="flex-center bg-opacity-50 hover:bg-opacity-70 xxs:h-9 xxs:w-9 absolute top-4 left-2 z-10 h-7 w-7 transform cursor-pointer! rounded-full p-2 transition duration-200 ease-in-out md:top-1/2 md:h-10 md:w-10 md:-translate-y-1/2"
                     onClick={() => setPreviewOpen(!previewOpen)}
                 >
                     <FontAwesomeIcon

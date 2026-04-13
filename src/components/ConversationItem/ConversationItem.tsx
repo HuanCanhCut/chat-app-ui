@@ -11,8 +11,8 @@ import { faEllipsis } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import UserAvatar from '~/components/UserAvatar'
 import SystemMessage from '~/layouts/Chat/Message/SystemMessage'
-import { useAppSelector } from '~/redux'
-import { getCurrentUser } from '~/redux/selector'
+import { selectCurrentUser } from '~/redux/selector'
+import { useAppSelector } from '~/redux/types'
 import { ConversationModel, MessageModel } from '~/type/type'
 import { momentTimezone } from '~/utils/moment'
 
@@ -22,7 +22,7 @@ interface Props {
 }
 
 const ConversationItem: React.FC<Props> = ({ conversation, className = '' }) => {
-    const currentUser = useAppSelector(getCurrentUser)
+    const currentUser = useAppSelector(selectCurrentUser)
 
     const tippyInstanceRef = useRef<any>(null)
 
@@ -31,7 +31,7 @@ const ConversationItem: React.FC<Props> = ({ conversation, className = '' }) => 
     const isActive = uuid === conversation.uuid
 
     // if not group then get user !== current user in conversation_members
-    const userMember = conversation.members.find((member) => member.user_id !== currentUser?.data.id)
+    const userMember = conversation.members?.find((member) => member.user_id !== currentUser?.data.id)
 
     const isRead =
         conversation.last_message.sender_id !== currentUser?.data.id ? !!conversation.last_message.is_read : true
@@ -41,7 +41,7 @@ const ConversationItem: React.FC<Props> = ({ conversation, className = '' }) => 
 
         const messageType = new Map<string | null, string>([
             [null, 'Đã thu hồi một tin nhắn'],
-            ['image', 'Đã gửi một ảnh'],
+            ['media', 'Đã gửi một file'],
         ])
 
         if (currentUser?.data.id === message.sender_id) {
@@ -83,7 +83,7 @@ const ConversationItem: React.FC<Props> = ({ conversation, className = '' }) => 
 
     return (
         <div
-            className={`group relative rounded-lg ${!isActive ? 'hover:bg-lightGray hover:dark:bg-dark-gray' : ''} ${className} ${isActive ? 'bg-[#ebf5ff] dark:bg-[#222e39bd]' : ''}`}
+            className={`group relative rounded-lg ${!isActive ? 'hover:bg-light-gray hover:dark:bg-dark-gray' : ''} ${className} ${isActive ? 'bg-[#ebf5ff] dark:bg-[#222e39bd]' : ''}`}
         >
             <Link href={`/message/${conversation.uuid}`} className={`flex items-center p-2 pr-5`}>
                 <div className="relative shrink-0">
@@ -91,7 +91,7 @@ const ConversationItem: React.FC<Props> = ({ conversation, className = '' }) => 
                         src={conversation.is_group ? conversation.avatar : userMember?.user.avatar}
                         size={56}
                         className="h-[48px] w-[48px] lg:h-[56px] lg:w-[56px]"
-                        isOnline={conversation.members.some(
+                        isOnline={conversation.members?.some(
                             (member) => member.user.is_online && member.user.id !== currentUser?.data.id,
                         )}
                         onlineClassName="h-4 w-4"
@@ -155,7 +155,7 @@ const ConversationItem: React.FC<Props> = ({ conversation, className = '' }) => 
                                         avatars={avatars.slice(0, 2)}
                                         size={16}
                                         translate={3}
-                                        className="flex h-5 items-center gap-2 [&>img]:h-5 [&>img]:w-5 [&>img]:border-2 [&>img]:border-white [&>img]:dark:border-dark"
+                                        className="[&>img]:dark:border-dark flex h-5 items-center gap-2 [&>img]:h-5 [&>img]:w-5 [&>img]:border-2 [&>img]:border-white"
                                         style={{
                                             width: `${16 * avatars.slice(0, 2).length}px`,
                                         }}
@@ -168,7 +168,7 @@ const ConversationItem: React.FC<Props> = ({ conversation, className = '' }) => 
                     </div>
                 }
             </Link>
-            <div className="absolute right-5 top-1/2 hidden -translate-y-1/2 group-hover:block">
+            <div className="absolute top-1/2 right-5 hidden -translate-y-1/2 group-hover:block">
                 <CustomTippy
                     renderItem={() => (
                         <ConversationOptions conversation={conversation} tippyInstanceRef={tippyInstanceRef} />
