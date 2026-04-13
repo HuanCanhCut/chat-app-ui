@@ -39,6 +39,34 @@ const PostAction = ({ post }: PostActionProps) => {
 
     const handleReaction = async (unified?: BaseReactionUnified) => {
         try {
+            mutate(
+                SWRKey.GET_POSTS,
+                (prev?: GetPostResponse) => {
+                    if (!prev) {
+                        return prev
+                    }
+
+                    const newData = prev.data.map((currentPost: PostResponse) => {
+                        if (currentPost.id === post.id) {
+                            return {
+                                ...currentPost,
+                                reaction: unified,
+                            }
+                        }
+
+                        return currentPost
+                    })
+
+                    return {
+                        ...prev,
+                        data: newData,
+                    }
+                },
+                {
+                    revalidate: false,
+                },
+            )
+
             if (unified) {
                 if (post.reaction !== unified) {
                     await postService.reactPost({ postId: post.id, unified })
@@ -60,7 +88,7 @@ const PostAction = ({ post }: PostActionProps) => {
                         if (currentPost.id === post.id) {
                             return {
                                 ...currentPost,
-                                ...postResponse.data,
+                                ...postResponse,
                                 reaction: unified,
                                 top_reactions: postResponse.data.top_reactions,
                             }

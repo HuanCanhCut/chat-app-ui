@@ -135,7 +135,7 @@ const StoryAction: React.FC<StoryActionProps> = ({ story, handleReactStory, conv
                 <input
                     ref={inputRef}
                     className={cn(
-                        'w-[300px] max-w-full rounded-3xl border border-white p-2 px-4 placeholder-white transition-all duration-200 ease-linear outline-none select-none dark:border-white',
+                        'w-[300px] max-w-full rounded-3xl border border-white p-2 px-4 text-white placeholder-white transition-all duration-200 ease-linear outline-none select-none dark:border-white dark:text-white',
                         isFocused && 'w-[600px]',
                     )}
                     onFocus={() => {

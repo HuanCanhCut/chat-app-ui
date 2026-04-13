@@ -69,7 +69,16 @@ const StoryItem: React.FC<StoryItemProps> = ({ story }) => {
                                 />
                             )
                         case 'text':
-                            return <h1>text</h1>
+                            return (
+                                <div
+                                    className="flex-center my-auto line-clamp-1 h-full w-full truncate bg-cover bg-center bg-no-repeat p-2 [word-break:break-word] whitespace-pre-wrap"
+                                    style={{ backgroundImage: `url('${story.background_url}')` }}
+                                >
+                                    <p className="w-full max-w-full font-medium [word-break:break-word] whitespace-pre-wrap text-white">
+                                        {story.caption}
+                                    </p>
+                                </div>
+                            )
                     }
                 })()}
 
@@ -83,7 +92,7 @@ const StoryItem: React.FC<StoryItemProps> = ({ story }) => {
                     />
                 </div>
 
-                <p className="absolute bottom-2 line-clamp-2 max-w-full truncate text-sm font-medium [word-break:break-word]">
+                <p className="absolute bottom-2 line-clamp-2 max-w-full truncate px-2 text-sm font-medium [word-break:break-word] text-white dark:text-white">
                     {story.user.full_name}
                 </p>
             </div>

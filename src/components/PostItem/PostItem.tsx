@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
+import Link from 'next/link'
 import moment from 'moment-timezone'
 
 import PostAction from './components/PostAction/PostAction'
 import MediaGrid from '~/components/MediaGrid'
 import UserAvatar from '~/components/UserAvatar'
+import config from '~/config'
 import { cn } from '~/lib/utils'
 import { PostResponse } from '~/type/post.type'
 
@@ -49,9 +51,13 @@ const PostItem = ({ post }: PostItemProps) => {
         <div className="rounded-lg bg-white dark:bg-[#27292a]">
             <div className="flex items-center justify-between px-3 py-2">
                 <div className="flex items-center gap-2">
-                    <UserAvatar src={post.user.avatar} />
-                    <div className="flex flex-col">
-                        <span className="text-base font-semibold">{post.user.full_name}</span>
+                    <Link href={`${config.routes.user}/@${post.user.nickname}`}>
+                        <UserAvatar src={post.user.avatar} size={42} />
+                    </Link>
+                    <div className="-mt-1 flex flex-col">
+                        <Link href={`${config.routes.user}/@${post.user.nickname}`}>
+                            <span className="text-base font-semibold hover:underline">{post.user.full_name}</span>
+                        </Link>
                         <span className="text-muted-foreground text-[13px] font-medium">
                             {formatTime(post.created_at)}
                         </span>

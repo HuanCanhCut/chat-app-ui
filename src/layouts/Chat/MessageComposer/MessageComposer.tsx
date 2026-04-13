@@ -68,6 +68,14 @@ const InputMessage: React.FC<InputMessageProps> = () => {
         if (e.key === 'Enter') {
             handleEmitMessage(uuid as string)
         }
+
+        setIsOpenEmoji((prev) => ({
+            ...prev,
+            emojiOpen: true,
+            emojiWrapperOpen: !prev.emojiWrapperOpen,
+        }))
+
+        setMessageValue('')
     }
 
     const handleEmitMessage = async (conversationUuid: string) => {
