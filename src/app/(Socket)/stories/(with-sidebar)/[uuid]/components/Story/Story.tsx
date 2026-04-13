@@ -452,7 +452,9 @@ const Story: React.FC<StoryProps> = ({ uuid }) => {
                                                         backgroundPosition: 'center',
                                                     }}
                                                 >
-                                                    <p className="text-2xl font-bold">{currentStory.caption}</p>
+                                                    <p className="text-center text-2xl font-bold text-white dark:text-white">
+                                                        {currentStory.caption}
+                                                    </p>
                                                 </div>
                                             )
                                         default:
@@ -480,7 +482,9 @@ const Story: React.FC<StoryProps> = ({ uuid }) => {
                                 </div>
                             )}
 
-                            <UserViewedStory story_uuid={currentStory.uuid} />
+                            {currentStory.user_id === currentUser?.data.id && (
+                                <UserViewedStory story_uuid={currentStory.uuid} />
+                            )}
                         </>
                     </div>
                     <div className="h-full flex-1 cursor-pointer">

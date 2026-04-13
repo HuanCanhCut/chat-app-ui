@@ -180,7 +180,10 @@ const StoryList = () => {
                     )}
                 </div>
             ) : (
-                <div className="flex items-center gap-3 rounded-lg bg-white p-2 px-4 dark:bg-[#27292a]">
+                <Link
+                    href={config.routes.create_story}
+                    className="flex items-center gap-3 rounded-lg bg-white p-2 px-4 dark:bg-[#27292a]"
+                >
                     <Button className="flex size-12 items-center rounded-full bg-[#e8f0f8] dark:bg-[#243a52]">
                         <Plus className="text-primary/60 dark:text-primary size-6" />
                     </Button>
@@ -188,7 +191,7 @@ const StoryList = () => {
                         <p className="text-lg font-medium">Tạo tin</p>
                         <p className="text-muted-foreground">Bạn có thể chia sẻ ảnh, video hoặc viết gì đó.</p>
                     </div>
-                </div>
+                </Link>
             )}
         </>
     )
