@@ -1,5 +1,4 @@
 import { BaseModel, MetaPagination } from './common.type'
-import { StoryModel } from './story.type'
 import { UserModel } from './user.type'
 
 export interface TopReaction {
