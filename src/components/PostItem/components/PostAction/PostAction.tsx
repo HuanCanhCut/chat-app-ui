@@ -155,7 +155,7 @@ const PostAction = ({ post }: PostActionProps) => {
                 />
             )}
 
-            <div className="relative flex items-center justify-between px-2 py-2 pb-0">
+            <div className="relative flex items-center justify-between">
                 {(post.top_reactions?.length || 0) > 0 && (
                     <div
                         onClick={() =>
@@ -164,7 +164,7 @@ const PostAction = ({ post }: PostActionProps) => {
                                 postId: post.id,
                             })
                         }
-                        className="group flex cursor-pointer"
+                        className="group flex cursor-pointer px-2 py-2 pb-0"
                     >
                         {post.top_reactions?.map((reaction, index) => {
                             const icon = baseReactionIcon(18)[reaction.react]
@@ -192,7 +192,7 @@ const PostAction = ({ post }: PostActionProps) => {
 
                 <div className="flex items-center gap-2">
                     {post.comment_count > 0 && (
-                        <div className="flex cursor-pointer">
+                        <div className="flex cursor-pointer px-2 py-2 pb-0">
                             <span className="text-muted-foreground ml-1 select-none hover:underline">
                                 {post.comment_count} bình luận
                             </span>
@@ -200,7 +200,7 @@ const PostAction = ({ post }: PostActionProps) => {
                     )}
 
                     {post.share_count > 0 && (
-                        <div className="flex cursor-pointer">
+                        <div className="flex cursor-pointer px-2 py-2 pb-0">
                             <span className="text-muted-foreground ml-1 select-none hover:underline">
                                 {post.share_count} chia sẻ
                             </span>

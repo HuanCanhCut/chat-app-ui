@@ -5,7 +5,7 @@ interface NavLinkProps {
     children: React.ReactNode
     href: string
     // eslint-disable-next-line no-unused-vars
-    className?: (options: { isActive: boolean }) => string
+    className?: ((options: { isActive: boolean }) => string) | string
 }
 
 export default function NavLink({ children, href, className = () => '' }: NavLinkProps) {
@@ -16,7 +16,7 @@ export default function NavLink({ children, href, className = () => '' }: NavLin
     }
 
     return (
-        <Link href={href} className={className(options)}>
+        <Link href={href} className={typeof className === 'function' ? className(options) : className}>
             {children}
         </Link>
     )

@@ -71,10 +71,10 @@ const StoryItem: React.FC<StoryItemProps> = ({ story }) => {
                         case 'text':
                             return (
                                 <div
-                                    className="flex-center my-auto line-clamp-1 h-full w-full truncate bg-cover bg-center bg-no-repeat p-2 [word-break:break-word] whitespace-pre-wrap"
+                                    className="flex-center my-auto h-full w-full bg-cover bg-center bg-no-repeat p-2 transition duration-100 hover:brightness-90"
                                     style={{ backgroundImage: `url('${story.background_url}')` }}
                                 >
-                                    <p className="w-full max-w-full font-medium [word-break:break-word] whitespace-pre-wrap text-white">
+                                    <p className="line-clamp-4 w-full max-w-full truncate font-medium whitespace-pre-wrap text-white">
                                         {story.caption}
                                     </p>
                                 </div>
@@ -88,6 +88,7 @@ const StoryItem: React.FC<StoryItemProps> = ({ story }) => {
                         src={story.user.avatar}
                         className={cn('size-10', {
                             'border-primary border-4': !story.is_viewed,
+                            'border-4 border-zinc-300 dark:border-zinc-700': story.is_viewed,
                         })}
                     />
                 </div>

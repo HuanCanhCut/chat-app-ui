@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
+import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
 import Tippy from 'huanpenguin-tippy-react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
@@ -14,6 +15,7 @@ import { Button } from '~/components/ui/button'
 import UserAvatar from '~/components/UserAvatar'
 import config from '~/config'
 import SWRKey from '~/enum/SWRKey'
+import { listenEvent } from '~/helpers/events'
 import { selectCurrentUser } from '~/redux/selector'
 import { useAppSelector } from '~/redux/types'
 import * as storyServices from '~/services/storyService'
@@ -116,32 +118,6 @@ const Story: React.FC<StoryProps> = ({ uuid }) => {
             setReactions(currentStory.reactions)
         }
     }, [currentStory])
-
-    useEffect(() => {
-        const handler = async () => {
-            if (document.visibilityState === 'visible') {
-                if (currentStory?.type === 'video') {
-                    try {
-                        await videoRef.current?.play()
-                    } catch (_) {}
-                } else if (currentStory?.type === 'image' || currentStory?.type === 'text') {
-                    startImageProgress()
-                }
-            } else {
-                if (currentStory?.type === 'video') {
-                    videoRef.current?.pause()
-                }
-                stopProgress()
-            }
-        }
-
-        window.addEventListener('visibilitychange', handler)
-
-        return () => {
-            window.removeEventListener('visibilitychange', handler)
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [])
 
     const handleNextStory = useCallback(() => {
         if (!userStories) {
@@ -306,6 +282,45 @@ const Story: React.FC<StoryProps> = ({ uuid }) => {
         }
     }, [handleNextStory, handlePrevStory, isPlaying, router, startProgress, currentStory, startImageProgress])
 
+    useEffect(() => {
+        const handler = async () => {
+            if (document.visibilityState === 'visible') {
+                if (currentStory?.type === 'video') {
+                    try {
+                        await videoRef.current?.play()
+                    } catch (_) {}
+                } else if (currentStory?.type === 'image' || currentStory?.type === 'text') {
+                    startImageProgress()
+                }
+            } else {
+                if (currentStory?.type === 'video') {
+                    videoRef.current?.pause()
+                }
+                stopProgress()
+            }
+        }
+
+        window.addEventListener('visibilitychange', handler)
+
+        return () => {
+            window.removeEventListener('visibilitychange', handler)
+        }
+    }, [currentStory, startImageProgress])
+
+    useEffect(() => {
+        const remove = listenEvent('STORY:TOGGLE_PLAY', ({ isPlaying: shouldPlay }: { isPlaying: boolean }) => {
+            if (shouldPlay) {
+                videoRef.current?.play()
+                startProgress()
+            } else {
+                videoRef.current?.pause()
+                stopProgress()
+            }
+        })
+
+        return remove
+    }, [startProgress, isPlaying])
+
     return (
         <div className="relative flex max-h-dvh w-full flex-col items-center overflow-hidden rounded-md">
             {currentStory && (
@@ -355,10 +370,14 @@ const Story: React.FC<StoryProps> = ({ uuid }) => {
 
                                 <div className="mt-3 flex justify-between">
                                     <div className="flex items-center gap-2">
-                                        <UserAvatar src={currentStory.user.avatar} className="size-10" />
-                                        <p className="font-medium text-white dark:text-white">
-                                            {currentStory.user.full_name}
-                                        </p>
+                                        <Link href={`${config.routes.user}/@${currentStory.user.nickname}`}>
+                                            <UserAvatar src={currentStory.user.avatar} className="size-10" />
+                                        </Link>
+                                        <Link href={`${config.routes.user}/@${currentStory.user.nickname}`}>
+                                            <p className="font-medium text-white dark:text-white">
+                                                {currentStory.user.full_name}
+                                            </p>
+                                        </Link>
                                         <span className="text-sm text-white dark:text-white">
                                             {momentTimezone(currentStory.created_at)}
                                         </span>
@@ -467,7 +486,7 @@ const Story: React.FC<StoryProps> = ({ uuid }) => {
                                 <div className="absolute bottom-1 left-2">
                                     <p className="flex items-center gap-2">
                                         <span className="flex items-center gap-1">
-                                            {reactions.reverse().map((reaction) => {
+                                            {reactions.toReversed().map((reaction) => {
                                                 const react = reaction.react as BaseReactionUnified
 
                                                 const icon = iconMapping[react]

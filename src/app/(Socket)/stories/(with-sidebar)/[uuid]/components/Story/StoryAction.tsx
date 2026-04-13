@@ -9,6 +9,7 @@ import { toast } from 'sonner'
 
 import baseReactionMapping from '~/common/baseReactionIcon'
 import Emoji from '~/components/Emoji'
+import { sendEvent } from '~/helpers/events'
 import socket from '~/helpers/socket'
 import { cn } from '~/lib/utils'
 import * as conversationServices from '~/services/conversationService'
@@ -129,6 +130,14 @@ const StoryAction: React.FC<StoryActionProps> = ({ story, handleReactStory, conv
         }
     }
 
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value
+
+        sendEvent('STORY:TOGGLE_PLAY', { isPlaying: value.trim().length === 0 })
+
+        setMessage(value)
+    }
+
     return (
         <div className="flex w-full max-w-dvw items-center gap-3 overflow-x-scroll overflow-y-hidden px-3 pt-3 pb-1 sm:justify-center">
             <div className="relative">
@@ -149,7 +158,7 @@ const StoryAction: React.FC<StoryActionProps> = ({ story, handleReactStory, conv
                     placeholder="Gửi tin nhắn..."
                     onKeyDown={handleKeyDown}
                     value={message}
-                    onChange={(e) => setMessage(e.target.value)}
+                    onChange={handleChange}
                 />
                 {isFocused && (
                     <div className="absolute top-1/2 right-3 flex -translate-y-1/2 items-center gap-2">
@@ -202,11 +211,19 @@ const StoryAction: React.FC<StoryActionProps> = ({ story, handleReactStory, conv
                     'flex w-[300px] items-center gap-2 opacity-100 transition-all duration-200 ease-linear',
                     isFocused && 'w-0 overflow-hidden',
                 )}
+                onMouseEnter={() => {
+                    sendEvent('STORY:TOGGLE_PLAY', { isPlaying: false })
+                }}
+                onMouseLeave={() => {
+                    sendEvent('STORY:TOGGLE_PLAY', { isPlaying: true })
+                }}
             >
                 {Object.entries(iconMapping).map(([key, value]) => (
-                    <div
+                    <motion.div
                         key={key}
                         className="cursor-pointer"
+                        whileHover={{ scale: 1.15 }}
+                        whileTap={{ scale: 1 }}
                         onClick={(e) => {
                             const rect = e.currentTarget.getBoundingClientRect()
 
@@ -218,7 +235,7 @@ const StoryAction: React.FC<StoryActionProps> = ({ story, handleReactStory, conv
                         }}
                     >
                         {value}
-                    </div>
+                    </motion.div>
                 ))}
             </div>
 

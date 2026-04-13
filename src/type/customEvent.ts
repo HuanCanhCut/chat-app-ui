@@ -24,6 +24,7 @@ interface AppEvents {
     'MESSAGE:REPLY': { message: MessageModel }
     'CONVERSATION:OPEN-MODAL': { type: 'theme' }
     'STORIES:CLOSE-MODAL': null
+    'STORY:TOGGLE_PLAY': { isPlaying: boolean }
 }
 
 export type { AppEvents }

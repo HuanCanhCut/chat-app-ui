@@ -104,7 +104,7 @@ const StoryList = () => {
                                     priority
                                 />
 
-                                <div className="dark:bg-dark-gray bg-light-gray relative flex h-12 flex-col items-center justify-end pb-1.5">
+                                <div className="dark:bg-dark-gray bg-light-gray relative flex h-12 shrink-0 flex-col items-center justify-end pb-1.5">
                                     <p className="text-sm font-medium">Tạo tin</p>
 
                                     <div className="bg-primary flex-center dark:border-dark-gray border-light-gray absolute top-0 right-1/2 size-10 translate-x-1/2 -translate-y-1/2 rounded-full border-4">
