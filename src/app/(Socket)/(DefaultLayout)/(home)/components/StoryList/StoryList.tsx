@@ -18,14 +18,20 @@ import SWRKey from '~/enum/SWRKey'
 import { selectCurrentUser } from '~/redux/selector'
 import * as storyServices from '~/services/storyService'
 
-const PER_PAGE = 10
+const LIMIT = 10
 
 const StoryList = () => {
     const currentUser = useSelector(selectCurrentUser)
 
-    const { data: stories, mutate } = useSWR([SWRKey.GET_STORIES], async () => {
-        return await storyServices.getStories({ page: 1, per_page: PER_PAGE })
-    })
+    const { data: stories, mutate } = useSWR(
+        [SWRKey.GET_STORIES],
+        async () => {
+            return await storyServices.getStories({ limit: LIMIT })
+        },
+        {
+            revalidateOnMount: true,
+        },
+    )
 
     const [showLeftScrollButton, setShowLeftScrollButton] = useState(false)
     const [showRightScrollButton, setShowRightScrollButton] = useState(true)
@@ -121,8 +127,8 @@ const StoryList = () => {
                                     next={async () => {
                                         try {
                                             const response = await storyServices.getStories({
-                                                page: stories.meta.pagination.current_page + 1,
-                                                per_page: PER_PAGE,
+                                                limit: LIMIT,
+                                                cursor: stories.meta.pagination.next_cursor,
                                             })
 
                                             const newData = {
@@ -142,12 +148,7 @@ const StoryList = () => {
                                         }
                                     }}
                                     className="flex gap-2 overflow-hidden!"
-                                    hasMore={
-                                        stories
-                                            ? stories?.meta.pagination.current_page <
-                                              stories?.meta.pagination.total_pages
-                                            : false
-                                    }
+                                    hasMore={stories.meta.pagination.has_next_page}
                                     scrollThreshold={0.8}
                                     loader={
                                         <div className="flex justify-center">

@@ -74,7 +74,7 @@ const StoryItem: React.FC<StoryItemProps> = ({ story }) => {
                                     className="flex-center my-auto h-full w-full bg-cover bg-center bg-no-repeat p-2 transition duration-100 hover:brightness-90"
                                     style={{ backgroundImage: `url('${story.background_url}')` }}
                                 >
-                                    <p className="line-clamp-4 w-full max-w-full truncate font-medium whitespace-pre-wrap text-white">
+                                    <p className="line-clamp-4 w-full max-w-full truncate text-center font-medium whitespace-pre-wrap text-white">
                                         {story.caption}
                                     </p>
                                 </div>

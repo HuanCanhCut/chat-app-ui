@@ -2,10 +2,12 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
+import { useRouter } from 'next/navigation'
 import { Image as ImageIcon, Video } from 'lucide-react'
 import { toast } from 'sonner'
 
 import Sidebar from './components/Sidebar'
+import config from '~/config'
 import handleApiError from '~/helpers/handleApiError'
 import uploadToCloudinary from '~/helpers/uploadToCloudinary'
 import Interaction from '~/layouts/Header/Interaction'
@@ -18,6 +20,8 @@ interface IFile extends File {
 }
 
 const CreateStoryPage = () => {
+    const router = useRouter()
+
     const [selectedType, setSelectedType] = useState<'text' | 'image' | 'video' | null>(null)
     const [selectedBackground, setSelectedBackground] = useState<string | null>(
         'https://res.cloudinary.com/dkmwrkngj/image/upload/v1775720869/64502458_318989065695201_361648744678031360_n_nnnwx0.jpg',
@@ -81,6 +85,8 @@ const CreateStoryPage = () => {
             toast.success('Story của bạn đã được tải lên thành công', {
                 id: toastId,
             })
+
+            router.push(config.routes.home)
         } catch (error) {
             if (toastId) {
                 handleApiError(error, undefined, toastId.toString())

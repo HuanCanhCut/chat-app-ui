@@ -1,20 +1,20 @@
-import { ResponsePagination } from '~/type/common.type'
+import { ResponseCursorPagination, ResponsePagination } from '~/type/common.type'
 import { BaseReactionUnified, ReactionModel } from '~/type/reaction.type'
 import { StoryModel, StoryWithReactions, UserViewedStoryModel } from '~/type/story.type'
 import { UserModel } from '~/type/user.type'
 import * as request from '~/utils/httpRequest'
 
 export const getStories = async ({
-    page,
-    per_page,
+    limit,
+    cursor,
 }: {
-    page: number
-    per_page: number
-}): Promise<ResponsePagination<StoryModel[]>> => {
+    limit: number
+    cursor?: string | null
+}): Promise<ResponseCursorPagination<StoryModel[]>> => {
     const response = await request.get('/stories', {
         params: {
-            page,
-            per_page,
+            limit,
+            cursor,
         },
     })
     return response.data

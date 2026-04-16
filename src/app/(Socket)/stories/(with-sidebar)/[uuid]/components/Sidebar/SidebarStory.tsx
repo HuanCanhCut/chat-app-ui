@@ -20,7 +20,7 @@ import { useAppSelector } from '~/redux/types'
 import * as storyServices from '~/services/storyService'
 import { StoryModel } from '~/type/story.type'
 
-const PER_PAGE = 12
+const LIMIT = 12
 
 interface SidebarStoryProps {
     isModal?: boolean
@@ -32,7 +32,7 @@ const SidebarStory: React.FC<SidebarStoryProps> = ({ isModal = false }) => {
     const currentUser = useAppSelector(selectCurrentUser)
 
     const { data: stories, mutate } = useSWR(SWRKey.GET_STORIES, () => {
-        return storyServices.getStories({ page: 1, per_page: PER_PAGE })
+        return storyServices.getStories({ limit: LIMIT })
     })
 
     const myStory = stories?.data?.find((story) => story.user.id === currentUser?.data?.id)
@@ -88,8 +88,8 @@ const SidebarStory: React.FC<SidebarStoryProps> = ({ isModal = false }) => {
                             }
 
                             const response = await storyServices.getStories({
-                                page: stories?.meta.pagination.current_page + 1,
-                                per_page: PER_PAGE,
+                                limit: LIMIT,
+                                cursor: stories?.meta.pagination.next_cursor,
                             })
 
                             mutate(
@@ -113,9 +113,7 @@ const SidebarStory: React.FC<SidebarStoryProps> = ({ isModal = false }) => {
                         }
                     }}
                     className="overflow-hidden!"
-                    hasMore={
-                        stories ? stories?.meta.pagination.current_page < stories?.meta.pagination.total_pages : false
-                    }
+                    hasMore={stories?.meta.pagination.has_next_page || false}
                     scrollThreshold={0.8}
                     loader={<Spinner className="mx-auto" />}
                     scrollableTarget="stories-scrollable"

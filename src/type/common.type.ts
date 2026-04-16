@@ -20,6 +20,23 @@ export interface MetaPagination {
     }
 }
 
+export interface MetaCursorPagination {
+    meta: {
+        pagination: {
+            limit: number
+            has_next_page: boolean
+            next_cursor: string | null
+        }
+        links: {
+            next: string | null
+        }
+    }
+}
+
 export interface ResponsePagination<T> extends MetaPagination {
+    data: T
+}
+
+export interface ResponseCursorPagination<T> extends MetaCursorPagination {
     data: T
 }
