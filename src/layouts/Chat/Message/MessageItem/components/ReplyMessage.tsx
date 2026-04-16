@@ -117,8 +117,8 @@ const ReplyMessage = ({ message, currentUser, memberMap, ref }: ReplyMessageProp
                                     text += 'Bạn'
                                 } else {
                                     text +=
-                                        memberMap[message.forward_origin.user.id].nickname ||
-                                        memberMap[message.forward_origin.user.id].user.full_name
+                                        memberMap[message.sender.id].nickname ||
+                                        memberMap[message.sender.id].user.full_name
                                 }
 
                                 text += ' đã trả lời tin của'
