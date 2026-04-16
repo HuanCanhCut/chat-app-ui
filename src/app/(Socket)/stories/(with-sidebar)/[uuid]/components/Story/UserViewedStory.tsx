@@ -11,6 +11,7 @@ import { Spinner } from '~/components/ui/spinner'
 import UserAvatar from '~/components/UserAvatar'
 import config from '~/config'
 import SWRKey from '~/enum/SWRKey'
+import { sendEvent } from '~/helpers/events'
 import * as storyServices from '~/services/storyService'
 import { BaseReactionUnified, ReactionModel } from '~/type/reaction.type'
 
@@ -42,6 +43,10 @@ const UserViewedStory: React.FC<UserViewedStoryProps> = ({ story_uuid }) => {
         setIsOpenDrawer(false)
     }, [story_uuid])
 
+    useEffect(() => {
+        sendEvent('STORY:TOGGLE_PLAY', { isPlaying: !isOpenDrawer })
+    }, [isOpenDrawer])
+
     return (
         <>
             {!isOpenDrawer ? (
@@ -49,8 +54,8 @@ const UserViewedStory: React.FC<UserViewedStoryProps> = ({ story_uuid }) => {
                     className="absolute bottom-2 left-3 flex cursor-pointer flex-col"
                     onClick={() => setIsOpenDrawer(!isOpenDrawer)}
                 >
-                    <ChevronUp />
-                    <p className="text-lg font-medium select-none">{totalViews} người xem</p>
+                    <ChevronUp className="text-white" />
+                    <p className="text-lg font-medium text-white select-none">{totalViews} người xem</p>
                     {totalViews > 0 && (
                         <UserAvatar src={userViewedStories?.data[0].user.avatar} size={24} className="mt-2" />
                     )}
@@ -70,7 +75,7 @@ const UserViewedStory: React.FC<UserViewedStoryProps> = ({ story_uuid }) => {
                     </div>
 
                     <ScrollArea className="h-0 flex-1 py-2" id="user_viewed_story_scrollable">
-                        <p className="text-muted-foreground flex items-center gap-2">
+                        <p className="flex items-center gap-2">
                             <Eye className="size-5" />
                             <span className="text-base font-medium">
                                 {userViewedStories?.meta.pagination.total} người xem

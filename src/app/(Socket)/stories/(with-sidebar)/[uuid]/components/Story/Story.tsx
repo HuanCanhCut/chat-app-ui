@@ -26,7 +26,7 @@ import { momentTimezone } from '~/utils/moment'
 
 const iconMapping = baseReactionIcon(18)
 
-const PER_PAGE = 10
+const LIMIT = 10
 const IMAGE_DURATION = 5000
 
 interface StoryProps {
@@ -46,7 +46,7 @@ const Story: React.FC<StoryProps> = ({ uuid }) => {
     const elapsedRef = useRef(0)
 
     const { data: stories } = useSWR(SWRKey.GET_STORIES, () => {
-        return storyServices.getStories({ page: 1, per_page: PER_PAGE })
+        return storyServices.getStories({ limit: LIMIT })
     })
 
     const { data: userStories, error } = useSWR(
@@ -311,7 +311,12 @@ const Story: React.FC<StoryProps> = ({ uuid }) => {
         const remove = listenEvent('STORY:TOGGLE_PLAY', ({ isPlaying: shouldPlay }: { isPlaying: boolean }) => {
             if (shouldPlay) {
                 videoRef.current?.play()
-                startProgress()
+
+                if (currentStory?.type === 'image' || currentStory?.type === 'text') {
+                    startImageProgress()
+                } else {
+                    startProgress()
+                }
             } else {
                 videoRef.current?.pause()
                 stopProgress()
@@ -319,7 +324,7 @@ const Story: React.FC<StoryProps> = ({ uuid }) => {
         })
 
         return remove
-    }, [startProgress, isPlaying])
+    }, [startProgress, isPlaying, currentStory?.type, startImageProgress])
 
     return (
         <div className="relative flex max-h-dvh w-full flex-col items-center overflow-hidden rounded-md">
@@ -494,7 +499,7 @@ const Story: React.FC<StoryProps> = ({ uuid }) => {
                                                 return <React.Fragment key={reaction.id}>{icon}</React.Fragment>
                                             })}
                                         </span>
-                                        <span className="mr-1 line-clamp-1 truncate whitespace-pre-wrap">
+                                        <span className="mr-1 line-clamp-1 truncate whitespace-pre-wrap text-white">
                                             đã gửi cho {currentStory.user.full_name}
                                         </span>
                                     </p>
