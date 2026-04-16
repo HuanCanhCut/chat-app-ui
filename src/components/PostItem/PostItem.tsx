@@ -11,9 +11,10 @@ import { PostResponse } from '~/type/post.type'
 
 interface PostItemProps {
     post: PostResponse
+    isModal?: boolean
 }
 
-const PostItem = ({ post }: PostItemProps) => {
+const PostItem = ({ post, isModal = false }: PostItemProps) => {
     const mediaContainerRef = useRef<HTMLDivElement>(null)
 
     const captionRef = useRef<HTMLParagraphElement>(null)
@@ -81,7 +82,7 @@ const PostItem = ({ post }: PostItemProps) => {
             )}
 
             {post.post_media.length > 0 && (
-                <div className={cn('h-auto w-full overflow-hidden rounded-md')} ref={mediaContainerRef}>
+                <div className={cn('h-auto w-full overflow-hidden')} ref={mediaContainerRef}>
                     <MediaGrid
                         media={post.post_media.map((md) => {
                             return { url: md.media_url, type: md.media_type }
@@ -92,7 +93,7 @@ const PostItem = ({ post }: PostItemProps) => {
                 </div>
             )}
 
-            <PostAction post={post} />
+            <PostAction post={post} isModal={isModal} />
         </div>
     )
 }

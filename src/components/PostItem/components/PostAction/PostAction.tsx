@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react'
+import ReactModal from 'react-modal'
 import { motion } from 'framer-motion'
 import { MessageCircle, Send, ThumbsUp } from 'lucide-react'
 import { mutate } from 'swr'
@@ -6,16 +7,13 @@ import { Instance, Props } from 'tippy.js'
 
 import baseReactionIcon from '~/common/baseReactionIcon'
 import CustomTippy from '~/components/CustomTippy'
+import PostModal from '~/components/PostModal'
 import ReactionModal from '~/components/ReactionModal/ReactionModal'
 import SWRKey from '~/enum/SWRKey'
 import handleApiError from '~/helpers/handleApiError'
 import * as postService from '~/services/postService'
 import { GetPostResponse, PostResponse } from '~/type/post.type'
 import { BaseReactionUnified } from '~/type/reaction.type'
-
-interface PostActionProps {
-    post: PostResponse
-}
 
 const iconMapping = baseReactionIcon(36)
 
@@ -29,13 +27,19 @@ const reactionNameMapping: Record<keyof typeof iconMapping, string> = {
     '1f621': 'Giận',
 }
 
-const PostAction = ({ post }: PostActionProps) => {
+interface PostActionProps {
+    post: PostResponse
+    isModal?: boolean
+}
+
+const PostAction = ({ post, isModal = false }: PostActionProps) => {
     const reactionTippyRef = useRef<Instance<Props> | null>(null)
 
     const [openReactionModal, setOpenReactionModal] = useState({
         isOpen: false,
         postId: 0,
     })
+    const [openPostModal, setOpenPostModal] = useState(false)
 
     const handleReaction = async (unified?: BaseReactionUnified) => {
         try {
@@ -144,6 +148,47 @@ const PostAction = ({ post }: PostActionProps) => {
         )
     }
 
+    const handleOpenPostModal = () => {
+        if (!isModal) {
+            setOpenPostModal(true)
+        }
+    }
+
+    const handleClosePostModal = () => {
+        setOpenPostModal(false)
+    }
+
+    const handleMutatePost = async () => {
+        try {
+            const postResponse = await postService.getPostById({ postId: post.id })
+
+            // mutate post
+            mutate(SWRKey.GET_POSTS, (prev?: GetPostResponse) => {
+                if (!prev) {
+                    return prev
+                }
+
+                const newData = prev.data.map((currentPost: PostResponse) => {
+                    if (currentPost.id === post.id) {
+                        return {
+                            ...currentPost,
+                            ...postResponse,
+                        }
+                    }
+
+                    return currentPost
+                })
+
+                return {
+                    ...prev,
+                    data: newData,
+                }
+            })
+        } catch (_) {
+            //
+        }
+    }
+
     return (
         <>
             {openReactionModal.isOpen && (
@@ -154,6 +199,18 @@ const PostAction = ({ post }: PostActionProps) => {
                     reactionableType="Post"
                 />
             )}
+
+            <ReactModal
+                isOpen={openPostModal}
+                ariaHideApp={false}
+                overlayClassName={'overlay'}
+                closeTimeoutMS={200}
+                onRequestClose={handleClosePostModal}
+                className={'modal'}
+                onAfterClose={handleMutatePost}
+            >
+                <PostModal post={post} onClose={handleClosePostModal} />
+            </ReactModal>
 
             <div className="relative flex items-center justify-between">
                 {(post.top_reactions?.length || 0) > 0 && (
@@ -193,7 +250,10 @@ const PostAction = ({ post }: PostActionProps) => {
                 <div className="flex items-center gap-2">
                     {post.comment_count > 0 && (
                         <div className="flex cursor-pointer px-2 py-2 pb-0">
-                            <span className="text-muted-foreground ml-1 select-none hover:underline">
+                            <span
+                                className="text-muted-foreground ml-1 select-none hover:underline"
+                                onClick={handleOpenPostModal}
+                            >
                                 {post.comment_count} bình luận
                             </span>
                         </div>
@@ -253,7 +313,10 @@ const PostAction = ({ post }: PostActionProps) => {
                         )}
                     </button>
                 </CustomTippy>
-                <button className="flex-center text-muted-foreground flex-1 rounded-sm py-1 font-medium hover:bg-gray-100 dark:hover:bg-zinc-500/20">
+                <button
+                    className="flex-center text-muted-foreground flex-1 rounded-sm py-1 font-medium hover:bg-gray-100 dark:hover:bg-zinc-500/20"
+                    onClick={handleOpenPostModal}
+                >
                     <MessageCircle size={18} /> <span className="ml-2 select-none">Bình luận</span>
                 </button>
                 <button className="flex-center text-muted-foreground flex-1 rounded-sm py-1 font-medium hover:bg-gray-100 dark:hover:bg-zinc-500/20">

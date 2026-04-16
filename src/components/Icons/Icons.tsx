@@ -1164,3 +1164,28 @@ export const WowIcon = ({ width = 20, height = 20, className }: IconProps) => {
         </svg>
     )
 }
+
+/**
+ * Comment
+ */
+
+export const NoCommentIcon = ({ width = 112, height = 112, className }: IconProps) => {
+    const uid = useId().replace(/:/g, '')
+
+    return (
+        <svg viewBox="0 0 112 112" width={width} height={height} className={className}>
+            <defs>
+                <clipPath id={`${uid}_clip`}>
+                    <path fill="none" d="M94.38 98.59H21.51V11.18h44.55l28.32 23.45v63.96z"></path>
+                </clipPath>
+            </defs>
+            <g clipPath={`url(#${uid}_clip)`}>
+                <path fill="#bcc0c4" d="M94.38 98.59H21.51V11.18h44.55l28.32 23.45v63.96z"></path>
+                <path fill="#1876f2" d="M65.94 8.72h32.27v25.95H73a7 7 0 0 1-7-7V8.72h-.06z"></path>
+            </g>
+            <rect width="57.1" height="3.51" x="29.39" y="47.67" fill="#fff" rx="1.68"></rect>
+            <rect width="57.1" height="3.51" x="29.39" y="58.2" fill="#fff" rx="1.68"></rect>
+            <rect width="57.1" height="3.51" x="29.39" y="68.73" fill="#fff" rx="1.68"></rect>
+        </svg>
+    )
+}

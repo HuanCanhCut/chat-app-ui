@@ -73,6 +73,11 @@ enum SWRKey {
      */
 
     GET_POSTS = '/posts',
+
+    /**
+     * COMMENT
+     */
+    GET_POST_COMMENTS = '/posts/:postId/comments',
 }
 
 export default SWRKey
