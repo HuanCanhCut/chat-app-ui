@@ -70,7 +70,7 @@ const MessagePage = () => {
         return () => {
             socket.off('USER_STATUS', socketHandler)
         }
-    }, [conversation, conversation?.data, mutateConversation])
+    }, [conversation, mutateConversation])
 
     useEffect(() => {
         const remove = listenEvent('INFO:TOGGLE', ({ isOpen }) => {
