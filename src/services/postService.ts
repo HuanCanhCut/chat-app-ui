@@ -1,4 +1,4 @@
-import { GetPostResponse, PostModel } from '~/type/post.type'
+import { GetPostResponse, PostModel, PostResponse } from '~/type/post.type'
 import { BaseReactionUnified, ReactionModel } from '~/type/reaction.type'
 import * as request from '~/utils/httpRequest'
 
@@ -13,7 +13,7 @@ interface CreatePostData {
     }
 }
 
-export const createPost = async ({ postData }: CreatePostData) => {
+export const createPost = async ({ postData }: CreatePostData): Promise<{ data: PostResponse }> => {
     const response = await request.post('posts', postData)
     return response.data
 }

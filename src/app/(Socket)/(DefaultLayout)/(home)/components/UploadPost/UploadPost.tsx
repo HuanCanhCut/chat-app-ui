@@ -7,6 +7,7 @@ import HeadlessTippy from 'huanpenguin-tippy-react/headless'
 import { Earth, ImagesIcon, Smile } from 'lucide-react'
 import pMap from 'p-map'
 import { toast } from 'sonner'
+import { mutate } from 'swr'
 
 import BackgroundSelector from './BackgroundSelector'
 import Emoji from '~/components/Emoji'
@@ -17,6 +18,7 @@ import { Button } from '~/components/ui/button'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '~/components/ui/dialog'
 import { Textarea } from '~/components/ui/textarea'
 import UserAvatar from '~/components/UserAvatar'
+import SWRKey from '~/enum/SWRKey'
 import handleApiError from '~/helpers/handleApiError'
 import uploadToCloudinary from '~/helpers/uploadToCloudinary'
 import { cn } from '~/lib/utils'
@@ -24,6 +26,7 @@ import { selectCurrentUser } from '~/redux/selector'
 import { useAppSelector } from '~/redux/types'
 import * as cloudinaryService from '~/services/cloudinaryService'
 import * as postService from '~/services/postService'
+import { GetPostResponse } from '~/type/post.type'
 import { validateMedia } from '~/utils/validateMediaUpload'
 
 interface IFile extends File {
@@ -173,13 +176,30 @@ const UploadPost = () => {
                 postData['media'] = postMediaUrls
             }
 
-            await postService.createPost({ postData })
+            const response = await postService.createPost({ postData })
 
             toast.success('Đăng bài viết thành công!', {
                 id: toastId,
             })
 
             submitButtonRef.current?.setAttribute('disabled', 'true')
+
+            mutate(
+                SWRKey.GET_POSTS,
+                (prev: GetPostResponse | undefined) => {
+                    if (!prev) {
+                        return prev
+                    }
+
+                    return {
+                        ...prev,
+                        data: [response.data, ...prev.data],
+                    }
+                },
+                {
+                    revalidate: false,
+                },
+            )
         } catch (error) {
             handleApiError(error, undefined, toastId.toString())
         } finally {
