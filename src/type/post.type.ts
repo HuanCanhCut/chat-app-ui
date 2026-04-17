@@ -22,7 +22,7 @@ export interface PostMediaModel extends BaseModel {
 export interface PostResponse extends PostModel {
     user: UserModel
     post_media: PostMediaModel[]
-    top_reactions?: Pick<ReactionModel, 'reactionable_id'> & { react: BaseReactionUnified }[]
+    top_reactions?: (Pick<ReactionModel, 'reactionable_id'> & { react: BaseReactionUnified })[]
     reaction?: BaseReactionUnified // current user react to post
 }
 

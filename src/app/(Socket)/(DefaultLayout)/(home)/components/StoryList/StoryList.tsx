@@ -143,7 +143,7 @@ const StoryList = () => {
                                             }
 
                                             mutate(newData, false)
-                                        } catch (error) {
+                                        } catch (_) {
                                             toast.error('Lỗi khi tải thêm tin')
                                         }
                                     }}

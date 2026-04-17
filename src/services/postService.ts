@@ -55,7 +55,7 @@ export const getPostById = async ({
 }: {
     postId: number
 }): Promise<{
-    data: PostModel & { top_reactions?: Pick<ReactionModel, 'reactionable_id'> & { react: BaseReactionUnified }[] }
+    data: PostModel & { top_reactions?: (Pick<ReactionModel, 'reactionable_id'> & { react: BaseReactionUnified })[] }
 }> => {
     const response = await request.get(`posts/${postId}`)
     return response.data

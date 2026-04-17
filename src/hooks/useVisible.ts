@@ -8,7 +8,7 @@ interface Options {
 
 type TargetElementType = HTMLElement
 
-const useElementOnScreen = (options: Options, targetRef: RefObject<TargetElementType>) => {
+const useElementOnScreen = (options: Options, targetRef: RefObject<TargetElementType | null>) => {
     const [isVisible, setIsVisible] = useState(false)
 
     const callbackFunction = (entries: IntersectionObserverEntry[]) => {

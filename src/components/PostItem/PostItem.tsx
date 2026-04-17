@@ -45,7 +45,7 @@ const PostItem = ({ post, isModal = false }: PostItemProps) => {
             return `Hôm qua lúc ${date.format('HH:mm')}`
         }
 
-        return date.format('D [tháng] M [lúc] HH:mm')
+        return date.format('DD [tháng] MM, YYYY [lúc] HH:mm')
     }
 
     return (
