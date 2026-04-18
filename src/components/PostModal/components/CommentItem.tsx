@@ -2,21 +2,29 @@ import Link from 'next/link'
 import Tippy from 'huanpenguin-tippy-react'
 import { Ellipsis } from 'lucide-react'
 import moment from 'moment-timezone'
+import { KeyedMutator } from 'swr'
 
 import BaseReaction from '~/components/BaseReaction'
+import { reactionNameMapping } from '~/components/BaseReaction/BaseReaction'
 import TopReactions from '~/components/TopReactions'
 import { Button } from '~/components/ui/button'
 import UserAvatar from '~/components/UserAvatar'
 import config from '~/config'
+import handleApiError from '~/helpers/handleApiError'
+import * as postServices from '~/services/postService'
 import { CommentResponse } from '~/type/comment'
+import { ResponseCursorPagination } from '~/type/common.type'
+import { PostResponse } from '~/type/post.type'
 import { BaseReactionUnified } from '~/type/reaction.type'
 import { momentTimezone } from '~/utils/moment'
 
 interface CommentItemProps {
     comment: CommentResponse
+    mutateComments: KeyedMutator<ResponseCursorPagination<CommentResponse[]>>
+    post: PostResponse
 }
 
-const CommentItem: React.FC<CommentItemProps> = ({ comment }) => {
+const CommentItem: React.FC<CommentItemProps> = ({ comment, mutateComments, post }) => {
     const formatTime = (dateTime: Date): string => {
         const date = moment(dateTime)
         const now = moment()
@@ -32,8 +40,85 @@ const CommentItem: React.FC<CommentItemProps> = ({ comment }) => {
         return date.format('DD [tháng] MM, YYYY [lúc] HH:mm')
     }
 
+    /**
+     *
+     * @param unified: react comment
+     * @param undefined: unreact comment
+     */
+
     const handleReaction = async (unified?: BaseReactionUnified | undefined) => {
-        console.log('handleReaction')
+        try {
+            mutateComments(
+                (prev: ResponseCursorPagination<CommentResponse[]> | undefined) => {
+                    if (!prev) return prev
+
+                    const reactionCount = (unified?: BaseReactionUnified | undefined) => {
+                        if (unified) {
+                            if (!comment.react) {
+                                return comment.reaction_count + 1
+                            }
+                            return comment.reaction_count
+                        }
+                        return comment.reaction_count - 1
+                    }
+
+                    return {
+                        ...prev,
+                        data: prev.data.map((item) => {
+                            if (item.id === comment.id) {
+                                return {
+                                    ...item,
+                                    reaction_count: reactionCount(unified),
+                                    react: unified ?? null,
+                                }
+                            }
+                            return item
+                        }),
+                    }
+                },
+                {
+                    revalidate: false,
+                },
+            )
+
+            if (unified) {
+                await postServices.reactComment({
+                    commentId: comment.id,
+                    unified,
+                })
+            } else {
+                await postServices.unreactComment({
+                    commentId: comment.id,
+                })
+            }
+
+            const commentResponse = await postServices.getCommentById({ commentId: comment.id })
+
+            mutateComments(
+                (prev: ResponseCursorPagination<CommentResponse[]> | undefined) => {
+                    if (!prev) return prev
+
+                    return {
+                        ...prev,
+                        data: prev.data.map((item) => {
+                            if (item.id === comment.id) {
+                                return {
+                                    ...item,
+                                    top_reactions: commentResponse.data.top_reactions,
+                                    react: commentResponse.data.react,
+                                }
+                            }
+                            return item
+                        }),
+                    }
+                },
+                {
+                    revalidate: false,
+                },
+            )
+        } catch (error) {
+            handleApiError(error)
+        }
     }
 
     return (
@@ -70,8 +155,15 @@ const CommentItem: React.FC<CommentItemProps> = ({ comment }) => {
                     </Tippy>
 
                     <BaseReaction handleReaction={handleReaction}>
-                        <p className="text-mutated-for text-muted-foreground cursor-pointer text-xs font-semibold hover:underline">
-                            Thích
+                        <p
+                            className="text-mutated-for text-muted-foreground cursor-pointer text-xs font-semibold hover:underline"
+                            style={{
+                                color: comment.react
+                                    ? `var(--reaction-${reactionNameMapping[comment.react].type})`
+                                    : undefined,
+                            }}
+                        >
+                            {comment.react ? reactionNameMapping[comment.react].name : 'Thích'}
                         </p>
                     </BaseReaction>
 

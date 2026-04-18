@@ -5,6 +5,7 @@ import { mutate } from 'swr'
 
 import baseReactionIcon from '~/common/baseReactionIcon'
 import BaseReaction from '~/components/BaseReaction'
+import { reactionNameMapping } from '~/components/BaseReaction/BaseReaction'
 import PostModal from '~/components/PostModal'
 import TopReactions from '~/components/TopReactions'
 import SWRKey from '~/enum/SWRKey'
@@ -12,18 +13,6 @@ import handleApiError from '~/helpers/handleApiError'
 import * as postService from '~/services/postService'
 import { GetPostResponse, PostResponse } from '~/type/post.type'
 import { BaseReactionUnified } from '~/type/reaction.type'
-
-const iconMapping = baseReactionIcon(36)
-
-const reactionNameMapping: Record<keyof typeof iconMapping, string> = {
-    '1f44d': 'Thích',
-    '1f970': 'Thương thương',
-    '2764-fe0f': 'Yêu thích',
-    '1f602': 'Haha',
-    '1f62e': 'Wow',
-    '1f622': 'Buồn',
-    '1f621': 'Giận',
-}
 
 interface PostActionProps {
     post: PostResponse
@@ -214,7 +203,14 @@ const PostAction = ({ post, isModal = false }: PostActionProps) => {
                                     return (
                                         <>
                                             {icon}{' '}
-                                            <span className="ml-2 select-none">{reactionNameMapping[react]}</span>
+                                            <span
+                                                className={`ml-2 select-none`}
+                                                style={{
+                                                    color: `var(--reaction-${reactionNameMapping[react].type})`,
+                                                }}
+                                            >
+                                                {reactionNameMapping[react].name}
+                                            </span>
                                         </>
                                     )
                                 })()}

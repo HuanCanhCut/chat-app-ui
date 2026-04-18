@@ -14,6 +14,40 @@ interface BaseReactionProps {
     className?: string
 }
 
+export const reactionNameMapping: Record<
+    keyof typeof iconMapping,
+    { name: string; type: 'like' | 'support' | 'heart' | 'haha' | 'wow' | 'sad' | 'angry' }
+> = {
+    '1f44d': {
+        name: 'Thích',
+        type: 'like',
+    },
+    '1f970': {
+        name: 'Thương thương',
+        type: 'support',
+    },
+    '2764-fe0f': {
+        name: 'Yêu thích',
+        type: 'heart',
+    },
+    '1f602': {
+        name: 'Haha',
+        type: 'haha',
+    },
+    '1f62e': {
+        name: 'Wow',
+        type: 'wow',
+    },
+    '1f622': {
+        name: 'Buồn',
+        type: 'sad',
+    },
+    '1f621': {
+        name: 'Phẫn nộ',
+        type: 'angry',
+    },
+}
+
 const BaseReaction = ({ handleReaction, children, className = '' }: BaseReactionProps) => {
     const reactionTippyRef = useRef<Instance<Props> | null>(null)
 
@@ -30,8 +64,14 @@ const BaseReaction = ({ handleReaction, children, className = '' }: BaseReaction
                                 key={key}
                                 whileHover={{ scale: 1.2 }}
                                 initial={{ y: 20, opacity: 0 }}
-                                transition={{ duration: 0.1, delay: index * 0.02 }}
-                                whileInView={{ y: 0, opacity: 1 }}
+                                whileInView={{
+                                    y: 0,
+                                    opacity: 1,
+                                    transition: {
+                                        duration: 0.1,
+                                        delay: index * 0.02,
+                                    },
+                                }}
                                 onClick={() => {
                                     handleReaction(unified)
                                     // await while hover reaction tippy reset

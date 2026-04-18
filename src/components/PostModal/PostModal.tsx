@@ -85,7 +85,7 @@ const PostModal: React.FC<PostModalProps> = ({ post, onClose = () => {} }) => {
                         {comments?.data.map((comment) => {
                             return (
                                 <React.Fragment key={comment.id}>
-                                    <CommentItem comment={comment} />
+                                    <CommentItem comment={comment} mutateComments={mutate} post={post} />
                                 </React.Fragment>
                             )
                         })}

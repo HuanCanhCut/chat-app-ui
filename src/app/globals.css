@@ -295,6 +295,15 @@ body.ReactModal__Body--open {
     --sidebar-accent-foreground: oklch(0.205 0 0);
     --sidebar-border: oklch(0.922 0 0);
     --sidebar-ring: oklch(0.708 0 0);
+
+    /* Reaction */
+    --reaction-like: #3E93F8;
+    --reaction-support: #887000;
+    --reaction-heart: #DD2334;
+    --reaction-haha: #887000;
+    --reaction-wow: #887000;
+    --reaction-sad: #887000;
+    --reaction-angry: #DD2334;
 }
 
 .dark {
@@ -330,6 +339,15 @@ body.ReactModal__Body--open {
     --sidebar-accent-foreground: oklch(0.985 0 0);
     --sidebar-border: oklch(1 0 0 / 10%);
     --sidebar-ring: oklch(0.556 0 0);
+
+    /* Reaction */
+    --reaction-like: #3E93F8;
+    --reaction-support: #F9CF00;
+    --reaction-heart: #FF5757;
+    --reaction-haha: #F9CF00;
+    --reaction-wow: #F9CF00;
+    --reaction-sad: #F9CF00;
+    --reaction-angry: #FF5757;
 }
 
 /*
