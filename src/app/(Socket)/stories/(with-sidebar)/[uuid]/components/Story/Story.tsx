@@ -99,10 +99,10 @@ const Story: React.FC<StoryProps> = ({ uuid }) => {
 
     useEffect(() => {
         if (currentStory && !currentStory.is_viewed) {
-            ;(async () => {
+            ; (async () => {
                 try {
                     await storyServices.viewStory(currentStory.uuid)
-                } catch (_) {}
+                } catch (_) { }
             })()
         }
     }, [currentStory])
@@ -288,7 +288,7 @@ const Story: React.FC<StoryProps> = ({ uuid }) => {
                 if (currentStory?.type === 'video') {
                     try {
                         await videoRef.current?.play()
-                    } catch (_) {}
+                    } catch (_) { }
                 } else if (currentStory?.type === 'image' || currentStory?.type === 'text') {
                     startImageProgress()
                 }
@@ -418,7 +418,7 @@ const Story: React.FC<StoryProps> = ({ uuid }) => {
                                                         if (currentStory.type === 'video') {
                                                             try {
                                                                 videoRef.current?.play()
-                                                            } catch (_) {}
+                                                            } catch (_) { }
                                                         } else {
                                                             startImageProgress()
                                                         }

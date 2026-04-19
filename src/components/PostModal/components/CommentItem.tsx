@@ -125,7 +125,7 @@ const CommentItem: React.FC<CommentItemProps> = ({ comment, mutateComments, clas
 
     const handleLoadReplies = async () => {
         try {
-            const repliesComment = await commentServices.getPostComments({
+            const { data: repliesComment } = await commentServices.getPostComments({
                 postId: comment.post_id,
                 limit: 10,
                 parentId: comment.id,
@@ -135,17 +135,26 @@ const CommentItem: React.FC<CommentItemProps> = ({ comment, mutateComments, clas
                 (prev: ResponseCursorPagination<CommentResponse[]> | undefined) => {
                     if (!prev) return prev
 
-                    return {
-                        ...prev,
-                        data: prev.data.map((item) => {
-                            if (item.id === comment.id) {
+                    const addReplies = (comments: CommentResponse[], replies: CommentResponse[]): CommentResponse[] => {
+                        return comments.map((cmt) => {
+                            if (cmt.id === comment.id) {
                                 return {
-                                    ...item,
-                                    replies: repliesComment.data,
+                                    ...cmt,
+                                    replies: [...replies, ...(cmt.replies || [])],
                                 }
                             }
-                            return item
-                        }),
+
+                            if (cmt.replies && cmt.replies.length > 0) {
+                                return { ...cmt, replies: addReplies(cmt.replies, replies) }
+                            }
+
+                            return cmt
+                        })
+                    }
+
+                    return {
+                        ...prev,
+                        data: addReplies(prev.data, repliesComment),
                     }
                 },
                 {
@@ -162,11 +171,11 @@ const CommentItem: React.FC<CommentItemProps> = ({ comment, mutateComments, clas
             className={cn('relative flex items-start py-1', className)}
             {...props}
             style={{
-                marginLeft: `${level * 10}px`,
+                marginLeft: level && level < 3 ? '20px' : level >= 3 ? '-32px' : '',
             }}
         >
             {level > 0 && (
-                <div className="absolute top-0 -left-[26.5px] h-6 w-6 rounded-bl-xl border-b-2 border-l-2 border-zinc-500 dark:border-zinc-600"></div>
+                <div className="absolute top-0 -left-[36.5px] h-5 w-7 rounded-bl-lg border-b-2 border-l-2 border-zinc-500 dark:border-zinc-600"></div>
             )}
 
             <div className="relative flex flex-col items-center self-stretch">
@@ -175,7 +184,7 @@ const CommentItem: React.FC<CommentItemProps> = ({ comment, mutateComments, clas
                 </Link>
 
                 {/* Comment line */}
-                {comment.reply_count > 0 && (
+                {comment.reply_count > 0 && level < 2 && (
                     <div className="absolute top-[40px] bottom-6 left-0 w-[calc(50%+1px)] border-r-2 border-zinc-500 dark:border-zinc-600" />
                 )}
             </div>
@@ -237,7 +246,9 @@ const CommentItem: React.FC<CommentItemProps> = ({ comment, mutateComments, clas
 
                 {comment.reply_count > 0 && comment.reply_count > (comment.replies?.length || 0) && (
                     <div className="mt-1 flex items-center gap-1.5">
-                        <div className="absolute bottom-3 left-[15.5px] flex h-4 w-7 flex-col self-stretch rounded-bl-xl border-t-0 border-b-2 border-l-2 border-zinc-500 bg-transparent select-none dark:border-zinc-600"></div>
+                        {level < 2 && (
+                            <div className="absolute bottom-3 left-[15.5px] flex h-4 w-7 flex-col self-stretch rounded-bl-lg border-t-0 border-b-2 border-l-2 border-zinc-500 bg-transparent select-none dark:border-zinc-600"></div>
+                        )}
                         <p
                             className="text-mutated-for text-muted-foreground ml-4 cursor-pointer text-sm font-medium select-none hover:underline"
                             onClick={handleLoadReplies}
@@ -248,7 +259,7 @@ const CommentItem: React.FC<CommentItemProps> = ({ comment, mutateComments, clas
                 )}
 
                 {comment.replies && comment.replies.length > 0 && (
-                    <>
+                    <div className="mt-1.5">
                         {comment.replies.map((reply) => (
                             <CommentItem
                                 key={reply.id}
@@ -257,7 +268,7 @@ const CommentItem: React.FC<CommentItemProps> = ({ comment, mutateComments, clas
                                 level={level + 1}
                             />
                         ))}
-                    </>
+                    </div>
                 )}
             </div>
         </div>
