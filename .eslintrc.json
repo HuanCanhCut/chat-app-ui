@@ -1,26 +1,28 @@
 {
-    "extends": "next/core-web-vitals",
-    "plugins": ["simple-import-sort", "prettier"],
-    "rules": {
-        "simple-import-sort/imports": [
-            "warn",
-            {
-                "groups": [["^react", "^next", "^\\w"], ["^"]]
-            }
-        ],
-        "simple-import-sort/exports": "warn",
-        "no-fallthrough": "warn",
-        "prettier/prettier": [
-            "warn",
-            {
-                "tabWidth": 4,
-                "printWidth": 120,
-                "semi": false,
-                "singleQuote": true,
-                "arrowParens": "always",
-                "endOfLine": "auto",
-                "plugins": ["prettier-plugin-tailwindcss"]
-            }
-        ]
-    }
+  "extends": "next/core-web-vitals",
+  "plugins": ["simple-import-sort", "prettier"],
+  "ignorePatterns": ["node_modules/", ".next/", "out/", "dist/", "public/"],
+  "rules": {
+    "simple-import-sort/imports": [
+      "warn",
+      {
+        "groups": [["^react", "^next", "^\\w"], ["^"]]
+      }
+    ],
+    "simple-import-sort/exports": "warn",
+    "no-fallthrough": "warn",
+    "prettier/prettier": [
+      "warn",
+      {
+        "tabWidth": 4,
+        "printWidth": 120,
+        "semi": false,
+        "singleQuote": true,
+        "arrowParens": "always",
+        "endOfLine": "auto",
+        "plugins": ["prettier-plugin-tailwindcss"],
+        "ignorePath": ".prettierignore"
+      }
+    ]
+  }
 }

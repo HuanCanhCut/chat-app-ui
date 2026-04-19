@@ -1,4 +1,3 @@
-import { CommentResponse } from '~/type/comment'
 import { GetPostResponse, PostModel, PostResponse } from '~/type/post.type'
 import { BaseReactionUnified, ReactionModel } from '~/type/reaction.type'
 import * as request from '~/utils/httpRequest'
@@ -34,7 +33,11 @@ export const getPostById = async ({
 }: {
     postId: number
 }): Promise<{
-    data: PostModel & { top_reactions?: (Pick<ReactionModel, 'reactionable_id'> & { react: BaseReactionUnified })[] }
+    data: PostModel & {
+        top_reactions?: (Pick<ReactionModel, 'reactionable_id'> & {
+            react: BaseReactionUnified
+        })[]
+    }
 }> => {
     const response = await request.get(`posts/${postId}`)
     return response.data
@@ -60,31 +63,4 @@ export const unreactPost = async ({ postId }: { postId: number }) => {
     } catch (error: any) {
         throw error
     }
-}
-
-export const reactComment = async ({ unified, commentId }: { commentId: number; unified: BaseReactionUnified }) => {
-    try {
-        const response = await request.post(`/comments/${commentId}/react`, {
-            unified,
-        })
-
-        return response.data
-    } catch (error: any) {
-        throw error
-    }
-}
-
-export const unreactComment = async ({ commentId }: { commentId: number }) => {
-    try {
-        const response = await request.del(`comments/${commentId}/unreact`)
-
-        return response.data
-    } catch (error: any) {
-        throw error
-    }
-}
-
-export const getCommentById = async ({ commentId }: { commentId: number }): Promise<{ data: CommentResponse }> => {
-    const response = await request.get(`/comments/${commentId}`)
-    return response.data
 }

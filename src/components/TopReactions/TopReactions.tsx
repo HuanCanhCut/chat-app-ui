@@ -39,26 +39,27 @@ const TopReactions = ({ topReactions, reactionCount, reactionableType, className
                         })
                     }
                 >
-                    {topReactions?.map((reaction, index) => {
-                        const icon = baseReactionIcon(18)[reaction.react]
+                    <div className="flex items-center">
+                        {topReactions?.map((reaction, index) => {
+                            const icon = baseReactionIcon(18)[reaction.react]
 
-                        return (
-                            <div
-                                key={index}
-                                className="flex items-center justify-center rounded-full border-2 border-white dark:border-[#27292a]"
-                                style={{
-                                    marginLeft: index === 0 ? 0 : '-4px',
-                                    marginRight: index === topReactions!.length - 1 ? '-4px' : 0,
-                                    zIndex: topReactions!.length - index,
-                                }}
-                            >
-                                {icon}
-                            </div>
-                        )
-                    })}
+                            return (
+                                <div
+                                    key={index}
+                                    className="flex items-center justify-center rounded-full border-2 border-white dark:border-[#27292a]"
+                                    style={{
+                                        marginLeft: index === 0 ? 0 : '-4px',
+                                        zIndex: topReactions!.length - index,
+                                    }}
+                                >
+                                    {icon}
+                                </div>
+                            )
+                        })}
+                    </div>
 
                     {reactionCount > 0 && (
-                        <span className="text-muted-foreground mx-1.5 text-sm select-none group-hover:underline">
+                        <span className="text-muted-foreground mx-1 text-sm select-none group-hover:underline">
                             {reactionCount}
                         </span>
                     )}

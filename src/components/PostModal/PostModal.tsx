@@ -23,7 +23,7 @@ interface PostModalProps {
     onClose?: () => void
 }
 
-const PostModal: React.FC<PostModalProps> = ({ post, onClose = () => {} }) => {
+const PostModal: React.FC<PostModalProps> = ({ post, onClose = () => { } }) => {
     const { data: comments, mutate } = useSWR(post.id ? [SWRKey.GET_POST_COMMENTS, post.id] : null, () => {
         return commentService.getPostComments({ postId: post.id, limit: COMMENT_LIMIT })
     })
@@ -85,7 +85,7 @@ const PostModal: React.FC<PostModalProps> = ({ post, onClose = () => {} }) => {
                         {comments?.data.map((comment) => {
                             return (
                                 <React.Fragment key={comment.id}>
-                                    <CommentItem comment={comment} mutateComments={mutate} post={post} />
+                                    <CommentItem comment={comment} mutateComments={mutate} />
                                 </React.Fragment>
                             )
                         })}

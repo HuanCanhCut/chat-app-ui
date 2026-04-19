@@ -16,4 +16,6 @@ export interface CommentResponse extends CommentModel {
     reaction_count: number
     top_reactions?: (Pick<ReactionModel, 'reactionable_id'> & { react: BaseReactionUnified })[]
     react: BaseReactionUnified | null
+    reply_count: number
+    replies?: CommentResponse[]
 }
