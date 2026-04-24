@@ -1,3 +1,4 @@
+import { CommentResponse } from './comment'
 import { MessageModel, UserModel } from './type'
 
 interface AppEvents {
@@ -25,6 +26,7 @@ interface AppEvents {
     'CONVERSATION:OPEN-MODAL': { type: 'theme' }
     'STORIES:CLOSE-MODAL': null
     'STORY:TOGGLE_PLAY': { isPlaying: boolean }
+    'COMMENT:NEW': { comment: CommentResponse }
 }
 
 export type { AppEvents }

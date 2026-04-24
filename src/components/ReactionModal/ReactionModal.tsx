@@ -41,7 +41,10 @@ const ReactionModal: React.FC<Props> = ({ isOpen, onClose, reactionableId, react
     const { data: reactionTypes, mutate: mutateReactionTypes } = useSWR(
         reactionableId ? [SWRKey.GET_REACTIONS, reactionableId] : null,
         () => {
-            return reactionServices.getReactionTypes({ reactionableId: reactionableId, reactionableType })
+            return reactionServices.getReactionTypes({
+                reactionableId: reactionableId,
+                reactionableType,
+            })
         },
         {
             revalidateOnMount: true,
@@ -206,10 +209,11 @@ const ReactionModal: React.FC<Props> = ({ isOpen, onClose, reactionableId, react
                     {tabs.map((tab) => (
                         <button
                             key={tab.type}
-                            className={`h-[60px] border-b-[3px] px-4 font-medium [&>img]:inline-flex ${tab.type !== 'all' ? 'text-xl' : ''} ${currentTab === tab.type
+                            className={`h-[60px] border-b-[3px] px-4 font-medium [&>img]:inline-flex ${tab.type !== 'all' ? 'text-xl' : ''} ${
+                                currentTab === tab.type
                                     ? 'border-primary text-primary'
                                     : 'rounded-lg border-transparent text-zinc-800 hover:bg-[#99999936] dark:text-zinc-400 dark:hover:bg-[#3e4141]'
-                                }`}
+                            }`}
                             onClick={() => handleChangeReaction(tab.type)}
                         >
                             <div className="flex h-full items-center">
@@ -243,7 +247,7 @@ const ReactionModal: React.FC<Props> = ({ isOpen, onClose, reactionableId, react
                         className="overflow-hidden!"
                         hasMore={
                             reactions &&
-                                reactions?.meta.pagination.current_page < reactions?.meta.pagination.total_pages
+                            reactions?.meta.pagination.current_page < reactions?.meta.pagination.total_pages
                                 ? true
                                 : false
                         }

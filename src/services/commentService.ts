@@ -51,3 +51,20 @@ export const getCommentById = async ({ commentId }: { commentId: number }): Prom
     const response = await request.get(`/comments/${commentId}`)
     return response.data
 }
+
+export const createComment = async ({
+    content,
+    postId,
+    parentId,
+}: {
+    content: string
+    postId: number
+    parentId?: number
+}): Promise<{ data: CommentResponse }> => {
+    const response = await request.post(`/comments/${postId}`, {
+        content,
+        parent_id: parentId || null,
+    })
+
+    return response.data
+}

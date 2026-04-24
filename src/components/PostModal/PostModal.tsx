@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { toast } from 'sonner'
 import useSWR from 'swr'
@@ -12,8 +12,11 @@ import CommentItem from './components/CommentItem'
 import { faSpinner, faXmark } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import SWRKey from '~/enum/SWRKey'
+import { listenEvent } from '~/helpers/events'
 import * as commentServices from '~/services/commentService'
 import * as commentService from '~/services/commentService'
+import { CommentResponse } from '~/type/comment'
+import { ResponseCursorPagination } from '~/type/common.type'
 import { PostResponse } from '~/type/post.type'
 
 const COMMENT_LIMIT = 15
@@ -23,10 +26,63 @@ interface PostModalProps {
     onClose?: () => void
 }
 
-const PostModal: React.FC<PostModalProps> = ({ post, onClose = () => { } }) => {
+const PostModal: React.FC<PostModalProps> = ({ post, onClose = () => {} }) => {
     const { data: comments, mutate } = useSWR(post.id ? [SWRKey.GET_POST_COMMENTS, post.id] : null, () => {
         return commentService.getPostComments({ postId: post.id, limit: COMMENT_LIMIT })
     })
+
+    useEffect(() => {
+        const remove = listenEvent('COMMENT:NEW', ({ comment }: { comment: CommentResponse }) => {
+            mutate(
+                (prev: ResponseCursorPagination<CommentResponse[]> | undefined) => {
+                    if (!prev) {
+                        return prev
+                    }
+
+                    // if comment is root comment
+                    if (!comment.parent_id) {
+                        return {
+                            ...prev,
+                            data: [comment, ...prev.data],
+                        }
+                    }
+                    //  if comment is child comment
+                    else {
+                        const addComment = (comments: CommentResponse[]): CommentResponse[] => {
+                            return comments.map((cmt): CommentResponse => {
+                                if (cmt.id === comment.parent_id) {
+                                    return {
+                                        ...cmt,
+                                        replies: [...(cmt.replies || []), comment],
+                                        reply_count: cmt.reply_count + 1,
+                                    }
+                                }
+
+                                if (cmt.replies && cmt.replies.length > 0) {
+                                    return {
+                                        ...cmt,
+                                        replies: addComment(cmt.replies),
+                                    }
+                                }
+
+                                return cmt
+                            })
+                        }
+
+                        return {
+                            ...prev,
+                            data: addComment(prev.data),
+                        }
+                    }
+                },
+                {
+                    revalidate: false,
+                },
+            )
+        })
+
+        return remove
+    }, [mutate])
 
     return (
         <PopperWrapper className="flex w-[650px] flex-col overflow-hidden">
@@ -93,7 +149,9 @@ const PostModal: React.FC<PostModalProps> = ({ post, onClose = () => { } }) => {
                 )}
             </div>
 
-            <CommentComposer post={post} />
+            <div className="px-3">
+                <CommentComposer post={post} />
+            </div>
         </PopperWrapper>
     )
 }
