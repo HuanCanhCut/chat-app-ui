@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { EmojiClickData } from 'emoji-picker-react'
 import Tippy from 'huanpenguin-tippy-react'
 import HeadlessTippy from 'huanpenguin-tippy-react/headless'
@@ -10,6 +10,7 @@ import { Textarea } from '~/components/ui/textarea'
 import UserAvatar from '~/components/UserAvatar'
 import { sendEvent } from '~/helpers/events'
 import handleApiError from '~/helpers/handleApiError'
+import useClickOutside from '~/hooks/useClickOutside'
 import { cn } from '~/lib/utils'
 import { selectCurrentUser } from '~/redux/selector'
 import { useAppSelector } from '~/redux/types'
@@ -25,8 +26,11 @@ interface CommentComposerProps {
 const CommentComposer: React.FC<CommentComposerProps> = ({ post, level = 0, parentCommentId = 0 }) => {
     const currentUser = useAppSelector(selectCurrentUser)
 
+    const containerRef = useRef<HTMLDivElement | null>(null)
+
     const [emojiOpen, setEmojiOpen] = useState<boolean>(false)
     const [value, setValue] = useState<string>('')
+    const [isShowActions, setIsShowActions] = useState(false)
 
     const handleToggleEmoji = () => {
         setEmojiOpen((prev) => {
@@ -65,27 +69,57 @@ const CommentComposer: React.FC<CommentComposerProps> = ({ post, level = 0, pare
         }
     }
 
+    useClickOutside(containerRef, () => {
+        setIsShowActions(false)
+    })
+
     return (
-        <div className="flex w-full items-center gap-3 py-4">
+        <div
+            className="relative flex w-full items-center gap-3 py-1"
+            style={{
+                paddingLeft: level && level < 3 ? '20px' : level >= 3 ? '-32px' : '',
+            }}
+            ref={containerRef}
+        >
+            {!!parentCommentId && (
+                <div
+                    className={cn(
+                        'bg-red absolute top-0 left-[-16.5px] h-6 w-8 rounded-bl-lg border-b-2 border-l-2 border-zinc-500 bg-transparent select-none dark:border-zinc-600',
+                        {
+                            'top-6 h-4': !!isShowActions,
+                        },
+                    )}
+                ></div>
+            )}
             <UserAvatar
                 src={currentUser?.data.avatar}
                 className={cn('size-8', {
                     'size-6': !!parentCommentId,
                 })}
             />
-
-            <div className="bg-white-gray dark:bg-dark-gray flex-1 rounded-2xl p-3 px-0 pb-1">
+            <div className="bg-white-gray dark:bg-dark-gray flex-1 overflow-hidden rounded-2xl py-2 pb-0">
                 <Textarea
-                    className="bg-white-gray dark:bg-dark-gray min-h-5 w-full resize-none rounded-none border-none p-0 px-3 pb-3 text-base shadow-none focus-visible:border-none focus-visible:ring-0 dark:border-none dark:shadow-none"
+                    className="bg-white-gray dark:bg-dark-gray min-h-5 w-full resize-none rounded-none border-none p-0 px-3 pb-2 text-base shadow-none focus-visible:border-none focus-visible:ring-0 dark:border-none dark:shadow-none"
                     placeholder={parentCommentId ? `Trả lời ${post.user.full_name}...` : 'Viết bình luận ...'}
                     value={value}
                     onChange={(e) => {
                         setValue(e.target.value)
                     }}
                     onKeyDown={handleKeydown}
+                    onFocus={() => {
+                        setIsShowActions(true)
+                    }}
                 />
 
-                <div className="text-muted-foreground flex w-full justify-between px-1">
+                <div
+                    className={cn(
+                        'text-muted-foreground flex w-full justify-between overflow-hidden px-1 transition-all duration-200 ease-linear',
+                        {
+                            'max-h-40 opacity-100': isShowActions,
+                            'max-h-0 opacity-0': !isShowActions,
+                        },
+                    )}
+                >
                     <HeadlessTippy
                         render={() => {
                             return (
@@ -99,6 +133,7 @@ const CommentComposer: React.FC<CommentComposerProps> = ({ post, level = 0, pare
                         offset={[0, 40]}
                         interactive
                         visible={emojiOpen}
+                        appendTo={document.body}
                     >
                         <Tippy content="Chọn biểu tượng cảm xúc">
                             <Button

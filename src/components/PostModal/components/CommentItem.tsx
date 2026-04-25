@@ -1,32 +1,45 @@
 import React from 'react'
 import Link from 'next/link'
 import Tippy from 'huanpenguin-tippy-react'
-import { Ellipsis } from 'lucide-react'
 import moment from 'moment-timezone'
 import { KeyedMutator } from 'swr'
 
+import CommentActions from './commentActions'
+import CommentComposer from './CommentComposer'
 import BaseReaction from '~/components/BaseReaction'
 import { reactionNameMapping } from '~/components/BaseReaction/BaseReaction'
 import TopReactions from '~/components/TopReactions'
-import { Button } from '~/components/ui/button'
 import UserAvatar from '~/components/UserAvatar'
 import config from '~/config'
 import handleApiError from '~/helpers/handleApiError'
 import { cn } from '~/lib/utils'
+import { selectCurrentUser } from '~/redux/selector'
+import { useAppSelector } from '~/redux/types'
 import * as commentServices from '~/services/commentService'
 import { CommentResponse } from '~/type/comment'
 import { ResponseCursorPagination } from '~/type/common.type'
+import { PostResponse } from '~/type/post.type'
 import { BaseReactionUnified } from '~/type/reaction.type'
 import { momentTimezone } from '~/utils/moment'
 
 interface CommentItemProps extends React.ComponentProps<'div'> {
     comment: CommentResponse
+    post: PostResponse
     mutateComments: KeyedMutator<ResponseCursorPagination<CommentResponse[]>>
     className?: string
     level?: number
 }
 
-const CommentItem: React.FC<CommentItemProps> = ({ comment, mutateComments, className = '', level = 0, ...props }) => {
+const CommentItem: React.FC<CommentItemProps> = ({
+    comment,
+    post,
+    mutateComments,
+    className = '',
+    level = 0,
+    ...props
+}) => {
+    const currentUser = useAppSelector(selectCurrentUser)
+
     const formatTime = (dateTime: Date): string => {
         const date = moment(dateTime)
         const now = moment()
@@ -185,12 +198,12 @@ const CommentItem: React.FC<CommentItemProps> = ({ comment, mutateComments, clas
 
                 {/* Comment line */}
                 {comment.reply_count > 0 && level < 2 && (
-                    <div className="absolute top-[40px] bottom-6 left-0 w-[calc(50%+1px)] border-r-2 border-zinc-500 dark:border-zinc-600" />
+                    <div className="absolute top-[40px] bottom-11 left-0 w-[calc(50%+1px)] border-r-2 border-zinc-500 dark:border-zinc-600" />
                 )}
             </div>
 
-            <div>
-                <div className="ml-3 flex items-center gap-1">
+            <div className="w-full">
+                <div className="group ml-3 flex items-center gap-1">
                     <div className="dark:bg-dark-gray bg-light-gray rounded-2xl px-3 py-2 text-wrap">
                         <Link href={`${config.routes.user}/@${comment.user.nickname}`}>
                             <p className="text-mutated-for cursor-pointer text-sm font-medium hover:underline">
@@ -201,13 +214,12 @@ const CommentItem: React.FC<CommentItemProps> = ({ comment, mutateComments, clas
                         <p className="text-[15px]">{comment.content}</p>
                     </div>
 
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        className="transition- rounded-full bg-transparent opacity-0 dark:bg-transparent"
-                    >
-                        <Ellipsis />
-                    </Button>
+                    {comment.user_id === currentUser?.data.id && (
+                        <CommentActions
+                            className="opacity-0 transition-opacity group-hover:opacity-100"
+                            comment={comment}
+                        />
+                    )}
                 </div>
                 <div className="mt-1 ml-4 flex items-center gap-3">
                     <Tippy content={formatTime(comment.created_at)}>
@@ -247,7 +259,7 @@ const CommentItem: React.FC<CommentItemProps> = ({ comment, mutateComments, clas
                 {comment.reply_count > 0 && comment.reply_count > (comment.replies?.length || 0) && (
                     <div className="mt-1 flex items-center gap-1.5">
                         {level < 2 && (
-                            <div className="absolute bottom-3 left-[15.5px] flex h-4 w-7 flex-col self-stretch rounded-bl-lg border-t-0 border-b-2 border-l-2 border-zinc-500 bg-transparent select-none dark:border-zinc-600"></div>
+                            <div className="absolute bottom-3 left-[15.5px] flex h-9 w-7 flex-col self-stretch rounded-bl-lg border-t-0 border-b-2 border-l-2 border-zinc-500 bg-transparent select-none dark:border-zinc-600"></div>
                         )}
                         <p
                             className="text-mutated-for text-muted-foreground ml-4 cursor-pointer text-sm font-medium select-none hover:underline"
@@ -266,8 +278,13 @@ const CommentItem: React.FC<CommentItemProps> = ({ comment, mutateComments, clas
                                 comment={reply}
                                 mutateComments={mutateComments}
                                 level={level + 1}
+                                post={post}
                             />
                         ))}
+
+                        {level + 1 < 3 && (
+                            <CommentComposer post={post} parentCommentId={comment.id} level={level + 1} />
+                        )}
                     </div>
                 )}
             </div>

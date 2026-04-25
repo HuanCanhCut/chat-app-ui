@@ -27,6 +27,7 @@ interface AppEvents {
     'STORIES:CLOSE-MODAL': null
     'STORY:TOGGLE_PLAY': { isPlaying: boolean }
     'COMMENT:NEW': { comment: CommentResponse }
+    'COMMENT:REMOVE': { commentId: number }
 }
 
 export type { AppEvents }

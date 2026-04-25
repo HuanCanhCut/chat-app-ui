@@ -19,7 +19,7 @@ const ChangeNicknameModal: React.FC = () => {
         return conversationServices.getConversationByUuid({ uuid: uuid as string })
     })
 
-    const inputRef = useRef<HTMLInputElement>(null)
+    const inputRef = useRef<HTMLInputElement | null>(null)
 
     const [nickname, setNickname] = useState<string>('')
     const [currentChange, setCurrentChange] = useState<ConversationMember | null>(null)

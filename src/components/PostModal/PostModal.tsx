@@ -84,6 +84,44 @@ const PostModal: React.FC<PostModalProps> = ({ post, onClose = () => {} }) => {
         return remove
     }, [mutate])
 
+    useEffect(() => {
+        const remove = listenEvent('COMMENT:REMOVE', ({ commentId }) => {
+            mutate(
+                (prev: ResponseCursorPagination<CommentResponse[]> | undefined) => {
+                    if (!prev) return prev
+
+                    const removeComment = (comments: CommentResponse[]): CommentResponse[] => {
+                        return comments
+                            .map((comment) => {
+                                if (comment.replies && comment.replies.length > 0) {
+                                    const filteredReplies = removeComment(comment.replies)
+                                    const removed = comment.replies.length - filteredReplies.length
+
+                                    return {
+                                        ...comment,
+                                        replies: filteredReplies,
+                                        reply_count: comment.reply_count - removed,
+                                    }
+                                }
+                                return comment
+                            })
+                            .filter((comment) => comment.id !== commentId)
+                    }
+
+                    return {
+                        ...prev,
+                        data: removeComment(prev.data),
+                    }
+                },
+                {
+                    revalidate: false,
+                },
+            )
+        })
+
+        return remove
+    }, [mutate])
+
     return (
         <PopperWrapper className="flex w-[650px] flex-col overflow-hidden">
             <header className="relative flex justify-center border-b border-gray-300 p-4 dark:border-zinc-700">
@@ -141,7 +179,7 @@ const PostModal: React.FC<PostModalProps> = ({ post, onClose = () => {} }) => {
                         {comments?.data.map((comment) => {
                             return (
                                 <React.Fragment key={comment.id}>
-                                    <CommentItem comment={comment} mutateComments={mutate} />
+                                    <CommentItem post={post} comment={comment} mutateComments={mutate} />
                                 </React.Fragment>
                             )
                         })}
@@ -149,7 +187,7 @@ const PostModal: React.FC<PostModalProps> = ({ post, onClose = () => {} }) => {
                 )}
             </div>
 
-            <div className="px-3">
+            <div className="p-3">
                 <CommentComposer post={post} />
             </div>
         </PopperWrapper>

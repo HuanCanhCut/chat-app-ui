@@ -68,3 +68,8 @@ export const createComment = async ({
 
     return response.data
 }
+
+export const deleteComment = async (commentId: number) => {
+    const response = await request.del(`/comments/${commentId}`)
+    return response.data
+}
