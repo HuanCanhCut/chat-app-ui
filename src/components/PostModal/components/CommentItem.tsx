@@ -4,7 +4,7 @@ import Tippy from 'huanpenguin-tippy-react'
 import moment from 'moment-timezone'
 import { KeyedMutator } from 'swr'
 
-import CommentActions from './commentActions'
+import CommentActions from './CommentActions'
 import CommentComposer from './CommentComposer'
 import BaseReaction from '~/components/BaseReaction'
 import { reactionNameMapping } from '~/components/BaseReaction/BaseReaction'
@@ -39,6 +39,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
     ...props
 }) => {
     const currentUser = useAppSelector(selectCurrentUser)
+    const [isReplying, setIsReplying] = React.useState(false)
 
     const formatTime = (dateTime: Date): string => {
         const date = moment(dateTime)
@@ -77,9 +78,8 @@ const CommentItem: React.FC<CommentItemProps> = ({
                         return comment.reaction_count - 1
                     }
 
-                    return {
-                        ...prev,
-                        data: prev.data.map((item) => {
+                    const updateReaction = (comments: CommentResponse[]): CommentResponse[] => {
+                        return comments.map((item) => {
                             if (item.id === comment.id) {
                                 return {
                                     ...item,
@@ -87,8 +87,22 @@ const CommentItem: React.FC<CommentItemProps> = ({
                                     react: unified ?? null,
                                 }
                             }
+
+                            // Recursive update nested replies
+                            if (item.replies && item.replies.length > 0) {
+                                return {
+                                    ...item,
+                                    replies: updateReaction(item.replies),
+                                }
+                            }
+
                             return item
-                        }),
+                        })
+                    }
+
+                    return {
+                        ...prev,
+                        data: updateReaction(prev.data),
                     }
                 },
                 {
@@ -113,9 +127,8 @@ const CommentItem: React.FC<CommentItemProps> = ({
                 (prev: ResponseCursorPagination<CommentResponse[]> | undefined) => {
                     if (!prev) return prev
 
-                    return {
-                        ...prev,
-                        data: prev.data.map((item) => {
+                    const updateFinalReaction = (comments: CommentResponse[]): CommentResponse[] => {
+                        return comments.map((item) => {
                             if (item.id === comment.id) {
                                 return {
                                     ...item,
@@ -123,8 +136,21 @@ const CommentItem: React.FC<CommentItemProps> = ({
                                     react: commentResponse.data.react,
                                 }
                             }
+
+                            if (item.replies && item.replies.length > 0) {
+                                return {
+                                    ...item,
+                                    replies: updateFinalReaction(item.replies),
+                                }
+                            }
+
                             return item
-                        }),
+                        })
+                    }
+
+                    return {
+                        ...prev,
+                        data: updateFinalReaction(prev.data),
                     }
                 },
                 {
@@ -197,7 +223,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
                 </Link>
 
                 {/* Comment line */}
-                {comment.reply_count > 0 && level < 2 && (
+                {((comment.reply_count > 0 && level < 2) || isReplying) && (
                     <div className="absolute top-[40px] bottom-11 left-0 w-[calc(50%+1px)] border-r-2 border-zinc-500 dark:border-zinc-600" />
                 )}
             </div>
@@ -242,7 +268,12 @@ const CommentItem: React.FC<CommentItemProps> = ({
                         </p>
                     </BaseReaction>
 
-                    <p className="text-mutated-for text-muted-foreground cursor-pointer text-xs font-medium select-none hover:underline">
+                    <p
+                        className="text-mutated-for text-muted-foreground cursor-pointer text-xs font-medium select-none hover:underline"
+                        onClick={() => {
+                            setIsReplying(true)
+                        }}
+                    >
                         Trả lời
                     </p>
 
@@ -282,10 +313,19 @@ const CommentItem: React.FC<CommentItemProps> = ({
                             />
                         ))}
 
-                        {level + 1 < 3 && (
+                        {level + 1 < 3 && !isReplying && (
                             <CommentComposer post={post} parentCommentId={comment.id} level={level + 1} />
                         )}
                     </div>
+                )}
+
+                {isReplying && (
+                    <CommentComposer
+                        post={post}
+                        parentCommentId={comment.id}
+                        level={level + 1}
+                        replyUser={comment.user}
+                    />
                 )}
             </div>
         </div>

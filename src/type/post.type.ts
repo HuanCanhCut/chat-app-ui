@@ -9,8 +9,6 @@ export interface PostModel extends BaseModel {
     reaction_count: number
     comment_count: number
     share_count: number
-    comments_count: number
-    reactions_count: number
 }
 
 export interface PostMediaModel extends BaseModel {

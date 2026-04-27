@@ -1,3 +1,4 @@
+import Conversation from './components/Conversation'
 import PostList from './components/PostList'
 import StoryList from './components/StoryList'
 import UploadPost from './components/UploadPost'
@@ -17,7 +18,7 @@ export default function Home() {
                     </div>
                 </div>
                 <div className="bp900:block col-span-3 hidden min-[1600px]:col-span-4!">
-                    <h2>hello</h2>
+                    <Conversation />
                 </div>
             </div>
         </>

@@ -79,6 +79,7 @@ const CommentActions: React.FC<CommentActionsProps> = ({ className, comment }) =
                                                 } catch (error) {
                                                     handleApiError(error)
 
+                                                    // Rollback if delete comment fail
                                                     sendEvent('COMMENT:NEW', { comment: commentData })
                                                 }
                                             })()
