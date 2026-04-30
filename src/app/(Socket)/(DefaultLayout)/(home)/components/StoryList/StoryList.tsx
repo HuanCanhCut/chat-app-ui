@@ -74,7 +74,7 @@ const StoryList = () => {
     return (
         <>
             {stories?.data.length ? (
-                <div className="relative">
+                <div className="relative overflow-hidden">
                     {showLeftScrollButton && (stories?.data.length || 0) > 0 && (
                         <Button
                             variant="ghost"
@@ -121,7 +121,7 @@ const StoryList = () => {
                         )}
 
                         {stories?.data && (
-                            <div className="flex items-center gap-2">
+                            <div className="flex max-w-25 items-center gap-2">
                                 <InfiniteScroll
                                     dataLength={stories.data.length}
                                     next={async () => {
@@ -148,6 +148,7 @@ const StoryList = () => {
                                         }
                                     }}
                                     className="flex gap-2 overflow-hidden!"
+                                    style={{ overflow: 'visible' }}
                                     hasMore={stories.meta.pagination.has_next_page}
                                     scrollThreshold={0.8}
                                     loader={

@@ -52,7 +52,7 @@ export default function Header() {
                     </Button>
                 </div>
 
-                <div className="hidden md:flex md:h-full md:items-center">
+                <div className="absolute left-1/2 hidden -translate-x-1/2 md:flex md:h-full md:items-center">
                     <Nav />
                 </div>
 
