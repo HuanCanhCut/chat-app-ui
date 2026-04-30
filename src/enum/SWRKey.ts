@@ -41,6 +41,7 @@ enum SWRKey {
     GET_CONVERSATIONS = '/conversations',
     GET_CONVERSATION_BY_UUID = '/conversations/:uuid',
     GET_HOME_CONVERSATION = '/conversations/home',
+    GET_PENGUIN_AI_CONVERSATION = '/conversations/penguin-ai',
 
     /**
      * Message

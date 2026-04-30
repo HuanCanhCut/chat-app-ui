@@ -246,7 +246,7 @@ const UploadPost = () => {
                                     suppressContentEditableWarning
                                     data-placeholder={`${currentUser?.data.full_name} ơi, bạn đang nghĩ gì thế?`}
                                     className={cn(
-                                        'flex-center mt-4 h-[300px] w-full rounded-md border-none px-4 text-center text-3xl leading-[300px] font-bold [word-break:break-word] outline-none',
+                                        'flex-center mt-4 h-75 w-full rounded-md border-none px-4 text-center text-3xl leading-75 font-bold [word-break:break-word] outline-none',
                                         {
                                             'leading-normal': caption,
                                         },
@@ -270,7 +270,7 @@ const UploadPost = () => {
                                     value={caption}
                                     onChange={(e) => setCaption(e.target.value)}
                                     className={cn(
-                                        'bg-light-gray mt-4 h-[300px] resize-none ring-0 placeholder:text-xl focus-visible:border-transparent focus-visible:ring-0',
+                                        'bg-light-gray mt-4 h-75 resize-none ring-0 placeholder:text-xl focus-visible:border-transparent focus-visible:ring-0',
                                         !caption && 'text-xl!',
                                         caption && 'text-base!',
                                         {

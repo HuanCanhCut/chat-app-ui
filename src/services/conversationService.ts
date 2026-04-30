@@ -181,3 +181,12 @@ export const createTempConversation = async ({ userId }: { userId: number }) => 
         throw error
     }
 }
+
+export const getPenguinAIConversation = async () => {
+    try {
+        const response = await request.get(`/conversations/penguin-ai`)
+        return response.data
+    } catch (error: any) {
+        throw error
+    }
+}
