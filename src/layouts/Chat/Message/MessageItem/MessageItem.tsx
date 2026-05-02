@@ -40,7 +40,11 @@ const MessageItem = ({ message, messageIndex, messages, currentUser, messageRef 
         return conversationServices.getConversationByUuid({ uuid: uuid as string })
     })
 
-    const options = { root: null, rootMargin: '0px', threshold: 0.5 }
+    const options = {
+        root: null,
+        rootMargin: '0px',
+        threshold: 0.01, // If the message is too long, setting the threshold too high will not work.
+    }
     const firstMessageRef = useRef<HTMLDivElement>(null)
     const isFirstMessageVisible: boolean = useVisible(options, firstMessageRef)
 
