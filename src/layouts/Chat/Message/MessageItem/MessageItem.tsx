@@ -319,7 +319,7 @@ const MessageItem = ({ message, messageIndex, messages, currentUser, messageRef 
                             </p>
                         )}
                     <div
-                        className={`relative flex w-full items-center ${message?.top_reactions?.length ? 'mb-[10px]' : ''} ${message.sender_id === currentUser?.id ? 'justify-end' : 'justify-start'}`}
+                        className={`relative flex w-full items-center ${message?.top_reactions?.length ? 'mb-2.5' : ''} ${message.sender_id === currentUser?.id ? 'justify-end' : 'justify-start'}`}
                     >
                         <ReplyMessage
                             message={message}

@@ -17,8 +17,6 @@ const LeftSidebar = () => {
         return conversationService.getPenguinAIConversation()
     })
 
-    console.log(penguinAI)
-
     return (
         <div className="pt-4">
             <Link href={`${config.routes.user}/@${currentUser?.data.nickname}`} className="flex items-center gap-2">

@@ -538,6 +538,50 @@ const Message: React.FC<MessageProps> = ({ conversation }) => {
         return remove
     }, [messages?.data, mutateMessages, offsetRange.end, uuid])
 
+    useEffect(() => {
+        const socketHandler = ({
+            message_id,
+            chunk,
+            conversation_uuid,
+        }: {
+            message_id: number
+            chunk: string
+            conversation_uuid: string
+        }) => {
+            if (conversation_uuid === uuid) {
+                mutateMessages(
+                    (prev) => {
+                        if (!prev) {
+                            return prev
+                        }
+
+                        const updatedData = prev.data.map((message) => {
+                            if (message.id === message_id) {
+                                return {
+                                    ...message,
+                                    content: message.content + chunk,
+                                }
+                            }
+                            return message
+                        })
+
+                        return {
+                            data: updatedData,
+                            meta: prev.meta,
+                        }
+                    },
+                    { revalidate: false },
+                )
+            }
+        }
+
+        socket.on('UPDATE_CHUNK_MESSAGE', socketHandler)
+
+        return () => {
+            socket.off('UPDATE_CHUNK_MESSAGE', socketHandler)
+        }
+    }, [mutateMessages, uuid])
+
     return (
         <div
             className={`relative grow overflow-hidden!`}
@@ -641,7 +685,7 @@ const Message: React.FC<MessageProps> = ({ conversation }) => {
                         <UserAvatar
                             src={conversation.is_group ? conversation.avatar : member?.user.avatar}
                             size={60}
-                            className="mx-auto h-[60px] w-[60px]"
+                            className="mx-auto h-15 w-15"
                         />
                         {conversation.is_group ? (
                             <p>{conversation.name}</p>

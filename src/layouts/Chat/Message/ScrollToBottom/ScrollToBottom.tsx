@@ -15,7 +15,7 @@ interface MessageRef {
 
 interface ScrollToBottomProps {
     offsetRange: { start: number; end: number }
-    scrollableRef: React.RefObject<HTMLDivElement>
+    scrollableRef: React.RefObject<HTMLDivElement | null>
     messageRefs: React.RefObject<MessageRef>
     PER_PAGE: number
     setOffsetRange: React.Dispatch<React.SetStateAction<{ start: number; end: number }>>
@@ -126,7 +126,7 @@ const ScrollToBottom = ({ offsetRange, scrollableRef, messageRefs, PER_PAGE, set
     return (
         <button
             ref={scrollToBottomRef}
-            className="flex-center absolute bottom-[-50px] left-1/2 z-50 h-9 w-9 -translate-x-1/2 cursor-pointer rounded-full bg-white shadow-lg transition-all duration-200 ease-linear dark:bg-[#46484b]"
+            className="flex-center absolute -bottom-12.5 left-1/2 z-50 h-9 w-9 -translate-x-1/2 cursor-pointer rounded-full bg-white shadow-lg transition-all duration-200 ease-linear dark:bg-[#46484b]"
             onClick={() => handleScrollToBottom()}
         >
             <FontAwesomeIcon icon={faArrowDown} width={22} height={22} />

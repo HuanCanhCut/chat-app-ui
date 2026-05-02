@@ -18,6 +18,7 @@ export interface UserModel extends BaseModel {
     is_online?: boolean
     last_online_at?: Date
     active_status: boolean
+    role: 'user' | 'bot' | 'admin'
     [key: string]: any
 }
 

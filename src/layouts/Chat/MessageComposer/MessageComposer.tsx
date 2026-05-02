@@ -1,6 +1,7 @@
 import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useParams } from 'next/navigation'
 import { Emoji as EmojiPicker, EmojiClickData, EmojiStyle } from 'emoji-picker-react'
+import { AnimatePresence, motion } from 'framer-motion'
 import Tippy from 'huanpenguin-tippy-react'
 import HeadlessTippy from 'huanpenguin-tippy-react/headless'
 import pMap from 'p-map'
@@ -13,6 +14,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Emoji from '~/components/Emoji'
 import { SendHorizontalIcon } from '~/components/Icons'
 import CustomImage from '~/components/Image/Image'
+import { Button } from '~/components/ui/button'
+import UserAvatar from '~/components/UserAvatar'
 import SWRKey from '~/enum/SWRKey'
 import { listenEvent, sendEvent } from '~/helpers/events'
 import socket from '~/helpers/socket'
@@ -23,6 +26,15 @@ import * as cloudinaryService from '~/services/cloudinaryService'
 import * as conversationServices from '~/services/conversationService'
 import { ConversationMember, MessageMedia, MessageModel } from '~/type/type'
 import { validateMedia } from '~/utils/validateMediaUpload'
+
+const MESSAGE_OPTIONS = [
+    {
+        id: 1,
+        value: 'penguin_ai',
+        description: 'Trợ lý AI',
+        avatar: 'https://res.cloudinary.com/dkmwrkngj/image/upload/v1759854156/dark-logo_e176mo.png',
+    },
+]
 
 interface InputMessageProps {
     className?: string
@@ -51,6 +63,7 @@ const InputMessage: React.FC<InputMessageProps> = () => {
     })
     const [media, setMedia] = useState<IFile[]>([])
     const [replyMessage, setReplyMessage] = useState<MessageModel | null>(null)
+    const [showMessageOptions, setShowMessageOptions] = useState(false)
 
     const memberMap = useMemo(() => {
         const member: ConversationMember[] = conversation?.data.members || []
@@ -268,30 +281,43 @@ const InputMessage: React.FC<InputMessageProps> = () => {
     }, [])
 
     const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-        // change height of textarea
+        const value = e.target.value
+
+        // resize textarea
         e.target.style.height = 'auto'
         e.target.style.height = e.target.scrollHeight + 'px'
 
+        //  detect @
+        const cursorPos = e.target.selectionStart
+        const textBeforeCursor = value.slice(0, cursorPos)
+
+        const match = textBeforeCursor.match(/(^|\s)@(\w*)$/)
+
+        if (match) {
+            setShowMessageOptions(true)
+        } else {
+            setShowMessageOptions(false)
+        }
+
+        // typing socket giữ nguyên
         if (currentUser?.data) {
-            // Only send when user enters the first letter, the following letters will not be sent.
-            if (messageValue.trim().length === 0 && e.target.value.trim().length > 0) {
+            if (messageValue.trim().length === 0 && value.trim().length > 0) {
                 socket.emit('MESSAGE_TYPING', {
                     conversation_uuid: uuid as string,
-                    user_id: currentUser?.data.id,
+                    user_id: currentUser.data.id,
                     is_typing: true,
                 })
             }
 
-            // Only send when user deletes all letters
-            if (e.target.value.trim().length === 0) {
+            if (value.trim().length === 0) {
                 socket.emit('MESSAGE_TYPING', {
                     conversation_uuid: uuid as string,
-                    user_id: currentUser?.data.id,
+                    user_id: currentUser.data.id,
                     is_typing: false,
                 })
             }
 
-            setMessageValue(e.target.value)
+            setMessageValue(value)
         }
     }
 
@@ -464,16 +490,60 @@ const InputMessage: React.FC<InputMessageProps> = () => {
                                 })}
                             </div>
                         )}
-                        <textarea
-                            className={`max-h-[140px] min-h-9 w-full resize-none rounded-3xl bg-(--receiver-light-background-color) px-4 py-1 pt-1.5 pr-12 text-(--receiver-light-text-color) outline-hidden dark:bg-(--receiver-dark-background-color) dark:text-(--receiver-dark-text-color) ${media.length && 'rounded-t-none'}`}
-                            value={messageValue}
-                            autoFocus
-                            onChange={handleInputChange}
-                            onKeyDown={handleTextareaKeyDown}
-                            rows={1}
-                            ref={textareaRef}
-                            spellCheck={false}
-                        />
+
+                        <div className="relative flex flex-1">
+                            <AnimatePresence>
+                                {showMessageOptions && (
+                                    <>
+                                        {MESSAGE_OPTIONS.map((messageOption) => {
+                                            return (
+                                                <motion.div
+                                                    key={messageOption.id}
+                                                    initial={{ opacity: 0, y: 10 }}
+                                                    animate={{ opacity: 1, y: 0 }}
+                                                    exit={{ opacity: 0, y: 10 }}
+                                                    transition={{ duration: 0.15 }}
+                                                    className="border-border bg-popover shadow-popover absolute bottom-full left-0 z-50 mb-2 w-52 rounded-lg border p-1 shadow-lg"
+                                                >
+                                                    <Button
+                                                        className="dark:hover:bg-dark hover:bg-light-gray flex w-full cursor-pointer items-center gap-2 rounded-md bg-transparent px-3 py-4 text-sm transition-colors dark:bg-transparent"
+                                                        variant={'ghost'}
+                                                        onClick={() => {
+                                                            setMessageValue((prev) => {
+                                                                return prev + 'penguin_ai '
+                                                            })
+
+                                                            textareaRef.current?.focus()
+                                                            setShowMessageOptions(false)
+                                                        }}
+                                                    >
+                                                        <UserAvatar
+                                                            size={22}
+                                                            src="https://res.cloudinary.com/dkmwrkngj/image/upload/v1759854156/dark-logo_e176mo.png"
+                                                        />
+                                                        <span className="font-medium">@penguin_ai</span>
+                                                        <span className="text-muted-foreground ml-auto text-[10px]">
+                                                            Trợ lý AI
+                                                        </span>
+                                                    </Button>
+                                                </motion.div>
+                                            )
+                                        })}
+                                    </>
+                                )}
+                            </AnimatePresence>
+
+                            <textarea
+                                className={`max-h-35 min-h-9 w-full resize-none rounded-3xl bg-(--receiver-light-background-color) px-4 py-1 pt-1.5 pr-12 text-(--receiver-light-text-color) outline-hidden dark:bg-(--receiver-dark-background-color) dark:text-(--receiver-dark-text-color) ${media.length && 'rounded-t-none'}`}
+                                value={messageValue}
+                                autoFocus
+                                onChange={handleInputChange}
+                                onKeyDown={handleTextareaKeyDown}
+                                rows={1}
+                                ref={textareaRef}
+                                spellCheck={false}
+                            />
+                        </div>
                     </div>
                     {/* show placeholder if messageValue is empty */}
                     {messageValue === '' && textareaRows() === 1 && (

@@ -23,7 +23,7 @@ const EmojiMessageStyle: React.FC<EmojiMessageStyleProps> = ({
     showLink = false,
 }) => {
     const highlight = (text: string) => {
-        const jsx: (string | JSX.Element)[] = []
+        const jsx: (string | React.JSX.Element)[] = []
 
         const regex = emojiRegex()
         let lastIndex = 0
@@ -65,7 +65,7 @@ const EmojiMessageStyle: React.FC<EmojiMessageStyleProps> = ({
     }
 
     return (
-        <p className="flex w-fit gap-1">
+        <p className="w-fit gap-1">
             {showLink ? <LinkHighlight className="underline">{highlight(text)}</LinkHighlight> : highlight(text)}
         </p>
     )

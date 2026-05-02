@@ -171,6 +171,21 @@ const MessageContent = ({
         }
     }, [message.content, message.type])
 
+    const handleCallAgain = () => {
+        const otherMember = conversation?.members?.find((member) => member.user_id !== currentUser?.id)
+
+        if (!otherMember) {
+            return
+        }
+
+        openWindowCall({
+            memberNickname: otherMember.user.nickname,
+            type: 'voice',
+            conversationUuid: uuid as string,
+            subType: 'caller',
+        })
+    }
+
     // message is revoked
     if (message.content === null) {
         return (
@@ -188,25 +203,10 @@ const MessageContent = ({
         )
     }
 
-    const handleCallAgain = () => {
-        const otherMember = conversation?.members?.find((member) => member.user_id !== currentUser?.id)
-
-        if (!otherMember) {
-            return
-        }
-
-        openWindowCall({
-            memberNickname: otherMember.user.nickname,
-            type: 'voice',
-            conversationUuid: uuid as string,
-            subType: 'caller',
-        })
-    }
-
     switch (message.type) {
         case 'text':
             return (
-                <div className={`relative ${linkPreview?.image ? 'w-full max-w-[300px]' : 'w-fit max-w-[80%]'} `}>
+                <div className={`relative ${linkPreview?.image ? 'w-full max-w-75' : 'w-fit max-w-[80%]'} `}>
                     <div
                         ref={combinedRef}
                         className={`rounded-3xl px-4 py-1.5 font-normal [word-break:break-word] whitespace-pre-wrap ${linkPreview && 'rounded-br-none rounded-bl-none'} ${
@@ -216,11 +216,24 @@ const MessageContent = ({
                         } ${consecutiveMessageStyle()}`}
                     >
                         <span className="max-w-fit wrap-break-word">
-                            <EmojiMessageStyle
-                                text={message.content}
-                                showLink={true}
-                                className="[&>#emoji-message]:inline-flex [&>#emoji-message]:align-middle"
-                            />
+                            {message.sender.role === 'bot' && message.content === '' ? (
+                                <div className="flex items-center gap-2">
+                                    <div className="inline-block rounded-3xl bg-(--receiver-light-background-color) dark:bg-(--receiver-dark-background-color)">
+                                        <div className="typing">
+                                            <div className="dot"></div>
+                                            <div className="dot"></div>
+                                            <div className="dot"></div>
+                                        </div>
+                                    </div>
+                                    <p>AI đang suy nghĩ</p>
+                                </div>
+                            ) : (
+                                <EmojiMessageStyle
+                                    text={message.content.trim()}
+                                    showLink={true}
+                                    className="[&>#emoji-message]:inline-flex [&>#emoji-message]:align-middle"
+                                />
+                            )}
                         </span>
                     </div>
                     {linkPreview && (
@@ -281,9 +294,7 @@ const MessageContent = ({
                                                     src={media.media_url || ''}
                                                     alt="message"
                                                     className={`h-full w-full cursor-pointer rounded-md object-cover object-center ${
-                                                        count === 1
-                                                            ? 'max-h-[260px] min-w-[180px]'
-                                                            : 'aspect-square max-h-[250px]'
+                                                        count === 1 ? 'max-h-65 min-w-45' : 'aspect-square max-h-62.5'
                                                     }`}
                                                     priority
                                                     quality={100}
@@ -301,9 +312,7 @@ const MessageContent = ({
                                                 <video
                                                     src={media.media_url || ''}
                                                     className={`h-full w-full cursor-pointer rounded-md object-cover object-center ${
-                                                        count === 1
-                                                            ? 'max-h-[260px] min-w-[180px]'
-                                                            : 'aspect-square max-h-[250px]'
+                                                        count === 1 ? 'max-h-65 min-w-45' : 'aspect-square max-h-62.5'
                                                     }`}
                                                     controls
                                                     onClick={() =>
@@ -331,7 +340,7 @@ const MessageContent = ({
                 <div
                     ref={combinedRef}
                     className={
-                        'w-[200px] rounded-2xl bg-(--reply-message-light-background-color) p-3 dark:bg-(--reply-message-dark-background-color)'
+                        'w-50 rounded-2xl bg-(--reply-message-light-background-color) p-3 dark:bg-(--reply-message-dark-background-color)'
                     }
                 >
                     <div className="flex items-center gap-2">
