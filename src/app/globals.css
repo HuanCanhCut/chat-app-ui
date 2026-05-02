@@ -297,13 +297,13 @@ body.ReactModal__Body--open {
     --sidebar-ring: oklch(0.708 0 0);
 
     /* Reaction */
-    --reaction-like: #3E93F8;
+    --reaction-like: #3e93f8;
     --reaction-support: #887000;
-    --reaction-heart: #DD2334;
+    --reaction-heart: #dd2334;
     --reaction-haha: #887000;
     --reaction-wow: #887000;
     --reaction-sad: #887000;
-    --reaction-angry: #DD2334;
+    --reaction-angry: #dd2334;
 }
 
 .dark {
@@ -341,13 +341,13 @@ body.ReactModal__Body--open {
     --sidebar-ring: oklch(0.556 0 0);
 
     /* Reaction */
-    --reaction-like: #3E93F8;
-    --reaction-support: #F9CF00;
-    --reaction-heart: #FF5757;
-    --reaction-haha: #F9CF00;
-    --reaction-wow: #F9CF00;
-    --reaction-sad: #F9CF00;
-    --reaction-angry: #FF5757;
+    --reaction-like: #3e93f8;
+    --reaction-support: #f9cf00;
+    --reaction-heart: #ff5757;
+    --reaction-haha: #f9cf00;
+    --reaction-wow: #f9cf00;
+    --reaction-sad: #f9cf00;
+    --reaction-angry: #ff5757;
 }
 
 /*

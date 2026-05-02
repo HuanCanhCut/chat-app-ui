@@ -1,7 +1,8 @@
-import { LegacyRef, useEffect, useState } from 'react'
+import { LegacyRef, useEffect, useRef, useState } from 'react'
 import Markdown from 'react-markdown'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
+import remarkGfm from 'remark-gfm'
 
 import Reaction from './Reaction'
 import Button from '~/components/Button'
@@ -61,6 +62,7 @@ const MessageContent = ({
     const { uuid } = useParams()
 
     const [linkPreview, setLinkPreview] = useState<LinkPreviewModel | null>(null)
+    const fetchedLinksRef = useRef<Set<string>>(new Set())
 
     const combinedRef = (el: HTMLDivElement) => {
         if (messageIndex === 0) {
@@ -149,27 +151,30 @@ const MessageContent = ({
     }
 
     useEffect(() => {
-        if (message.type !== 'text') {
+        if (message.type !== 'text') return
+
+        const linkMatch = message.content?.match(linkRegex)
+        if (!linkMatch) {
             return
         }
 
-        const linkMatch = message.content?.match(linkRegex)
+        const link = linkMatch[0]
 
-        if (linkMatch) {
-            const link = linkMatch[0]
-
-            ;(async () => {
-                try {
-                    const response = await messageServices.getLinkPreview({ urls: [link] })
-
-                    if (response && response.data[0].success) {
-                        setLinkPreview(response.data[0])
-                    }
-                } catch (error) {
-                    console.log(error)
-                }
-            })()
+        if (fetchedLinksRef.current.has(link)) {
+            return
         }
+
+        fetchedLinksRef.current.add(link)
+        ;(async () => {
+            try {
+                const response = await messageServices.getLinkPreview({ urls: [link] })
+                if (response && response.data[0].success) {
+                    setLinkPreview(response.data[0])
+                }
+            } catch (error) {
+                console.log(error)
+            }
+        })()
     }, [message.content, message.type])
 
     const handleCallAgain = () => {
@@ -233,11 +238,27 @@ const MessageContent = ({
                              */
                             message.sender.role === 'bot' ? (
                                 <Markdown
+                                    remarkPlugins={[remarkGfm]} // adds support for footnotes, strikethrough, tables, tasklists and URLs directly
                                     components={{
                                         strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
+                                        table: ({ children }) => (
+                                            <table className="w-full border-collapse border border-(--receiver-light-text-color) text-sm dark:border-(--receiver-dark-text-color)">
+                                                {children}
+                                            </table>
+                                        ),
+                                        th: ({ children }) => (
+                                            <th className="border border-(--receiver-light-text-color) px-3 py-2 text-left font-semibold dark:border-(--receiver-dark-text-color)">
+                                                {children}
+                                            </th>
+                                        ),
+                                        td: ({ children }) => (
+                                            <td className="border border-(--receiver-light-text-color) px-3 py-2 dark:border-(--receiver-dark-text-color)">
+                                                {children}
+                                            </td>
+                                        ),
                                     }}
                                 >
-                                    {message.content}
+                                    {message.content.replace(/\n{3,}/g, '\n\n')}
                                 </Markdown>
                             ) : (
                                 /**

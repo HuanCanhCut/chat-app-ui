@@ -121,15 +121,7 @@ const Conversations = () => {
     }, [conversations, mutateConversations])
 
     useEffect(() => {
-        const socketHandler = ({
-            user_id,
-            is_online,
-            last_online_at,
-        }: {
-            user_id: number
-            is_online: boolean
-            last_online_at: string | null
-        }) => {
+        const socketHandler = ({ user_id, is_online }: { user_id: number; is_online: boolean }) => {
             if (conversationUserMap[user_id]) {
                 if (!conversations?.data) {
                     return
@@ -414,6 +406,63 @@ const Conversations = () => {
 
         return remove
     }, [conversations, mutateConversations])
+
+    useEffect(() => {
+        const socketHandler = ({
+            message_id,
+            chunk,
+            conversation_uuid,
+        }: {
+            message_id: number
+            chunk: string
+            conversation_uuid: string
+        }) => {
+            mutateConversations(
+                (prev) => {
+                    if (!prev) {
+                        return prev
+                    }
+
+                    /**
+                     * Get conversation with last_message id = message_id
+                     */
+                    const conversation = Object.values(prev.data).find(
+                        (conversation) => conversation.last_message.id === message_id,
+                    )
+
+                    const conversationUuid = conversation?.uuid
+
+                    if (!conversationUuid) {
+                        return prev
+                    }
+
+                    const updatedData = {
+                        ...prev,
+                        data: {
+                            ...prev.data,
+                            [conversationUuid]: {
+                                ...conversation,
+                                last_message: {
+                                    ...conversation?.last_message,
+                                    content: conversation?.last_message?.content + chunk,
+                                },
+                            },
+                        },
+                    }
+                    return updatedData
+                },
+                {
+                    revalidate: false,
+                },
+            )
+        }
+
+        socket.on('UPDATE_CHUNK_MESSAGE', socketHandler)
+
+        return () => {
+            socket.off('UPDATE_CHUNK_MESSAGE', socketHandler)
+        }
+    }, [mutateConversations])
 
     useEffect(() => {
         const socketHandler = (data: ConversationModel) => {
