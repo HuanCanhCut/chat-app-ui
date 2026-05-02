@@ -41,6 +41,7 @@
         "react-infinite-scroll-component": "^6.1.0",
         "react-linkify": "^1.0.0-alpha",
         "react-loading-skeleton": "^3.5.0",
+        "react-markdown": "^10.1.0",
         "react-modal": "^3.16.3",
         "react-redux": "^9.2.0",
         "redux": "^5.0.1",

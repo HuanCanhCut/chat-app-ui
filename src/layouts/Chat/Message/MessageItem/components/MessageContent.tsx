@@ -1,4 +1,5 @@
 import { LegacyRef, useEffect, useState } from 'react'
+import Markdown from 'react-markdown'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 
@@ -227,7 +228,21 @@ const MessageContent = ({
                                     </div>
                                     <p>AI đang suy nghĩ</p>
                                 </div>
+                            ) : /**
+                             * Sender is bot, use react markdown with custom style
+                             */
+                            message.sender.role === 'bot' ? (
+                                <Markdown
+                                    components={{
+                                        strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
+                                    }}
+                                >
+                                    {message.content}
+                                </Markdown>
                             ) : (
+                                /**
+                                 * sender is user
+                                 */
                                 <EmojiMessageStyle
                                     text={message.content.trim()}
                                     showLink={true}

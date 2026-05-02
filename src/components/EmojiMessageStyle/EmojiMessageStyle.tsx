@@ -1,6 +1,5 @@
 import React from 'react'
-import { Emoji } from 'emoji-picker-react'
-import { EmojiStyle } from 'emoji-picker-react'
+import { Emoji, EmojiStyle } from 'emoji-picker-react'
 import emojiRegex from 'emoji-regex'
 
 import LinkHighlight from '../LinkHighlight'
