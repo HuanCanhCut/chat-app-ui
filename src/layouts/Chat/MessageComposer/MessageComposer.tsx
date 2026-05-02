@@ -20,6 +20,7 @@ import SWRKey from '~/enum/SWRKey'
 import { listenEvent, sendEvent } from '~/helpers/events'
 import socket from '~/helpers/socket'
 import uploadToCloudinary from '~/helpers/uploadToCloudinary'
+import { cn } from '~/lib/utils'
 import { selectCurrentUser } from '~/redux/selector'
 import { useAppSelector } from '~/redux/types'
 import * as cloudinaryService from '~/services/cloudinaryService'
@@ -64,6 +65,7 @@ const InputMessage: React.FC<InputMessageProps> = () => {
     const [media, setMedia] = useState<IFile[]>([])
     const [replyMessage, setReplyMessage] = useState<MessageModel | null>(null)
     const [showMessageOptions, setShowMessageOptions] = useState(false)
+    const [selectedOptionIndex, setSelectedOptionIndex] = useState(-1)
 
     const memberMap = useMemo(() => {
         const member: ConversationMember[] = conversation?.data.members || []
@@ -297,6 +299,7 @@ const InputMessage: React.FC<InputMessageProps> = () => {
             setShowMessageOptions(true)
         } else {
             setShowMessageOptions(false)
+            setSelectedOptionIndex(-1)
         }
 
         // typing socket giữ nguyên
@@ -324,10 +327,71 @@ const InputMessage: React.FC<InputMessageProps> = () => {
     const handleTextareaKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
         e.stopPropagation()
 
+        /**
+         * handle keydown when showMessageOptions is true
+         * - ArrowUp: move up
+         * - ArrowDown: move down
+         * - Enter: select option
+         * - Escape: close menu
+         */
+        if (showMessageOptions) {
+            if (e.key === 'ArrowUp') {
+                e.preventDefault()
+                setSelectedOptionIndex((prev) => (prev <= 0 ? MESSAGE_OPTIONS.length - 1 : prev - 1))
+                return
+            }
+
+            if (e.key === 'ArrowDown') {
+                e.preventDefault()
+                setSelectedOptionIndex((prev) => (prev >= MESSAGE_OPTIONS.length - 1 ? 0 : prev + 1))
+                return
+            }
+
+            if (e.key === 'Enter' && selectedOptionIndex >= 0) {
+                e.preventDefault()
+                const selectedOption = MESSAGE_OPTIONS[selectedOptionIndex]
+                handleSelectOption(selectedOption)
+                return
+            }
+
+            if (e.key === 'Escape') {
+                setShowMessageOptions(false)
+                setSelectedOptionIndex(-1)
+                return
+            }
+        }
+
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault()
             handleEmitMessage(uuid as string)
         }
+    }
+
+    const handleSelectOption = (messageOption: (typeof MESSAGE_OPTIONS)[number]) => {
+        if (!textareaRef.current) return
+
+        const value = textareaRef.current.value
+        const cursorPos = textareaRef.current.selectionStart
+        const textBefore = value.slice(0, cursorPos)
+        const textAfter = value.slice(cursorPos)
+
+        const mentionMatch = textBefore.match(/@\w*$/)
+        const newTextBefore = mentionMatch
+            ? textBefore.slice(0, mentionMatch.index) + `@${messageOption.value} `
+            : textBefore + `@${messageOption.value} `
+
+        const newValue = newTextBefore + textAfter
+        setMessageValue(newValue)
+
+        setTimeout(() => {
+            if (!textareaRef.current) return
+            const newCursor = newTextBefore.length
+            textareaRef.current.setSelectionRange(newCursor, newCursor)
+            textareaRef.current.focus()
+        }, 0)
+
+        setShowMessageOptions(false)
+        setSelectedOptionIndex(-1)
     }
 
     const textareaRows = () => {
@@ -506,15 +570,51 @@ const InputMessage: React.FC<InputMessageProps> = () => {
                                                     className="border-border bg-popover shadow-popover absolute bottom-full left-0 z-50 mb-2 w-52 rounded-lg border p-1 shadow-lg"
                                                 >
                                                     <Button
-                                                        className="dark:hover:bg-dark hover:bg-light-gray flex w-full cursor-pointer items-center gap-2 rounded-md bg-transparent px-3 py-4 text-sm transition-colors dark:bg-transparent"
-                                                        variant={'ghost'}
+                                                        className={cn(
+                                                            'dark:hover:bg-dark hover:bg-light-gray flex w-full cursor-pointer items-center gap-2 rounded-md bg-transparent px-3 py-4 text-sm transition-colors dark:bg-transparent',
+                                                            selectedOptionIndex ===
+                                                                MESSAGE_OPTIONS.indexOf(messageOption)
+                                                                ? 'bg-light-gray dark:bg-dark'
+                                                                : '',
+                                                        )}
                                                         onClick={() => {
-                                                            setMessageValue((prev) => {
-                                                                return prev + 'penguin_ai '
-                                                            })
+                                                            if (!textareaRef.current) return
 
-                                                            textareaRef.current?.focus()
+                                                            const value = textareaRef.current.value
+                                                            const cursorPos = textareaRef.current.selectionStart
+                                                            const textBefore = value.slice(0, cursorPos)
+                                                            const textAfter = value.slice(cursorPos)
+
+                                                            const mentionMatch = textBefore.match(/@\w*$/)
+                                                            /**
+                                                             * if match, remove @mention and add @value
+                                                             * if not match, add @value
+                                                             */
+                                                            const newTextBefore = mentionMatch
+                                                                ? textBefore.slice(0, mentionMatch.index) +
+                                                                  `@${messageOption.value} `
+                                                                : textBefore + `@${messageOption.value} `
+
+                                                            const newValue = newTextBefore + textAfter
+                                                            setMessageValue(newValue)
+
+                                                            /**
+                                                             * reset cursor to after @mention
+                                                             * need setTimeout to wait for re-render
+                                                             */
+                                                            setTimeout(() => {
+                                                                if (!textareaRef.current) return
+                                                                const newCursor = newTextBefore.length
+
+                                                                textareaRef.current.setSelectionRange(
+                                                                    newCursor,
+                                                                    newCursor,
+                                                                )
+                                                                textareaRef.current.focus()
+                                                            }, 0)
+
                                                             setShowMessageOptions(false)
+                                                            setSelectedOptionIndex(-1)
                                                         }}
                                                     >
                                                         <UserAvatar
