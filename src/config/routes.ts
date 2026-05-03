@@ -1,6 +1,7 @@
 interface Routes {
     home: string
     user: string
+    user_friends: string
     auth: string
     message: string
     create_story: string
@@ -11,6 +12,7 @@ interface Routes {
 export const routes: Routes = {
     home: '/',
     user: '/user',
+    user_friends: '/user/:nickname/friends',
     auth: '/auth',
     message: '/message',
     create_story: '/stories/create',
