@@ -3,7 +3,8 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
 import Tippy from 'huanpenguin-tippy-react'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Ellipsis } from 'lucide-react'
+import { toast } from 'sonner'
 import useSWR from 'swr'
 
 import StoryAction from './StoryAction'
@@ -11,11 +12,23 @@ import UserViewedStory from './UserViewedStory'
 import { faPause, faPlay, faVolumeHigh, faVolumeMute } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import baseReactionIcon from '~/common/baseReactionIcon'
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from '~/components/ui/alert-dialog'
 import { Button } from '~/components/ui/button'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '~/components/ui/dropdown-menu'
 import UserAvatar from '~/components/UserAvatar'
 import config from '~/config'
 import SWRKey from '~/enum/SWRKey'
-import { listenEvent } from '~/helpers/events'
+import { listenEvent, sendEvent } from '~/helpers/events'
+import handleApiError from '~/helpers/handleApiError'
 import { selectCurrentUser } from '~/redux/selector'
 import { useAppSelector } from '~/redux/types'
 import * as storyServices from '~/services/storyService'
@@ -45,16 +58,20 @@ const Story: React.FC<StoryProps> = ({ uuid }) => {
     const isAnimatingRef = useRef(false)
     const elapsedRef = useRef(0)
 
+    const [isShowDeleteDialog, setIsShowDeleteDialog] = useState(false)
+    const [isShowStoryAction, setIsShowStoryAction] = useState(false)
+
     const { data: stories } = useSWR(SWRKey.GET_STORIES, () => {
         return storyServices.getStories({ limit: LIMIT })
     })
 
-    const { data: userStories, error } = useSWR(
-        uuid || params.uuid ? [SWRKey.GET_USER_STORIES, uuid || params.uuid] : null,
-        () => {
-            return storyServices.getUserStories(uuid || (params.uuid as string))
-        },
-    )
+    const {
+        data: userStories,
+        mutate: mutateUserStory,
+        error,
+    } = useSWR(uuid || params.uuid ? [SWRKey.GET_USER_STORIES, uuid || params.uuid] : null, () => {
+        return storyServices.getUserStories(uuid || (params.uuid as string))
+    })
 
     const [currentStory, setCurrentStory] = useState<StoryWithReactions | null>(null)
     const [isMuted, setIsMuted] = useState(false)
@@ -307,8 +324,8 @@ const Story: React.FC<StoryProps> = ({ uuid }) => {
         }
     }, [currentStory?.type, startImageProgress])
 
-    useEffect(() => {
-        const remove = listenEvent('STORY:TOGGLE_PLAY', ({ isPlaying: shouldPlay }: { isPlaying: boolean }) => {
+    const togglePlayStory = useCallback(
+        ({ isPlaying: shouldPlay }: { isPlaying: boolean }) => {
             if (shouldPlay) {
                 videoRef.current?.play()
 
@@ -321,10 +338,49 @@ const Story: React.FC<StoryProps> = ({ uuid }) => {
                 videoRef.current?.pause()
                 stopProgress()
             }
-        })
+        },
+        [currentStory?.type, startImageProgress, startProgress],
+    )
+
+    useEffect(() => {
+        const remove = listenEvent('STORY:TOGGLE_PLAY', togglePlayStory)
 
         return remove
-    }, [startProgress, isPlaying, currentStory?.type, startImageProgress])
+    }, [togglePlayStory])
+
+    useEffect(() => {
+        togglePlayStory({ isPlaying: !isShowStoryAction })
+    }, [togglePlayStory, isShowStoryAction])
+
+    const handleDeleteStory = async () => {
+        try {
+            if (currentStory) {
+                await storyServices.deleteStory({ uuid: currentStory.uuid })
+
+                mutateUserStory(
+                    (prev) => {
+                        if (!prev) {
+                            return prev
+                        }
+
+                        const updatedData = prev.data.filter((story) => story.uuid !== currentStory.uuid)
+
+                        return {
+                            ...prev,
+                            data: updatedData,
+                        }
+                    },
+                    {
+                        revalidate: false,
+                    },
+                )
+
+                toast.success('Xóa story thành công')
+            }
+        } catch (error) {
+            handleApiError(error)
+        }
+    }
 
     return (
         <div className="relative flex max-h-dvh w-full flex-col items-center overflow-hidden rounded-md">
@@ -432,6 +488,49 @@ const Story: React.FC<StoryProps> = ({ uuid }) => {
                                                 )}
                                             </button>
                                         </Tippy>
+
+                                        {currentUser?.data.id === currentStory.user.id && (
+                                            <>
+                                                <DropdownMenu onOpenChange={(isOpen) => setIsShowStoryAction(isOpen)}>
+                                                    <DropdownMenuTrigger asChild>
+                                                        <button className="flex items-start bg-transparent p-0 outline-none dark:bg-transparent">
+                                                            <Ellipsis />
+                                                        </button>
+                                                    </DropdownMenuTrigger>
+                                                    <DropdownMenuContent>
+                                                        <DropdownMenuItem
+                                                            onClick={() => {
+                                                                setIsShowDeleteDialog(true)
+                                                            }}
+                                                        >
+                                                            Xóa story
+                                                        </DropdownMenuItem>
+                                                    </DropdownMenuContent>
+                                                </DropdownMenu>
+
+                                                <AlertDialog
+                                                    open={isShowDeleteDialog}
+                                                    onOpenChange={setIsShowDeleteDialog}
+                                                >
+                                                    <AlertDialogContent>
+                                                        <AlertDialogHeader>
+                                                            <AlertDialogTitle>
+                                                                Bạn có chắc chắn muốn xóa story này không?
+                                                            </AlertDialogTitle>
+                                                            <AlertDialogDescription>
+                                                                Hành động này không thể hoàn tác
+                                                            </AlertDialogDescription>
+                                                        </AlertDialogHeader>
+                                                        <AlertDialogFooter>
+                                                            <AlertDialogCancel>Hủy</AlertDialogCancel>
+                                                            <AlertDialogAction onClick={handleDeleteStory}>
+                                                                Xóa
+                                                            </AlertDialogAction>
+                                                        </AlertDialogFooter>
+                                                    </AlertDialogContent>
+                                                </AlertDialog>
+                                            </>
+                                        )}
                                     </div>
                                 </div>
                             </div>

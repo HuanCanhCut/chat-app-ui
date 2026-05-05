@@ -86,3 +86,8 @@ export const getUserViewedStories = async ({
     })
     return response.data
 }
+
+export const deleteStory = async ({ uuid }: { uuid: string }) => {
+    const response = await request.del(`/stories/${uuid}`)
+    return response.data
+}
