@@ -123,7 +123,7 @@ const PostModal: React.FC<PostModalProps> = ({ post, onClose = () => {} }) => {
     }, [mutate])
 
     return (
-        <PopperWrapper className="flex w-[650px] flex-col overflow-hidden">
+        <PopperWrapper className="flex w-162.5 flex-col overflow-hidden">
             <header className="relative flex justify-center border-b border-gray-300 p-4 dark:border-zinc-700">
                 <h3 className="text-xl font-semibold">{`Bình luận của ${post.user.full_name}`}</h3>
                 <Button buttonType="icon" onClick={onClose} className="absolute top-1/2 right-3 -translate-y-1/2">

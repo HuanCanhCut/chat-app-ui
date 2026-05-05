@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react'
+import React, { useEffect } from 'react'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { toast } from 'sonner'
 import { KeyedMutator } from 'swr'
@@ -8,6 +8,7 @@ import { KeyedMutator } from 'swr'
 import PostItem from '../../../../../../components/PostItem/PostItem'
 import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { listenEvent } from '~/helpers/events'
 import * as postService from '~/services/postService'
 import { GetPostResponse } from '~/type/post.type'
 
@@ -19,6 +20,21 @@ interface PostListProps {
 }
 
 const PostList: React.FC<PostListProps> = ({ posts, mutatePost }) => {
+    useEffect(() => {
+        const remove = listenEvent('POST:DELETE', ({ postId }) => {
+            mutatePost((prev: GetPostResponse | undefined) => {
+                if (!prev) return prev
+
+                return {
+                    ...prev,
+                    data: prev.data.filter((post) => post.id !== postId),
+                }
+            })
+        })
+
+        return remove
+    }, [mutatePost])
+
     return (
         <div>
             {posts?.data && (

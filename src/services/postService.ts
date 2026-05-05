@@ -82,3 +82,13 @@ export const unreactPost = async ({ postId }: { postId: number }) => {
         throw error
     }
 }
+
+export const deletePost = async ({ postId }: { postId: number }) => {
+    try {
+        const response = await request.del(`posts/${postId}`)
+
+        return response.data
+    } catch (error: any) {
+        throw error
+    }
+}

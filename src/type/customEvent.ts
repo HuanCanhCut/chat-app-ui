@@ -28,6 +28,7 @@ interface AppEvents {
     'STORY:TOGGLE_PLAY': { isPlaying: boolean }
     'COMMENT:NEW': { comment: CommentResponse }
     'COMMENT:REMOVE': { commentId: number }
+    'POST:DELETE': { postId: number }
 }
 
 export type { AppEvents }

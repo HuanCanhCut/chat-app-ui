@@ -1,12 +1,31 @@
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
+import { Ellipsis } from 'lucide-react'
 import moment from 'moment-timezone'
+import { toast } from 'sonner'
 
 import PostAction from './components/PostAction/PostAction'
 import MediaGrid from '~/components/MediaGrid'
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from '~/components/ui/alert-dialog'
+import { Button } from '~/components/ui/button'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '~/components/ui/dropdown-menu'
 import UserAvatar from '~/components/UserAvatar'
 import config from '~/config'
+import { sendEvent } from '~/helpers/events'
+import handleApiError from '~/helpers/handleApiError'
 import { cn } from '~/lib/utils'
+import { selectCurrentUser } from '~/redux/selector'
+import { useAppSelector } from '~/redux/types'
+import * as postServices from '~/services/postService'
 import { PostResponse } from '~/type/post.type'
 
 interface PostItemProps {
@@ -15,11 +34,15 @@ interface PostItemProps {
 }
 
 const PostItem = ({ post, isModal = false }: PostItemProps) => {
+    const currentUser = useAppSelector(selectCurrentUser)
+
     const mediaContainerRef = useRef<HTMLDivElement>(null)
 
     const captionRef = useRef<HTMLParagraphElement>(null)
     const [expanded, setExpanded] = useState(false)
     const [shouldClamp, setShouldClamp] = useState(false)
+
+    const [isShowConfirmModal, setIsShowConfirmModal] = useState(false)
 
     useEffect(() => {
         if (captionRef.current) {
@@ -48,8 +71,59 @@ const PostItem = ({ post, isModal = false }: PostItemProps) => {
         return date.format('DD [tháng] MM, YYYY [lúc] HH:mm')
     }
 
+    const handleDeletePost = async () => {
+        try {
+            await postServices.deletePost({ postId: post.id })
+
+            toast.success('Xóa bài viết thành công')
+
+            sendEvent('POST:DELETE', { postId: post.id })
+        } catch (error) {
+            handleApiError(error)
+        }
+    }
+
     return (
-        <div className="rounded-lg bg-white dark:bg-[#27292a]">
+        <div className="relative rounded-lg bg-white dark:bg-[#27292a]">
+            {currentUser?.data.id === post.user_id && (
+                <>
+                    <DropdownMenu modal={false}>
+                        <DropdownMenuTrigger asChild>
+                            <Button
+                                variant="ghost"
+                                className="absolute top-4 right-4 z-10 border-none bg-transparent ring-0 focus-visible:ring-0 dark:bg-transparent"
+                            >
+                                <Ellipsis />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                            <DropdownMenuItem
+                                onClick={() => {
+                                    setIsShowConfirmModal(true)
+                                }}
+                            >
+                                Xóa bài viết
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+
+                    <AlertDialog open={isShowConfirmModal} onOpenChange={setIsShowConfirmModal}>
+                        <AlertDialogContent>
+                            <AlertDialogHeader>
+                                <AlertDialogTitle>Bạn có chắc chắn muốn xóa bài viết này không?</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                    Hành động này không thể hoàn tác. Bài viết sẽ bị xóa vĩnh viễn khỏi máy chủ của
+                                    chúng tôi.
+                                </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                                <AlertDialogCancel>Hủy</AlertDialogCancel>
+                                <AlertDialogAction onClick={handleDeletePost}>Tiếp tục</AlertDialogAction>
+                            </AlertDialogFooter>
+                        </AlertDialogContent>
+                    </AlertDialog>
+                </>
+            )}
             <div className="flex items-center justify-between px-3 py-2">
                 <div className="flex items-center gap-2">
                     <Link href={`${config.routes.user}/@${post.user.nickname}`}>
