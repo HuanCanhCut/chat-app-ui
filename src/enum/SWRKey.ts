@@ -75,6 +75,7 @@ enum SWRKey {
      */
 
     GET_POSTS = '/posts',
+    GET_USER_POSTS = '/posts/user/:userId',
 
     /**
      * COMMENT

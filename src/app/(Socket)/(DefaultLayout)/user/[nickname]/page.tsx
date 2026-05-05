@@ -4,12 +4,14 @@ import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import useSWR from 'swr'
 
+import PostList from '../../(home)/components/PostList'
 import UserAvatar from '~/components/UserAvatar'
 import config from '~/config'
 import SWRKey from '~/enum/SWRKey'
 import { selectCurrentUser } from '~/redux/selector'
 import { useAppSelector } from '~/redux/types'
 import * as friendService from '~/services/friendService'
+import * as postService from '~/services/postService'
 import * as userService from '~/services/userService'
 
 const ProfilePage = () => {
@@ -37,9 +39,13 @@ const ProfilePage = () => {
         },
     )
 
+    const { data: posts, mutate } = useSWR(user?.data.id ? [SWRKey.GET_USER_POSTS, user?.data.id] : null, () => {
+        return postService.getUserPosts({ limit: 10, userId: user?.data.id ?? 0 })
+    })
+
     return (
-        <div className="mt-4 grid grid-cols-12">
-            <div className="col-span-5">
+        <div className="mt-4 grid grid-cols-12 gap-3">
+            <div className="col-span-12 sm:col-span-5">
                 <div className="dark:bg-dark rounded-md bg-white p-3">
                     <div className="flex justify-between">
                         <div>
@@ -70,6 +76,7 @@ const ProfilePage = () => {
                     </div>
                 </div>
             </div>
+            <div className="col-span-12 sm:col-span-7">{posts && <PostList posts={posts} mutatePost={mutate} />}</div>
         </div>
     )
 }

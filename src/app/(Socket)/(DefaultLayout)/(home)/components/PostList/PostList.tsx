@@ -3,21 +3,22 @@
 import React from 'react'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { toast } from 'sonner'
-import useSWR from 'swr'
+import { KeyedMutator } from 'swr'
 
 import PostItem from '../../../../../../components/PostItem/PostItem'
 import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import SWRKey from '~/enum/SWRKey'
 import * as postService from '~/services/postService'
+import { GetPostResponse } from '~/type/post.type'
 
 const LIMIT = 10
 
-const PostList = () => {
-    const { data: posts, mutate } = useSWR(SWRKey.GET_POSTS, () => {
-        return postService.getPosts({ limit: LIMIT })
-    })
+interface PostListProps {
+    posts: GetPostResponse
+    mutatePost: KeyedMutator<GetPostResponse>
+}
 
+const PostList: React.FC<PostListProps> = ({ posts, mutatePost }) => {
     return (
         <div>
             {posts?.data && (
@@ -41,7 +42,7 @@ const PostList = () => {
                                 },
                             }
 
-                            mutate(newData, false)
+                            mutatePost(newData, false)
                         } catch (error) {
                             toast.error('Lỗi khi tải thêm tin')
                         }

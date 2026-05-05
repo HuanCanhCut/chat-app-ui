@@ -228,9 +228,6 @@ const PostAction = ({ post, isModal = false }: PostActionProps) => {
                 >
                     <MessageCircle size={18} /> <span className="ml-2 select-none">Bình luận</span>
                 </button>
-                <button className="flex-center text-muted-foreground flex-1 rounded-sm py-1 font-medium hover:bg-gray-100 dark:hover:bg-zinc-500/20">
-                    <Send size={18} /> <span className="ml-2 select-none">Chia sẻ</span>
-                </button>
             </div>
         </>
     )

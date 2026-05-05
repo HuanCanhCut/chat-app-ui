@@ -1,10 +1,22 @@
+'use client'
+
+import useSWR from 'swr'
+
 import Conversation from './components/Conversation'
 import LeftSidebar from './components/LeftSidebar'
 import PostList from './components/PostList'
 import StoryList from './components/StoryList'
 import UploadPost from './components/UploadPost'
+import SWRKey from '~/enum/SWRKey'
+import * as postService from '~/services/postService'
+
+const LIMIT = 10
 
 export default function Home() {
+    const { data: posts, mutate } = useSWR(SWRKey.GET_POSTS, () => {
+        return postService.getPosts({ limit: LIMIT })
+    })
+
     return (
         <div className="bg-light-gray dark:bg-dark flex min-h-[calc(100dvh-var(--header-height-mobile))] gap-4 px-2 md:min-h-[calc(100dvh-var(--header-height))]">
             {/* Left sidebar */}
@@ -17,7 +29,7 @@ export default function Home() {
                 <div className="mx-auto flex max-w-175 flex-col gap-3">
                     <UploadPost />
                     <StoryList />
-                    <PostList />
+                    {posts && <PostList posts={posts} mutatePost={mutate} />}
                 </div>
             </div>
 

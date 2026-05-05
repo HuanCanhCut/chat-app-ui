@@ -28,6 +28,24 @@ export const getPosts = async ({ limit, cursor }: { limit: number; cursor?: stri
     return response.data
 }
 
+export const getUserPosts = async ({
+    limit,
+    cursor,
+    userId,
+}: {
+    userId: number
+    limit: number
+    cursor?: string
+}): Promise<GetPostResponse> => {
+    const response = await request.get(`users/${userId}/posts`, {
+        params: {
+            limit,
+            cursor,
+        },
+    })
+    return response.data
+}
+
 export const getPostById = async ({
     postId,
 }: {
