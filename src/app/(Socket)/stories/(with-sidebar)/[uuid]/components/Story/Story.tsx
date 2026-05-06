@@ -27,7 +27,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import UserAvatar from '~/components/UserAvatar'
 import config from '~/config'
 import SWRKey from '~/enum/SWRKey'
-import { listenEvent, sendEvent } from '~/helpers/events'
+import { listenEvent } from '~/helpers/events'
 import handleApiError from '~/helpers/handleApiError'
 import { selectCurrentUser } from '~/redux/selector'
 import { useAppSelector } from '~/redux/types'
@@ -493,7 +493,10 @@ const Story: React.FC<StoryProps> = ({ uuid }) => {
                                             <>
                                                 <DropdownMenu onOpenChange={(isOpen) => setIsShowStoryAction(isOpen)}>
                                                     <DropdownMenuTrigger asChild>
-                                                        <button className="flex items-start bg-transparent p-0 outline-none dark:bg-transparent">
+                                                        <button
+                                                            className="flex items-start bg-transparent p-0 outline-none dark:bg-transparent"
+                                                            onClick={(e) => e.stopPropagation()}
+                                                        >
                                                             <Ellipsis />
                                                         </button>
                                                     </DropdownMenuTrigger>
@@ -502,6 +505,7 @@ const Story: React.FC<StoryProps> = ({ uuid }) => {
                                                             onClick={() => {
                                                                 setIsShowDeleteDialog(true)
                                                             }}
+                                                            variant="destructive"
                                                         >
                                                             Xóa story
                                                         </DropdownMenuItem>

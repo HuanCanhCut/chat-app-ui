@@ -98,6 +98,7 @@ const PostItem = ({ post, isModal = false }: PostItemProps) => {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent>
                             <DropdownMenuItem
+                                variant="destructive"
                                 onClick={() => {
                                     setIsShowConfirmModal(true)
                                 }}
