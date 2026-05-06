@@ -7,6 +7,7 @@ interface Routes {
     create_story: string
     not_found: string
     stories: string
+    user_friends_invite: string
 }
 
 export const routes: Routes = {
@@ -18,4 +19,5 @@ export const routes: Routes = {
     create_story: '/stories/create',
     not_found: '/not-found',
     stories: '/stories/:uuid',
+    user_friends_invite: '/user/:nickname/friends/invite',
 }

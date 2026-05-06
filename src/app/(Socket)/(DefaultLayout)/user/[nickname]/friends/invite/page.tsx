@@ -1,7 +1,13 @@
-import { useCallback, useEffect, useState } from 'react'
+'use client'
+
+import { useCallback } from 'react'
+import InfiniteScroll from 'react-infinite-scroll-component'
 import Link from 'next/link'
+import { toast } from 'sonner'
 import useSWR from 'swr'
 
+import { faSpinner } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Button from '~/components/Button'
 import UserAvatar from '~/components/UserAvatar'
 import config from '~/config'
@@ -12,76 +18,16 @@ import { FriendInvitationResponse, FriendsShip } from '~/type/type'
 
 const PER_PAGE = 15
 
-const FriendInvitationList = () => {
-    const [page, setPage] = useState(1)
-
+const InvitePage = () => {
     const { data: friendInvitation, mutate: mutateFriendInvitation } = useSWR<FriendInvitationResponse>(
         [SWRKey.GET_FRIEND_INVITATION],
         () => {
-            return friendService.getFriendInvitation({ page, per_page: PER_PAGE })
+            return friendService.getFriendInvitation({ page: 1, per_page: PER_PAGE })
         },
         {
             revalidateOnMount: true,
         },
     )
-
-    useEffect(() => {
-        let isLoading = false // Track if a page increment is in progress
-
-        const handleScroll = () => {
-            if (window.innerHeight + window.scrollY >= document.body.offsetHeight && !isLoading) {
-                isLoading = true // Set loading to true to prevent further increments
-                if (!friendInvitation) {
-                    return
-                }
-
-                setPage((prevPage) => {
-                    return prevPage >= friendInvitation.meta.pagination.total_pages ? prevPage : prevPage + 1
-                })
-
-                setTimeout(() => {
-                    isLoading = false // Reset loading after a short delay
-                }, 500) // Adjust the delay as needed
-            }
-        }
-
-        window.addEventListener('scroll', handleScroll)
-        return () => {
-            window.removeEventListener('scroll', handleScroll)
-        }
-    }, [friendInvitation])
-
-    useEffect(() => {
-        if (page <= 1) {
-            return
-        }
-
-        const getMoreFriends = async () => {
-            try {
-                const res = await friendService.getFriendInvitation({ page, per_page: PER_PAGE })
-
-                if (!friendInvitation?.data) {
-                    return
-                }
-
-                if (res) {
-                    const newData: FriendInvitationResponse = {
-                        ...res,
-                        data: [...friendInvitation.data, ...res.data],
-                    }
-
-                    mutateFriendInvitation(newData, {
-                        revalidate: false,
-                    })
-                }
-            } catch (error: any) {
-                handleApiError(error)
-            }
-        }
-
-        getMoreFriends()
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [page])
 
     const handleMutateFriendInvitation = useCallback(
         (invitation: FriendsShip, status: 'accepted' | 'rejected') => {
@@ -140,7 +86,51 @@ const FriendInvitationList = () => {
     )
 
     return (
-        <>
+        <InfiniteScroll
+            dataLength={friendInvitation?.data.length || 0}
+            next={async () => {
+                try {
+                    if (!friendInvitation?.data) {
+                        return
+                    }
+
+                    const res = await friendService.getFriendInvitation({
+                        page: (friendInvitation?.meta.pagination.current_page ?? 0) + 1,
+                        per_page: PER_PAGE,
+                    })
+
+                    if (!res) {
+                        return
+                    }
+
+                    const newData = {
+                        ...friendInvitation,
+                        data: [...friendInvitation.data, ...res.data],
+                        meta: {
+                            ...friendInvitation.meta,
+                            pagination: {
+                                ...res.meta.pagination,
+                            },
+                        },
+                    }
+
+                    mutateFriendInvitation(newData, false)
+                } catch (error) {
+                    toast.error('Lỗi khi tải thêm bạn')
+                }
+            }}
+            className="mt-4 grid grid-cols-1 gap-3 overflow-hidden! md:grid-cols-2"
+            hasMore={
+                (friendInvitation?.meta.pagination.current_page ?? 0) <
+                (friendInvitation?.meta.pagination.total_pages ?? 0)
+            }
+            scrollThreshold={0.8}
+            loader={
+                <div className="flex justify-center">
+                    <FontAwesomeIcon icon={faSpinner} className="animate-spin" />
+                </div>
+            }
+        >
             {friendInvitation?.data?.map((invitation: FriendsShip, index: number) => {
                 return (
                     <Link
@@ -150,7 +140,7 @@ const FriendInvitationList = () => {
                     >
                         <UserAvatar
                             src={invitation.user?.avatar}
-                            className="xxs::min-w-[70px] w-[60px] rounded-full"
+                            className="xxs::min-w-[70px] w-15 rounded-full"
                             size={70}
                         />
 
@@ -209,8 +199,8 @@ const FriendInvitationList = () => {
                     </Link>
                 )
             })}
-        </>
+        </InfiniteScroll>
     )
 }
 
-export default FriendInvitationList
+export default InvitePage
