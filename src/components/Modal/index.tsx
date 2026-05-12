@@ -2,7 +2,6 @@ import ReactModal from 'react-modal'
 
 import Button from '../Button'
 import PopperWrapper from '../PopperWrapper'
-import { ScrollArea } from '../ui/scroll-area'
 import { faXmark } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 

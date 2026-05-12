@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import ReactModal from 'react-modal'
-import { MessageCircle, Send, ThumbsUp } from 'lucide-react'
+import { MessageCircle, ThumbsUp } from 'lucide-react'
 import { mutate } from 'swr'
 
 import baseReactionIcon from '~/common/baseReactionIcon'

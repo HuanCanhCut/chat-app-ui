@@ -1,4 +1,4 @@
-import { LegacyRef } from 'react'
+import React, { LegacyRef } from 'react'
 
 import { sendEvent } from '~/helpers/events'
 import { selectCurrentUser } from '~/redux/selector'
@@ -41,7 +41,7 @@ const SystemMessage = ({
             name: string
         }
 
-        const jsx: (string | JSX.Element)[] = []
+        const jsx: (string | React.JSX.Element)[] = []
 
         const regex = /\{(.*?)\}/g
         let lastIndex = 0
